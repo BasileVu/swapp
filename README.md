@@ -6,17 +6,23 @@ Application web permettant d'échanger des objets avec d'autres personnes.
 
 ## Installation
 
-Pour commencer il faut lancer la commande 
+### Prérequis
+Python 3.5
 
+#### Clonage des fichiers du projet
 ```
-git clone https://github.com/Flagoul/HEIG_PDG_2016.git
+git clone git@github.com:Flagoul/HEIG_PDG_2016.git
 ```
 
-Ensuite on peut démarrer l'application web sur un serveur local.
-
+#### Installer les dépendances pour python
 ```
-cd HEIG_PDG_2016
+cd /repo/directory/
+pip install -r requirements.txt
+```
+
+### Démarrage du serveur
+```
 python manage.py runserver
 ```
+L'application est ensuite disponnible à l'adresse http://127.0.0.1:8000
 
-L'application sera disponible à l'adresse http://127.0.0.1:8000/
