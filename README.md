@@ -14,7 +14,7 @@ Python 3.5
 ### Installation steps
 Begin by cloning the repo:
 ```
-git clone git@github.com:Flagoul/HEIG_PDG_2016.git
+git clone git@github.com:Flagoul/swapp.git
 ```
 Optional: create a virtualenv: 
 ```
