@@ -1,34 +1,34 @@
-# HEIG_PDG_2016
+# Swapp
 
 ## Description
 
-Application web permettant d'échanger des objets avec d'autres personnes.
+Project developped at HEIG-VD in the PDG course by a team of 5 people. 
+
+It consists in a web app on which an user can trade objects with other people.
 
 ## Installation
 
-### Prérequis
+### Prerequisites
 Python 3.5
 
-#### Clonage des fichiers du projet
+### Installation steps
+Begin by cloning the repo:
 ```
 git clone git@github.com:Flagoul/HEIG_PDG_2016.git
 ```
-
-#### Mettre en place un virtualenv
+Optional: create a virtualenv: 
 ```
 cd /HEIG_PDG_2016/
 virtualenv env
 source ./env/Scripts/activate
 ```
-
-#### Installer les dépendances pour python
+Install dependencies:
 ```
 pip install -r requirements.txt
 ```
 
-### Démarrage du serveur
+Finally, start the server:
 ```
 python manage.py runserver
 ```
-L'application est ensuite disponnible à l'adresse http://127.0.0.1:8000
-
+The app should be running at http://127.0.0.1:8000.
