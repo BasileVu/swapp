@@ -22,11 +22,13 @@ Optional: create a virtualenv:
 > virtualenv env
 > source ./env/Scripts/activate
 ```
-Install backend dependencies :
+#### Install backend dependencies :
 ```
 > pip install -r requirements.txt
 ```
-Install frontend dependencies :
+#### Install frontend dependencies :
+install sass :
+http://sass-lang.com/install
 ```
 > npm install
 > grunt
