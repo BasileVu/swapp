@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from django.contrib.staticfiles.finders import AppDirectoriesFinder
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -39,12 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'comments',
-    'homepage',
+    'pages.home',
     'items',
     'notifications',
     'offers',
     'private_messages',
     'users',
+    'menus.header_menu',
 ]
 
 MIDDLEWARE = [
@@ -125,4 +128,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
+# default app public directory
+AppDirectoriesFinder.source_dir = 'static/public'
+
+# other public directories
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static/public"),
+]
+
+# where to collect static files
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/public/")
+
+# public urls prefix
 STATIC_URL = '/static/'

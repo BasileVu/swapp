@@ -14,21 +14,31 @@ Python 3.5
 ### Installation steps
 Begin by cloning the repo:
 ```
-git clone git@github.com:Flagoul/swapp.git
+> git clone git@github.com:Flagoul/swapp.git
 ```
 Optional: create a virtualenv: 
 ```
-cd /HEIG_PDG_2016/
-virtualenv env
-source ./env/Scripts/activate
+> cd /HEIG_PDG_2016/
+> virtualenv env
+> source ./env/Scripts/activate
 ```
-Install dependencies:
+Install backend dependencies :
 ```
-pip install -r requirements.txt
+> pip install -r requirements.txt
+```
+Install frontend dependencies :
+```
+> npm install
+> grunt
 ```
 
 Finally, start the server:
 ```
-python manage.py runserver
+> python manage.py runserver
 ```
 The app should be running at http://127.0.0.1:8000.
+
+Optionally, you can set the server to watch your development changes using :
+```
+> grunt watch
+```
