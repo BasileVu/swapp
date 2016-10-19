@@ -296,3 +296,4 @@ tests/report/
 *.sqlite
 *.sqlite2
 *.sqlite3
+.sass-cache/
