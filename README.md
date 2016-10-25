@@ -29,6 +29,23 @@ Optional: create a virtualenv:
 #### Install frontend dependencies :
 install sass :
 http://sass-lang.com/install
+
+To install sass you must first download the ruby installer from http://rubyinstaller.org/
+
+Then you must run this command and accept the certificate (on windows).
+
+```
+gem source -a http://rubygems.org/
+```
+
+Then install sass with 
+
+```
+gem install sass
+```
+
+Finally you can install the dependencies in the project with :
+
 ```
 > npm install
 > grunt
