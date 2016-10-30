@@ -1,18 +1,20 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
-class User(models.Model):
-    username = models.CharField(max_length=30)
-    password = models.CharField(max_length=100)
-    email = models.CharField(max_length=150)
+class UserProfile(models.Model):
+    """Defines additional non-authentication- related information about the user."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     account_active = models.BooleanField()
     creation_date = models.DateTimeField('date published')
 
     def __str__(self):
         return self.username
 
+
 class Note(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    """Defines the note that can be attributed to an user after a proposition was made."""
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
     note = models.IntegerField(default=0)
 
