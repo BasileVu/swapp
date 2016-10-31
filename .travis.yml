@@ -5,7 +5,7 @@ python:
   
 install: 
   - "pip install -r requirements.txt"
-  - "apt-get install sass"
+  - "gem install sass"
   - "npm install"
 
 script: 
