@@ -5,6 +5,7 @@ python:
   
 before_install:
   - rvm use 2.3.0 --install
+  - nvm install 6.0.0
 
 install: 
   - "pip install -r requirements.txt"
