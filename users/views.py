@@ -55,5 +55,4 @@ def logout_view(request):
 
 @login_required(login_url="users:login", redirect_field_name="")
 def account_view(request):
-    print(request.user.userprofile.account_active)
     return render(request, "users/account.html", {"username": request.user.username})
