@@ -1,9 +1,18 @@
 language: python
+
 python:
   - "3.5"
-install: "pip install -r requirements.txt"
-script: python manage.py migrate &&
-        python manage.py test
+  
+install: 
+  - "pip install -r requirements.txt"
+  - "apt-get install sass"
+  - "npm install"
+
+script: 
+  - "python manage.py migrate"
+  - "python manage.py test"
+  - "grunt"
+
 branches:
   only:
     - master
