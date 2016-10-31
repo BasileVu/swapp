@@ -3,6 +3,9 @@ language: python
 python:
   - "3.5"
   
+before_install:
+  - rvm use 2.3.0 --install
+
 install: 
   - "pip install -r requirements.txt"
   - "gem install sass"
