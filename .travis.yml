@@ -7,4 +7,3 @@ script: python manage.py migrate &&
 branches:
   only:
     - master
-    - user-account-creation
