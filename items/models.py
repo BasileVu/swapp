@@ -35,7 +35,7 @@ class Category(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
     def __str__(self):
