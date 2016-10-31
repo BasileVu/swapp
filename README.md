@@ -1,5 +1,7 @@
 # Swapp
 
+[![Build Status](https://travis-ci.com/Flagoul/swapp.svg?token=EpMgztqGsgqLdu8HDosP&branch=master)](https://travis-ci.com/Flagoul/swapp)
+
 ## Description
 
 Project developped at HEIG-VD in the PDG course by a team of 5 people. 
