@@ -1,0 +1,16 @@
+// Header menu
+#header-navbar {
+  position: relative;
+}
+#header-logo {
+  position: absolute;
+  left: 50%;
+  width: $logo-width;
+  text-align: center;
+  margin-left: -($logo-width/2);
+  margin-top: 6px;
+  color: white;
+}
+#main-content {
+  margin-top: 100px;
+}
