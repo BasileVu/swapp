@@ -1,5 +1,4 @@
 import json
-
 from django.test import Client, TestCase
 
 from items.models import Category

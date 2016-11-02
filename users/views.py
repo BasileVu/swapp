@@ -71,7 +71,6 @@ def logout_view(request):
 def account_view(request):
     return render(request, "users/account.html", {"username": request.user.username})
 
-
 @require_GET
 @login_required()
 def get_personal_account_info(request):
