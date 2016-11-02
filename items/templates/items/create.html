@@ -33,8 +33,8 @@
                        name="price_max" maxlength="{{ price_max_max_length }}" required>
             </div>
             <div class="form-group">
-                <label for="categories">Category</label>
-                <select id="categories" name="categories" class="form-control">
+                <label for="category">Category</label>
+                <select id="category" name="category" class="form-control">
                     {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.name }}</option>
                     {% endfor %}
