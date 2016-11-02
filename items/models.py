@@ -6,22 +6,21 @@ class Item(models.Model):
     description = models.CharField(max_length=2000)
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
-    creation_date = models.DateTimeField('date published')
+    creation_date = models.DateTimeField("date published")
     archived = models.BooleanField()
 
+    owner = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
+
     def __str__(self):
         return self.name
 
 
-class Media(models.Model):
+class Image(models.Model):
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-
-class Image(Media):
     path = models.CharField(max_length=200)
+
+    item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -35,8 +34,8 @@ class Category(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    user = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username

@@ -1,0 +1,54 @@
+{% load static %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Register</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "css/styles.css" %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Create item</h1>
+        <form action="{% url "items:create" %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Name</label>
+                <input id="name" class="form-control" type="text" placeholder="Name"
+                       name="name" maxlength="{{ name_max_length }}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input id="description" class="form-control" type="text" placeholder="Description"
+                       name="description" maxlength="{{ description_max_length }}" required>
+            </div>
+            <div class="form-group">
+                <label for="price_min">Minimum price</label>
+                <input id="price_min" class="form-control" type="text" placeholder="Minimum price"
+                       name="price_min" maxlength="{{ price_min_max_length }}" required>
+            </div>
+            <div class="form-group">
+                <label for="price_max">Maximum price</label>
+                <input id="price_max" class="form-control" type="text" placeholder="Maximum price"
+                       name="price_max" maxlength="{{ price_max_max_length }}" required>
+            </div>
+            <div class="form-group">
+                <label for="categories">Category</label>
+                <select id="categories" name="categories" class="form-control">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if error_message %}
+                <div class="alert alert-danger">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
