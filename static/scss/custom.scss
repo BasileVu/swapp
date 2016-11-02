@@ -11,6 +11,14 @@
   margin-top: 6px;
   color: white;
 }
-#main-content {
-  margin-top: 100px;
+#content-search {
+  background-color: brown;
+  height: $search-height;
+
+  > div {
+    padding-top: 75px;
+  }
+}
+#content-main {
+  margin-top: 30px;
 }

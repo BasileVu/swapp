@@ -23,6 +23,11 @@ module.exports = function(grunt) {
                         src: ['node_modules/bootstrap/dist/js/bootstrap.js'],
                         dest: 'static/public/js/',
                         flatten: true
+                    }, {
+                        expand: true,
+                        src: ['node_modules/isotope-layout/dist/isotope.pkgd.js'],
+                        dest: 'static/public/js/',
+                        flatten: true
                     }
                 ]
             }
