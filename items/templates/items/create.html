@@ -8,19 +8,8 @@
     <link href="{% static "css/styles.css" %}" rel="stylesheet">
 </head>
 <body>
-
-name = models.CharField(max_length=30)
-    description = models.CharField(max_length=2000)
-    price_min = models.IntegerField(default=0)
-    price_max = models.IntegerField(default=0)
-    creation_date = models.DateTimeField("date published")
-    archived = models.BooleanField()
-
-    owner = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
-    category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
-
     <div class="container">
-        <h1>Register</h1>
+        <h1>Create item</h1>
         <form action="{% url "items:create" %}" method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -45,7 +34,7 @@ name = models.CharField(max_length=30)
             </div>
             <div class="form-group">
                 <label for="categories">Category</label>
-                <select id="categories" name="categories" class="selectpicker">
+                <select id="categories" name="categories" class="form-control">
                     {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.name }}</option>
                     {% endfor %}
