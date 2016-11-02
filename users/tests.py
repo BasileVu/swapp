@@ -1,4 +1,6 @@
-from django.test import TestCase
+import json
+
+from django.test import Client, TestCase
 
 from users.models import *
 
@@ -19,3 +21,81 @@ class UserProfileTests(TestCase):
         User.objects.create_user("username", "test@test.com", "password")
         User.objects.get(pk=1).delete()
         self.assertEqual(UserProfile.objects.count(), 0)
+
+
+class AccountAPITests(TestCase):
+    c = Client()
+
+    def post_user(self):
+        return self.c.post("/api/account/", data=json.dumps({
+            "username": "username",
+            "email": "test@test.com",
+            "password": "password"
+        }), content_type="application/json")
+
+    def test_user_creation(self):
+        r = self.post_user()
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r["Location"], "/api/users/1/")
+
+    def test_user_creation_conflict(self):
+        self.post_user()
+        r = self.post_user()
+        self.assertEqual(r.status_code, 409)
+
+    def test_incomplete_json(self):
+        r = self.c.post("/api/account/", data=json.dumps({
+            "username": "username"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_login_incorrect(self):
+        self.post_user()
+        r = self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "passwor"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 401)
+
+    def test_login_incomplete_json(self):
+        self.post_user()
+        r = self.c.post("/api/login/", data=json.dumps({
+            "username": "username"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_login_success(self):
+        self.post_user()
+        r = self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+
+    def test_personal_info_protected(self):
+        self.post_user()
+        r = self.c.get("/api/personal/")
+        self.assertEqual(r.status_code, 302)
+
+        r = self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+
+        r = self.c.get("/api/personal/")
+        self.assertEqual(r.status_code, 200)
+
+    def test_logout(self):
+        self.post_user()
+
+        r = self.c.get("/api/logout/")
+        self.assertEqual(r.status_code, 302)
+
+        self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+
+        r = self.c.get("/api/logout/")
+        self.assertEqual(r.status_code, 200)

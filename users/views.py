@@ -1,10 +1,16 @@
+import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.http import JsonResponse
+from django.views import View
+from django.views.decorators.http import require_POST, require_GET
 
 
 def register_view(request):
@@ -57,3 +63,54 @@ def logout_view(request):
 @login_required(login_url="users:login", redirect_field_name="")
 def account_view(request):
     return render(request, "users/account.html", {"username": request.user.username})
+
+
+@require_POST
+def create_account(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        username = data["username"]
+        password = data["password"]
+        email = data["email"]
+    except KeyError:
+        return JsonResponse({"error": "a value is incorrect"}, status=400)
+
+    try:
+        user = User.objects.create_user(username, email, password)
+    except IntegrityError:
+        return JsonResponse({"error": "user already exists"}, status=409)
+
+    response = HttpResponse()
+    response["Location"] = "/api/users/%d/" % user.id
+    response.status_code = 201
+    return response
+
+
+@require_GET
+@login_required()
+def get_personal_account_info(request):
+    return JsonResponse({"username": request.user.username})
+
+
+@require_POST
+def api_login(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        username = data["username"]
+        password = data["password"]
+    except KeyError:
+        return JsonResponse({"error": "a value is incorrect"}, status=400)
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return HttpResponse()
+    else:
+        return JsonResponse({"error": "invalid username/password combination"}, status=401)
+
+
+@require_GET
+@login_required()
+def api_logout(request):
+    logout(request)
+    return HttpResponse()
