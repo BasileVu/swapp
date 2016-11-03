@@ -9,10 +9,12 @@ class UserProfile(models.Model):
     """Defines additional non-authentication- related information about the user."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     account_active = models.BooleanField()
-    creation_date = models.DateTimeField('date published')
+    creation_date = models.DateTimeField("date published")
+
+    categories = models.ManyToManyField("items.Category")
 
     def __str__(self):
-        return self.user.username + "'s profile"
+        return self.user.username
 
 
 @receiver(post_save, sender=User)
@@ -24,7 +26,7 @@ def create_user_profile(sender, instance, signal, created, **kwargs):
 
 class Note(models.Model):
     """Defines the note that can be attributed to an user after a proposition was made."""
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
     note = models.IntegerField(default=0)
 

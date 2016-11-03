@@ -22,12 +22,13 @@ def register_view(request):
         })
 
     try:
-        User.objects.create_user(username, email, password)
+        user = User.objects.create_user(username, email, password)
     except IntegrityError:
         return render(request, "users/register.html", {
             "error_message": "User already exists."
         })
 
+    login(request, user)
     return HttpResponseRedirect(reverse("users:account"))
 
 
