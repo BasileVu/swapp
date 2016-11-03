@@ -19,7 +19,6 @@ def create_view(request):
         description = request.POST["description"]
         price_min = request.POST["price_min"]
         price_max = request.POST["price_max"]
-        creation_date = datetime.datetime.now().time()
         archived = 0
         category = request.POST["category"]
     except KeyError:
@@ -31,20 +30,21 @@ def create_view(request):
         })
 
     try:
-        category = Category.objects.get(id=category)
-        item = Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
-                                   creation_date=creation_date, archived=archived,
-                                   owner=UserProfile.objects.get(user=request.user))
+
+        item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
+                    archived=archived,
+                    category=Category.objects.get(id=category),
+                    owner=UserProfile.objects.get(user=request.user))
+        item.save();
     except IntegrityError:
         return render(request, "items/create.html", {
             'categories': Category.objects.all(),
             "error_message": "Item already exists."
         })
 
-    item(request)
-    return HttpResponseRedirect(reverse("items:item"))
+    return HttpResponseRedirect('/items/%s/' % item.id)
 
 
-def item_view(request):
-    return render(request, "item/item.html", {"item": ""})
+def item_view(request, item_id):
+    return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
 

@@ -4,6 +4,6 @@ from . import views
 
 app_name = "items"
 urlpatterns = [
-    url(r"^item/create/$", views.create_view, name="create"),
-    url(r"^item/$", views.item_view, name="item"),
+    url(r"^create/$", views.create_view, name="create"),
+    url(r"^(?P<item_id>\d+)/$", views.item_view, name="item"),
 ]
