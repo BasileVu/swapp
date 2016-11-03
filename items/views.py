@@ -35,7 +35,7 @@ def create_view(request):
                     archived=archived,
                     category=Category.objects.get(id=category),
                     owner=UserProfile.objects.get(user=request.user))
-        item.save();
+        item.save()
     except IntegrityError:
         return render(request, "items/create.html", {
             'categories': Category.objects.all(),
