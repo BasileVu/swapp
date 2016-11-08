@@ -10,5 +10,4 @@ urlpatterns = [
     url(r"^api/items/(?P<item_id>\d+)/$", views.get_item, name="get_item"),
     url(r"^api/items/(?P<item_id>\d+)/archive$", views.archive_item, name="archive_item"),
     url(r"^api/items/(?P<item_id>\d+)/unarchive$", views.unarchive_item, name="unarchive_item"),
-
 ]
