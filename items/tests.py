@@ -26,7 +26,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 1)
         Category.objects.create(name="Test")
         self.assertEqual(Category.objects.count(), 1)
-        return self.c.post("/api/items/create", data=json.dumps({
+        r = self.c.post("/api/items/create", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 1,
@@ -34,13 +34,14 @@ class ItemAPITests(TestCase):
             "owner": UserProfile.objects.get(id=1),
             "category": Category.objects.get(id=1)
         }), content_type="application/json")
+        self.assertEqual(r.status_code, 201)
 
     def post_item_should_not_work_if_price_min_is_bigger_than_price_max(self):
         User.objects.create_user("username", "test@test.com", "password")
         self.assertEqual(UserProfile.objects.count(), 1)
         Category.objects.create(name="Test")
         self.assertEqual(Category.objects.count(), 1)
-        return self.c.post("/api/items/create", data=json.dumps({
+        r = self.c.post("/api/items/create", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 2,
@@ -48,13 +49,14 @@ class ItemAPITests(TestCase):
             "owner": UserProfile.objects.get(id=1),
             "category": Category.objects.get(id=1)
         }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
 
     def archive_item(self):
         User.objects.create_user("username", "test@test.com", "password")
         self.assertEqual(UserProfile.objects.count(), 1)
         Category.objects.create(name="Test")
         self.assertEqual(Category.objects.count(), 1)
-        self.c.post("/api/items/create", data=json.dumps({
+        r = self.c.post("/api/items/create", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 1,
@@ -62,7 +64,9 @@ class ItemAPITests(TestCase):
             "owner": UserProfile.objects.get(id=1),
             "category": Category.objects.get(id=1)
         }), content_type="application/json")
-        return self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, 201)
+        r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
 
     def unarchive_item(self):
         User.objects.create_user("username", "test@test.com", "password")
@@ -77,4 +81,6 @@ class ItemAPITests(TestCase):
             "owner": UserProfile.objects.get(id=1),
             "category": Category.objects.get(id=1)
         }), content_type="application/json")
-        return self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, 201)
+        r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
