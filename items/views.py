@@ -9,11 +9,7 @@ import datetime
 
 # Create your views here.
 from django.urls import reverse
-<<<<<<< HEAD
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
-=======
-from django.views.decorators.http import require_http_methods
->>>>>>> 27febc3... Add the REST API urls for archiving and unarchiving items
 
 from items.models import Category, Item
 from users.models import UserProfile
@@ -55,8 +51,6 @@ def create_view(request):
 def item_view(request, item_id):
     return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
 
-
-<<<<<<< HEAD
 @require_POST
 @login_required(login_url="users:login", redirect_field_name="")
 def create_item(request):
@@ -91,9 +85,6 @@ def create_item(request):
 def get_item(request, item_id):
     return JsonResponse(Item.objects.get(id=item_id), status=200)
 
-
-=======
->>>>>>> 27febc3... Add the REST API urls for archiving and unarchiving items
 @require_http_methods(["PATCH"])
 @login_required(login_url="users:login", redirect_field_name="")
 def archive_item(request, item_id):
@@ -103,13 +94,8 @@ def archive_item(request, item_id):
         return JsonResponse({"error": "User not logged in or item not found"}, status=409)
 
     response = HttpResponse()
-<<<<<<< HEAD
     response["Location"] = "/api/items/%d/" % int(item_id)
     response.status_code = 200
-=======
-    response["Location"] = "/api/item/%d/" % int(item_id)
-    response.status_code = 201
->>>>>>> 27febc3... Add the REST API urls for archiving and unarchiving items
     return response
 
 
@@ -122,11 +108,7 @@ def unarchive_item(request, item_id):
         return JsonResponse({"error": "User not logged in or item not found"}, status=409)
 
     response = HttpResponse()
-<<<<<<< HEAD
     response["Location"] = "/api/items/%d/" % int(item_id)
     response.status_code = 200
-=======
-    response["Location"] = "/api/item/%d/" % int(item_id)
-    response.status_code = 201
->>>>>>> 27febc3... Add the REST API urls for archiving and unarchiving items
+
     return response
