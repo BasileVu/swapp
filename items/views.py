@@ -1,12 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
 import datetime
 
 # Create your views here.
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 from items.models import Category, Item
 from users.models import UserProfile
@@ -17,8 +20,8 @@ def create_view(request):
     try:
         name = request.POST["name"]
         description = request.POST["description"]
-        price_min = request.POST["price_min"]
-        price_max = request.POST["price_max"]
+        price_min = int(request.POST["price_min"])
+        price_max = int(request.POST["price_max"])
         archived = 0
         category = request.POST["category"]
     except KeyError:
@@ -48,3 +51,30 @@ def create_view(request):
 def item_view(request, item_id):
     return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
 
+
+@require_http_methods(["PATCH"])
+@login_required(login_url="users:login", redirect_field_name="")
+def archive_item(request, item_id):
+    try:
+        Item.objects.filter(id=item_id, owner=UserProfile.objects.get(user=request.user).id).update(archived=1)
+    except IntegrityError:
+        return JsonResponse({"error": "User not logged in or item not found"}, status=409)
+
+    response = HttpResponse()
+    response["Location"] = "/api/item/%d/" % int(item_id)
+    response.status_code = 201
+    return response
+
+
+@require_http_methods(["PATCH"])
+@login_required(login_url="users:login", redirect_field_name="")
+def unarchive_item(request, item_id):
+    try:
+        Item.objects.filter(id=item_id, owner=UserProfile.objects.get(user=request.user).id).update(archived=0)
+    except IntegrityError:
+        return JsonResponse({"error": "User not logged in or item not found"}, status=409)
+
+    response = HttpResponse()
+    response["Location"] = "/api/item/%d/" % int(item_id)
+    response.status_code = 201
+    return response
