@@ -82,6 +82,7 @@ def create_item(request):
 def get_item(request, item_id):
     return JsonResponse(Item.objects.get(id=item_id), status=200)
 
+
 @require_http_methods(["PATCH"])
 @login_required(login_url="users:login", redirect_field_name="")
 def archive_item(request, item_id):
