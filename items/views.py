@@ -31,9 +31,7 @@ def create_view(request):
             'categories': Category.objects.all(),
             "error_message": "Price min is higher than price max."
         })
-
     try:
-
         item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
                     archived=archived,
                     category=Category.objects.get(id=category),
@@ -44,7 +42,6 @@ def create_view(request):
             'categories': Category.objects.all(),
             "error_message": "Item already exists."
         })
-
     return HttpResponseRedirect('/items/%s/' % item.id)
 
 

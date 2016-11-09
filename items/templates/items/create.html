@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <h1>Create item</h1>
-        <form action="{% url "items:create" %}" method="post">
+        <form action="{% url "items:create_view" %}" method="post">
             {% csrf_token %}
             <div class="form-group">
                 <label for="username">Name</label>
