@@ -1,7 +1,7 @@
 <div id="content-search">
     <div class="container">
         <form class="row">
-            <div class="col-md-12">
+            <div class="col-md-10 col-sm-11">
                 <div class="input-group">
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -16,7 +16,8 @@
                     </div>
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Toutes catégories
+                            <span class="hidden-sm-down">Toutes catégories</span>
+                            <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">Animaux &amp; Accessoires</a>
@@ -59,10 +60,13 @@
                     <span class="input-group-btn">
                         <button class="btn btn-secondary" type="button"><i class="fa fa-search"></i></button>
                     </span>
-                    <span class="input-group-addon">
-                        Avancée
-                    </span>
                 </div>
+            </div>
+            <div class="col-md-2 col-sm-1 advanced">
+                <a href="#">
+                    <span class="hidden-sm-down">Advanced</span>
+                    <span class="hidden-md-up"><i class="fa fa-cog"></i></span>
+                </a>
             </div>
         </form>
     </div>

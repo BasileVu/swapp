@@ -12,6 +12,22 @@ body {
   background-color: white !important;
   border-bottom: 3px solid $brand-primary-lighten;
 }
+#responsive-menu {
+  position: relative;
+}
+#responsive-menu-toggle {
+  position: absolute;
+  top: -2px;
+  right: 0;
+}
+#navbarResponsive {
+  text-align: center;
+}
+#responsive-header-logo {
+  display: block;
+  text-align: center;
+  padding: 5px 0;
+}
 #header-logo {
   position: absolute;
   left: 50%;
@@ -34,6 +50,10 @@ body {
       background-color: white;
       padding: ($grid-gutter-width + 3px) $grid-gutter-width;
       border: 1px solid $brand-secondary;
+    }
+    .advanced {
+      text-align: center;
+      margin-top: 5px;
     }
   }
 }
