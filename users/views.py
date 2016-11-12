@@ -9,8 +9,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
-from django.views import View
 from django.views.decorators.http import require_POST, require_GET
+from rest_framework import generics
+
+from users.models import UserProfile
+from users.permissions import IsOwner
+from users.serializers import UserProfileSerializer, UserSerializer
 
 
 def register_view(request):
@@ -114,3 +118,14 @@ def api_login(request):
 def api_logout(request):
     logout(request)
     return HttpResponse()
+
+
+class UserCreate(generics.CreateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsOwner,)
