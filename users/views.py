@@ -6,13 +6,13 @@ from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
-from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
+from rest_framework.response import Response
 
 from users.models import UserProfile
 from users.permissions import IsOwner
@@ -79,16 +79,16 @@ def create_account(request):
         password = data["password"]
         email = data["email"]
     except KeyError:
-        return JsonResponse({"error": "a value is incorrect"}, status=400)
+        return JsonResponse({"error": "a value is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user = User.objects.create_user(username, email, password)
     except IntegrityError:
-        return JsonResponse({"error": "user already exists"}, status=409)
+        return JsonResponse({"error": "user already exists"}, status=status.HTTP_409_CONFLICT)
 
     response = HttpResponse()
     response["Location"] = "/api/users/%d/" % user.id
-    response.status_code = 201
+    response.status_code = status.HTTP_201_CREATED
     return response
 
 
@@ -122,6 +122,7 @@ def api_logout(request):
     return HttpResponse()
 
 
+# FIXME
 class UserCreate(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -132,7 +133,7 @@ class UserCreate(generics.CreateAPIView):
 
         user = User.objects.create_user(**request.data)
         response = Response(status=status.HTTP_201_CREATED)
-        response['Location'] = "/api/users/%d" % user.id
+        response['Location'] = "/api/users/%d/" % user.id
         return response
 
 

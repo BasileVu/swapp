@@ -10,8 +10,7 @@ urlpatterns = [
     url(r"^account/$", views.account_view, name="account"),
     url(r"^api/login/$", views.api_login, name="api_login"),
     url(r"^api/logout/$", views.api_logout, name="api_logout"),
-    url(r"^api/account/$", views.create_account, name="api_account_creation"),
     url(r"^api/personal/$", views.get_personal_account_info, name="api_personal_info"),
-    url(r"^api/users/$", views.UserCreate.as_view(), name="users"),
+    url(r"^api/users/$", views.create_account, name="users"),
     url(r"^api/users/(?P<pk>[0-9]+)/$", views.UserDetail.as_view(), name="user-detail"),
 ]
