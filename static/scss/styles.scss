@@ -24,7 +24,7 @@
 @import "../../node_modules/bootstrap/scss/buttons";
 
 // Components
-//@import "../../node_modules/bootstrap/scss/animation";
+@import "../../node_modules/bootstrap/scss/animation";
 @import "../../node_modules/bootstrap/scss/dropdown";
 @import "../../node_modules/bootstrap/scss/button-group";
 @import "../../node_modules/bootstrap/scss/input-group";
@@ -41,10 +41,10 @@
 //@import "../../node_modules/bootstrap/scss/media";
 //@import "../../node_modules/bootstrap/scss/list-group";
 //@import "../../node_modules/bootstrap/scss/responsive-embed";
-//@import "../../node_modules/bootstrap/scss/close";
+@import "../../node_modules/bootstrap/scss/close";
 
 // Components w/ JavaScript
-//@import "../../node_modules/bootstrap/scss/modal";
+@import "../../node_modules/bootstrap/scss/modal";
 //@import "../../node_modules/bootstrap/scss/tooltip";
 //@import "../../node_modules/bootstrap/scss/popover";
 //@import "../../node_modules/bootstrap/scss/carousel";

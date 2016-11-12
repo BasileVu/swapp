@@ -45,10 +45,17 @@
 $gray-dark:                 #373a3c !default;
 $gray:                      #55595c !default;
 $gray-light:                #818a91 !default;
-$gray-lighter:              #eceeef !default;
-$gray-lightest:             #f7f7f9 !default;
+$gray-lighter: #cacccd !default;
+$gray-lightest: #eeeef0 !default;
 
-$brand-primary: #eb6d64 !default;
+$brand-primary: #40b2cd !default;
+$brand-primary-darken: darken($brand-primary, 20) !default;
+$brand-primary-lighten: lighten($brand-primary, 20) !default;
+
+$brand-secondary: #eed5a9 !default;
+$brand-secondary-darken: darken($brand-secondary, 20) !default;
+$brand-secondary-lighten: lighten($brand-secondary, 20) !default;
+
 $brand-success:             #5cb85c !default;
 $brand-info:                #5bc0de !default;
 $brand-warning:             #f0ad4e !default;
@@ -151,7 +158,7 @@ $container-max-widths: (
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:      12 !default;
-$grid-gutter-width: 30px !default;
+$grid-gutter-width: 10px !default;
 
 
 // Typography
@@ -173,11 +180,11 @@ $font-size-xs:   .75rem !default;
 
 $line-height-base: 1.5 !default;
 
-$font-size-h1: 2.5rem !default;
-$font-size-h2: 2rem !default;
-$font-size-h3: 1.75rem !default;
-$font-size-h4: 1.5rem !default;
-$font-size-h5: 1.25rem !default;
+$font-size-h1: 1.8rem !default;
+$font-size-h2: 1.6rem !default;
+$font-size-h3: 1.4rem !default;
+$font-size-h4: 1.2rem !default;
+$font-size-h5: 1.1rem !default;
 $font-size-h6: 1rem !default;
 
 $display1-size: 6rem !default;
@@ -488,9 +495,9 @@ $navbar-dark-hover-color:           rgba(255,255,255,.75) !default;
 $navbar-dark-active-color:          rgba(255,255,255,1) !default;
 $navbar-dark-disabled-color:        rgba(255,255,255,.25) !default;
 
-$navbar-light-color:                rgba(0,0,0,.3) !default;
-$navbar-light-hover-color:          rgba(0,0,0,.6) !default;
-$navbar-light-active-color:         rgba(0,0,0,.8) !default;
+$navbar-light-color:                $brand-primary !default;
+$navbar-light-hover-color:          $brand-primary-lighten !default;
+$navbar-light-active-color:         $brand-primary-darken !default;
 $navbar-light-disabled-color:       rgba(0,0,0,.15) !default;
 
 
@@ -842,4 +849,4 @@ $fa-li-width:         (30em / 14) !default;
 
 // Custom variables
 $logo-width: 100px;
-$search-height: 200px
+$search-height: 140px

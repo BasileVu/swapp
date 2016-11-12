@@ -15,6 +15,11 @@ module.exports = function(grunt) {
                         flatten: true
                     }, {
                         expand: true,
+                        src: ['node_modules/imagesloaded/imagesloaded.pkgd.js'],
+                        dest: 'static/public/js/',
+                        flatten: true
+                    }, {
+                        expand: true,
                         src: ['node_modules/jquery/dist/jquery.js'],
                         dest: 'static/public/js/',
                         flatten: true
@@ -25,7 +30,7 @@ module.exports = function(grunt) {
                         flatten: true
                     }, {
                         expand: true,
-                        src: ['node_modules/isotope-layout/dist/isotope.pkgd.js'],
+                        src: ['node_modules/packery/dist/isotope.pkgd.js'],
                         dest: 'static/public/js/',
                         flatten: true
                     }
