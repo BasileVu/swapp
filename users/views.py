@@ -10,7 +10,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
+from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework import status
 
 from users.models import UserProfile
 from users.permissions import IsOwner
@@ -121,8 +123,17 @@ def api_logout(request):
 
 
 class UserCreate(generics.CreateAPIView):
-    queryset = UserProfile.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.create_user(**request.data)
+        response = Response(status=status.HTTP_201_CREATED)
+        response['Location'] = "/api/users/%d" % user.id
+        return response
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
