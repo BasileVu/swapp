@@ -13,10 +13,10 @@ from django.views.decorators.http import require_POST, require_GET
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 
-from users.models import UserProfile
-from users.permissions import IsOwner
-from users.serializers import UserProfileSerializer, UserSerializer
+from users.permissions import IsUserHimself, IsUserOfProfile
+from users.serializers import *
 
 
 def register_view(request):
@@ -138,6 +138,12 @@ class UserCreate(generics.CreateAPIView):
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsUserHimself,)
+
+
+class UserProfileDetail(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    permission_classes = (IsOwner,)
+    permission_classes = (IsUserOfProfile,)

@@ -16,3 +16,7 @@ script:
   - "python manage.py migrate"
   - "python manage.py test"
   - "grunt"
+  
+branches:
+  only:
+    - master

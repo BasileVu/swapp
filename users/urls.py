@@ -12,5 +12,5 @@ urlpatterns = [
     url(r"^api/logout/$", views.api_logout, name="api_logout"),
     url(r"^api/personal/$", views.get_personal_account_info, name="api_personal_info"),
     url(r"^api/users/$", views.create_account, name="users"),
-    url(r"^api/users/(?P<pk>[0-9]+)/$", views.UserDetail.as_view(), name="user-detail"),
+    url(r"^api/users/(?P<pk>[0-9]+)/profile/$", views.UserProfileDetail.as_view(), name="user-profile-detail"),
 ]
