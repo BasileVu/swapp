@@ -2,6 +2,7 @@ import json
 
 from django.test import Client, TestCase
 
+from items.models import Category
 from users.models import *
 
 
@@ -26,10 +27,16 @@ class UserProfileTests(TestCase):
 class AccountAPITests(TestCase):
     c = Client()
 
-    def post_user(self):
-        return self.c.post("/api/account/", data=json.dumps({
+    def post_user(self, username="username", email="test@test.com", password="password"):
+        return self.c.post("/api/users/", data=json.dumps({
+            "username": username,
+            "email": email,
+            "password": password
+        }), content_type="application/json")
+
+    def login(self):
+        return self.c.post("/api/login/", data=json.dumps({
             "username": "username",
-            "email": "test@test.com",
             "password": "password"
         }), content_type="application/json")
 
@@ -44,7 +51,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 409)
 
     def test_incomplete_json(self):
-        r = self.c.post("/api/account/", data=json.dumps({
+        r = self.c.post("/api/users/", data=json.dumps({
             "username": "username"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
@@ -66,24 +73,59 @@ class AccountAPITests(TestCase):
 
     def test_login_success(self):
         self.post_user()
-        r = self.c.post("/api/login/", data=json.dumps({
-            "username": "username",
-            "password": "password"
-        }), content_type="application/json")
+        r = self.login()
         self.assertEqual(r.status_code, 200)
 
-    def test_personal_info_protected(self):
+    def test_get_protected_user_info_not_logged_in(self):
+        url = self.post_user()["Location"]
+        r = self.c.get(url)
+        self.assertEqual(r.status_code, 403)
+
+    def test_get_protected_user_info_logged_in(self):
+        url = self.post_user()["Location"]
+        self.login()
+        # Create category and associated it with a userprofile
+        c = Category(name="test")
+        c.save()
+        u = User.objects.get(pk=1)
+        u.userprofile.categories.add(c)
+        r = self.c.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["username"], "username")
+        self.assertEqual(r.data["email"], "test@test.com")
+        self.assertListEqual(r.data["categories"], [1])
+        self.assertListEqual(r.data["items"], [])
+        self.assertListEqual(r.data["notes"], [])
+        self.assertListEqual(r.data["likes"], [])
+        self.assertEqual(r.data["account_active"], False)
+
+    def test_cannot_get_other_protected_info(self):
         self.post_user()
-        r = self.c.get("/api/personal/")
-        self.assertEqual(r.status_code, 302)
+        self.login()
 
-        r = self.c.post("/api/login/", data=json.dumps({
-            "username": "username",
-            "password": "password"
+        url = self.post_user("username2")["Location"]
+        r = self.c.get(url)
+        self.assertEqual(r.status_code, 403)
+
+    def test_get_email_not_logged_in(self):
+        url = self.post_user()["Location"] + "email/"
+        r = self.c.get(url)
+        self.assertEqual(r.status_code, 403)
+
+    def test_change_email_not_logged_in(self):
+        url = self.post_user()["Location"] + "email/"
+        r = self.c.put(url, data=json.dumps({
+            "email": "e@e.com"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 403)
 
-        r = self.c.get("/api/personal/")
+    def test_change_email_logged_in(self):
+        url = self.post_user()["Location"] + "email/"
+        self.login()
+        r = self.c.put(url, data=json.dumps({
+            "email": "e@e.com"
+        }), content_type="application/json")
         self.assertEqual(r.status_code, 200)
 
     def test_logout(self):
@@ -92,10 +134,7 @@ class AccountAPITests(TestCase):
         r = self.c.get("/api/logout/")
         self.assertEqual(r.status_code, 302)
 
-        self.c.post("/api/login/", data=json.dumps({
-            "username": "username",
-            "password": "password"
-        }), content_type="application/json")
+        self.login()
 
         r = self.c.get("/api/logout/")
         self.assertEqual(r.status_code, 200)
