@@ -57,6 +57,40 @@ body {
     }
   }
 }
+.inventory {
+  padding-bottom: 2*$grid-gutter-width;
+  margin-bottom: 4*$grid-gutter-width;
+  border-bottom: 1px solid $gray-lightest;
+
+  h3 {
+    display: block;
+    text-align: center;
+  }
+}
+#home-inventory {
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
+  ol {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+
+    li {
+      display: inline-block;
+      width: $grid-gutter-width;
+      height: $grid-gutter-width;
+      @include border-radius(100%);
+      background-color: $gray-lighter;
+      margin: 0 $grid-gutter-width;
+    }
+    .is-selected {
+      background-color: $brand-primary;
+    }
+  }
+}
 #content-main {
   padding-top: 30px;
 

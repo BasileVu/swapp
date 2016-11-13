@@ -5513,6 +5513,32 @@ body {
       text-align: center;
       margin-top: 5px; }
 
+.inventory {
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #eeeef0; }
+  .inventory h3 {
+    display: block;
+    text-align: center; }
+
+#home-inventory {
+  overflow: hidden; }
+  #home-inventory:focus {
+    outline: none; }
+  #home-inventory ol {
+    margin: 0;
+    padding: 0;
+    text-align: center; }
+    #home-inventory ol li {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 100%;
+      background-color: #cacccd;
+      margin: 0 10px; }
+    #home-inventory ol .is-selected {
+      background-color: #40b2cd; }
+
 #content-main {
   padding-top: 30px; }
   #content-main .grid-item .infos {
