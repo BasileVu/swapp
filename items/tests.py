@@ -34,34 +34,35 @@ class ItemAPITests(TestCase):
 
     def test_post_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
-            "name": "name",
+            "name": "test",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1).id,
-            "category": Category.objects.get(id=1).id
+            "category": 1
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
 
-    def test_post_item_should_not_work_if_price_min_is_bigger_than_price_max(self):
+    def test_post_item_should_return_400_if_price_min_is_bigger_than_price_max(self):
         r = self.c.post("/api/items/", data=json.dumps({
-            "name": "name",
+            "name": "test",
             "description": "test",
             "price_min": 2,
             "price_max": 1,
-            "owner": UserProfile.objects.get(id=1).id,
-            "category": Category.objects.get(id=1).id
+            "category": 1
         }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_post_item_should_return_400_if_json_data_is_invalid(self):
+        r = self.c.post("/api/items/", data=json.dumps({}), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
     def test_archive_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
-            "name": "name",
+            "name": "test",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1).id,
-            "category": Category.objects.get(id=1).name
+            "category": 1
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
         r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
@@ -69,12 +70,11 @@ class ItemAPITests(TestCase):
 
     def test_unarchive_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
-            "name": "name",
+            "name": "test",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1).id,
-            "category": Category.objects.get(id=1).id
+            "category": 1
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
         r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")

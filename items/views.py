@@ -1,14 +1,11 @@
+import json
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
-import datetime
-
-# Create your views here.
-from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
 from items.models import Category, Item
@@ -52,16 +49,17 @@ def item_view(request, item_id):
 @login_required(login_url="users:login", redirect_field_name="")
 def create_item(request):
     try:
-        name = request.POST["name"]
-        description = request.POST["description"]
-        price_min = int(request.POST["price_min"])
-        price_max = int(request.POST["price_max"])
+        received_json_data = json.loads(request.body.decode("utf-8"))
+        name = received_json_data["name"]
+        description = received_json_data["description"]
+        price_min = int(received_json_data["price_min"])
+        price_max = int(received_json_data["price_max"])
         archived = 0
-        category = request.POST["category"]
+        category = int(received_json_data["category"])
     except KeyError:
-        return render(request, "items/create.html", {'categories': Category.objects.all()})
+        return JsonResponse({"error": "Error in the JSON data"}, status=400)
     if price_min > price_max:
-        return JsonResponse({"error": "The minimum price is higher than the maximum price"}, status=400)
+        return JsonResponse({"error": "Error, the minimum price is higher than the maximum price"}, status=400)
 
     try:
         item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
