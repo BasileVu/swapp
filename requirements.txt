@@ -1,2 +1,2 @@
 Django==1.10.3
-djangorestframework
+djangorestframework==3.5.3
