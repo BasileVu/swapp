@@ -14,13 +14,13 @@ It consists in a web app on which an user can trade objects with other people.
 Python 3.5
 
 ### Installation steps
-Begin by cloning the repo:
+Begin by cloning the repo and go into it:
 ```
 > git clone git@github.com:Flagoul/swapp.git
+> cd swapp
 ```
 Optional: create a virtualenv: 
 ```
-> cd /HEIG_PDG_2016/
 > virtualenv env
 > source ./env/Scripts/activate
 ```
