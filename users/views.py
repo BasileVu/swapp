@@ -168,7 +168,7 @@ def user_account(request, pk):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-class UserName(generics.RetrieveUpdateAPIView):
+class UserName(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserNameSerializer
     permission_classes = (permissions.IsAuthenticated,
@@ -196,7 +196,7 @@ class UserEmail(generics.RetrieveUpdateAPIView):
                           IsUserHimself)
 
 
-class UserPassword(generics.RetrieveUpdateAPIView):
+class UserPassword(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserPasswordSerializer
     permission_classes = (permissions.IsAuthenticated,
