@@ -2890,11 +2890,11 @@ button.close {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  background-color: #000; }
+  background-color: #ddab54; }
   .modal-backdrop.fade {
     opacity: 0; }
   .modal-backdrop.in {
-    opacity: 0.5; }
+    opacity: 0.8; }
 
 .modal-header {
   padding: 15px;
@@ -2933,14 +2933,14 @@ button.close {
 
 @media (min-width: 544px) {
   .modal-dialog {
-    max-width: 600px;
+    max-width: 768px;
     margin: 30px auto; }
 
   .modal-sm {
-    max-width: 300px; } }
+    max-width: 544px; } }
 @media (min-width: 992px) {
   .modal-lg {
-    max-width: 900px; } }
+    max-width: 1200px; } }
 .bg-faded {
   background-color: #eeeef0; }
 
@@ -5464,6 +5464,47 @@ a.text-danger:focus, a.text-danger:hover {
 body {
   box-shadow: inset 0 200px 120px 0 #fcf8f1; }
 
+.btn-group-justified {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate; }
+  .btn-group-justified .btn,
+  .btn-group-justified .btn-group {
+    float: none;
+    display: table-cell;
+    width: 1%; }
+    .btn-group-justified .btn .btn,
+    .btn-group-justified .btn-group .btn {
+      width: 100%; }
+    .btn-group-justified .btn .dropdown-menu,
+    .btn-group-justified .btn-group .dropdown-menu {
+      left: auto; }
+
+.modal-dialog .content {
+  background-color: white; }
+  .modal-dialog .content .options .more {
+    margin-top: 10px; }
+  .modal-dialog .content .options .modal-panel {
+    border: 1px solid #eed5a9;
+    border-radius: 0.25rem;
+    margin-top: 20px; }
+    .modal-dialog .content .options .modal-panel .title {
+      border-bottom: 1px solid #eed5a9;
+      padding: 10px;
+      text-align: center; }
+      .modal-dialog .content .options .modal-panel .title h5, .modal-dialog .content .options .modal-panel .title h6 {
+        margin-bottom: 0; }
+      .modal-dialog .content .options .modal-panel .title h6 {
+        font-weight: 300; }
+    .modal-dialog .content .options .modal-panel .preview {
+      padding: 10px 10px 0; }
+      .modal-dialog .content .options .modal-panel .preview img {
+        margin-bottom: 10px;
+        border-radius: 0.25rem; }
+    .modal-dialog .content .options .modal-panel .see-more {
+      margin: 0 10px 10px; }
+
 .btn-reversed {
   background-color: transparent;
   border: 1px solid #40b2cd;
@@ -5513,9 +5554,9 @@ body {
       text-align: center;
       margin-top: 5px; }
 
-.inventory {
+.personal-inventory {
   margin-bottom: 40px; }
-  .inventory h3 {
+  .personal-inventory h3 {
     display: block;
     text-align: center;
     margin: 20px 0; }
