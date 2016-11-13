@@ -21,65 +21,60 @@ class ItemTests(TestCase):
 class ItemAPITests(TestCase):
     c = Client()
 
-    def post_item(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        self.assertEqual(UserProfile.objects.count(), 1)
+    def setUp(self):
+        User.objects.create_user(username="username", email="test@test.com", password="password")
         Category.objects.create(name="Test")
-        self.assertEqual(Category.objects.count(), 1)
-        r = self.c.post("/api/items/create", data=json.dumps({
+        self.login()
+
+    def login(self):
+        return self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+
+    def test_post_item(self):
+        r = self.c.post("/api/items/", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1),
-            "category": Category.objects.get(id=1)
+            "owner": UserProfile.objects.get(id=1).id,
+            "category": Category.objects.get(id=1).id
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
 
-    def post_item_should_not_work_if_price_min_is_bigger_than_price_max(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        self.assertEqual(UserProfile.objects.count(), 1)
-        Category.objects.create(name="Test")
-        self.assertEqual(Category.objects.count(), 1)
-        r = self.c.post("/api/items/create", data=json.dumps({
+    def test_post_item_should_not_work_if_price_min_is_bigger_than_price_max(self):
+        r = self.c.post("/api/items/", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 2,
             "price_max": 1,
-            "owner": UserProfile.objects.get(id=1),
-            "category": Category.objects.get(id=1)
+            "owner": UserProfile.objects.get(id=1).id,
+            "category": Category.objects.get(id=1).id
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
-    def archive_item(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        self.assertEqual(UserProfile.objects.count(), 1)
-        Category.objects.create(name="Test")
-        self.assertEqual(Category.objects.count(), 1)
-        r = self.c.post("/api/items/create", data=json.dumps({
+    def test_archive_item(self):
+        r = self.c.post("/api/items/", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1),
-            "category": Category.objects.get(id=1)
+            "owner": UserProfile.objects.get(id=1).id,
+            "category": Category.objects.get(id=1).name
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
         r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
         self.assertEqual(r.status_code, 200)
 
-    def unarchive_item(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        self.assertEqual(UserProfile.objects.count(), 1)
-        Category.objects.create(name="Test")
-        self.assertEqual(Category.objects.count(), 1)
-        self.c.post("/api/items/create", data=json.dumps({
+    def test_unarchive_item(self):
+        r = self.c.post("/api/items/", data=json.dumps({
             "name": "name",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "owner": UserProfile.objects.get(id=1),
-            "category": Category.objects.get(id=1)
+            "owner": UserProfile.objects.get(id=1).id,
+            "category": Category.objects.get(id=1).id
         }), content_type="application/json")
         self.assertEqual(r.status_code, 201)
         r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
