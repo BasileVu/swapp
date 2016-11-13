@@ -1,4 +1,4 @@
-import datetime
+from django.utils import timezone
 
 from django.db import models
 
@@ -8,7 +8,7 @@ class Item(models.Model):
     description = models.CharField(max_length=2000)
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
-    creation_date = models.DateTimeField("date published", default=datetime.datetime.now)
+    creation_date = models.DateTimeField("date published", default=timezone.now)
     archived = models.BooleanField()
 
     owner = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
