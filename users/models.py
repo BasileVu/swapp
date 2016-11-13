@@ -9,7 +9,11 @@ class UserProfile(models.Model):
     """Defines additional non-authentication- related information about the user."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     account_active = models.BooleanField()
-    creation_date = models.DateTimeField("date published")
+    # On ne peut pas plutôt utiliser directement le champ date_joined de l'User de Django ?
+    # Plutôt mettre alors une date de dernière modification des infos du compte non ?
+    # Par contre trouver un moyen de faire un trigger propre sur une modification.
+    # creation_date = models.DateTimeField("date published")
+    last_modification_date = models.DateTimeField("date last modification")
 
     categories = models.ManyToManyField("items.Category")
 
@@ -21,7 +25,8 @@ class UserProfile(models.Model):
 def create_user_profile(sender, instance, signal, created, **kwargs):
     """Handler to create user profile when an user is created"""
     if created:
-        UserProfile(user=instance, account_active=False, creation_date=timezone.now()).save()
+        # UserProfile(user=instance, account_active=False, creation_date=timezone.now()).save()
+        UserProfile(user=instance, account_active=False, last_modification_date=timezone.now()).save()
 
 
 class Note(models.Model):

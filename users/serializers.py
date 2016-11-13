@@ -2,33 +2,53 @@ from rest_framework import serializers
 from users.models import *
 
 
-class UserProfileActiveSerializer(serializers.ModelSerializer):
+class UserNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username',)
+
+
+class UserFirstNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name',)
+
+
+class UserLastNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('last_name',)
+
+
+class UserEMailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email',)
+
+
+class UserPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('password',)
+
+
+class UserProfileAccountActiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('account_active',)
 
 
+# A adapter
 class UserProfileCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('categories',)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ('categories', 'account_active', 'creation_date')
-
-
-class NoteSerializer(serializers.ModelSerializer):
+# A adapter
+"""class NoteSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
 
     class Meta:
         model = Note
-        fields = ('id', 'user_id', 'text', 'note')
+        fields = ('id', 'user_id', 'text', 'note')"""

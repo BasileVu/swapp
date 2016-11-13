@@ -41,7 +41,3 @@ class Like(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
-def get_items(id):
-    return Category.objects.get(pk=id).items
