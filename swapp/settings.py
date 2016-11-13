@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'notifications',
     'offers',
     'private_messages',
+    'search',
     'users',
     'menus.header_menu',
 ]

@@ -5,7 +5,9 @@
   "main": "index.html",
   "dependencies": {
     "bootstrap": "4.0.0-alpha.4",
-    "font-awesome": "4.6.3"
+    "font-awesome": "4.6.3",
+    "imagesloaded": "^4.1.1",
+    "isotope-layout": "^3.0.1"
   },
   "devDependencies": {
     "grunt": "1.0.1",
