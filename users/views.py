@@ -14,6 +14,9 @@ from django.views.decorators.http import require_POST, require_GET
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from users.permissions import IsUserHimself, IsOwner
 from users.serializers import *
@@ -116,29 +119,26 @@ def api_logout(request):
         return response"""
 
 
-class UsersAccounts(View):
+class UsersAccounts(APIView):
     def get(self, request):
         # A discuter si besoin ou non d'être connecté si on fait un get sur tous les user a la fois
         if not request.user.is_authenticated():
             return JsonResponse({"error": "you are not connected"}, status=status.HTTP_403_FORBIDDEN)
         # A compléter
 
-        return JsonResponse( status=status.HTTP_200_OK)
+        return JsonResponse({}, status=status.HTTP_200_OK)
 
     def post(self, request):
         try:
             data = json.loads(request.body.decode("utf-8"))
             username = data["username"]
-            first_name = data["first_name"]
-            last_name = data["last_name"]
             email = data["email"]
             password = data["password"]
         except KeyError:
             return JsonResponse({"error": "a value is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email,
-                                            password=password)
+            user = User.objects.create_user(username=username, email=email, password=password)
         except IntegrityError:
             return JsonResponse({"error": "user already exists"}, status=status.HTTP_409_CONFLICT)
 
@@ -148,44 +148,55 @@ class UsersAccounts(View):
         return response
 
 
-@require_GET
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
 def user_account(request, pk):
-    if not request.user.is_authenticated():
-        return JsonResponse({"error": "you are not connected"}, status=status.HTTP_403_FORBIDDEN)
-    # A compléter
+    pk = int(pk)
+    if request.user.id == pk:
+        user = User.objects.get(pk=pk)
+        user_profile = user.userprofile
 
-    return JsonResponse(status=status.HTTP_200_OK)
+        # TODO write serializer
+        return Response(status=status.HTTP_200_OK, data= {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "categories": [],  # TODO
+            "account_active": user_profile.account_active
+        })
+    else:
+        return JsonResponse({}, status=status.HTTP_403_FORBIDDEN)
 
 
-class UserNameUpdate(generics.UpdateAPIView):
+class UserName(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserNameSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsUserHimself,)
 
 
-class UserFirstNameUpdate(generics.UpdateAPIView):
+class UserFirstName(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserFirstNameSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsUserHimself,)
 
 
-class UserLastNameUpdate(generics.UpdateAPIView):
+class UserLastName(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserLastNameSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsUserHimself,)
 
 
-class UserEMailUpdate(generics.UpdateAPIView):
+class UserEmail(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserEMailSerializer
+    serializer_class = UserEmailSerializer
     permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself,)
+                          IsUserHimself)
 
 
-class UserPasswordUpdate(generics.UpdateAPIView):
+class UserPassword(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserPasswordSerializer
     permission_classes = (permissions.IsAuthenticated,
@@ -193,7 +204,7 @@ class UserPasswordUpdate(generics.UpdateAPIView):
 
 
 # Réfléchir à un meilleur moyen de faire l'activation d'un compte.
-class UserProfileAccountActiveUpdate(generics.UpdateAPIView):
+class UserProfileAccountActive(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfileAccountActiveSerializer
     permission_classes = (permissions.IsAuthenticated,

@@ -99,26 +99,25 @@ class AccountAPITests(TestCase):
         r = self.c.get(url)
         self.assertEqual(r.status_code, 403)
 
+    def test_get_email_not_logged_in(self):
+        url = self.post_user()["Location"] + "email/"
+        r = self.c.get(url)
+        self.assertEqual(r.status_code, 403)
+
     def test_change_email_not_logged_in(self):
-        url = self.post_user()["Location"]
-        r = self.c.patch(url, data=json.dumps({
+        url = self.post_user()["Location"] + "email/"
+        r = self.c.put(url, data=json.dumps({
             "email": "e@e.com"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 403)
 
     def test_change_email_logged_in(self):
-        url = self.post_user()["Location"]
+        url = self.post_user()["Location"] + "email/"
         self.login()
-        r = self.c.patch(url, data=json.dumps({
+        r = self.c.put(url, data=json.dumps({
             "email": "e@e.com"
         }), content_type="application/json")
-        print("email logged in", r.data)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["id"], 1)
-        self.assertEqual(r.data["username"], "username")
-        self.assertEqual(r.data["email"], "e@e.com")
-        self.assertListEqual(r.data["categories"], [])
-        self.assertEqual(r.data["account_active"], False)
 
     def test_logout(self):
         self.post_user()
@@ -130,12 +129,3 @@ class AccountAPITests(TestCase):
 
         r = self.c.get("/api/logout/")
         self.assertEqual(r.status_code, 200)
-
-    def test_usertest(self):
-        url = self.post_user()["Location"] + "test/"
-        self.login()
-        print(url)
-        r = self.c.patch(url, data=json.dumps({
-            "email": "e@e.com"
-        }), content_type="application/json")
-        print("test:", r.status_code, r.data)

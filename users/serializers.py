@@ -20,7 +20,7 @@ class UserLastNameSerializer(serializers.ModelSerializer):
         fields = ('last_name',)
 
 
-class UserEMailSerializer(serializers.ModelSerializer):
+class UserEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email',)

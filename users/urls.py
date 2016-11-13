@@ -15,10 +15,10 @@ urlpatterns = [
     # For debug only csrf exempt
     url(r"^api/users/$", csrf_exempt(views.UsersAccounts.as_view()), name="users"),
     url(r"^api/users/(?P<pk>[0-9]+)/$", views.user_account, name="user"),
-    url(r"^api/users/(?P<pk>[0-9]+)/username/$", views.UserNameUpdate, name="username"),
-    url(r"^api/users/(?P<pk>[0-9]+)/firstname/$", views.UserFirstNameUpdate, name="firstname"),
-    url(r"^api/users/(?P<pk>[0-9]+)/lastname/$", views.UserLastNameUpdate, name="lastname"),
-    url(r"^api/users/(?P<pk>[0-9]+)/email/$", views.UserEMailUpdate, name="email"),
-    url(r"^api/users/(?P<pk>[0-9]+)/password/$", views.UserPasswordUpdate, name="password"),
-    url(r"^api/users/(?P<pk>[0-9]+)/accountactive/$", views.UserProfileAccountActiveUpdate, name="accountactive"),
+    url(r"^api/users/(?P<pk>[0-9]+)/username/$", views.UserName.as_view(), name="username"),
+    url(r"^api/users/(?P<pk>[0-9]+)/firstname/$", views.UserFirstName.as_view(), name="firstname"),
+    url(r"^api/users/(?P<pk>[0-9]+)/lastname/$", views.UserLastName.as_view(), name="lastname"),
+    url(r"^api/users/(?P<pk>[0-9]+)/email/$", views.UserEmail.as_view(), name="email"),
+    url(r"^api/users/(?P<pk>[0-9]+)/password/$", views.UserPassword.as_view(), name="password"),
+    url(r"^api/users/(?P<pk>[0-9]+)/accountactive/$", views.UserProfileAccountActive.as_view(), name="accountactive"),
 ]
