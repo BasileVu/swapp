@@ -118,13 +118,14 @@ def api_logout(request):
 
 
 class UsersAccounts(APIView):
-    def get(self, request):
+    # TODO delete if not used
+    """def get(self, request):
         # A discuter si besoin ou non d'être connecté si on fait un get sur tous les user a la fois
         if not request.user.is_authenticated():
             return JsonResponse({"error": "you are not connected"}, status=status.HTTP_403_FORBIDDEN)
         # A compléter
 
-        return JsonResponse({}, status=status.HTTP_200_OK)
+        return JsonResponse({}, status=status.HTTP_200_OK)"""
 
     def post(self, request):
         try:
@@ -133,16 +134,15 @@ class UsersAccounts(APIView):
             email = data["email"]
             password = data["password"]
         except KeyError:
-            return JsonResponse({"error": "a value is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "a value is incorrect"})
 
         try:
             user = User.objects.create_user(username=username, email=email, password=password)
         except IntegrityError:
-            return JsonResponse({"error": "user already exists"}, status=status.HTTP_409_CONFLICT)
+            return Response(status=status.HTTP_409_CONFLICT)
 
-        response = HttpResponse()
+        response = Response(status=status.HTTP_201_CREATED)
         response["Location"] = "/api/users/%d/" % user.id
-        response.status_code = status.HTTP_201_CREATED
         return response
 
 
@@ -155,15 +155,18 @@ def user_account(request, pk):
         user_profile = user.userprofile
 
         # TODO write serializer
-        return Response(status=status.HTTP_200_OK, data= {
+        return Response(status=status.HTTP_200_OK, data={
             "id": user.id,
             "username": user.username,
             "email": user.email,
-            "categories": [],  # TODO
+            "categories": [c.id for c in user_profile.categories.all()],  # FIXME
+            "items": [i.id for i in user_profile.item_set.all()],  # FIXME
+            "notes": [n.id for n in user_profile.note_set.all()],  # FIXME
+            "likes": [l.id for l in user_profile.like_set.all()],  # FIXME
             "account_active": user_profile.account_active
         })
     else:
-        return JsonResponse({}, status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class UserName(generics.RetrieveUpdateAPIView):
@@ -207,5 +210,3 @@ class UserProfileAccountActive(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileAccountActiveSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsOwner,)
-
-# Manque categories et +

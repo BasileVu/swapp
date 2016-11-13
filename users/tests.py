@@ -2,6 +2,7 @@ import json
 
 from django.test import Client, TestCase
 
+from items.models import Category
 from users.models import *
 
 
@@ -83,12 +84,20 @@ class AccountAPITests(TestCase):
     def test_get_protected_user_info_logged_in(self):
         url = self.post_user()["Location"]
         self.login()
+        # Create category and associated it with a userprofile
+        c = Category(name="test")
+        c.save()
+        u = User.objects.get(pk=1)
+        u.userprofile.categories.add(c)
         r = self.c.get(url)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["id"], 1)
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["email"], "test@test.com")
-        self.assertListEqual(r.data["categories"], [])
+        self.assertListEqual(r.data["categories"], [1])
+        self.assertListEqual(r.data["items"], [])
+        self.assertListEqual(r.data["notes"], [])
+        self.assertListEqual(r.data["likes"], [])
         self.assertEqual(r.data["account_active"], False)
 
     def test_cannot_get_other_protected_info(self):
