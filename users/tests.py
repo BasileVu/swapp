@@ -127,6 +127,31 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, 200)
 
+    def test_change_password_not_logged_in(self):
+        url = self.post_user()["Location"] + "password/"
+        r = self.c.put(url, data=json.dumps({
+            "password": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 403)
+
+    def test_change_password_logged_in(self):
+        url = self.post_user()["Location"] + "password/"
+        self.login()
+        r = self.c.put(url, data=json.dumps({
+            "password": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data, {})
+
+    def test_cannot_change_password_of_another_user(self):
+        self.post_user()
+        url = self.post_user("username2")["Location"] + "email/"
+        self.login()
+        r = self.c.put(url, data=json.dumps({
+            "password": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 403)
+
     def test_logout(self):
         self.post_user()
 

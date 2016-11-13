@@ -30,6 +30,7 @@ class UserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('password',)
+        extra_kwargs = {'password': {'write_only': True}}
 
 
 class UserProfileAccountActiveSerializer(serializers.ModelSerializer):
