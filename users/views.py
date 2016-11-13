@@ -8,9 +8,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.views import View
 from django.views.decorators.http import require_POST, require_GET
-
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
