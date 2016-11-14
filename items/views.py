@@ -1,22 +1,10 @@
-import json
-
-from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.decorators import permission_classes, api_view
-from rest_framework.permissions import IsAuthenticated
 
-from items.models import Category, Item, Like
+from items.models import Like
 from items.serializers import *
-from users.models import UserProfile
 
 
 # TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
-# TODO : Add permissions for example category cannot be post put delete... unless user is administrator
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -42,7 +30,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
-    serializer_class = Image
+    serializer_class = ImageSerializer
 
 
 class LikeViewSet(viewsets.ModelViewSet):

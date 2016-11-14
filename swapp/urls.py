@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'', include('pages.home.urls')),
     url(r'', include('users.urls')),
     url(r'', include('items.urls')),
+    url(r'', include('offers.urls')),
 ]
