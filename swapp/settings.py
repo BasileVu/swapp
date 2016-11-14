@@ -135,7 +135,7 @@ AppDirectoriesFinder.source_dir = 'static/public'
 
 # other public directories
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/public"),
+    os.path.join(BASE_DIR, ""),
 ]
 
 # where to collect static files

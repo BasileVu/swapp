@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from items.models import Category, Item, Image
+from items.permissions import IsPermitted
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -23,7 +24,6 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
