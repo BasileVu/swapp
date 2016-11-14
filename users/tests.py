@@ -11,15 +11,14 @@ class UserProfileTests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 1)
 
     def test_no_user_profile_creation_after_user_edit(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        u = User.objects.get(pk=1)
+        u = User.objects.create_user("username", "test@test.com", "password")
         u.username = "username2"
         u.save()
         self.assertEqual(UserProfile.objects.count(), 1)
 
     def test_user_profile_deletion_on_user_deletion(self):
-        User.objects.create_user("username", "test@test.com", "password")
-        User.objects.get(pk=1).delete()
+        u = User.objects.create_user("username", "test@test.com", "password")
+        u.delete()
         self.assertEqual(UserProfile.objects.count(), 0)
 
 
@@ -151,6 +150,29 @@ class AccountAPITests(TestCase):
             "password": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 403)
+
+    def test_change_location_not_logged_in(self):
+        url = self.post_user()["Location"] + "location/"
+        r = self.c.put(url, data=json.dumps({
+            "location": "location"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 403)
+
+    def test_change_location(self):
+        url = self.post_user()["Location"] + "location/"
+        self.login()
+        r = self.c.put(url, data=json.dumps({
+            "location": "location"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+
+    def test_change_location_empty(self):
+        url = self.post_user()["Location"] + "location/"
+        self.login()
+        r = self.c.put(url, data=json.dumps({
+            "location": ""
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
 
     def test_logout(self):
         self.post_user()

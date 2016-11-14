@@ -6,7 +6,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods, require_POST, require_GET
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 
 from items.models import Category, Item
 from users.models import UserProfile
@@ -45,8 +46,9 @@ def create_view(request):
 def item_view(request, item_id):
     return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
 
-@require_POST
-@login_required(login_url="users:login", redirect_field_name="")
+
+@api_view(["POST"])
+@permission_classes((IsAuthenticated,))
 def create_item(request):
     try:
         received_json_data = json.loads(request.body.decode("utf-8"))
@@ -59,7 +61,10 @@ def create_item(request):
     except KeyError:
         return JsonResponse({"error": "Error in the JSON data"}, status=400)
     if price_min > price_max:
-        return JsonResponse({"error": "Error, the minimum price is higher than the maximum price"}, status=400)
+        return JsonResponse({"error": "The minimum price is higher than the maximum price"}, status=400)
+
+    if request.user.userprofile.location == "":
+        return JsonResponse({"error": "Your location is not specified"}, status=400)
 
     try:
         item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
@@ -76,12 +81,12 @@ def create_item(request):
     return response
 
 
-@require_GET
+@api_view(["GET"])
 def get_item(request, item_id):
     return JsonResponse(Item.objects.get(id=item_id), status=200)
 
 
-@require_http_methods(["PATCH"])
+@api_view(["PATCH"])
 @login_required(login_url="users:login", redirect_field_name="")
 def archive_item(request, item_id):
     try:
@@ -95,7 +100,7 @@ def archive_item(request, item_id):
     return response
 
 
-@require_http_methods(["PATCH"])
+@api_view(["PATCH"])
 @login_required(login_url="users:login", redirect_field_name="")
 def unarchive_item(request, item_id):
     try:

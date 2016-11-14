@@ -39,6 +39,13 @@ class UserProfileAccountActiveSerializer(serializers.ModelSerializer):
         fields = ('account_active',)
 
 
+class UserProfileLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('location',)
+        extra_kwargs = {'location': {'required': True}}
+
+
 # A adapter
 class UserProfileCategoriesSerializer(serializers.ModelSerializer):
     class Meta:

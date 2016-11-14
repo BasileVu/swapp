@@ -22,7 +22,9 @@ class ItemAPITests(TestCase):
     c = Client()
 
     def setUp(self):
-        User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.location = "location"
+        self.current_user.userprofile.save()
         Category.objects.create(name="Test")
         self.login()
 
@@ -32,17 +34,20 @@ class ItemAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def test_post_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
+    def post_item(self):
+        return self.c.post("/api/items/", data=json.dumps({
             "name": "test",
             "description": "test",
             "price_min": 1,
             "price_max": 2,
             "category": 1
         }), content_type="application/json")
+
+    def test_post_item(self):
+        r = self.post_item()
         self.assertEqual(r.status_code, 201)
 
-    def test_post_item_should_return_400_if_price_min_is_bigger_than_price_max(self):
+    def test_post_item_price_min_bigger_than_price_max(self):
         r = self.c.post("/api/items/", data=json.dumps({
             "name": "test",
             "description": "test",
@@ -52,8 +57,14 @@ class ItemAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
-    def test_post_item_should_return_400_if_json_data_is_invalid(self):
+    def test_post_item_json_data_invalid(self):
         r = self.c.post("/api/items/", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_post_item_user_location_not_specified(self):
+        self.current_user.userprofile.location = ""
+        self.current_user.userprofile.save()
+        r = self.post_item()
         self.assertEqual(r.status_code, 400)
 
     def test_archive_item(self):
