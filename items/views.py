@@ -14,8 +14,12 @@ from items.models import Category, Item, Like
 from items.serializers import *
 from users.models import UserProfile
 
+# TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
+# TODO : Add permissions for example category cannot be post put delete... unless user is administrator
+
 
 class ItemViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsPermitted, ]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
