@@ -45,6 +45,7 @@ def create_view(request):
 def item_view(request, item_id):
     return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
 
+
 @require_POST
 @login_required(login_url="users:login", redirect_field_name="")
 def create_item(request):
