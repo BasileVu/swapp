@@ -46,7 +46,7 @@ body {
         @include border-radius($border-radius);
       }
       .title-wrapper {
-        padding: (2*$grid-gutter-width) $grid-gutter-width;
+        padding: 2*$grid-gutter-width;
         h2 {
           margin: 0;
         }
@@ -60,7 +60,7 @@ body {
           margin-left: $grid-gutter-width;
         }
         .description {
-          padding: 0 ($grid-gutter-width);
+          padding: 0 (2*$grid-gutter-width);
         }
         .user-representation {
           display: table;
@@ -167,6 +167,34 @@ body {
         }
         .bottom-link {
             padding: 0 $grid-gutter-width $grid-gutter-width;
+        }
+      }
+      .comments {
+        margin: (4*$grid-gutter-width) 0;
+        padding: $grid-gutter-width;
+
+        h3 {
+          padding-left: $grid-gutter-width;
+        }
+        textarea {
+          width: 100%;
+          height: 8*$grid-gutter-width;
+          border: 1px solid $brand-secondary;
+          background-color: white;
+          padding: $grid-gutter-width;
+        }
+        .comment {
+          border-top: 1px solid $brand-secondary;
+          padding: (2*$grid-gutter-width) $grid-gutter-width;
+
+          p {
+            margin: 0;
+          }
+          .writer-infos {
+              font-size: $font-size-sm;
+              font-style: italic;
+              font-weight: 300;
+            }
         }
       }
     }

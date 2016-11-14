@@ -5503,7 +5503,7 @@ body {
         border: 1px solid #eed5a9;
         border-radius: 0.25rem; }
       .modal .container .content .title-wrapper {
-        padding: 20px 10px; }
+        padding: 20px; }
         .modal .container .content .title-wrapper h2 {
           margin: 0; }
       .modal .container .content .details {
@@ -5513,7 +5513,7 @@ body {
         .modal .container .content .details h5.infos {
           margin-left: 10px; }
         .modal .container .content .details .description {
-          padding: 0 10px; }
+          padding: 0 20px; }
         .modal .container .content .details .user-representation {
           display: table;
           table-layout: fixed;
@@ -5586,6 +5586,26 @@ body {
           border-radius: 0.25rem; }
       .modal .container .content .options .bottom-link {
         padding: 0 10px 10px; }
+      .modal .container .content .comments {
+        margin: 40px 0;
+        padding: 10px; }
+        .modal .container .content .comments h3 {
+          padding-left: 10px; }
+        .modal .container .content .comments textarea {
+          width: 100%;
+          height: 80px;
+          border: 1px solid #eed5a9;
+          background-color: white;
+          padding: 10px; }
+        .modal .container .content .comments .comment {
+          border-top: 1px solid #eed5a9;
+          padding: 20px 10px; }
+          .modal .container .content .comments .comment p {
+            margin: 0; }
+          .modal .container .content .comments .comment .writer-infos {
+            font-size: 0.875rem;
+            font-style: italic;
+            font-weight: 300; }
 
 .btn-reversed {
   background-color: transparent;
