@@ -14,17 +14,28 @@ from items.models import Category, Item, Like
 from items.serializers import *
 from users.models import UserProfile
 
+
 # TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
 # TODO : Add permissions for example category cannot be post put delete... unless user is administrator
 
 
 class ItemViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsPermitted, ]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user.userprofile)
 
-class CategoryViewSet(viewsets.ModelViewSet):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        if request.method == 'PUT' or request.method == "PATCH" or request.method == "DELETE":
+            return view.owner == request.user
+        if request.method == 'POST':
+            return request.user.is_authenticated()
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -38,7 +49,7 @@ class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
 
-
+'''
 @login_required(login_url="users:login", redirect_field_name="")
 def create_view(request):
     try:
@@ -139,3 +150,4 @@ def unarchive_item(request, item_id):
     response.status_code = 200
 
     return response
+'''

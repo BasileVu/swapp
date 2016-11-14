@@ -1,5 +1,6 @@
 import json
 
+import logging
 from django.test import Client
 from django.test import TestCase
 from items.models import *
@@ -28,6 +29,13 @@ class ItemAPITests(TestCase):
         Category.objects.create(name="Test")
         self.login()
 
+    def post_user(self, username="username", email="test@test.com", password="password"):
+        return self.c.post("/api/users/", data=json.dumps({
+            "username": username,
+            "email": email,
+            "password": password
+        }), content_type="application/json")
+
     def login(self):
         return self.c.post("/api/login/", data=json.dumps({
             "username": "username",
@@ -40,11 +48,17 @@ class ItemAPITests(TestCase):
             "description": "test",
             "price_min": 1,
             "price_max": 2,
-            "category": 1
+            "category": 1,
         }), content_type="application/json")
 
     def test_post_item(self):
         r = self.post_item()
+        print(r.content)
+        print(r)
+        print(r.status_code)
+        logging.getLogger('my_logger').error(r.status_code)
+        logging.getLogger('my_logger').error(r)
+        logging.getLogger('my_logger').error(r.content)
         self.assertEqual(r.status_code, 201)
 
     def test_post_item_price_min_bigger_than_price_max(self):
@@ -53,7 +67,7 @@ class ItemAPITests(TestCase):
             "description": "test",
             "price_min": 2,
             "price_max": 1,
-            "category": 1
+            "category": 1,
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
