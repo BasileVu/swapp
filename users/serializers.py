@@ -12,12 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all())
+    items = serializers.PrimaryKeyRelatedField(source="item_set", many=True, queryset=Item.objects.all())
     categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
 
     class Meta:
         model = UserProfile
-        fields = ('user', 'account_active', 'items', 'categories')
+        fields = ('items', 'user', 'account_active', 'categories')
 
 
 class UserNameSerializer(serializers.ModelSerializer):
