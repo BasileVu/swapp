@@ -7,9 +7,21 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
+from rest_framework import generics
 
 from items.models import Category, Item
+from items.serializers import ItemSerializer
 from users.models import UserProfile
+
+
+class ItemList(generics.ListCreateAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+
+
+class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
 
 @login_required(login_url="users:login", redirect_field_name="")
