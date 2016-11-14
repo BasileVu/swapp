@@ -54,7 +54,92 @@ body {
       .details {
         border-top: 1px solid $brand-secondary;
         margin: 0;
-        padding: (2*$grid-gutter-width) 0 $grid-gutter-width $grid-gutter-width;
+        padding: (2*$grid-gutter-width) 0 $grid-gutter-width;
+
+        h5.infos {
+          margin-left: $grid-gutter-width;
+        }
+        .description {
+          padding: 0 ($grid-gutter-width);
+        }
+        .user-representation {
+          display: table;
+          table-layout: fixed;
+          width: 100%;
+          margin: (2*$grid-gutter-width) 0;
+
+          div {
+            display: table-cell;
+            vertical-align: middle;
+            float: none;
+
+            .check {
+              color: $brand-success;
+            }
+          }
+        }
+        .evaluation, .category {
+          margin-top: $grid-gutter-width;
+          padding-top: $grid-gutter-width;
+          border-top: 1px solid $brand-secondary;
+          text-align: center;
+          font-weight: 300;
+
+          .star {
+            color: $brand-success;
+          }
+        }
+        .key-val {
+          margin-top: 3*$grid-gutter-width;
+
+          .row {
+            padding: 5px $grid-gutter-width;
+            border-bottom: 1px solid $brand-secondary;
+            font-size: $font-size-sm;
+          }
+          ul {
+            padding: 0;
+            margin: 0;
+          }
+          .last {
+            border-bottom: none;
+          }
+          .interests {
+            margin-top: (2*$grid-gutter-width);
+            margin-bottom: (2*$grid-gutter-width);
+          }
+          .right {
+            font-weight: 300;
+          }
+        }
+        .reactions {
+          padding: (3*$grid-gutter-width) 0;
+          margin: 0;
+          text-align: center;
+          font-size: $font-size-sm;
+          ul {
+            margin: 0;
+
+            li {
+              margin: 0 (2*$grid-gutter-width);
+
+              i {
+                font-size: $font-size-h6;
+                color: $brand-primary-lighten;
+              }
+            }
+          }
+        }
+        .first-move {
+          padding: 0 $grid-gutter-width;
+          margin-bottom: 3*$grid-gutter-width;
+        }
+        .fraud {
+          font-size: $small-font-size;
+          text-align: center;
+          font-weight: 300;
+          margin-bottom: 2*$grid-gutter-width;
+        }
       }
       .options {
         .more {
