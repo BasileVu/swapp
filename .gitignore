@@ -275,4 +275,3 @@ tests/report/
 *.sqlite2
 *.sqlite3
 .sass-cache/
-migrations/
