@@ -19,19 +19,47 @@ body {
     }
   }
 }
-.modal-dialog {
-  .content {
-    background-color: white;
+.modal {
+  cursor: zoom-out;
+  background-image: url("../../static/images/fondmodal.jpg");
+  background-repeat: repeat;
 
-    .options {
-      .more {
-        margin-top: $grid-gutter-width;
-      }
+  .container {
+    cursor: default;
+    position: relative;
+    padding: 0 5px;
+
+    .close {
+      position: absolute;
+      right: $grid-gutter-width;
+      top: -(5*$grid-gutter-width);
+      color: $gray-light;
+      font-size: $font-size-h1;
+    }
+    .content {
+      background-color: white;
+      box-shadow: 0 0 300px 150px white;
+      margin: (7*$grid-gutter-width) 0;
+
       .modal-panel {
         border: 1px solid $brand-secondary;
         @include border-radius($border-radius);
-        margin-top: 2*$grid-gutter-width;
-
+      }
+      .title-wrapper {
+        padding: (2*$grid-gutter-width) $grid-gutter-width;
+        h2 {
+          margin: 0;
+        }
+      }
+      .details {
+        border-top: 1px solid $brand-secondary;
+        margin: 0;
+        padding: (2*$grid-gutter-width) 0 $grid-gutter-width $grid-gutter-width;
+      }
+      .options {
+        .more {
+          margin-top: $grid-gutter-width;
+        }
         .title {
           border-bottom: 1px solid $brand-secondary;
           padding: $grid-gutter-width;
@@ -52,8 +80,8 @@ body {
             @include border-radius($border-radius);
           }
         }
-        .see-more {
-          margin: 0 $grid-gutter-width $grid-gutter-width;
+        .bottom-link {
+            padding: 0 $grid-gutter-width $grid-gutter-width;
         }
       }
     }
@@ -113,6 +141,9 @@ body {
       margin-top: 5px;
     }
   }
+}
+.inventory, .similar {
+  margin-top: 2*$grid-gutter-width;
 }
 .personal-inventory {
   margin-bottom: 4*$grid-gutter-width;

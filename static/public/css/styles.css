@@ -2890,11 +2890,11 @@ button.close {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  background-color: #ddab54; }
+  background-color: white; }
   .modal-backdrop.fade {
     opacity: 0; }
   .modal-backdrop.in {
-    opacity: 0.8; }
+    opacity: 0.2; }
 
 .modal-header {
   padding: 15px;
@@ -5481,29 +5481,52 @@ body {
     .btn-group-justified .btn-group .dropdown-menu {
       left: auto; }
 
-.modal-dialog .content {
-  background-color: white; }
-  .modal-dialog .content .options .more {
-    margin-top: 10px; }
-  .modal-dialog .content .options .modal-panel {
-    border: 1px solid #eed5a9;
-    border-radius: 0.25rem;
-    margin-top: 20px; }
-    .modal-dialog .content .options .modal-panel .title {
-      border-bottom: 1px solid #eed5a9;
-      padding: 10px;
-      text-align: center; }
-      .modal-dialog .content .options .modal-panel .title h5, .modal-dialog .content .options .modal-panel .title h6 {
-        margin-bottom: 0; }
-      .modal-dialog .content .options .modal-panel .title h6 {
-        font-weight: 300; }
-    .modal-dialog .content .options .modal-panel .preview {
-      padding: 10px 10px 0; }
-      .modal-dialog .content .options .modal-panel .preview img {
-        margin-bottom: 10px;
+.modal {
+  cursor: zoom-out;
+  background-image: url("../../static/images/fondmodal.jpg");
+  background-repeat: repeat; }
+  .modal .container {
+    cursor: default;
+    position: relative;
+    padding: 0 5px; }
+    .modal .container .close {
+      position: absolute;
+      right: 10px;
+      top: -50px;
+      color: #818a91;
+      font-size: 1.8rem; }
+    .modal .container .content {
+      background-color: white;
+      box-shadow: 0 0 300px 150px white;
+      margin: 70px 0; }
+      .modal .container .content .modal-panel {
+        border: 1px solid #eed5a9;
         border-radius: 0.25rem; }
-    .modal-dialog .content .options .modal-panel .see-more {
-      margin: 0 10px 10px; }
+      .modal .container .content .title-wrapper {
+        padding: 20px 10px; }
+        .modal .container .content .title-wrapper h2 {
+          margin: 0; }
+      .modal .container .content .details {
+        border-top: 1px solid #eed5a9;
+        margin: 0;
+        padding: 20px 0 10px 10px; }
+      .modal .container .content .options .more {
+        margin-top: 10px; }
+      .modal .container .content .options .title {
+        border-bottom: 1px solid #eed5a9;
+        padding: 10px;
+        text-align: center; }
+        .modal .container .content .options .title h5, .modal .container .content .options .title h6 {
+          margin-bottom: 0; }
+        .modal .container .content .options .title h6 {
+          font-weight: 300; }
+      .modal .container .content .options .preview {
+        padding: 10px 10px 0; }
+        .modal .container .content .options .preview img {
+          margin-bottom: 10px;
+          border-radius: 0.25rem; }
+      .modal .container .content .options .bottom-link {
+        padding: 0 10px 10px; }
 
 .btn-reversed {
   background-color: transparent;
@@ -5553,6 +5576,9 @@ body {
     #content-search .container .advanced {
       text-align: center;
       margin-top: 5px; }
+
+.inventory, .similar {
+  margin-top: 20px; }
 
 .personal-inventory {
   margin-bottom: 40px; }
