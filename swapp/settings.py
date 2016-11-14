@@ -143,3 +143,11 @@ STATICFILES_DIRS = [
 
 # public urls prefix
 STATIC_URL = '/static/'
+
+# Rest Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}

@@ -2,22 +2,21 @@ import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.http import require_POST, require_GET
 from rest_framework import generics
+
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from users.permissions import IsUserHimself, IsOwner
-from users.serializers import *
+# TODO delete when not used anymore
+from users.models import UserProfile
+from users.serializers import UserAccountSerializer
 
 
 def register_view(request):
@@ -45,6 +44,7 @@ def register_view(request):
     return HttpResponseRedirect(reverse("users:account"))
 
 
+# TODO delete when not used anymore
 def login_view(request):
     try:
         username = request.POST["username"]
@@ -62,73 +62,103 @@ def login_view(request):
         })
 
 
+# TODO delete when not used anymore
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("users:login"))
 
 
+# TODO delete when not used anymore
 @login_required(login_url="users:login", redirect_field_name="")
 def account_view(request):
     return render(request, "users/account.html", {"username": request.user.username})
 
-@require_GET
-@login_required()
-def get_personal_account_info(request):
-    return JsonResponse({"username": request.user.username})
+
+class OwnUserAccountMixin:
+    def get_object(self):
+        return self.request.user
 
 
-@require_POST
-def api_login(request):
+@api_view(['POST'])
+def create_user(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        username = data["username"]
+        email = data["email"]
+        password = data["password"]
+    except KeyError as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
+
+    try:
+        user = User.objects.create_user(username=username, email=email, password=password)
+    except IntegrityError:
+        return Response(status=status.HTTP_409_CONFLICT)
+
+    response = Response(status=status.HTTP_201_CREATED)
+    response["Location"] = "/api/users/%d/" % user.id
+    return response
+
+
+@api_view(['POST'])
+def login_user(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
         username = data["username"]
         password = data["password"]
-    except KeyError:
-        return JsonResponse({"error": "a value is incorrect"}, status=400)
+    except KeyError as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
 
     user = authenticate(username=username, password=password)
     if user is not None:
         login(request, user)
-        return HttpResponse()
+        return Response(status=status.HTTP_200_OK)
     else:
-        return JsonResponse({"error": "invalid username/password combination"}, status=401)
+        print(User.objects.get(pk=1).username)
+        print(User.objects.get(pk=1).password)
+        print(username)
+        print(password)
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
 
 
-@require_GET
-@login_required()
-def api_logout(request):
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def logout_user(request):
     logout(request)
-    return HttpResponse()
+    return Response(status=status.HTTP_200_OK)
 
 
-# FIXME or delete
-"""class UserCreate(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+"""class UserAccount(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def get(self, request):
+        user = request.user
+        user_profile = request.user.userprofile
 
-        user = User.objects.create_user(**request.data)
-        response = Response(status=status.HTTP_201_CREATED)
-        response['Location'] = "/api/users/%d/" % user.id
-        return response"""
+        return Response(status=status.HTTP_200_OK, data={
+            "id": user.id,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "account_active": user_profile.account_active,
+            "last_modification_date": user_profile.last_modification_date,
+            "categories": [c.id for c in user_profile.categories.all()],
+            "items": [i.id for i in user_profile.item_set.all()],
+            "notes": [n.id for n in user_profile.note_set.all()],
+            "likes": [l.id for l in user_profile.like_set.all()],
+        })
 
-
-class UsersAccounts(APIView):
-    # TODO delete if not used
-    """def get(self, request):
-        # A discuter si besoin ou non d'être connecté si on fait un get sur tous les user a la fois
-        if not request.user.is_authenticated():
-            return JsonResponse({"error": "you are not connected"}, status=status.HTTP_403_FORBIDDEN)
-        # A compléter
-
-        return JsonResponse({}, status=status.HTTP_200_OK)"""
-
-    def post(self, request):
+    def patch(self, request):
         try:
             data = json.loads(request.body.decode("utf-8"))
+            username = data.get("username", None)
+            password = data.get("password", None)
+            first_name = data.get("first_name", None)
+            last_name = data.get("last_name", None)
+            email = data.get("email", None)
+            account_active = data.get("account_active", None)
+
+
             username = data["username"]
             email = data["email"]
             password = data["password"]
@@ -142,76 +172,94 @@ class UsersAccounts(APIView):
 
         response = Response(status=status.HTTP_201_CREATED)
         response["Location"] = "/api/users/%d/" % user.id
-        return response
+        return response"""
+
+
+class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserAccountSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        user_profile = request.user.userprofile
+
+        return Response(status=status.HTTP_200_OK, data={
+            "id": user.id,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "account_active": user_profile.account_active,
+            "last_modification_date": user_profile.last_modification_date,
+            "categories": [c.id for c in user_profile.categories.all()],
+            "items": [i.id for i in user_profile.item_set.all()],
+            "notes": [n.id for n in user_profile.note_set.all()],
+            "likes": [l.id for l in user_profile.like_set.all()],
+        })
 
 
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
-def user_account(request, pk):
-    pk = int(pk)
-    if request.user.id == pk:
-        user = User.objects.get(pk=pk)
-        user_profile = user.userprofile
+def change_password(request):
+    """
+    An endpoint for changing password.
+    """
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        old_password = data["old_password"]
+        password = data["password"]
+    except KeyError as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
 
-        # TODO write serializer
-        return Response(status=status.HTTP_200_OK, data={
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "categories": [c.id for c in user_profile.categories.all()],  # FIXME
-            "items": [i.id for i in user_profile.item_set.all()],  # FIXME
-            "notes": [n.id for n in user_profile.note_set.all()],  # FIXME
-            "likes": [l.id for l in user_profile.like_set.all()],  # FIXME
-            "account_active": user_profile.account_active
-        })
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-
-class UserName(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserNameSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself,)
+    # Check old password
+    if not request.user.check_password(old_password):
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "Wrong password."}, )
+    # set_password also hashes the password that the user will get
+    self.object.set_password(serializer.data.get("new_password"))
+    self.object.save()
+    return Response("Success.", status=status.HTTP_200_OK)
 
 
-class UserFirstName(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserFirstNameSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself,)
-
-
-class UserLastName(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserLastNameSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself,)
-
-
-class UserEmail(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserEmailSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself)
-
-
-class UserPassword(generics.UpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserPasswordSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsUserHimself,)
-
-
-# Réfléchir à un meilleur moyen de faire l'activation d'un compte.
-class UserProfileAccountActive(generics.RetrieveUpdateAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileAccountActiveSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsOwner,)
-
-
-class UserProfileLocation(generics.RetrieveUpdateAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileLocationSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+# TODO delete
+# class UserAccount(OwnUserMixin, generics.RetrieveAPIView):
+#     queryset = UserProfile.objects.all()
+#     serializer_class = UserAccountSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# class UserName(OwnUserMixin, generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserNameSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# class UserFirstName(OwnUserMixin, generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserFirstNameSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# class UserLastName(OwnUserMixin, generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserLastNameSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# class UserEmail(OwnUserMixin, generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserEmailSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# class UserPassword(OwnUserMixin, generics.UpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserPasswordSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#
+# # Réfléchir à un meilleur moyen de faire l'activation d'un compte.
+# class UserProfileAccountActive(OwnUserMixin, generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserProfileAccountActiveSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
