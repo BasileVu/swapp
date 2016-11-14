@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+
 class UserProfile(models.Model):
     """
     Defines additional non-authentication-related information about the user.
