@@ -21,4 +21,5 @@ urlpatterns = [
     url(r"^api/users/(?P<pk>[0-9]+)/email/$", views.UserEmail.as_view(), name="email"),
     url(r"^api/users/(?P<pk>[0-9]+)/password/$", views.UserPassword.as_view(), name="password"),
     url(r"^api/users/(?P<pk>[0-9]+)/accountactive/$", views.UserProfileAccountActive.as_view(), name="accountactive"),
+    url(r"^api/users/(?P<pk>[0-9]+)/location/$", views.UserProfileLocation.as_view(), name="location"),
 ]

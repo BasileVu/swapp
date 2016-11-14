@@ -205,7 +205,13 @@ class UserPassword(generics.UpdateAPIView):
 
 # Réfléchir à un meilleur moyen de faire l'activation d'un compte.
 class UserProfileAccountActive(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
+    queryset = UserProfile.objects.all()
     serializer_class = UserProfileAccountActiveSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsOwner,)
+
+
+class UserProfileLocation(generics.RetrieveUpdateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileLocationSerializer
+    permission_classes = (permissions.IsAuthenticated,)

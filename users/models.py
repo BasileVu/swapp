@@ -4,7 +4,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-
 class UserProfile(models.Model):
     """
     Defines additional non-authentication-related information about the user.
@@ -12,11 +11,12 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     account_active = models.BooleanField()
     last_modification_date = models.DateTimeField(auto_now=True)
+    location = models.CharField(max_length=100)
 
     categories = models.ManyToManyField("items.Category")
 
     def __str__(self):
-        return self.user.username
+        return "User profile of " + self.user.username
 
 
 @receiver(post_save, sender=User)
