@@ -269,6 +269,34 @@ body {
     }
   }
 }
+.view-item {
+
+}
+#advanced-search-modal {
+  form {
+    padding: (2*$grid-gutter-width);
+  }
+  .labels {
+    margin: (4*$grid-gutter-width) 0 ($grid-gutter-width);
+
+    label {
+      text-align: right;
+      font-weight: 600;
+    }
+  }
+  .map-range {
+    .form-check-inline {
+      font-weight: 400;
+      margin-top: 5px;
+    }
+  }
+  .map {
+    margin-top: 4*$grid-gutter-width;
+  }
+  #search-modal-map {
+    height: 400px;
+  }
+}
 .btn-reversed {
   background-color: transparent;
   border: 1px solid $brand-primary;

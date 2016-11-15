@@ -1,20 +1,21 @@
 $('document').ready(function() {
     // home grid ///////////////////////////
-    var $grid = $('.grid').isotope({
+    var grid = $('.grid').isotope({
         // options
         itemSelector: '.grid-item',
         layoutMode: 'masonry'
     });
-    $grid.imagesLoaded().progress( function() {
-        $grid.isotope('layout');
+    // layout only when images are loaded
+    grid.imagesLoaded().progress( function() {
+        grid.isotope('layout');
     });
-
+    // display items details when hovered
     $('.grid-item').hover(function () {
         $(this).addClass('hovered');
-        $grid.isotope('layout');
+        grid.isotope('layout');
     }, function () {
         $(this).removeClass('hovered');
-        $grid.isotope('layout');
+        grid.isotope('layout');
     });
 
     // home inventory ///////////////////////////
@@ -30,7 +31,7 @@ $('document').ready(function() {
     });
 
     // modal slider ///////////////////////////
-    var $carousel = $('.modal-carousel').flickity({
+    var modalCarousel = $('.modal-carousel').flickity({
         cellAlign: 'center',
         contain: true,
         imagesLoaded: true,
@@ -39,42 +40,81 @@ $('document').ready(function() {
         adaptiveHeight: true
     });
 
-    var $carouselNav = $('.modal-carousel-nav');
-    var $carouselNavCells = $carouselNav.find('.carousel-cell');
+    var modalCarouselNav = $('.modal-carousel-nav');
+    var modalCarouselNavCells = modalCarouselNav.find('.carousel-cell');
 
-    $carouselNav.on( 'click', '.carousel-cell', function( event ) {
+    modalCarouselNav.on( 'click', '.carousel-cell', function( event ) {
         var index = $( event.currentTarget ).index();
-        $carousel.flickity( 'select', index );
+        modalCarousel.flickity( 'select', index );
     });
 
-    var flkty = $carousel.data('flickity');
-    var navCellHeight = $carouselNavCells.height();
-    var navHeight = $carouselNav.height();
+    var flkty = modalCarousel.data('flickity');
+    var navCellHeight = modalCarouselNavCells.height();
+    var navHeight = modalCarouselNav.height();
 
-    $carousel.on( 'select.flickity', function() {
+    modalCarousel.on( 'select.flickity', function() {
         // set selected nav cell
-        $carouselNav.find('.is-nav-selected').removeClass('is-nav-selected');
-        var $selected = $carouselNavCells.eq( flkty.selectedIndex )
+        modalCarouselNav.find('.is-nav-selected').removeClass('is-nav-selected');
+        var selected = modalCarouselNavCells.eq( flkty.selectedIndex )
             .addClass('is-nav-selected');
         // scroll nav
-        var scrollY = $selected.position().top +
-            $carouselNav.scrollTop() - ( navHeight + navCellHeight ) / 2;
-        $carouselNav.animate({
+        var scrollY = selected.position().top +
+            modalCarouselNav.scrollTop() - ( navHeight + navCellHeight ) / 2;
+        modalCarouselNav.animate({
             scrollTop: scrollY
         });
     });
 
     // display modal ///////////////////////////
-    $('#view-item-x').on('show.bs.modal', function (e) {
+    var theItemModal = $('#view-item-x');
+    // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
+    theItemModal.on('show.bs.modal', function (e) {
         setTimeout(function () {
-            $('.modal-carousel').flickity('resize');
+            modalCarousel.flickity('resize');
             $('.modal-carousel-height').matchHeight({
                 byRow: false,
-                target: $('.modal-carousel')
+                target: modalCarousel
             });
         }, 300)
     });
     $('.open-modal-item-x').click(function () {
-        $('#view-item-x').modal('show');
+        theItemModal.modal('show');
+    });
+
+    // advanced search ///////////////////////////
+    var advancedSearchModal = $('#advanced-search-modal');
+    $('.open-modal-advanced-search').click(function () {
+        advancedSearchModal.modal('show');
+    });
+    advancedSearchModal.on('show.bs.modal', function (e) {
+        setTimeout(function () {
+            var map = new google.maps.Map(document.getElementById('search-modal-map'), {
+                center: {lat: -34.397, lng: 150.644},
+                scrollwheel: false,
+                zoom: 8
+            });
+            var marker = new google.maps.Marker({
+                map: map,
+                position: {lat: -34.197, lng: 150.844}
+            });
+            var marker = new google.maps.Marker({
+                map: map,
+                position: {lat: -34.308, lng: 150.679},
+            });
+            var marker = new google.maps.Marker({
+                map: map,
+                position: {lat: -34.390, lng: 150.664}
+            });
+            var circle = new google.maps.Circle({
+                map: map,
+                center: {lat: -34.397, lng: 150.644},
+                radius: 100000,    // 10 miles in metres
+                fillColor: '#eed5a9',
+                fillOpacity: 0.3,
+                strokeColor: '#40b2cd',
+                strokeOpacity: 1,
+                strokeWeight: 3
+            });
+        }, 300)
     });
 });
