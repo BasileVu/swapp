@@ -21,13 +21,12 @@ class Item(models.Model):
 
 
 class Image(models.Model):
-    name = models.CharField(max_length=200)
-    path = models.CharField(max_length=200)
+    image = models.ImageField('Uploaded image', null=True)
 
     item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.image.name
 
 
 class Category(models.Model):
