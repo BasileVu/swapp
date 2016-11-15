@@ -38,13 +38,12 @@ module.exports = function(grunt) {
                         src: ['node_modules/flickity/dist/flickity.pkgd.js'],
                         dest: 'static/public/js/',
                         flatten: true
-                    } /* , {
+                    }, {
                         expand: true,
-                        src: ['node_modules/flickity/dist/flickity.css'],
-                        dest: 'static/public/css/',
+                        src: ['node_modules/jquery-match-height/dist/jquery.matchHeight.js'],
+                        dest: 'static/public/js/',
                         flatten: true
                     }
-                    */
                 ]
             }
         },
