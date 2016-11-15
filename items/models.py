@@ -1,6 +1,8 @@
+from django.forms import forms
 from django.utils import timezone
 
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class Item(models.Model):
@@ -9,7 +11,7 @@ class Item(models.Model):
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
     creation_date = models.DateTimeField("date published", default=timezone.now)
-    archived = models.BooleanField()
+    archived = models.BooleanField(default=False)
 
     owner = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
     category = models.ForeignKey("items.Category", on_delete=models.CASCADE)

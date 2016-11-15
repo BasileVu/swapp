@@ -1,18 +1,43 @@
-import json
+from rest_framework import viewsets
 
-from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.http import JsonResponse
-from django.shortcuts import render
-from rest_framework.decorators import permission_classes, api_view
-from rest_framework.permissions import IsAuthenticated
-
-from items.models import Category, Item
-from users.models import UserProfile
+from items.models import Like
+from items.serializers import *
 
 
+# TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
+
+
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user.userprofile)
+
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        if request.method == 'PUT' or request.method == "PATCH" or request.method == "DELETE":
+            return view.owner == request.user
+        if request.method == 'POST':
+            return request.user.is_authenticated()
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+
+
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+'''
 @login_required(login_url="users:login", redirect_field_name="")
 def create_view(request):
     try:
@@ -113,3 +138,4 @@ def unarchive_item(request, item_id):
     response.status_code = 200
 
     return response
+'''

@@ -1,5 +1,23 @@
 from rest_framework import serializers
+
+from items.models import Item, Category
 from users.models import *
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email')
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    items = serializers.PrimaryKeyRelatedField(source="item_set", many=True, queryset=Item.objects.all())
+    categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
+
+    class Meta:
+        model = UserProfile
+        fields = ('user', 'account_active', 'items', 'categories')
 
 
 class UserNameSerializer(serializers.ModelSerializer):
