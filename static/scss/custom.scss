@@ -65,11 +65,40 @@ body {
         }
         .modal-carousel {
           padding: 0;
-          overflow: hidden;
           border-left: 1px solid $brand-secondary;
+          position: relative;
+
+          .flickity-viewport {
+            overflow: hidden;
+          }
+          &:focus {
+            outline: none;
+          }
 
           .carousel-cell {
             min-width: 100%;
+            cursor: move;
+          }
+          .flickity-page-dots {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            position: absolute;
+            top: -(3*$grid-gutter-width);
+            width: 100%;
+
+            li {
+              display: inline-block;
+              width: $grid-gutter-width;
+              height: $grid-gutter-width;
+              @include border-radius(100%);
+              background-color: $brand-secondary;
+              margin: 0 ($grid-gutter-width);
+
+              &.is-selected {
+                background-color: $brand-primary;
+              }
+            }
           }
         }
         .modal-carousel-nav {
@@ -143,6 +172,9 @@ body {
             margin-top: (2*$grid-gutter-width);
             margin-bottom: (2*$grid-gutter-width);
           }
+          .left {
+            padding-right: $grid-gutter-width + 5px;
+          }
           .right {
             font-weight: 300;
           }
@@ -156,7 +188,7 @@ body {
             margin: 0;
 
             li {
-              margin: 0 (2*$grid-gutter-width);
+              margin: 0 ($grid-gutter-width);
 
               i {
                 font-size: $font-size-h6;

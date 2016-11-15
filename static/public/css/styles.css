@@ -5514,10 +5514,31 @@ body {
             border-bottom: 1px solid #eed5a9; }
         .modal .container .content .showroom .modal-carousel {
           padding: 0;
-          overflow: hidden;
-          border-left: 1px solid #eed5a9; }
+          border-left: 1px solid #eed5a9;
+          position: relative; }
+          .modal .container .content .showroom .modal-carousel .flickity-viewport {
+            overflow: hidden; }
+          .modal .container .content .showroom .modal-carousel:focus {
+            outline: none; }
           .modal .container .content .showroom .modal-carousel .carousel-cell {
-            min-width: 100%; }
+            min-width: 100%;
+            cursor: move; }
+          .modal .container .content .showroom .modal-carousel .flickity-page-dots {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            position: absolute;
+            top: -30px;
+            width: 100%; }
+            .modal .container .content .showroom .modal-carousel .flickity-page-dots li {
+              display: inline-block;
+              width: 10px;
+              height: 10px;
+              border-radius: 100%;
+              background-color: #eed5a9;
+              margin: 0 10px; }
+              .modal .container .content .showroom .modal-carousel .flickity-page-dots li.is-selected {
+                background-color: #40b2cd; }
         .modal .container .content .showroom .modal-carousel-nav {
           height: 300px;
           overflow: hidden; }
@@ -5568,6 +5589,8 @@ body {
           .modal .container .content .details .key-val .interests {
             margin-top: 20px;
             margin-bottom: 20px; }
+          .modal .container .content .details .key-val .left {
+            padding-right: 15px; }
           .modal .container .content .details .key-val .right {
             font-weight: 300; }
         .modal .container .content .details .reactions {
@@ -5578,7 +5601,7 @@ body {
           .modal .container .content .details .reactions ul {
             margin: 0; }
             .modal .container .content .details .reactions ul li {
-              margin: 0 20px; }
+              margin: 0 10px; }
               .modal .container .content .details .reactions ul li i {
                 font-size: 1rem;
                 color: #91d3e2; }
