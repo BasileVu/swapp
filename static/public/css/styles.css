@@ -5502,6 +5502,27 @@ body {
       .modal .container .content .modal-panel {
         border: 1px solid #eed5a9;
         border-radius: 0.25rem; }
+      .modal .container .content .showroom {
+        margin: 0;
+        border-bottom: 1px solid #eed5a9; }
+        .modal .container .content .showroom .carousel-nav .carousel-cell {
+          cursor: pointer; }
+        .modal .container .content .showroom .modal-carousel-nav {
+          padding: 0; }
+          .modal .container .content .showroom .modal-carousel-nav .carousel-cell.is-nav-selected {
+            border-top: 1px solid #eed5a9;
+            border-bottom: 1px solid #eed5a9; }
+        .modal .container .content .showroom .modal-carousel {
+          padding: 0;
+          overflow: hidden;
+          border-left: 1px solid #eed5a9; }
+          .modal .container .content .showroom .modal-carousel .carousel-cell {
+            min-width: 100%; }
+        .modal .container .content .showroom .modal-carousel-nav {
+          height: 300px;
+          overflow: hidden; }
+        .modal .container .content .showroom .carousel-nav {
+          cursor: pointer; }
       .modal .container .content .title-wrapper {
         padding: 20px; }
         .modal .container .content .title-wrapper h2 {

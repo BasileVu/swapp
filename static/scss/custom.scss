@@ -45,6 +45,41 @@ body {
         border: 1px solid $brand-secondary;
         @include border-radius($border-radius);
       }
+      .showroom {
+        margin: 0;
+        border-bottom: 1px solid $brand-secondary;
+
+        .carousel-nav .carousel-cell {
+          cursor: pointer;
+        }
+        .modal-carousel-nav {
+          padding: 0;
+
+          .carousel-cell {
+
+            &.is-nav-selected {
+              border-top: 1px solid $brand-secondary;
+              border-bottom: 1px solid $brand-secondary;
+            }
+          }
+        }
+        .modal-carousel {
+          padding: 0;
+          overflow: hidden;
+          border-left: 1px solid $brand-secondary;
+
+          .carousel-cell {
+            min-width: 100%;
+          }
+        }
+        .modal-carousel-nav {
+          height: 300px;
+          overflow: hidden;
+        }
+        .carousel-nav {
+          cursor: pointer;
+        }
+      }
       .title-wrapper {
         padding: 2*$grid-gutter-width;
         h2 {
