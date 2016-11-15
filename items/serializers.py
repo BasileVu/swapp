@@ -12,7 +12,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('id', 'name', 'path', 'item')
+        fields = ('id', 'image', 'item')
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -26,12 +26,12 @@ class ItemSerializer(serializers.ModelSerializer):
         """
         Check that the start is before the stop.
         """
-        if data['price_min'] > data['price_max']:
+        if 'price_min' in data and 'price_max' in data and data['price_min'] > data['price_max']:
             raise serializers.ValidationError("Price min is higher than price max")
         return data
 
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
-                  'category')
+                  'category', 'image_set')
         read_only_fields = ('owner',)
