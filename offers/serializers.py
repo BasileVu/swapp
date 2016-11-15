@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from items.models import Category, Item, Image
 from offers.models import Offer
 
 
