@@ -66,9 +66,9 @@ $('document').ready(function() {
     });
 
     // display modal ///////////////////////////
-    var theModal = $('#view-item-x');
+    var theItemModal = $('#view-item-x');
     // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
-    theModal.on('show.bs.modal', function (e) {
+    theItemModal.on('show.bs.modal', function (e) {
         setTimeout(function () {
             modalCarousel.flickity('resize');
             $('.modal-carousel-height').matchHeight({
@@ -78,6 +78,12 @@ $('document').ready(function() {
         }, 300)
     });
     $('.open-modal-item-x').click(function () {
-        theModal.modal('show');
+        theItemModal.modal('show');
+    });
+
+    // advanced search ///////////////////////////
+    var advancedSearchModal = $('#advanced-search-modal');
+    $('.open-modal-advanced-search').click(function () {
+        advancedSearchModal.modal('show');
     });
 });
