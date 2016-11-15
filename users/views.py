@@ -89,6 +89,11 @@ def create_user(request):
     except KeyError as e:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
+    # Check if not empty fields
+    if not username or not password:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={
+            "error": "fields '" + username + "' and '" + password + "' can't be empty"})
+
     try:
         user = User.objects.create_user(username=username, email=email, password=password)
     except IntegrityError:
@@ -108,6 +113,10 @@ def login_user(request):
     except KeyError as e:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
+    # Check if not empty fields
+    if not username or not password:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
+
     user = authenticate(username=username, password=password)
     if user is not None:
         login(request, user)
@@ -121,54 +130,6 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return Response(status=status.HTTP_200_OK)
-
-
-"""class UserAccount(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request):
-        user = request.user
-        user_profile = request.user.userprofile
-
-        return Response(status=status.HTTP_200_OK, data={
-            "id": user.id,
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "account_active": user_profile.account_active,
-            "last_modification_date": user_profile.last_modification_date,
-            "categories": [c.id for c in user_profile.categories.all()],
-            "items": [i.id for i in user_profile.item_set.all()],
-            "notes": [n.id for n in user_profile.note_set.all()],
-            "likes": [l.id for l in user_profile.like_set.all()],
-        })
-
-    def patch(self, request):
-        try:
-            data = json.loads(request.body.decode("utf-8"))
-            username = data.get("username", None)
-            password = data.get("password", None)
-            first_name = data.get("first_name", None)
-            last_name = data.get("last_name", None)
-            email = data.get("email", None)
-            account_active = data.get("account_active", None)
-
-
-            username = data["username"]
-            email = data["email"]
-            password = data["password"]
-        except KeyError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "a value is incorrect"})
-
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-        except IntegrityError:
-            return Response(status=status.HTTP_409_CONFLICT)
-
-        response = Response(status=status.HTTP_201_CREATED)
-        response["Location"] = "/api/users/%d/" % user.id
-        return response"""
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
@@ -186,6 +147,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
+            "location": user_profile.location,
             "is_active": user.is_active,
             "last_modification_date": user_profile.last_modification_date,
             "categories": [c.id for c in user_profile.categories.all()],
@@ -196,6 +158,13 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
     # FIXME two errors occur when we launch the tests (two users can't have the same username)
     def update(self, request, *args, **kwargs):
+        # FIXME improve that with direct serializer
+        location = request.data.get("location")
+
+        if location is not None:
+            request.user.userprofile.location = location
+            request.user.userprofile.save()
+
         try:
             return super(UserAccount, self).update(request, *args, **kwargs)
         except IntegrityError as e:
@@ -215,6 +184,10 @@ def change_password(request):
     except KeyError as e:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
+    # Check if not empty fields
+    if not old_password or not new_password:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
+
     # Check old password
     if not request.user.check_password(old_password):
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
@@ -223,47 +196,3 @@ def change_password(request):
     request.user.set_password(new_password)
     request.user.save()
     return Response(status=status.HTTP_200_OK)
-
-
-# TODO delete
-# class UserAccount(OwnUserMixin, generics.RetrieveAPIView):
-#     queryset = UserProfile.objects.all()
-#     serializer_class = UserAccountSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# class UserName(OwnUserMixin, generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserNameSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# class UserFirstName(OwnUserMixin, generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserFirstNameSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# class UserLastName(OwnUserMixin, generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserLastNameSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# class UserEmail(OwnUserMixin, generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserEmailSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# class UserPassword(OwnUserMixin, generics.UpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserPasswordSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#
-# # Réfléchir à un meilleur moyen de faire l'activation d'un compte.
-# class UserProfileAccountActive(OwnUserMixin, generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserProfileAccountActiveSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
