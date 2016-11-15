@@ -49,6 +49,7 @@ class ItemAPITests(TestCase):
             "price_min": 1,
             "price_max": 2,
             "category": 1,
+            "image_set": []
         }), content_type="application/json")
 
     def test_post_item(self):
