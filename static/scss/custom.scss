@@ -277,7 +277,7 @@ body {
     padding: (2*$grid-gutter-width);
   }
   .labels {
-    margin: 4*$grid-gutter-width 0;
+    margin: (4*$grid-gutter-width) 0 ($grid-gutter-width);
 
     label {
       text-align: right;
@@ -292,6 +292,9 @@ body {
   }
   .map {
     margin-top: 4*$grid-gutter-width;
+  }
+  #search-modal-map {
+    height: 400px;
   }
 }
 .btn-reversed {

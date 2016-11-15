@@ -5656,7 +5656,7 @@ body {
 #advanced-search-modal form {
   padding: 20px; }
 #advanced-search-modal .labels {
-  margin: 40px 0; }
+  margin: 40px 0 10px; }
   #advanced-search-modal .labels label {
     text-align: right;
     font-weight: 600; }
@@ -5665,6 +5665,8 @@ body {
   margin-top: 5px; }
 #advanced-search-modal .map {
   margin-top: 40px; }
+#advanced-search-modal #search-modal-map {
+  height: 400px; }
 
 .btn-reversed {
   background-color: transparent;
