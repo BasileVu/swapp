@@ -86,7 +86,6 @@ def get_csrf_token(request):
 
 
 @api_view(["POST"])
-@csrf_protect
 def create_user(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
@@ -112,7 +111,6 @@ def create_user(request):
 
 
 @api_view(['POST'])
-@csrf_protect
 def login_user(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
@@ -134,7 +132,6 @@ def login_user(request):
 
 
 @api_view(['GET'])
-@csrf_protect
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
     logout(request)
@@ -181,7 +178,6 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
 
 @api_view(['PUT'])
-@csrf_protect
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
