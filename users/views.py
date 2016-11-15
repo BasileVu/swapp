@@ -14,11 +14,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-# TODO delete when not used anymore
 from users.models import UserProfile
 from users.serializers import UserAccountSerializer
 
 
+# TODO delete when not user anymore
 def register_view(request):
     try:
         username = request.POST["username"]
@@ -87,7 +87,7 @@ def create_user(request):
         email = data["email"]
         password = data["password"]
     except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
     try:
         user = User.objects.create_user(username=username, email=email, password=password)
@@ -106,17 +106,13 @@ def login_user(request):
         username = data["username"]
         password = data["password"]
     except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
     user = authenticate(username=username, password=password)
     if user is not None:
         login(request, user)
         return Response(status=status.HTTP_200_OK)
     else:
-        print(User.objects.get(pk=1).username)
-        print(User.objects.get(pk=1).password)
-        print(username)
-        print(password)
         return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
 
 
@@ -199,7 +195,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
         })
 
 
-@api_view(['GET'])
+@api_view(['PUT'])
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
@@ -208,17 +204,18 @@ def change_password(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
         old_password = data["old_password"]
-        password = data["password"]
+        new_password = data["new_password"]
     except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e) + " is incorrect"})
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
 
     # Check old password
     if not request.user.check_password(old_password):
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "Wrong password."}, )
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
+
     # set_password also hashes the password that the user will get
-    self.object.set_password(serializer.data.get("new_password"))
-    self.object.save()
-    return Response("Success.", status=status.HTTP_200_OK)
+    request.user.set_password(new_password)
+    request.user.save()
+    return Response(status=status.HTTP_200_OK)
 
 
 # TODO delete
