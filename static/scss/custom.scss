@@ -365,6 +365,7 @@ body {
     }
   }
   .carousel-cell {
+    position: relative;
     a {
       @include border-radius($border-radius);
       overflow: hidden;
@@ -375,6 +376,14 @@ body {
         padding: $grid-gutter-width;
         display: block;
       }
+    }
+    a.delete {
+      border: none;
+      text-align: center;
+      color: $brand-danger;
+      position: absolute;
+      top: 3px;
+      right: $grid-gutter-width + 3px;
     }
   }
 }
