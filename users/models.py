@@ -10,7 +10,6 @@ class UserProfile(models.Model):
     Defines additional non-authentication-related information about the user.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    account_active = models.BooleanField()
     last_modification_date = models.DateTimeField(auto_now=True)
     location = models.CharField(max_length=100)
 
@@ -26,9 +25,11 @@ def create_user_profile(sender, instance, signal, created, **kwargs):
     Handler to create user profile when an user is created.
     """
     if created:
-        UserProfile(user=instance, account_active=False, last_modification_date=timezone.now()).save()
+        UserProfile(user=instance, last_modification_date=timezone.now()).save()
     else:
-        instance.userprofile.last_modification_date = timezone.now()
+        # When we make a modification on the User (fields), we change the field "last_modification_date"
+        # whit the new datetime.
+        instance.userprofile.save()
 
 
 class Note(models.Model):
