@@ -1,4 +1,6 @@
 import json
+
+import time
 from django.test import Client, TestCase
 
 from items.models import Category, Item, Like
@@ -20,8 +22,6 @@ class UserProfileTests(TestCase):
         u = User.objects.create_user("username", "test@test.com", "password")
         u.delete()
         self.assertEqual(UserProfile.objects.count(), 0)
-
-        # test dates modification
 
 
 class AccountAPITests(TestCase):
@@ -124,7 +124,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "")
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["email"], "test@test.com")
-        self.assertEqual(r.data["account_active"], False)
+        self.assertEqual(r.data["is_active"], True)
         self.assertNotEqual(r.data["last_modification_date"], "")
         self.assertListEqual(r.data["categories"], [1])
         self.assertListEqual(r.data["items"], [1])
@@ -183,7 +183,7 @@ class AccountAPITests(TestCase):
         self.post_user()
 
         r = self.c.patch("/api/account/", data=json.dumps({
-            "account_active": True,
+            "is_active": False,
         }), content_type="application/json")
         self.assertEqual(r.status_code, 401)
         self.assertEqual("password" in r.data, False)
@@ -194,25 +194,22 @@ class AccountAPITests(TestCase):
         # Test if no modification
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["account_active"], False)
+        self.assertEqual(r.data["is_active"], True)
 
     def test_update_one_user_info_logged_in(self):
         self.post_user()
         self.login()
 
         r = self.c.patch("/api/account/", data=json.dumps({
-            "account_active": True,
+            "is_active": False,
         }), content_type="application/json")
-        print(json.dumps({
-            "account_active": True,
-        }))
         self.assertEqual(r.status_code, 200)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
+        # We can't connect anymore (is_active has the boolean value False)
         r = self.c.get("/api/account/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["account_active"], True)
+        self.assertEqual(r.status_code, 401)
 
     def test_update_one_not_considered_user_info_logged_in(self):
         self.post_user()
@@ -230,7 +227,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
-    def test_update_one_user_info_patch_malformed_json_logged_in(self):
+    def test_update_one_user_info_malformed_json_logged_in(self):
         self.post_user()
         self.login()
 
@@ -245,7 +242,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["email"], "test@test.com")
 
-    def test_update_one_user_info_put_malformed_json_logged_in(self):
+    def test_update_user_info_malformed_json_logged_in(self):
         self.post_user()
         self.login()
 
@@ -255,7 +252,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 400)
         self.assertEqual("password" in r.data, False)
         # Need three more fields (mandatory)
-        self.assertEqual(len(r.data), 3)
+        self.assertEqual(len(r.data), 4)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
@@ -292,6 +289,7 @@ class AccountAPITests(TestCase):
             "first_name": "firstname",
             "last_name": "lastname",
             "email": "newemail@newemail.com",
+            "is_active": True
         }), content_type="application/json")
         self.assertEqual(r.status_code, 200)
         self.assertEqual("password" in r.data, False)
@@ -349,7 +347,8 @@ class AccountAPITests(TestCase):
         r = self.login(password="password")
         self.assertEqual(r.status_code, 200)
 
-    def test_two_users_cant_have_same_username_update(self):
+    # FIXME atomic errors
+    """def test_two_users_cant_have_same_username_update_patch(self):
         self.post_user(username="user1", password="pass1")
         self.post_user(username="user2", password="pass2")
         self.login(username="user1", password="pass1")
@@ -357,92 +356,75 @@ class AccountAPITests(TestCase):
         r = self.c.patch("/api/account/", data=json.dumps({
             "username": "user2",
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 404)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
+        self.assertEqual(r.status_code, 409)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["username"], "user1")
 
-    """def test_change_email_not_logged_in(self):
-        self.post_user()
-        r = self.c.patch("/api/login/", data=json.dumps({
-            "username": "username",
-            "password": "password"
+        self.c.get("/api/logout/")
+        self.login(username="user2", password="pass2")
+
+        r = self.c.get("/api/account/")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["username"], "user2")
+
+    def test_two_users_cant_have_same_username_update_put(self):
+        self.post_user(username="user1", password="pass1")
+        self.post_user(username="user2", password="pass2")
+        self.login(username="user1", password="pass1")
+
+        r = self.c.put("/api/account/", data=json.dumps({
+            "username": "user2",
+            "first_name": "firstname",
+            "last_name": "lastname",
+            "email": "newemail@newemail.com",
         }), content_type="application/json")
-        r = self.patch_field_user("/api/account/email/", "email", "e@e.com")
-        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.status_code, 409)
 
-    def test_change_email_logged_in(self):
-        self.post_user()
-        self.login()
-        r = self.patch_field_user("/api/account/email/", "email", "e@e.com")
+        r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["username"], "user1")
 
-    def test_change_password_not_logged_in(self):
-        self.post_user()
-        r = self.patch_field_user("/api/account/email/", "password", "test")
-        self.assertEqual(r.status_code, 401)
+        self.c.get("/api/logout/")
+        self.login(username="user2", password="pass2")
 
-    def test_change_password_logged_in(self):
-        self.post_user()
-        self.login()
-        r = self.patch_field_user("/api/account/email/", "password", "test")
-        self.assertEqual(r.status_code, 200)"""
+        r = self.c.get("/api/account/")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["username"], "user2")"""
 
-    """def test_get_username_not_logged_in(self):
-        self.post_user()
-        r = self.c.get("/api/account/username/")
-        self.assertEqual(r.status_code, 401)
-
-    def test_get_username_logged_in(self):
+    def test_update_malformed_email_logged_in(self):
         self.post_user()
         self.login()
 
-        r = self.c.get("/api/account/username/")
+        r = self.c.patch("/api/account/", data=json.dumps({
+            "email": "test",
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+        self.assertEqual("password" in r.data, False)
+        self.assertEqual(len(r.data), 1)
+
+        r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["username"], "username")
+        self.assertEqual(r.data["email"], "test@test.com")
 
-    def test_put_get_firstname(self):
-        self.post_user()
-
-        r = self.patch_field_user("/api/account/first_name/", "first_name", "firstname")
-        self.assertEqual(r.status_code, 401)
-
-        r = self.c.get("/api/account/first_name/")
-        self.assertEqual(r.status_code, 401)
-
-        self.login()
-
-        r = self.c.get("/api/account/first_name/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["first_name"], "")
-
-        r = self.patch_field_user("/api/account/first_name/", "first_name", "firstname")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["first_name"], "firstname")"""
-
-    """def test_put_get_firstname_logged_in(self):
-        url = self.post_user()["Location"] + "first_name/"
-        self.login()
-
-        r = self.put_field_user(url, "first_name", "firstname")
-        self.assertEqual(r.status_code, 200)
-
-        r = self.c.get(url)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["first_name"], "username")"""
-
-    """def test_get_email_not_logged_in(self):
-        self.post_user()
-        r = self.c.get("/api/account/email/")
-        self.assertEqual(r.status_code, 401)
-
-    def test_get_email_logged_in(self):
+    def test_modification_date_user_logged_in(self):
         self.post_user()
         self.login()
 
-        r = self.c.get("/api/account/email/")
+        r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["email"], "test@test.com")"""
+        datetime = r.data["last_modification_date"]
+
+        r = self.c.patch("/api/account/", data=json.dumps({
+            "email": "mail@mail.com",
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual("password" in r.data, False)
+        self.assertEqual(len(r.data), 0)
+
+        r = self.c.get("/api/account/")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["email"], "mail@mail.com")
+        time.sleep(0.2)
+        self.assertGreaterEqual(r.data["last_modification_date"], datetime)

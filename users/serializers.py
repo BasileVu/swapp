@@ -1,28 +1,9 @@
 from rest_framework import serializers
 
-<<<<<<< HEAD
-from items.models import Item, Category
-from users.models import *
+from django.db.utils import IntegrityError
+from rest_framework import status
+from rest_framework.response import Response
 
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(source="item_set", many=True, queryset=Item.objects.all())
-    categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
-
-    class Meta:
-        model = UserProfile
-        fields = ('user', 'account_active', 'items', 'categories')
-
-
-class UserNameSerializer(serializers.ModelSerializer):
-=======
 from users.models import *
 
 
@@ -66,19 +47,18 @@ class UserAccountSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True)
     first_name = serializers.CharField(write_only=True)
     last_name = serializers.CharField(write_only=True)
-    email = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
+    is_active = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = UserProfile
         # TODO add location field
         fields = (
-            'username', 'first_name', 'last_name', 'email', 'account_active',
+            'username', 'first_name', 'last_name', 'email', 'is_active'
         )
-        extra_kwargs = {'account_active': {'write_only': True}}
 
 
 """class UserNameSerializer(serializers.ModelSerializer):
->>>>>>> 00c6a9d... user-rest improvement
     class Meta:
         model = User
         fields = ('username',)
@@ -129,7 +109,7 @@ class UserProfileCategoriesSerializer(serializers.ModelSerializer):
         fields = ('categories',)
 
 
-# A adapter
+# TODO to adapt
 """class NoteSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
 

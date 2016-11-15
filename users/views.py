@@ -186,13 +186,20 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
-            "account_active": user_profile.account_active,
+            "is_active": user.is_active,
             "last_modification_date": user_profile.last_modification_date,
             "categories": [c.id for c in user_profile.categories.all()],
             "items": [i.id for i in user_profile.item_set.all()],
             "notes": [n.id for n in user_profile.note_set.all()],
             "likes": [l.id for l in user_profile.like_set.all()],
         })
+
+    # FIXME two errors occur when we launch the tests (two users can't have the same username)
+    def update(self, request, *args, **kwargs):
+        try:
+            return super(UserAccount, self).update(request, *args, **kwargs)
+        except IntegrityError as e:
+            return Response(status=status.HTTP_409_CONFLICT, data={"error": str(e)})
 
 
 @api_view(['PUT'])
