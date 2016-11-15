@@ -5521,7 +5521,8 @@ body {
           .modal .container .content .showroom .modal-carousel:focus {
             outline: none; }
           .modal .container .content .showroom .modal-carousel .carousel-cell {
-            min-width: 100%;
+            max-width: 100%;
+            width: 100%;
             cursor: move; }
           .modal .container .content .showroom .modal-carousel .flickity-page-dots {
             margin: 0;
@@ -5536,11 +5537,12 @@ body {
               height: 10px;
               border-radius: 100%;
               background-color: #eed5a9;
-              margin: 0 10px; }
+              margin: 0 10px;
+              cursor: pointer; }
               .modal .container .content .showroom .modal-carousel .flickity-page-dots li.is-selected {
                 background-color: #40b2cd; }
         .modal .container .content .showroom .modal-carousel-nav {
-          height: 300px;
+          height: 320px;
           overflow: hidden; }
         .modal .container .content .showroom .carousel-nav {
           cursor: pointer; }

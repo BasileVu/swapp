@@ -1,4 +1,5 @@
 $('document').ready(function() {
+    // home grid ///////////////////////////
     var $grid = $('.grid').isotope({
         // options
         itemSelector: '.grid-item',
@@ -16,6 +17,7 @@ $('document').ready(function() {
         $grid.isotope('layout');
     });
 
+    // home inventory ///////////////////////////
     $('#home-inventory').flickity({
         // options
         cellAlign: 'center',
@@ -27,6 +29,7 @@ $('document').ready(function() {
         adaptiveHeight: true
     });
 
+    // modal slider ///////////////////////////
     var $carousel = $('.modal-carousel').flickity({
         cellAlign: 'center',
         contain: true,
@@ -45,7 +48,6 @@ $('document').ready(function() {
     });
 
     var flkty = $carousel.data('flickity');
-    var navTop  = $carouselNav.position().top;
     var navCellHeight = $carouselNavCells.height();
     var navHeight = $carouselNav.height();
 
@@ -60,5 +62,19 @@ $('document').ready(function() {
         $carouselNav.animate({
             scrollTop: scrollY
         });
+    });
+
+    // display modal ///////////////////////////
+    $('#view-item-x').on('show.bs.modal', function (e) {
+        setTimeout(function () {
+            $('.modal-carousel').flickity('resize');
+            $('.modal-carousel-height').matchHeight({
+                byRow: false,
+                target: $('.modal-carousel')
+            });
+        }, 300)
+    });
+    $('.open-modal-item-x').click(function () {
+        $('#view-item-x').modal('show');
     });
 });
