@@ -12,7 +12,19 @@ class CategorySerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('id', 'name', 'path', 'item')
+        fields = ('id', 'image', 'item')
+
+    def post(self, request, format='jpg'):
+        up_file = request.FILES['file']
+        destination = open('/Users/Username/' + up_file.name, 'wb+')
+        for chunk in up_file.chunks():
+            destination.write(chunk)
+            destination.close()
+
+        # ...
+        # do some stuff with uploaded file
+        # ...
+        return Response(up_file.name, status.HTTP_201_CREATED)
 
 
 class LikeSerializer(serializers.ModelSerializer):

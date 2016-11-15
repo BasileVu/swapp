@@ -4,10 +4,10 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'api/items', views.ItemViewSet)
-router.register(r'api/categories', views.CategoryViewSet)
-router.register(r'api/likes', views.LikeViewSet)
-router.register(r'api/images', views.ImageViewSet)
+router.register(r'items', views.ItemViewSet)
+router.register(r'categories', views.CategoryViewSet)
+router.register(r'likes', views.LikeViewSet)
+router.register(r'images', views.ImageViewSet)
 
 app_name = "items"
 urlpatterns = [
