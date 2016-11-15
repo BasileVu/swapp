@@ -608,3 +608,4 @@ class CSRFTests(TestCase):
         }), content_type="application/json", HTTP_X_CSRFTOKEN=self.get_csrf())
         self.assertEqual(r.status_code, 200)"""
 
+
