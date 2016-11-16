@@ -277,4 +277,6 @@ tests/report/
 .sass-cache/
 
 ## angular
-.baseDir.ts
+.baseDir.*
+*.tmp.*
+.tscache/
