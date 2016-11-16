@@ -8,7 +8,7 @@ import {Component, ViewEncapsulation } from '@angular/core';
     templateUrl: './home.component.html'
 })
 
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent {
 
     constructor() {
     }
