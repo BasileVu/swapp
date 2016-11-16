@@ -31,7 +31,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         )
 
         if category_name is not None:
-            category_list = Category.objects.filter(name__icontains=category_name)
+            category_list = Category.objects.filter(name=category_name)
             queryset = queryset.filter(category__in=category_list)
 
         if price_max is not None:

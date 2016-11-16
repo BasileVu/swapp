@@ -120,8 +120,6 @@ class ItemSearchApiTests(TestCase):
         self.create_item(c1, u2, name="New mouse", description="Brand new", price_min=20, price_max=100)
         self.create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000)
 
-        self.client.login()
-
     def test_list_item_no_filter(self):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, 200)
@@ -134,11 +132,11 @@ class ItemSearchApiTests(TestCase):
 
         r = self.client.get(self.url + "?category=test")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 5)
+        self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.url + "?category=Test")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 5)
+        self.assertEqual(len(r.data), 2)
 
         r = self.client.get(self.url + "?category=Test2")
         self.assertEqual(r.status_code, 200)
@@ -147,7 +145,6 @@ class ItemSearchApiTests(TestCase):
         r = self.client.get(self.url + "?category=Test3")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 1)
-
 
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
