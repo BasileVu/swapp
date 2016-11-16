@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -61,7 +62,11 @@ class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
 
 
-class LikeViewSet(viewsets.ModelViewSet):
+class LikeViewSet(mixins.RetrieveModelMixin,
+                  mixins.DestroyModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
 

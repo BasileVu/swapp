@@ -333,8 +333,6 @@ class ImageAPITests(TestCase):
 
 
 class CategoryAPITests(TestCase):
-    c = Client()
-
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
         self.current_user.userprofile.save()
@@ -343,16 +341,16 @@ class CategoryAPITests(TestCase):
         self.login()
 
     def login(self):
-        return self.c.post("/api/login/", data=json.dumps({
+        return self.client.post("/api/login/", data=json.dumps({
             "username": "username",
             "password": "password"
         }), content_type="application/json")
 
     def get_categories(self):
-        return self.c.get("/api/categories/", content_type="application/json")
+        return self.client.get("/api/categories/", content_type="application/json")
 
     def get_category(self, id_category=1):
-        return self.c.get("/api/categories/" + str(id_category) + "/", content_type="application/json")
+        return self.client.get("/api/categories/" + str(id_category) + "/", content_type="application/json")
 
     def test_get_categories(self):
         r = self.get_categories()
@@ -383,149 +381,100 @@ class CategoryAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, 405)
 
-        r = self.client.post("/api/categories/1/", data=json.dumps({
-            "name": "test"
-        }), content_type="application/json")
+        r = self.client.delete("/api/categories/1/", content_type="application/json")
         self.assertEqual(r.status_code, 405)
 
-'''
-class LikeAPITests(TestCase):
-    c = Client()
 
+class LikeAPITests(TestCase):
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
         self.current_user.userprofile.location = "location"
         self.current_user.userprofile.save()
-        Category.objects.create(name="Test")
-        Category.objects.create(name="Test2")
-        self.login()
 
-    def post_user(self, username="username", email="test@test.com", password="password"):
-        return self.c.post("/api/users/", data=json.dumps({
-            "username": username,
-            "email": email,
-            "password": password
-        }), content_type="application/json")
+        c1 = Category.objects.create(name="Test")
+        c2 = Category.objects.create(name="Test2")
+
+        self.other_user = User.objects.create_user(username="user1", email="test@test.com", password="password").userprofile
+
+        self.create_item(c1, self.other_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
+        self.create_item(c2, self.current_user.userprofile, name="Shirt", description="My old shirt", price_min=5, price_max=30)
+
+    def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
+        return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
+                                   archived=archived, category=category, owner=owner)
 
     def login(self):
-        return self.c.post("/api/login/", data=json.dumps({
+        return self.client.post("/api/login/", data=json.dumps({
             "username": "username",
             "password": "password"
         }), content_type="application/json")
 
-    def post_offer(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
-        return self.c.post("/api/items/", data=json.dumps({
-            "name": name,
-            "description": description,
-            "price_min": price_min,
-            "price_max": price_max,
-            "category": category,
-            "image_set": image_set
+    def post_like(self, user, item):
+        return self.client.post("/api/likes/", data=json.dumps({
+            "user": user,
+            "item": item
         }), content_type="application/json")
 
-    def get_offer(self):
-        return self.c.get("/api/items/", content_type="application/json")
+    def get_likes(self):
+        return self.client.get("/api/likes/", content_type="application/json")
 
-    def get_offer(self, id_item=1):
-        return self.c.get("/api/items/" + str(id_item) + "/", content_type="application/json")
+    def get_like(self, id_like):
+        return self.client.get("/api/likes/" + str(id_like) + "/", content_type="application/json")
 
-    def put_offer(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
-        return self.c.put("/api/items/" + str(id_item) + "/", data=json.dumps({
-            "name": name,
-            "description": description,
-            "price_min": price_min,
-            "price_max": price_max,
-            "category": category,
-            "image_set": image_set
-        }), content_type="application/json")
+    def delete_like(self, id_like):
+        return self.client.delete("/api/items/" + str(id_like) + "/", content_type="application/json")
 
-    def delete_offer(self, id_item=1):
-        return self.c.delete("/api/items/" + str(id_item) + "/", content_type="application/json")
-
-    def patch_offer(self, id_item=1, data=json.dumps({"name": "test"})):
-        return self.c.patch("/api/items/" + str(id_item) + "/", data=data, content_type="application/json")
-
-    def test_post_offer(self):
-        self.c.login()
-        r = self.post_item()
+    def test_post_like(self):
+        self.client.login()
+        r = self.post_like(1, self.current_user.userprofile.id)
         self.assertEqual(r.status_code, 201)
 
-    def test_get_offers(self):
-        r = self.get_items()
+    def test_get_likes(self):
+        r = self.get_likes()
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
         self.client.login()
-        r = self.post_item()
+        r = self.post_like(1, self.current_user.userprofile.id)
         self.assertEqual(r.status_code, 201)
-        r = self.get_items()
+        r = self.get_likes()
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 1)
 
-    def test_get_offer(self):
+    def test_get_like(self):
         self.client.login()
-        r = self.post_item()
+        r = self.post_like(1, self.current_user.userprofile.id)
         self.assertEqual(r.status_code, 201)
-        r = self.get_item(id_item=r.data['id'])
+        r = self.get_like(id_like=r.data['id'])
         self.assertEqual(r.status_code, 200)
-        r = self.get_item(id_item=10)
+        r = self.get_like(id_like=10)
         self.assertEqual(r.status_code, 404)
 
-    def test_put_offer(self):
+    def test_delete_like(self):
         self.client.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        r = self.post_like(1, self.current_user.userprofile.id)
         self.assertEqual(r.status_code, 201)
         id_item = r.data['id']
-        r = self.put_item(id_item=id_item, name="test2", description="test2", price_min=2, price_max=3, category=2)
-        self.assertEqual(r.status_code, 200)
-        r = self.get_item(id_item=id_item)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data['name'], "test2")
-        self.assertEqual(r.data['description'], "test2")
-        self.assertEqual(r.data['price_min'], 2)
-        self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
-        r = self.put_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
-
-    def test_patch_offer(self):
-        self.client.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
-        id_item = r.data['id']
-        r = self.patch_item(id_item=id_item, data=json.dumps({"name": "test2"}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_item(id_item=id_item, data=json.dumps({"description": "test2"}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_item(id_item=id_item, data=json.dumps({"price_min": 2}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_item(id_item=id_item, data=json.dumps({"price_max": 3}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_item(id_item=id_item, data=json.dumps({"category": 2}))
-        self.assertEqual(r.status_code, 200)
-        r = self.get_item(id_item=id_item)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data['name'], "test2")
-        self.assertEqual(r.data['description'], "test2")
-        self.assertEqual(r.data['price_min'], 2)
-        self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
-        r = self.patch_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
-
-    def test_delete_category(self):
-        self.client.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
-        id_item = r.data['id']
-        r = self.get_items()
+        r = self.get_likes()
         self.assertEqual(len(r.data), 1)
-        r = self.delete_item(id_item=id_item)
+        r = self.delete_like(id_like=id_item)
         self.assertEqual(r.status_code, 204)
-        r = self.get_items()
+        r = self.get_likes()
         self.assertEqual(len(r.data), 0)
-        r = self.delete_item(id_item=10)
+        r = self.delete_like(id_like=10)
         self.assertEqual(r.status_code, 404)
-'''
+
+    def test_put_patch_should_be_denied_offer(self):
+        self.client.login()
+
+        r = self.client.put("/api/likes/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+        r = self.client.patch("/api/likes/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
 
 
 class ItemSearchApiTests(TestCase):
