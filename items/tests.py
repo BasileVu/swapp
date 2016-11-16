@@ -1,6 +1,9 @@
 import json
 
 import logging
+from tempfile import NamedTemporaryFile
+
+from PIL import Image as ImagePil
 from django.test import Client
 from django.test import TestCase
 from items.models import *
@@ -196,6 +199,334 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
     '''
 
+'''
+class ImageAPITests(TestCase):
+
+    def setUp(self):
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.location = "location"
+        self.current_user.userprofile.save()
+
+        self.tmp_file = ImagePil.new('RGB', (100, 100))
+
+        self.c = Category.objects.create(name="Test")
+        self.i = Item.objects.create(name="Test", description="Test", price_min=1, price_max=2,
+                                     archived=False, category=self.c, owner=self.current_user.userprofile)
+
+        self.login()
+
+    def login(self):
+        return self.client.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+
+    def post_image(self, image, item):
+        return self.client.post("/api/images/", data=json.dumps({
+            "image": image,
+            "item": item
+        }), content_type="application/json", format='multipart')
+
+    def get_images(self):
+        return self.client.get("/api/images/", content_type="application/json")
+
+    def get_image(self, id_image=1):
+        return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
+
+    def put_image(self, id_image=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+        return self.client.put("/api/images/" + str(id_image) + "/", data=json.dumps({
+            "name": name,
+            "description": description,
+            "price_min": price_min,
+            "price_max": price_max,
+            "category": category,
+            "image_set": image_set
+        }), content_type="application/json", format='multipart')
+
+    def delete_image(self, id_image=1):
+        return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
+
+    def patch_image(self, id_image=1, data=json.dumps({"name": "test"})):
+        return self.client.patch("/api/images/" + str(id_image) + "/", data=data, content_type="application/json", format='multipart')
+
+    def test_post_image(self):
+        self.client.login()
+        r = self.post_image(self.tmp_file, self.i)
+        self.assertEqual(r.status_code, 201)
+
+    def test_get_image(self):
+        r = self.get_image()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+        self.client.login()
+        r = self.post_image()
+        self.assertEqual(r.status_code, 201)
+        r = self.get_image()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1)
+
+    def test_get_image(self):
+        self.client.login()
+        r = self.post_image()
+        self.assertEqual(r.status_code, 201)
+        r = self.get_image(id_image=r.data['id'])
+        self.assertEqual(r.status_code, 200)
+        r = self.get_image(id_image=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_put_image(self):
+        self.client.login()
+        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_image = r.data['id']
+        r = self.put_image(id_image=id_image, name="test2", description="test2", price_min=2, price_max=3, category=2)
+        self.assertEqual(r.status_code, 200)
+        r = self.get_image(id_image=id_image)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test2")
+        self.assertEqual(r.data['description'], "test2")
+        self.assertEqual(r.data['price_min'], 2)
+        self.assertEqual(r.data['price_max'], 3)
+        self.assertEqual(r.data['category'], 2)
+        r = self.put_image(id_image=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_patch_image(self):
+        self.client.login()
+        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_image = r.data['id']
+        r = self.patch_image(id_image=id_image, data=json.dumps({"name": "test2"}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_image(id_image=id_image, data=json.dumps({"description": "test2"}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_image(id_image=id_image, data=json.dumps({"price_min": 2}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_image(id_image=id_image, data=json.dumps({"price_max": 3}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_image(id_image=id_image, data=json.dumps({"category": 2}))
+        self.assertEqual(r.status_code, 200)
+        r = self.get_image(id_image=id_image)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test2")
+        self.assertEqual(r.data['description'], "test2")
+        self.assertEqual(r.data['price_min'], 2)
+        self.assertEqual(r.data['price_max'], 3)
+        self.assertEqual(r.data['category'], 2)
+        r = self.patch_image(id_image=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_delete_image(self):
+        self.client.login()
+        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_image = r.data['id']
+        r = self.get_images()
+        self.assertEqual(len(r.data), 1)
+        r = self.delete_image(id_image=id_image)
+        self.assertEqual(r.status_code, 204)
+        r = self.get_images()
+        self.assertEqual(len(r.data), 0)
+        r = self.delete_image(id_image=10)
+        self.assertEqual(r.status_code, 404)
+'''
+
+
+class CategoryAPITests(TestCase):
+    c = Client()
+
+    def setUp(self):
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.save()
+        Category.objects.create(name="Test")
+        Category.objects.create(name="Test2")
+        self.login()
+
+    def login(self):
+        return self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+
+    def get_categories(self):
+        return self.c.get("/api/categories/", content_type="application/json")
+
+    def get_category(self, id_category=1):
+        return self.c.get("/api/categories/" + str(id_category) + "/", content_type="application/json")
+
+    def test_get_categories(self):
+        r = self.get_categories()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 2)
+
+    def test_get_category(self):
+        r = self.get_category(id_category=1)
+        self.assertEqual(r.status_code, 200)
+        r = self.get_category(id_category=100)
+        self.assertEqual(r.status_code, 404)
+
+    def test_post_delete_put_patch_should_not_work_category(self):
+        self.client.login()
+
+        r = self.client.post("/api/categories/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+        r = self.client.put("/api/categories/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+        r = self.client.patch("/api/categories/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+        r = self.client.post("/api/categories/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+'''
+class LikeAPITests(TestCase):
+    c = Client()
+
+    def setUp(self):
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.location = "location"
+        self.current_user.userprofile.save()
+        Category.objects.create(name="Test")
+        Category.objects.create(name="Test2")
+        self.login()
+
+    def post_user(self, username="username", email="test@test.com", password="password"):
+        return self.c.post("/api/users/", data=json.dumps({
+            "username": username,
+            "email": email,
+            "password": password
+        }), content_type="application/json")
+
+    def login(self):
+        return self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
+        }), content_type="application/json")
+
+    def post_offer(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+        return self.c.post("/api/items/", data=json.dumps({
+            "name": name,
+            "description": description,
+            "price_min": price_min,
+            "price_max": price_max,
+            "category": category,
+            "image_set": image_set
+        }), content_type="application/json")
+
+    def get_offer(self):
+        return self.c.get("/api/items/", content_type="application/json")
+
+    def get_offer(self, id_item=1):
+        return self.c.get("/api/items/" + str(id_item) + "/", content_type="application/json")
+
+    def put_offer(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+        return self.c.put("/api/items/" + str(id_item) + "/", data=json.dumps({
+            "name": name,
+            "description": description,
+            "price_min": price_min,
+            "price_max": price_max,
+            "category": category,
+            "image_set": image_set
+        }), content_type="application/json")
+
+    def delete_offer(self, id_item=1):
+        return self.c.delete("/api/items/" + str(id_item) + "/", content_type="application/json")
+
+    def patch_offer(self, id_item=1, data=json.dumps({"name": "test"})):
+        return self.c.patch("/api/items/" + str(id_item) + "/", data=data, content_type="application/json")
+
+    def test_post_offer(self):
+        self.c.login()
+        r = self.post_item()
+        self.assertEqual(r.status_code, 201)
+
+    def test_get_offers(self):
+        r = self.get_items()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+        self.client.login()
+        r = self.post_item()
+        self.assertEqual(r.status_code, 201)
+        r = self.get_items()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1)
+
+    def test_get_offer(self):
+        self.client.login()
+        r = self.post_item()
+        self.assertEqual(r.status_code, 201)
+        r = self.get_item(id_item=r.data['id'])
+        self.assertEqual(r.status_code, 200)
+        r = self.get_item(id_item=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_put_offer(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_item = r.data['id']
+        r = self.put_item(id_item=id_item, name="test2", description="test2", price_min=2, price_max=3, category=2)
+        self.assertEqual(r.status_code, 200)
+        r = self.get_item(id_item=id_item)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test2")
+        self.assertEqual(r.data['description'], "test2")
+        self.assertEqual(r.data['price_min'], 2)
+        self.assertEqual(r.data['price_max'], 3)
+        self.assertEqual(r.data['category'], 2)
+        r = self.put_item(id_item=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_patch_offer(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_item = r.data['id']
+        r = self.patch_item(id_item=id_item, data=json.dumps({"name": "test2"}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_item(id_item=id_item, data=json.dumps({"description": "test2"}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_item(id_item=id_item, data=json.dumps({"price_min": 2}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_item(id_item=id_item, data=json.dumps({"price_max": 3}))
+        self.assertEqual(r.status_code, 200)
+        r = self.patch_item(id_item=id_item, data=json.dumps({"category": 2}))
+        self.assertEqual(r.status_code, 200)
+        r = self.get_item(id_item=id_item)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test2")
+        self.assertEqual(r.data['description'], "test2")
+        self.assertEqual(r.data['price_min'], 2)
+        self.assertEqual(r.data['price_max'], 3)
+        self.assertEqual(r.data['category'], 2)
+        r = self.patch_item(id_item=10)
+        self.assertEqual(r.status_code, 404)
+
+    def test_delete_category(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_item = r.data['id']
+        r = self.get_items()
+        self.assertEqual(len(r.data), 1)
+        r = self.delete_item(id_item=id_item)
+        self.assertEqual(r.status_code, 204)
+        r = self.get_items()
+        self.assertEqual(len(r.data), 0)
+        r = self.delete_item(id_item=10)
+        self.assertEqual(r.status_code, 404)
+'''
+
 
 class ItemSearchApiTests(TestCase):
 
@@ -320,3 +651,4 @@ class ItemSearchApiTests(TestCase):
         r = self.client.get(self.url + "?price_min=0&price_max=1000")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
+
