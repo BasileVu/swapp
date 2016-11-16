@@ -1,4 +1,7 @@
+from django.db.models import Q
+from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from items.models import Like
 from items.serializers import *
@@ -10,6 +13,31 @@ from items.serializers import *
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+    def list(self, request, *args, **kwargs):
+        q = self.request.query_params.get("q", "")
+        category_name = self.request.query_params.get("category", None)
+        latitude = self.request.query_params.get("lat", 0)  # TODO
+        longitude = self.request.query_params.get("lon", 0)  # TODO
+        price_min = self.request.query_params.get("price_min", 0)
+        price_max = self.request.query_params.get("price_max", None)
+        order_by = self.request.query_params.get("order_by", None)  # TODO
+        limit = self.request.query_params.get("limit", None)  # TODO
+        page = self.request.query_params.get("page", None)  # TODO
+
+        queryset = Item.objects.filter(
+            Q(name__icontains=q) | Q(description__icontains=q),
+            price_min__gte=int(price_min)
+        )
+
+        if category_name is not None:
+            category_list = Category.objects.filter(name__icontains=category_name)
+            queryset = queryset.filter(category__in=category_list)
+
+        if price_max is not None:
+            queryset = queryset.filter(price_max__lte=int(price_max))
+
+        return Response(ItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.userprofile)
