@@ -69,6 +69,13 @@ module.exports = function(grunt) {
                 }
             }
         },
+        ts: {
+            default: {
+                src: ["static/ts/**/*.ts", "!node_modules/**"],
+                outDir: 'static/public/js/',
+                tsconfig: true
+            }
+        },
         watch: {
             styles: {
                 expand: true,
@@ -92,8 +99,9 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
-    grunt.registerTask('default', ['copy', 'sass']);
+    grunt.registerTask('default', ['copy', 'sass', 'ts']);
 };
