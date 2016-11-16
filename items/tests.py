@@ -199,7 +199,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
     '''
 
-'''
+
 class ImageAPITests(TestCase):
 
     def setUp(self):
@@ -233,21 +233,8 @@ class ImageAPITests(TestCase):
     def get_image(self, id_image=1):
         return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
 
-    def put_image(self, id_image=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
-        return self.client.put("/api/images/" + str(id_image) + "/", data=json.dumps({
-            "name": name,
-            "description": description,
-            "price_min": price_min,
-            "price_max": price_max,
-            "category": category,
-            "image_set": image_set
-        }), content_type="application/json", format='multipart')
-
     def delete_image(self, id_image=1):
         return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
-
-    def patch_image(self, id_image=1, data=json.dumps({"name": "test"})):
-        return self.client.patch("/api/images/" + str(id_image) + "/", data=data, content_type="application/json", format='multipart')
 
     def test_post_image(self):
         self.client.login()
@@ -274,47 +261,18 @@ class ImageAPITests(TestCase):
         r = self.get_image(id_image=10)
         self.assertEqual(r.status_code, 404)
 
-    def test_put_image(self):
+    def test_put_patch_should_be_denied_offer(self):
         self.client.login()
-        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
-        id_image = r.data['id']
-        r = self.put_image(id_image=id_image, name="test2", description="test2", price_min=2, price_max=3, category=2)
-        self.assertEqual(r.status_code, 200)
-        r = self.get_image(id_image=id_image)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data['name'], "test2")
-        self.assertEqual(r.data['description'], "test2")
-        self.assertEqual(r.data['price_min'], 2)
-        self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
-        r = self.put_image(id_image=10)
-        self.assertEqual(r.status_code, 404)
 
-    def test_patch_image(self):
-        self.client.login()
-        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
-        id_image = r.data['id']
-        r = self.patch_image(id_image=id_image, data=json.dumps({"name": "test2"}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_image(id_image=id_image, data=json.dumps({"description": "test2"}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_image(id_image=id_image, data=json.dumps({"price_min": 2}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_image(id_image=id_image, data=json.dumps({"price_max": 3}))
-        self.assertEqual(r.status_code, 200)
-        r = self.patch_image(id_image=id_image, data=json.dumps({"category": 2}))
-        self.assertEqual(r.status_code, 200)
-        r = self.get_image(id_image=id_image)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data['name'], "test2")
-        self.assertEqual(r.data['description'], "test2")
-        self.assertEqual(r.data['price_min'], 2)
-        self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
-        r = self.patch_image(id_image=10)
-        self.assertEqual(r.status_code, 404)
+        r = self.client.put("/api/likes/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+        r = self.client.patch("/api/likes/1/", data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
 
     def test_delete_image(self):
         self.client.login()
@@ -329,7 +287,6 @@ class ImageAPITests(TestCase):
         self.assertEqual(len(r.data), 0)
         r = self.delete_image(id_image=10)
         self.assertEqual(r.status_code, 404)
-'''
 
 
 class CategoryAPITests(TestCase):
@@ -463,7 +420,7 @@ class LikeAPITests(TestCase):
         r = self.delete_like(id_like=10)
         self.assertEqual(r.status_code, 404)
 
-    def test_put_patch_should_be_denied_offer(self):
+    def test_put_patch_should_be_denied(self):
         self.client.login()
 
         r = self.client.put("/api/likes/1/", data=json.dumps({
