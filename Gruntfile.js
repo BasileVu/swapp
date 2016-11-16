@@ -34,6 +34,11 @@ module.exports = function(grunt) {
                         cwd: 'node_modules/rxjs/',
                         src: ['**'],
                         dest: 'static/public/js/vendor/rxjs/'
+                    }, {
+                        expand: true,
+                        cwd: 'static/ts/',
+                        src: ['**', '!**/*.ts'],
+                        dest: 'static/public/js/'
                     }
                 ]
             }
