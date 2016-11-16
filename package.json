@@ -27,13 +27,14 @@
     "zone.js": "^0.6.25"
   },
   "devDependencies": {
+    "@types/core-js": "^0.9.34",
+    "@types/node": "^6.0.45",
+    "concurrently": "^3.0.0",
     "grunt": "1.0.1",
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-sass": "1.0.0",
     "grunt-contrib-watch": "1.0.0",
-    "@types/core-js": "^0.9.34",
-    "@types/node": "^6.0.45",
-    "concurrently": "^3.0.0",
+    "grunt-ts": "^6.0.0-beta.3",
     "lite-server": "^2.2.2",
     "typescript": "^2.0.3"
   },

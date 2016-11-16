@@ -275,3 +275,6 @@ tests/report/
 *.sqlite2
 *.sqlite3
 .sass-cache/
+
+## angular
+.baseDir.ts
