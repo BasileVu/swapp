@@ -5,9 +5,6 @@ import {ItemsService} from "./items.service";
 // Add the RxJS Observable operators.
 import {Item} from "./item";
 
-/* To use our JS library */
-declare var homeGrid: any
-
 @Component({
     moduleId: module.id,
     selector: 'items',
