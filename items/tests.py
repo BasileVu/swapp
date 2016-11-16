@@ -1,9 +1,11 @@
 import json
 
 import logging
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 from PIL import Image as ImagePil
+from django.core.files.base import ContentFile
 from django.test import Client
 from django.test import TestCase
 from items.models import *
@@ -207,11 +209,15 @@ class ImageAPITests(TestCase):
         self.current_user.userprofile.location = "location"
         self.current_user.userprofile.save()
 
-        self.tmp_file = ImagePil.new('RGB', (100, 100))
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        file = BytesIO(image.tobytes())
+        file.name = 'test.png'
+        file.seek(0)
+        self.file = ContentFile(file.read(), 'test.png')
 
-        self.c = Category.objects.create(name="Test")
-        self.i = Item.objects.create(name="Test", description="Test", price_min=1, price_max=2,
-                                     archived=False, category=self.c, owner=self.current_user.userprofile)
+        c = Category.objects.create(name="Test")
+        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2,
+                                     archived=False, category=c, owner=self.current_user.userprofile)
 
         self.login()
 
@@ -238,7 +244,7 @@ class ImageAPITests(TestCase):
 
     def test_post_image(self):
         self.client.login()
-        r = self.post_image(self.tmp_file, self.i)
+        r = self.post_image(self.file, 1)
         self.assertEqual(r.status_code, 201)
 
     def test_get_image(self):
