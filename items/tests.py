@@ -69,6 +69,9 @@ class ItemAPITests(TestCase):
             "image_set": image_set
         }), content_type="application/json")
 
+    def delete_item(self, id_item=1):
+        return self.c.delete("/api/items/" + str(id_item) + "/", content_type="application/json")
+
     def patch_item(self, id_item=1, data=json.dumps({"name": "test"})):
         return self.c.patch("/api/items/" + str(id_item) + "/", data=data, content_type="application/json")
 
@@ -147,6 +150,19 @@ class ItemAPITests(TestCase):
         r = self.patch_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
+    def test_delete_item(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        id_item = r.data['id']
+        r = self.get_items()
+        self.assertEqual(len(r.data), 1)
+        r = self.delete_item(id_item=id_item)
+        self.assertEqual(r.status_code, 204)
+        r = self.get_items()
+        self.assertEqual(len(r.data), 0)
+        r = self.delete_item(id_item=10)
+        self.assertEqual(r.status_code, 404)
     '''
     def test_post_item_user_location_not_specified(self):
         self.current_user.userprofile.location = ""
