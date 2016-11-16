@@ -127,6 +127,28 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
+    def test_list_item_category(self):
+        r = self.client.get(self.url + "?category=category")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+
+        r = self.client.get(self.url + "?category=test")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 5)
+
+        r = self.client.get(self.url + "?category=Test")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 5)
+
+        r = self.client.get(self.url + "?category=Test2")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 2)
+
+        r = self.client.get(self.url + "?category=Test3")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1)
+
+
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
         self.assertEqual(r.status_code, 200)
