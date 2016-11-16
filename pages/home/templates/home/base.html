@@ -6,6 +6,7 @@
 {% include 'home/head.html' %}
 
 <body id="swapp">
+    <my-app>Loading...</my-app>
 
 {% include 'header_menu/menu.html' %}
 
@@ -24,5 +25,13 @@
 <script src="{% static 'js/jquery.matchHeight.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNi0DkJRcQiOhJzSitoV5GhlacK6fNtKs" async defer></script>
+
+<script src="{% static 'js/zone.js' %}"></script>
+<script src="{% static 'js/Reflect.js' %}"></script>
+<script src="{% static 'js/system.src.js' %}"></script>
+<script src="{% static 'js/systemjs.config.js' %}"></script>
+<script>
+    System.import('app').catch(function(err){ console.error(err); });
+</script>
 </body>
 </html>
