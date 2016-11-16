@@ -1,0 +1,65 @@
+<!--<app-title [subtitle]="subtitle"></app-title>-->
+<!--<nav>-->
+    <!--<a routerLink="items"   routerLinkActive="active">Items</a>-->
+    <!--<a routerLink="crisis"  routerLinkActive="active">Crisis Center</a>-->
+    <!--<a routerLink="heroes"  routerLinkActive="active">Heroes</a>-->
+<!--</nav>-->
+<!--<router-outlet></router-outlet>-->
+
+<nav id="header-navbar" class="navbar navbar-light navbar-fixed-top">
+    <div class="container hidden-sm-down">
+        <div class="pull-lg-left">
+            <ul class="nav navbar-nav pull-lg-left">
+                <li class="nav-item active">
+                    <a class="nav-link" routerLink="home" routerLinkActive="active"><i class="fa fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-bell"></i> Notifs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-envelope"></i> Messages</a>
+                </li>
+            </ul>
+        </div>
+        <app-title [subtitle]="subtitle"></app-title>
+        <div class="pull-md-right">
+            <ul class="nav navbar-nav pull-lg-left">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Infos <i class="fa fa-info-circle"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Configs <i class="fa fa-cog"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Profile <img class="avatar" src="http://placehold.it/25x25"/></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="responsive-menu" class="container hidden-md-up">
+        <a id="responsive-header-logo" href="#">SWAPP</a>
+        <button id="responsive-menu-toggle" class="btn btn-reversed btn-primary" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div id="navbarResponsive" class="collapse navbar-toggleable-md">
+            <ul class="nav navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-bell"></i> Notifs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-envelope"></i> Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Infos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-cog"></i> Configs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><img class="avatar" src="http://placehold.it/25x25"/> Profile</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<router-outlet></router-outlet>
