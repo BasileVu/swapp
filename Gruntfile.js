@@ -43,6 +43,19 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        sync: {
+            main: {
+                files: [
+                    {
+                        cwd: 'static/ts/',
+                        src: ['**', '!**/*.ts'],
+                        dest: 'static/public/js/'
+                    }
+                ],
+                verbose: true,
+                failOnError: true
+            }
+        },
         sass: {
             dist: {
                 files: {
@@ -67,17 +80,22 @@ module.exports = function(grunt) {
             }
         },
         watch: {
+            copies: {
+                files: ['static/ts/**/*.html'],
+                tasks: ['sync']
+            },
             styles: {
-                expand: true,
-                files: ['**/*.scss'],
+                files: ['static/scss/**/*.scss'],
                 tasks: ['sass']
+            },
+            typescripts: {
+                files: ['static/ts/**/*.ts'],
+                tasks: ['ts']
             },
             livereload: {
                 files : [
-                    '**/static/public/js/*.js',
-                    '**/templates/**/*.html',
-                    '**/static/public/css/*.css',
-                    '**/static/scss/*.scss',
+                    '**/templates/**/*',
+                    '**/static/public/**/*',
                     '**/*.py'
                 ],
                 options: {
@@ -88,6 +106,7 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks('grunt-contrib-watch');
