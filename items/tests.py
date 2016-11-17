@@ -1,6 +1,7 @@
 import json
 
 import logging
+import tempfile
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
@@ -209,12 +210,6 @@ class ImageAPITests(TestCase):
         self.current_user.userprofile.location = "location"
         self.current_user.userprofile.save()
 
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        file = BytesIO(image.tobytes())
-        file.name = 'test.png'
-        file.seek(0)
-        self.file = ContentFile(file.read(), 'test.png')
-
         c = Category.objects.create(name="Test")
         Item.objects.create(name="Test", description="Test", price_min=1, price_max=2,
                                      archived=False, category=c, owner=self.current_user.userprofile)
@@ -227,11 +222,13 @@ class ImageAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_image(self, image, item):
-        return self.client.post("/api/images/", data=json.dumps({
-            "image": image,
-            "item": item
-        }), content_type="application/json", format='multipart')
+    def post_image(self, item):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        #file = tempfile.NamedTemporaryFile(suffix='.png')
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
 
     def get_images(self):
         return self.client.get("/api/images/", content_type="application/json")
@@ -244,7 +241,7 @@ class ImageAPITests(TestCase):
 
     def test_post_image(self):
         self.client.login()
-        r = self.post_image(self.file, 1)
+        r = self.post_image(1)
         self.assertEqual(r.status_code, 201)
 
     def test_get_image(self):
@@ -252,7 +249,7 @@ class ImageAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
         self.client.login()
-        r = self.post_image()
+        r = self.post_image(1)
         self.assertEqual(r.status_code, 201)
         r = self.get_image()
         self.assertEqual(r.status_code, 200)
@@ -260,7 +257,7 @@ class ImageAPITests(TestCase):
 
     def test_get_image(self):
         self.client.login()
-        r = self.post_image()
+        r = self.post_image(1)
         self.assertEqual(r.status_code, 201)
         r = self.get_image(id_image=r.data['id'])
         self.assertEqual(r.status_code, 200)
@@ -282,7 +279,7 @@ class ImageAPITests(TestCase):
 
     def test_delete_image(self):
         self.client.login()
-        r = self.post_image(name="test", description="test", price_min=1, price_max=2, category=1)
+        r = self.post_image(1)
         self.assertEqual(r.status_code, 201)
         id_image = r.data['id']
         r = self.get_images()
