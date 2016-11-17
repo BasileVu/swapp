@@ -1,13 +1,14 @@
 from django.conf.urls import url, include
-from rest_framework import routers
 
+from swapp.ShareAPIRootRouter import SharedAPIRootRouter
 from . import views
 
-router = routers.DefaultRouter()
-router.register(r'items', views.ItemViewSet)
-router.register(r'categories', views.CategoryViewSet)
-router.register(r'likes', views.LikeViewSet)
-router.register(r'images', views.ImageViewSet)
+router = SharedAPIRootRouter()
+router.register(r'items', views.ItemViewSet, base_name="items")
+router.register(r'categories', views.CategoryViewSet, base_name="categories")
+router.register(r'likes', views.LikeViewSet, base_name="likes")
+router.register(r'images', views.ImageViewSet, base_name="images")
+
 
 app_name = "items"
 urlpatterns = [
