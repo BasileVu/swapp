@@ -17,6 +17,8 @@ var inventory_component_1 = require('./inventory/inventory.component');
 var profile_component_1 = require('./profile/profile.component');
 var items_component_1 = require('./items/items.component');
 var search_component_1 = require('./search/search.component');
+var search_modal_component_1 = require('./search-modal/search-modal.component');
+var items_modal_component_1 = require('./items-modal/items-modal.component');
 var inventory_service_1 = require('./inventory/inventory.service');
 var profile_service_1 = require('./profile/profile.service');
 var items_service_1 = require('./items/items.service');
@@ -36,6 +38,8 @@ var HomeModule = (function () {
                 profile_component_1.ProfileComponent,
                 items_component_1.ItemsComponent,
                 search_component_1.SearchComponent,
+                search_modal_component_1.SearchModalComponent,
+                items_modal_component_1.ItemsModalComponent,
                 home_component_1.HomeComponent
             ],
             providers: [

@@ -9,31 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var items_service_1 = require("./items.service");
-var ItemsComponent = (function () {
-    function ItemsComponent(itemsService) {
-        this.itemsService = itemsService;
-        this.errorMessage = "No items available for now";
-        this.mode = 'Observable';
+var ItemsModalComponent = (function () {
+    function ItemsModalComponent() {
     }
-    ItemsComponent.prototype.ngOnInit = function () {
-        this.getItems();
+    ItemsModalComponent.prototype.ngOnInit = function () {
+        console.log('initiated items Modal');
     };
-    ItemsComponent.prototype.getItems = function () {
-        var _this = this;
-        this.itemsService.getItems()
-            .subscribe(function (items) { return _this.items = items; }, function (error) { return _this.errorMessage = error; });
+    ItemsModalComponent.prototype.ngAfterContentInit = function () {
+        console.log("items modal after content init");
     };
-    ItemsComponent = __decorate([
+    ItemsModalComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
-            selector: 'items',
+            selector: 'items-modal',
             encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './items.component.html'
+            templateUrl: './items-modal.component.html'
         }), 
-        __metadata('design:paramtypes', [items_service_1.ItemsService])
-    ], ItemsComponent);
-    return ItemsComponent;
+        __metadata('design:paramtypes', [])
+    ], ItemsModalComponent);
+    return ItemsModalComponent;
 }());
-exports.ItemsComponent = ItemsComponent;
-//# sourceMappingURL=items.component.js.map
+exports.ItemsModalComponent = ItemsModalComponent;
+//# sourceMappingURL=items-modal.component.js.map

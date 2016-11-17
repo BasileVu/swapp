@@ -1,6 +1,8 @@
 "use strict";
 var Item = (function () {
-    function Item() {
+    function Item(id, name) {
+        this.id = id;
+        this.name = name;
     }
     return Item;
 }());

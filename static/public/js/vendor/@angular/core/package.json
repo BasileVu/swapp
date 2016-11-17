@@ -10,12 +10,13 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "/Users/mathieuurstein/Dropbox/HEIGVD/PDG/swapp"
+      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
     ]
   ],
   "_from": "@angular/core@>=2.2.0 <2.3.0",
   "_id": "@angular/core@2.2.0",
   "_inCache": true,
+  "_installable": true,
   "_location": "/@angular/core",
   "_nodeVersion": "6.7.0",
   "_npmOperationalInternal": {
@@ -44,7 +45,7 @@
   "_shasum": "7a3a8592b6731a65e5a9746ce45419d86d15fe56",
   "_shrinkwrap": null,
   "_spec": "@angular/core@~2.2.0",
-  "_where": "/Users/mathieuurstein/Dropbox/HEIGVD/PDG/swapp",
+  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
   "author": {
     "name": "angular"
   },
