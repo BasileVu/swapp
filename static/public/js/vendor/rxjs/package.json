@@ -10,12 +10,13 @@
         "spec": "5.0.0-beta.12",
         "type": "version"
       },
-      "/Users/mathieuurstein/Dropbox/HEIGVD/PDG/swapp"
+      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
     ]
   ],
   "_from": "rxjs@5.0.0-beta.12",
   "_id": "rxjs@5.0.0-beta.12",
   "_inCache": true,
+  "_installable": true,
   "_location": "/rxjs",
   "_nodeVersion": "5.0.0",
   "_npmOperationalInternal": {
@@ -44,7 +45,7 @@
   "_shasum": "cdfde2d8c4639d20ae7794bff8fddf32da7ad337",
   "_shrinkwrap": null,
   "_spec": "rxjs@5.0.0-beta.12",
-  "_where": "/Users/mathieuurstein/Dropbox/HEIGVD/PDG/swapp",
+  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
   "author": {
     "name": "Ben Lesh",
     "email": "blesh@netflix.com"

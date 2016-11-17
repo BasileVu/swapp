@@ -11,6 +11,7 @@ export class ItemsService {
 
     constructor (private http: Http) {}
 
+// TODO : with promise
     getItems (): Observable<Item[]> {
         return this.http.get(this.itemsUrl)
             .map(this.extractData)

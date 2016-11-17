@@ -16,6 +16,7 @@ var ItemsService = (function () {
         this.http = http;
         this.itemsUrl = '/api/items/'; // URL to web API
     }
+    // TODO : with promise
     ItemsService.prototype.getItems = function () {
         return this.http.get(this.itemsUrl)
             .map(this.extractData)

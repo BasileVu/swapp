@@ -8,4 +8,9 @@ export class Item {
     archived: boolean;
     owner: number;
     category: number;
+
+    constructor(id, name) {
+        this.id = id;
+        this.name = name;
+    }
 }

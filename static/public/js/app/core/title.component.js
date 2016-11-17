@@ -14,7 +14,7 @@ var user_service_1 = require('../core/user.service');
 var TitleComponent = (function () {
     function TitleComponent(userService) {
         this.subtitle = '';
-        this.title = 'Swapp';
+        this.title = 'SWAPP';
         this.user = '';
         this.user = userService.userFirstName;
     }

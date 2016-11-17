@@ -1,53 +1,3 @@
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngIf="items === undefined">
-    {{ errorMessage }}
-</div>
-
-
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items">
-    <div class="inner-item open-modal-item-x">
-        <img class="img-fluid" src="http://placehold.it/600x600"/>
-        <div class="infos">
-            <a href="#"><i class="fa fa-folder"></i>Catégorie</a>
-            <a href="#"><i class="fa fa-map-marker"></i>Lieu</a>
-        </div>
-        <div class="row user">
-            <div class="col-xs-3">
-                <img class="avatar img-fluid" src="http://placehold.it/50x50"/>
-            </div>
-            <div class="col-xs-9">
-                {{ item.name }}
-            </div>
-        </div>
-        <div class="row reactions">
-            <ul class="list-inline">
-                <li class="list-inline-item">
-                    <i class="fa fa-refresh"></i><br>
-                    22
-                </li>
-                <li class="list-inline-item">
-                    <i class="fa fa-comment"></i><br>
-                    6
-                </li>
-                <li class="list-inline-item">
-                    <i class="fa fa-eye"></i><br>
-                    123
-                </li>
-                <li class="list-inline-item">
-                    <i class="fa fa-heart"></i><br>
-                    5
-                </li>
-            </ul>
-        </div>
-        <div class="swap btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
-        <div class="share btn btn-primary"><i class="fa fa-share"></i></div>
-    </div>
-</div>
-
-
-
-
-
-
 <div id="view-item-x" class="modal fade view-item">
     <div class="container" role="document">
         <div class="row content">
@@ -349,3 +299,4 @@
         </a>
     </div>
 </div>
+

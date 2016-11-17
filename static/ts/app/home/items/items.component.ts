@@ -13,7 +13,7 @@ import {Item} from "./item";
 })
 export class ItemsComponent implements OnInit {
 
-    errorMessage: string;
+    errorMessage: string = "No items available for now";
     items: Item[];
     mode = 'Observable';
     constructor (private itemsService: ItemsService) {}
@@ -27,6 +27,5 @@ export class ItemsComponent implements OnInit {
             .subscribe(
                 items => this.items = items,
                 error =>  this.errorMessage = <any>error);
-        // TODO : check if no item
     }
 }

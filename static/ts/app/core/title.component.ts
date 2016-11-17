@@ -9,7 +9,7 @@ import { UserService }      from '../core/user.service';
 })
 export class TitleComponent {
   @Input() subtitle = '';
-  title = 'Swapp';
+  title = 'SWAPP';
   user = '';
 
   constructor(userService: UserService) {
