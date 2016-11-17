@@ -12,9 +12,10 @@ export class ItemsService {
     constructor (private http: Http) {}
 
 // TODO : with promise
-    getItems (): Observable<Item[]> {
+    getItems (): Promise<Item[]> {
         return this.http.get(this.itemsUrl)
-            .map(this.extractData)
+            .toPromise()
+            .then(this.extractData)
             .catch(this.handleError);
     }
 
@@ -34,7 +35,7 @@ export class ItemsService {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
-        return Observable.throw(errMsg);
+        return Promise.reject(errMsg);
     }
 
     // getItems(): Observable<Item[]> {

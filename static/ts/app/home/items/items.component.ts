@@ -24,7 +24,7 @@ export class ItemsComponent implements OnInit {
 
     getItems() {
         this.itemsService.getItems()
-            .subscribe(
+            .then(
                 items => this.items = items,
                 error =>  this.errorMessage = <any>error);
     }
