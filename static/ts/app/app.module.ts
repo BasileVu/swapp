@@ -34,7 +34,7 @@ import { AppRoutingModule } from './app-routing.module';
     declarations: [ AppComponent ],
 
     providers: [ AuthService ],
-
+    
     // Define the root component
     bootstrap:    [ AppComponent ]
 })

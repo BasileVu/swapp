@@ -280,6 +280,7 @@ tests/report/
 .baseDir.*
 *.tmp.*
 .tscache/
+<<<<<<< HEAD
 
 # Created by https://www.gitignore.io/api/visu,visualstudiocode
 
@@ -290,3 +291,5 @@ tests/report/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+=======
+>>>>>>> ec4229cf367281cdb3d373dbe12294ead9a52226
