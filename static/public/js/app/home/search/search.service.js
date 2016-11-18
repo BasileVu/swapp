@@ -13,27 +13,31 @@ var http_1 = require('@angular/http');
 var SearchService = (function () {
     function SearchService(http) {
         this.http = http;
+        this.itemsUrl = '/api/categories/'; // URL to web API
     }
-    SearchService.prototype.getData = function () {
-        return {
-            filters: [
-                "Recommended",
-                "Trends",
-                "Latest",
-                "Nearest"
-            ],
-            category: [
-                'Animals & Accessories',
-                'Art',
-                'Audio - TV - Video',
-                'Cars',
-                'Jewels & Watch',
-                'Billets & Voucher',
-                'Camping',
-                'Movie & DVD',
-                'Video Games'
-            ]
-        };
+    SearchService.prototype.getCategories = function () {
+        return this.http.get(this.itemsUrl)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    };
+    SearchService.prototype.extractData = function (res) {
+        var body = res.json();
+        return body || {};
+    };
+    SearchService.prototype.handleError = function (error) {
+        // In a real world app, we might use a remote logging infrastructure
+        var errMsg;
+        if (error instanceof http_1.Response) {
+            var body = error.json() || '';
+            var err = body.error || JSON.stringify(body);
+            errMsg = error.status + " - " + (error.statusText || '') + " " + err;
+        }
+        else {
+            errMsg = error.message ? error.message : error.toString();
+        }
+        console.error(errMsg);
+        return Promise.reject(errMsg);
     };
     SearchService = __decorate([
         core_1.Injectable(), 

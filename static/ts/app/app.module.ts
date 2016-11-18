@@ -7,9 +7,8 @@ import { AppComponent }   from './app.component';
 import { HomeModule } from './home/home.module';
 
 /* Feature Modules */
-// import { ItemsModule }    from './items/items.module';
-import { CoreModule }       from './core/core.module';
-import { AuthService }            from './shared/authentication/authentication.service';
+import { CoreModule }           from './core/core.module';
+import { AuthService }          from './shared/authentication/authentication.service';
 
 /* Routing Module */
 import { AppRoutingModule } from './app-routing.module';
@@ -21,9 +20,6 @@ import { AppRoutingModule } from './app-routing.module';
     imports: [
         BrowserModule,
         HomeModule,
-        /*
-         CoreModule,
-         */
         CoreModule.forRoot({userFirstName: 'John', userLastName: 'Smith'}),
         AppRoutingModule,
         HttpModule,
@@ -34,7 +30,7 @@ import { AppRoutingModule } from './app-routing.module';
     declarations: [ AppComponent ],
 
     providers: [ AuthService ],
-    
+
     // Define the root component
     bootstrap:    [ AppComponent ]
 })

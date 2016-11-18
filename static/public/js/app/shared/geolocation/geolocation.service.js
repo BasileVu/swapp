@@ -9,23 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ItemsModalComponent = (function () {
-    function ItemsModalComponent() {
+var GEOLOCATION_ERRORS = {
+    'errors.location.unsupportedBrowser': 'Browser does not support location services',
+    'errors.location.permissionDenied': 'You have rejected access to your location',
+    'errors.location.positionUnavailable': 'Unable to determine your location',
+    'errors.location.timeout': 'Service timeout has been reached'
+};
+// Source: https://gist.github.com/sasha7/0c32f3686eb49d44ccc8
+var GeolocationService = (function () {
+    function GeolocationService() {
     }
-    ItemsModalComponent.prototype.ngOnInit = function () {
-    };
-    ItemsModalComponent.prototype.ngAfterContentInit = function () {
-    };
-    ItemsModalComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'items-modal',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './items-modal.component.html'
-        }), 
+    GeolocationService = __decorate([
+        core_1.Injectable(), 
         __metadata('design:paramtypes', [])
-    ], ItemsModalComponent);
-    return ItemsModalComponent;
+    ], GeolocationService);
+    return GeolocationService;
 }());
-exports.ItemsModalComponent = ItemsModalComponent;
-//# sourceMappingURL=items-modal.component.js.map
+exports.GeolocationService = GeolocationService;
+/*
+export var geolocationServiceInjectables: Array<any> = [
+  provide(GeolocationService, { useClass: GeolocationService })
+];
+*/ 
+//# sourceMappingURL=geolocation.service.js.map

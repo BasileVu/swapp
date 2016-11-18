@@ -1,4 +1,5 @@
-import {Component, ViewEncapsulation } from '@angular/core';
+import {Component, ViewEncapsulation, OnInit, AfterViewInit } from '@angular/core';
+import {Observable} from 'rxjs';
 
 @Component({
     moduleId: module.id,
@@ -7,8 +8,13 @@ import {Component, ViewEncapsulation } from '@angular/core';
     templateUrl: './home.component.html'
 })
 
-export class HomeComponent {
+export class HomeComponent implements OnInit, AfterViewInit {
 
-    constructor() {
+    constructor(){}
+
+    ngOnInit() {}
+
+    ngAfterViewInit() {
     }
+
 }

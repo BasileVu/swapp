@@ -9,6 +9,5 @@ import {Component, ViewEncapsulation} from '@angular/core';
 export class SearchModalComponent {
 
     ngOnInit() {
-        console.log('initiated advanced search Modal');
     }
 }

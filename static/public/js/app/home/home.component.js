@@ -12,6 +12,9 @@ var core_1 = require('@angular/core');
 var HomeComponent = (function () {
     function HomeComponent() {
     }
+    HomeComponent.prototype.ngOnInit = function () { };
+    HomeComponent.prototype.ngAfterViewInit = function () {
+    };
     HomeComponent = __decorate([
         core_1.Component({
             moduleId: module.id,

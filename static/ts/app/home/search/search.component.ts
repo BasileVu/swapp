@@ -1,6 +1,7 @@
 import {Component, ViewEncapsulation} from '@angular/core';
 
 import { SearchService } from './search.service';
+import { Category } from './category';
 
 @Component({
     moduleId: module.id,
@@ -10,33 +11,19 @@ import { SearchService } from './search.service';
 })
 export class SearchComponent {
 
-    // public searchConfiguration:any;
-    // private _search:Object;
-    //
-    // constructor(private _searchService:SearchService) {
-    //     this.searchConfiguration = this._searchService.getData();
-    //     // this.searchConfiguration.select = (start, end) => this._onSelect(start, end);
-    // }
-    //
-    // public onSearchReady(calendar):void {
-    //     this._search = calendar;
-    // }
-    //
-    // private _onSelect(start, end):void {
-    //
-    //     console.log("search.component.ts _onSelect");
-    //     // if (this._calendar != null) {
-    //     //     let title = prompt('Event Title:');
-    //     //     let eventData;
-    //     //     if (title) {
-    //     //         eventData = {
-    //     //             title: title,
-    //     //             start: start,
-    //     //             end: end
-    //     //         };
-    //     //         jQuery(this._calendar).fullCalendar('renderEvent', eventData, true);
-    //     //     }
-    //     //     jQuery(this._calendar).fullCalendar('unselect');
-    //     // }
-    // }
+    errorMessage: string = "No category available for now";
+    categories: Category[];
+
+    constructor (private searchService: SearchService) {}
+
+    ngOnInit() {
+        this.getCategories();
+    }
+
+    getCategories() {
+        this.searchService.getCategories()
+            .then(
+                categories => this.categories = categories,
+                error =>  this.errorMessage = <any>error);
+    }
 }

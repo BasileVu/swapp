@@ -14,7 +14,6 @@ var ItemsComponent = (function () {
     function ItemsComponent(itemsService) {
         this.itemsService = itemsService;
         this.errorMessage = "No items available for now";
-        this.mode = 'Observable';
     }
     ItemsComponent.prototype.ngOnInit = function () {
         this.getItems();

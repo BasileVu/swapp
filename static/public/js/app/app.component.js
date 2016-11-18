@@ -18,6 +18,16 @@ var AppComponent = (function () {
     }
     AppComponent.prototype.ngOnInit = function () {
         this.http.get("/api/csrf/");
+        // TODO : make a proper service to store geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                localStorage.setItem("latitude", String(position.coords.latitude));
+                localStorage.setItem("longitude", String(position.coords.longitude));
+            });
+        }
+        else {
+            console.log("Geolocation not available");
+        }
     };
     AppComponent.prototype.ngAfterViewInit = function () {
         $('document').ready(function () {

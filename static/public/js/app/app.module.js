@@ -15,7 +15,6 @@ var http_1 = require('@angular/http');
 var app_component_1 = require('./app.component');
 var home_module_1 = require('./home/home.module');
 /* Feature Modules */
-// import { ItemsModule }    from './items/items.module';
 var core_module_1 = require('./core/core.module');
 var authentication_service_1 = require('./shared/authentication/authentication.service');
 /* Routing Module */
@@ -30,9 +29,6 @@ var AppModule = (function () {
             imports: [
                 platform_browser_1.BrowserModule,
                 home_module_1.HomeModule,
-                /*
-                 CoreModule,
-                 */
                 core_module_1.CoreModule.forRoot({ userFirstName: 'John', userLastName: 'Smith' }),
                 app_routing_module_1.AppRoutingModule,
                 http_1.HttpModule,

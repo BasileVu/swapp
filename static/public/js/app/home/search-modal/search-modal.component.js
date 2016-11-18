@@ -13,7 +13,6 @@ var SearchModalComponent = (function () {
     function SearchModalComponent() {
     }
     SearchModalComponent.prototype.ngOnInit = function () {
-        console.log('initiated advanced search Modal');
     };
     SearchModalComponent = __decorate([
         core_1.Component({
