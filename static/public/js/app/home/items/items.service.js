@@ -10,16 +10,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
-var Observable_1 = require('rxjs/Observable');
 var ItemsService = (function () {
     function ItemsService(http) {
         this.http = http;
         this.itemsUrl = '/api/items/'; // URL to web API
     }
-    // TODO : with promise
     ItemsService.prototype.getItems = function () {
         return this.http.get(this.itemsUrl)
-            .map(this.extractData)
+            .toPromise()
+            .then(this.extractData)
             .catch(this.handleError);
     };
     ItemsService.prototype.extractData = function (res) {
@@ -38,7 +37,7 @@ var ItemsService = (function () {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
-        return Observable_1.Observable.throw(errMsg);
+        return Promise.reject(errMsg);
     };
     ItemsService = __decorate([
         core_1.Injectable(), 

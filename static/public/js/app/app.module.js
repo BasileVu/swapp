@@ -17,13 +17,16 @@ var home_module_1 = require('./home/home.module');
 /* Feature Modules */
 // import { ItemsModule }    from './items/items.module';
 var core_module_1 = require('./core/core.module');
+var authentication_service_1 = require('./shared/authentication/authentication.service');
 /* Routing Module */
 var app_routing_module_1 = require('./app-routing.module');
+// Declare the NgModule decorator
 var AppModule = (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         core_1.NgModule({
+            // Define the services imported by our app
             imports: [
                 platform_browser_1.BrowserModule,
                 home_module_1.HomeModule,
@@ -35,7 +38,10 @@ var AppModule = (function () {
                 http_1.HttpModule,
                 http_1.JsonpModule
             ],
+            // Define other components in our module
             declarations: [app_component_1.AppComponent],
+            providers: [authentication_service_1.AuthService],
+            // Define the root component
             bootstrap: [app_component_1.AppComponent]
         }), 
         __metadata('design:paramtypes', [])

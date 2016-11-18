@@ -13,6 +13,8 @@ var ProfileComponent = (function () {
     function ProfileComponent() {
     }
     ProfileComponent.prototype.ngOnInit = function () {
+        if (true)
+            true;
     };
     ProfileComponent = __decorate([
         core_1.Component({

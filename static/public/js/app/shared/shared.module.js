@@ -13,6 +13,7 @@ var common_1 = require('@angular/common');
 var forms_1 = require('@angular/forms');
 var awesome_pipe_1 = require('./awesome.pipe');
 var highlight_directive_1 = require('./highlight.directive');
+var authentication_service_1 = require('./authentication/authentication.service');
 var SharedModule = (function () {
     function SharedModule() {
     }
@@ -21,7 +22,7 @@ var SharedModule = (function () {
             imports: [common_1.CommonModule],
             declarations: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective],
             exports: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective,
-                common_1.CommonModule, forms_1.FormsModule]
+                common_1.CommonModule, forms_1.FormsModule, authentication_service_1.AuthService]
         }), 
         __metadata('design:paramtypes', [])
     ], SharedModule);

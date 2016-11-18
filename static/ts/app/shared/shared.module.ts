@@ -4,12 +4,13 @@ import { FormsModule }         from '@angular/forms';
 
 import { AwesomePipe }         from './awesome.pipe';
 import { HighlightDirective }  from './highlight.directive';
+import { AuthService }         from './authentication/authentication.service';
 
 @NgModule({
   imports:      [ CommonModule ],
   declarations: [ AwesomePipe, HighlightDirective ],
   exports:      [ AwesomePipe, HighlightDirective,
-                  CommonModule, FormsModule ]
+                  CommonModule, FormsModule, AuthService ]
 })
 export class SharedModule { }
 

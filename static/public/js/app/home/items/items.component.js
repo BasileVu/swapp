@@ -22,7 +22,7 @@ var ItemsComponent = (function () {
     ItemsComponent.prototype.getItems = function () {
         var _this = this;
         this.itemsService.getItems()
-            .subscribe(function (items) { return _this.items = items; }, function (error) { return _this.errorMessage = error; });
+            .then(function (items) { return _this.items = items; }, function (error) { return _this.errorMessage = error; });
     };
     ItemsComponent = __decorate([
         core_1.Component({
