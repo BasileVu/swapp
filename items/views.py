@@ -15,6 +15,10 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
+    def create(self, validated_data):
+        item = Item.objects.create(validated_data)
+        return item
+
     def list(self, request, *args, **kwargs):
         q = self.request.query_params.get("q", "")
         category_name = self.request.query_params.get("category", None)
