@@ -49,14 +49,15 @@ class ItemAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list(), like_set=list()):
         return self.c.post("/api/items/", data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "image_set": image_set
+            "image_set": image_set,
+            "like_set": like_set
         }), content_type="application/json")
 
     def get_items(self):
@@ -65,14 +66,15 @@ class ItemAPITests(TestCase):
     def get_item(self, id_item=1):
         return self.c.get("/api/items/" + str(id_item) + "/", content_type="application/json")
 
-    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list(), like_set=list()):
         return self.c.put("/api/items/" + str(id_item) + "/", data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "image_set": image_set
+            "image_set": image_set,
+            "like_set": like_set
         }), content_type="application/json")
 
     def delete_item(self, id_item=1):
@@ -84,7 +86,7 @@ class ItemAPITests(TestCase):
     def test_post_item(self):
         self.c.login()
         r = self.post_item()
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.data, 201)
 
     def test_post_item_price_min_bigger_than_price_max(self):
         r = self.post_item(price_min=2, price_max=1)
