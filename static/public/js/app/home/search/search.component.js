@@ -28,7 +28,8 @@ var SearchComponent = (function () {
             moduleId: module.id,
             selector: 'search',
             encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './search.component.html'
+            templateUrl: './search.component.html',
+            providers: [search_service_1.SearchService]
         }), 
         __metadata('design:paramtypes', [search_service_1.SearchService])
     ], SearchComponent);

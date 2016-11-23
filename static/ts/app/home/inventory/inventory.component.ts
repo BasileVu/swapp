@@ -2,8 +2,6 @@ import {
     Component, ViewEncapsulation, OnInit
 } from '@angular/core';
 
-import { AuthService } from './../../shared/authentication/authentication.service';
-
 @Component({
     moduleId: module.id,
     selector: 'inventory',
@@ -12,13 +10,8 @@ import { AuthService } from './../../shared/authentication/authentication.servic
 })
 export class InventoryComponent implements OnInit {
 
-    constructor(private authService: AuthService) { }
+    constructor() { }
 
     ngOnInit(): void {
-        if (this.authService.checkCredentials()) {
-            console.log("credentials OK");
-        } else {
-            console.log("No credentials");
-        }
     }
 }

@@ -1,5 +1,8 @@
 import {Component, ViewEncapsulation} from '@angular/core';
 
+import { SearchService } from './../search/search.service';
+import { Category } from './../search/category';
+
 @Component({
     moduleId: module.id,
     selector: 'search-modal',
@@ -8,6 +11,19 @@ import {Component, ViewEncapsulation} from '@angular/core';
 })
 export class SearchModalComponent {
 
+    errorMessage: string = "No category available for now";
+    categories: Category[];
+
+    constructor (private searchService: SearchService) {}
+
     ngOnInit() {
+        this.getCategories();
+    }
+
+    getCategories() {
+        this.searchService.getCategories()
+            .then(
+                categories => this.categories = categories,
+                error =>  this.errorMessage = <any>error);
     }
 }

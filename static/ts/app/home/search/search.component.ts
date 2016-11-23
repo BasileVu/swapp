@@ -7,7 +7,8 @@ import { Category } from './category';
     moduleId: module.id,
     selector: 'search',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './search.component.html'
+    templateUrl: './search.component.html',
+    providers: [SearchService]
 })
 export class SearchComponent {
 

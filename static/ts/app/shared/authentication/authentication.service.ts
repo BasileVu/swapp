@@ -20,18 +20,18 @@ export class AuthService {
     logout() {
         localStorage.removeItem("user");
     }
-
-    login(user) {
+    
+    login(username, password) {
         /*var authenticatedUser = users.find(u => u.email === user.email);
         if (authenticatedUser && authenticatedUser.password === user.password) {
             localStorage.setItem("user", authenticatedUser);
             return true;
         }*/
         return false;
-
     }
 
     checkCredentials() {
-        return localStorage.getItem("user") !== null;
+        //return localStorage.getItem("user") !== null;
+        return true;
     }
 }

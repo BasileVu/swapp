@@ -32,7 +32,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     
     ngAfterViewInit() {
 
-        $('document').ready(function() {
+        setTimeout(function() {
+$('document').ready(function() {
             // home grid ///////////////////////////
             var grid = $('.grid').isotope({
                 // options
@@ -155,5 +156,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             });
         });
 
+        }, 500);
+        
     }
 }

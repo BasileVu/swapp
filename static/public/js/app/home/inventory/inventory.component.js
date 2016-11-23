@@ -9,18 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var authentication_service_1 = require('./../../shared/authentication/authentication.service');
 var InventoryComponent = (function () {
-    function InventoryComponent(authService) {
-        this.authService = authService;
+    function InventoryComponent() {
     }
     InventoryComponent.prototype.ngOnInit = function () {
-        if (this.authService.checkCredentials()) {
-            console.log("credentials OK");
-        }
-        else {
-            console.log("No credentials");
-        }
     };
     InventoryComponent = __decorate([
         core_1.Component({
@@ -29,7 +21,7 @@ var InventoryComponent = (function () {
             encapsulation: core_1.ViewEncapsulation.None,
             templateUrl: './inventory.component.html'
         }), 
-        __metadata('design:paramtypes', [authentication_service_1.AuthService])
+        __metadata('design:paramtypes', [])
     ], InventoryComponent);
     return InventoryComponent;
 }());

@@ -1,11 +1,11 @@
 <search></search>
 
 <div id="content-main" class="container">
-    <div class="row personal-inventory">
+    <div [hidden]="hidden" class="row personal-inventory">
         <inventory></inventory>
     </div>
     <div class="row grid" #classGrid>
-        <profile></profile>
+        <profile [hidden]="hidden"></profile>
         <items></items>
     </div>
 </div>

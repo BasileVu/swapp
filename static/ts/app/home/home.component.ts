@@ -1,6 +1,8 @@
 import {Component, ViewEncapsulation, OnInit, AfterViewInit } from '@angular/core';
 import {Observable} from 'rxjs';
 
+import { AuthService } from '../shared/authentication/authentication.service';
+
 @Component({
     moduleId: module.id,
     selector: 'home',
@@ -10,9 +12,13 @@ import {Observable} from 'rxjs';
 
 export class HomeComponent implements OnInit, AfterViewInit {
 
-    constructor(){}
+    hidden: boolean;
 
-    ngOnInit() {}
+    constructor(private authService : AuthService){}
+
+    ngOnInit() {
+        this.hidden = !this.authService.checkCredentials();
+    }
 
     ngAfterViewInit() {
     }

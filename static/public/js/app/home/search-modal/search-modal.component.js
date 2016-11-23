@@ -9,10 +9,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var search_service_1 = require('./../search/search.service');
 var SearchModalComponent = (function () {
-    function SearchModalComponent() {
+    function SearchModalComponent(searchService) {
+        this.searchService = searchService;
+        this.errorMessage = "No category available for now";
     }
     SearchModalComponent.prototype.ngOnInit = function () {
+        this.getCategories();
+    };
+    SearchModalComponent.prototype.getCategories = function () {
+        var _this = this;
+        this.searchService.getCategories()
+            .then(function (categories) { return _this.categories = categories; }, function (error) { return _this.errorMessage = error; });
     };
     SearchModalComponent = __decorate([
         core_1.Component({
@@ -21,7 +30,7 @@ var SearchModalComponent = (function () {
             encapsulation: core_1.ViewEncapsulation.None,
             templateUrl: './search-modal.component.html'
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [search_service_1.SearchService])
     ], SearchModalComponent);
     return SearchModalComponent;
 }());
