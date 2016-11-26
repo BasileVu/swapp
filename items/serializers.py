@@ -20,10 +20,12 @@ class LikeSerializer(serializers.ModelSerializer):
         model = Like
         fields = ('id', 'user', 'item')
 
+
 class ImageItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = ('id', 'image')
+
 
 class LikeItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,6 +42,14 @@ class ItemSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Price min is higher than price max")
         return data
 
+    class Meta:
+        model = Item
+        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
+                  'category', 'image_set', 'like_set')
+        read_only_fields = ('owner',)
+
+
+class AggregatedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     image_set = ImageItemSerializer(many=True)
     like_set = LikeItemSerializer(many=True)

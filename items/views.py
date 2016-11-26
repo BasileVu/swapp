@@ -2,6 +2,7 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from items.models import Like
@@ -15,9 +16,12 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
-    def create(self, validated_data):
-        item = Item.objects.create(validated_data)
-        return item
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AggregatedItemSerializer
+        if self.action == 'retrieve':
+            return AggregatedItemSerializer
+        return ItemSerializer
 
     def list(self, request, *args, **kwargs):
         q = self.request.query_params.get("q", "")
@@ -42,7 +46,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         if price_max is not None:
             queryset = queryset.filter(price_max__lte=int(price_max))
 
-        return Response(ItemSerializer(queryset, many=True).data)
+        return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.userprofile)
