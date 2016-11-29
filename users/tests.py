@@ -457,12 +457,15 @@ class AccountAPITests(TestCase):
 
     def test_change_location_not_logged_in(self):
         self.post_user()
-        r = self.c.patch("/api/account/", data=json.dumps({
-            "location": "location"
+        r = self.c.patch("/api/account/location", data=json.dumps({
+            "street": "street",
+            "city": "city",
+            "country": "country",
+            "region": "region"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 401)
 
-    def test_change_location_logged_in(self):
+    def test_change_location_location_and_coordinates_changed(self):
         self.post_user()
         self.login()
 
@@ -479,6 +482,15 @@ class AccountAPITests(TestCase):
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["location"], location)
+
+    def test_change_location_patch_refused(self):
+        self.post_user()
+        self.login()
+
+        r = self.c.patch("/api/account/location/", data=json.dumps({
+            "street": "street"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
 
     def test_change_location_empty_json(self):
         self.post_user()
@@ -563,3 +575,29 @@ class CSRFTests(TestCase):
         self.assertEqual(r.status_code, 200)"""
 
 
+class CoordinatesTests(TestCase):
+
+    def get_coordinates(self):
+        return User.objects.get_by_natural_key(self.user.username).coordinates
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="username", password="password")
+        self.client.login(username="username", password="password")
+
+    def test_coordinates_0_at_beginning(self):
+        c = self.get_coordinates()
+        self.assertEqual(c.latitude, 0)
+        self.assertEqual(c.longitude, 0)
+
+    def test_coordinates_change_after_location_modification(self):
+        r = self.client.put("/api/account/location/", data=json.dumps({
+            "street": "street",
+            "city": "city",
+            "country": "country",
+            "region": "region"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+
+        c = self.get_coordinates()
+        self.assertNotEqual(c.latitude, 0)
+        self.assertNotEqual(c.longitude, 0)

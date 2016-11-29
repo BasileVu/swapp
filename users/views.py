@@ -13,7 +13,7 @@ from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, mixins
 
 from users.models import UserProfile, Location
 from users.serializers import UserAccountSerializer, LocationSerializer
@@ -197,9 +197,18 @@ def change_password(request):
     return Response(status=status.HTTP_200_OK)
 
 
-class LocationView(generics.UpdateAPIView):
+class LocationView(mixins.UpdateModelMixin, generics.GenericAPIView):
     serializer_class = LocationSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
         return self.request.user.location
+
+    def put(self, request, *args, **kwargs):
+        # FIXME update coordinates using google maps api
+        c = request.user.coordinates
+        c.latitude = 42
+        c.longitude = 42
+        c.save()
+
+        return self.update(request, *args, **kwargs)

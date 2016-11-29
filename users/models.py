@@ -26,6 +26,12 @@ class Location(models.Model):
     country = models.CharField(max_length=50)
 
 
+class Coordinates(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    latitude = models.FloatField(null=True, blank=True, default=0)
+    longitude = models.FloatField(null=True, blank=True, default=0)
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, signal, created, **kwargs):
     """
@@ -34,6 +40,7 @@ def create_user_profile(sender, instance, signal, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance, last_modification_date=timezone.now())
         Location.objects.create(user=instance)
+        Coordinates.objects.create(user=instance)
     else:
         # When we make a modification on the User (fields), we change the field "last_modification_date"
         # whit the new datetime.
