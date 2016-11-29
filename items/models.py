@@ -41,4 +41,4 @@ class Like(models.Model):
     item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.username
+        return self.user.user.username
