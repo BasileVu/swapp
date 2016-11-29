@@ -474,10 +474,7 @@ class AccountAPITests(TestCase):
         }
 
         r = self.c.put("/api/account/location/", data=json.dumps(location), content_type="application/json")
-        print(r.data)
         self.assertEqual(r.status_code, 200)
-
-        print("street:", Location.objects.get(pk=1).street)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)

@@ -20,7 +20,7 @@ class UserProfile(models.Model):
 
 class Location(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    street = models.CharField(max_length=100)
+    street = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
     region = models.CharField(max_length=50)
     country = models.CharField(max_length=50)

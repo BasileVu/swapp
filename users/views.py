@@ -197,7 +197,9 @@ def change_password(request):
     return Response(status=status.HTTP_200_OK)
 
 
-class LocationView(OwnUserAccountMixin, generics.UpdateAPIView):
-    queryset = Location.objects.all()
+class LocationView(generics.UpdateAPIView):
     serializer_class = LocationSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user.location
