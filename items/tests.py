@@ -54,6 +54,19 @@ class ItemAPITests(TestCase):
             "like_set": like_set
         }), content_type="application/json")
 
+    def post_like(self, user, item):
+        return self.client.post("/api/likes/", data=json.dumps({
+            "user": user,
+            "item": item
+        }), content_type="application/json")
+
+    def post_image(self, item):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+
     def get_items(self):
         return self.c.get("/api/items/", content_type="application/json")
 
@@ -165,6 +178,43 @@ class ItemAPITests(TestCase):
         self.assertEqual(len(r.data), 0)
         r = self.delete_item(id_item=10)
         self.assertEqual(r.status_code, 404)
+
+    def test_get_items_should_return_like_set_category_name_and_image_set_with_name(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_like(1, 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_items()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1);
+        self.assertEqual(r.data[0]['name'], "test")
+        self.assertEqual(r.data[0]['description'], "test")
+        self.assertEqual(r.data[0]['price_min'], 1)
+        self.assertEqual(r.data[0]['price_max'], 2)
+        self.assertEqual(r.data[0]['category']['name'], "Test")
+        self.assertIn("/media/test", r.data[0]['image_set'][0]["image"])
+        self.assertEqual(r.data[0]['like_set'][0]["user"], 1)
+
+    def test_get_item_should_return_like_set_category_name_and_image_set_with_name(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_like(1, 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_item(id_item=r.data['id'])
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test")
+        self.assertEqual(r.data['description'], "test")
+        self.assertEqual(r.data['price_min'], 1)
+        self.assertEqual(r.data['price_max'], 2)
+        self.assertEqual(r.data['category']['name'], "Test")
+        self.assertIn("/media/test", r.data['image_set'][0]["image"])
+        self.assertEqual(r.data['like_set'][0]["user"], 1)
     '''
     def test_post_item_user_location_not_specified(self):
         self.current_user.userprofile.location = ""

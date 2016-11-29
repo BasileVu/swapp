@@ -14,12 +14,9 @@ from items.serializers import *
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
-    serializer_class = ItemSerializer
 
     def get_serializer_class(self):
-        if self.action == 'list':
-            return AggregatedItemSerializer
-        if self.action == 'retrieve':
+        if self.action == 'list' or self.action == 'retrieve':
             return AggregatedItemSerializer
         return ItemSerializer
 
