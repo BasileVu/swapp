@@ -1,12 +1,6 @@
 import json
 
-import logging
-import tempfile
-from io import BytesIO
-from tempfile import NamedTemporaryFile
-
 from PIL import Image as ImagePil
-from django.core.files.base import ContentFile
 from django.test import Client
 from django.test import TestCase
 from items.models import *
@@ -86,7 +80,7 @@ class ItemAPITests(TestCase):
     def test_post_item(self):
         self.c.login()
         r = self.post_item()
-        self.assertEqual(r.data, 201)
+        self.assertEqual(r.status_code, 201)
 
     def test_post_item_price_min_bigger_than_price_max(self):
         r = self.post_item(price_min=2, price_max=1)
@@ -129,7 +123,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
         self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
+        self.assertEqual(r.data['category']['name'], "Test2")
         r = self.put_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
@@ -154,7 +148,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
         self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
+        self.assertEqual(r.data['category']['name'], "Test2")
         r = self.patch_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
