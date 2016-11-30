@@ -1,13 +1,7 @@
-from django.conf.urls import url, include
+from rest_framework.routers import DefaultRouter
 
-from swapp.ShareAPIRootRouter import SharedAPIRootRouter
-from . import views
+from comments.views import CommentViewSet
 
-router = SharedAPIRootRouter()
-router.register(r'comments', views.CommentViewSet, base_name="comments")
-
-
-app_name = "comments"
-urlpatterns = [
-    url(r'^', include(router.urls)),
-]
+router = DefaultRouter()
+router.register(r'comments', CommentViewSet)
+urlpatterns = router.urls

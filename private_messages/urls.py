@@ -1,13 +1,6 @@
-from django.conf.urls import url, include
-
-from swapp.ShareAPIRootRouter import SharedAPIRootRouter
+from rest_framework.routers import DefaultRouter
 from . import views
 
-router = SharedAPIRootRouter()
-router.register(r'private_messages', views.MessageViewSet, base_name="private_messages")
-
-
-app_name = "private_messages"
-urlpatterns = [
-    url(r'^', include(router.urls)),
-]
+router = DefaultRouter()
+router.register(r'messages', views.MessageViewSet)
+urlpatterns = router.urls
