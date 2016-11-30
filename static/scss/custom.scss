@@ -271,7 +271,7 @@ body {
 }
 
 // Register and Update modal ////////////////////////////////////
-#register-update-modal {
+#register-user-modal, #update-user-modal {
   .modal-panel {
     padding: 2*$grid-gutter-width;
   }
@@ -279,11 +279,14 @@ body {
     margin: (2*$grid-gutter-width) 0 $grid-gutter-width;
   }
   .col-img {
-    padding: 0 (2*$grid-gutter-width);
+    padding-right: (2*$grid-gutter-width);
   }
   .col-img-frame {
     width: 60%;
-    margin: (2*$grid-gutter-width) auto;
+    margin: (4*$grid-gutter-width) auto;
+  }
+  .submit {
+    margin-top: 2*$grid-gutter-width;
   }
 }
 

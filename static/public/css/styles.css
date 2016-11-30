@@ -5653,15 +5653,17 @@ body {
             font-style: italic;
             font-weight: 300; }
 
-#register-update-modal .modal-panel {
+#register-user-modal .modal-panel, #update-user-modal .modal-panel {
   padding: 20px; }
-#register-update-modal h3 {
+#register-user-modal h3, #update-user-modal h3 {
   margin: 20px 0 10px; }
-#register-update-modal .col-img {
-  padding: 0 20px; }
-#register-update-modal .col-img-frame {
+#register-user-modal .col-img, #update-user-modal .col-img {
+  padding-right: 20px; }
+#register-user-modal .col-img-frame, #update-user-modal .col-img-frame {
   width: 60%;
-  margin: 20px auto; }
+  margin: 40px auto; }
+#register-user-modal .submit, #update-user-modal .submit {
+  margin-top: 20px; }
 
 #advanced-search-modal form {
   padding: 20px; }
