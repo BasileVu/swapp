@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from rest_framework import permissions
 from rest_framework import status
@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import generics, mixins
 
 from users.models import UserProfile, Location
-from users.serializers import UserAccountSerializer, LocationSerializer
+from users.serializers import *
 
 
 # TODO delete when not user anymore
@@ -88,21 +88,11 @@ def get_csrf_token(request):
 
 @api_view(["POST"])
 def create_user(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        username = data["username"]
-        email = data["email"]
-        password = data["password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
-
-    # Check if not empty fields
-    if not username or not password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={
-            "error": "fields '" + username + "' and '" + password + "' can't be empty"})
+    serializer = UserCreateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
     try:
-        user = User.objects.create_user(username=username, email=email, password=password)
+        user = User.objects.create_user(**serializer.validated_data)
     except IntegrityError:
         return Response(status=status.HTTP_409_CONFLICT)
 
@@ -141,7 +131,7 @@ def logout_user(request):
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserAccountSerializer
+    serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):

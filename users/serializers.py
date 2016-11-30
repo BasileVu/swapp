@@ -3,17 +3,36 @@ from rest_framework import serializers
 from users.models import *
 
 
-class UserAccountSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=True)
+    first_name = serializers.CharField(write_only=True, required=True)
+    last_name = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(write_only=True, required=True)
     last_name = serializers.CharField(write_only=True, required=True)
     email = serializers.EmailField(write_only=True, required=True)
 
     class Meta:
-        model = UserProfile
-        fields = (
-            'username', 'first_name', 'last_name', 'email'
-        )
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')
+
+
+class LoginUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'password')
 
 
 # TODO to adapt
