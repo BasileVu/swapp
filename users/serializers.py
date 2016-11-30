@@ -35,13 +35,9 @@ class LoginUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password')
 
 
-# TODO to adapt
-"""class NoteSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
-
-    class Meta:
-        model = Note
-        fields = ('id', 'user_id', 'text', 'note')"""
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True)
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -53,3 +49,13 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('street', 'city', 'region', 'country')
+
+
+# TODO to adapt
+"""class NoteSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
+
+    class Meta:
+        model = Note
+        fields = ('id', 'user_id', 'text', 'note')"""
+

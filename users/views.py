@@ -158,22 +158,15 @@ def change_password(request):
     """
     An endpoint for changing password.
     """
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        old_password = data["old_password"]
-        new_password = data["new_password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
+    serializer = ChangePasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    # Check if not empty fields
-    if not old_password or not new_password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
+    old_password = serializer.validated_data["old_password"]
+    new_password = serializer.validated_data["new_password"]
 
-    # Check old password
     if not request.user.check_password(old_password):
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
 
-    # set_password also hashes the password that the user will get
     request.user.set_password(new_password)
     request.user.save()
     return Response(status=status.HTTP_200_OK)
