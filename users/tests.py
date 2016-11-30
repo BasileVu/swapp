@@ -329,7 +329,7 @@ class AccountAPITests(TestCase):
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 1)
 
-    def test_change_password_logged_in(self):
+    def test_change_password(self):
         self.post_user()
         self.login()
 
@@ -345,7 +345,7 @@ class AccountAPITests(TestCase):
         r = self.login(password="newpassword")
         self.assertEqual(r.status_code, 200)
 
-    def test_change_password_with_false_old_password_logged_in(self):
+    def test_change_password_with_false_old_password(self):
         self.post_user()
         self.login()
 
@@ -363,13 +363,22 @@ class AccountAPITests(TestCase):
         r = self.login(password="password")
         self.assertEqual(r.status_code, 200)
 
-    def test_change_password_empty_json_logged_in(self):
+    def test_change_password_empty_json(self):
         self.post_user()
         self.login()
 
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "",
             "new_password": ""
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_change_password_partial_json(self):
+        self.post_user()
+        self.login()
+
+        r = self.client.put("/api/account/password/", data=json.dumps({
+            "old_password": "password"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
