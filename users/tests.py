@@ -112,12 +112,12 @@ class AccountAPITests(TestCase):
         r = self.c.get("/api/logout/")
         self.assertEqual(r.status_code, 200)
 
-    def test_get_protected_user_info_not_logged_in(self):
+    def test_get_account_info_not_logged_in(self):
         self.post_user()
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 401)
 
-    def test_get_protected_user_info_logged_in(self):
+    def test_get_account_info_logged_in(self):
         self.post_user()
         self.login()
         self.create_elements_with_user_link()
@@ -130,29 +130,19 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "")
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["email"], "test@test.com")
-        self.assertEqual(r.data["is_active"], True)
-        self.assertEqual(r.data["location"], "")
+        self.assertEqual(r.data["location"], {
+            "street": "",
+            "city": "",
+            "country": "",
+            "region": ""
+        })
         self.assertNotEqual(r.data["last_modification_date"], "")
         self.assertListEqual(r.data["categories"], [1])
         self.assertListEqual(r.data["items"], [1])
         self.assertListEqual(r.data["notes"], [1])
         self.assertListEqual(r.data["likes"], [1])
 
-        r = self.c.patch("/api/account/", data=json.dumps({
-            "first_name": "firstname",
-            "last_name": "lastname",
-            "location": "locationtest"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
-
-        r = self.c.get("/api/account/")
-
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["first_name"], "firstname")
-        self.assertEqual(r.data["last_name"], "lastname")
-        self.assertEqual(r.data["location"], "locationtest")
-
-    def test_update_user_info_not_logged_in(self):
+    def test_update_account_not_logged_in(self):
         self.post_user()
 
         r = self.c.patch("/api/account/", data=json.dumps({
@@ -171,7 +161,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "")
         self.assertEqual(r.data["last_name"], "")
 
-    def test_update_user_info_logged_in(self):
+    def test_update_account_logged_in(self):
         self.post_user()
         self.login()
 
@@ -188,11 +178,11 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "firstname")
         self.assertEqual(r.data["last_name"], "lastname")
 
-    def test_update_one_user_info_not_logged_in(self):
+    def test_cannot_update_account_not_logged_in(self):
         self.post_user()
 
         r = self.c.patch("/api/account/", data=json.dumps({
-            "is_active": False,
+            "email": "a@b.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, 401)
         self.assertEqual("password" in r.data, False)
@@ -203,24 +193,23 @@ class AccountAPITests(TestCase):
         # Test if no modification
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["is_active"], True)
+        self.assertNotEqual(r.data["email"], "a@b.com")
 
-    def test_update_one_user_info_logged_in(self):
+    def test_cannot_connect_if_account_not_active(self):
         self.post_user()
-        self.login()
 
-        r = self.c.patch("/api/account/", data=json.dumps({
-            "is_active": False,
+        u = User.objects.get(pk=1)
+        u.is_active = False
+        u.save()
+
+        r = self.c.post("/api/login/", data=json.dumps({
+            "username": "username",
+            "password": "password"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
 
-        # We can't connect anymore (is_active has the boolean value False)
-        r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 401)
 
-    def test_update_one_user_info_empty_json_logged_in(self):
+    def test_update_account_empty_json(self):
         self.post_user()
         self.login()
 
@@ -235,7 +224,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["username"], "username")
 
-    def test_update_one_not_considered_user_info_logged_in(self):
+    def test_update_one_not_considered_info(self):
         self.post_user()
         self.login()
         datetime = str(timezone.now())
@@ -251,7 +240,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
-    def test_update_one_user_info_malformed_json_logged_in(self):
+    def test_update_account_malformed_json(self):
         self.post_user()
         self.login()
 
@@ -266,7 +255,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["email"], "test@test.com")
 
-    def test_update_user_info_malformed_json_logged_in(self):
+    def test_update_user_account_incomplete_json(self):
         self.post_user()
         self.login()
 
@@ -275,40 +264,14 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
         self.assertEqual("password" in r.data, False)
-        # Need five fields (mandatory)
-        self.assertEqual(len(r.data), 5)
+        # Need 3 fields (mandatory)
+        self.assertEqual(len(r.data), 3)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["email"], "test@test.com")
 
-    def test_complete_update_user_info_not_logged_in(self):
-        self.post_user()
-
-        r = self.c.put("/api/account/", data=json.dumps({
-            "username": "newusername",
-            "first_name": "firstname",
-            "last_name": "last_name",
-            "email": "newemail@newemail.com",
-            "is_active": False,
-            "location": "test"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, 401)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 1)
-
-        self.login()
-
-        r = self.c.get("/api/account/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["username"], "username")
-        self.assertEqual(r.data["first_name"], "")
-        self.assertEqual(r.data["last_name"], "")
-        self.assertEqual(r.data["email"], "test@test.com")
-        self.assertEqual(r.data["is_active"], True)
-        self.assertEqual(r.data["location"], "")
-
-    def test_complete_update_user_info_logged_in(self):
+    def test_complete_update_account(self):
         self.post_user()
         self.login()
 
@@ -316,9 +279,7 @@ class AccountAPITests(TestCase):
             "username": "newusername",
             "first_name": "firstname",
             "last_name": "lastname",
-            "email": "newemail@newemail.com",
-            "is_active": True,
-            "location": "test",
+            "email": "newemail@newemail.com"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 200)
         self.assertEqual("password" in r.data, False)
@@ -330,10 +291,9 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "firstname")
         self.assertEqual(r.data["last_name"], "lastname")
         self.assertEqual(r.data["email"], "newemail@newemail.com")
-        self.assertEqual(r.data["is_active"], True)
-        self.assertEqual(r.data["location"], "test")
+        self.assertEqual(r.data["location"], {'country': '', 'city': '', 'region': '', 'street': ''})
 
-    def test_complete_update_user_info_empty_json_logged_in(self):
+    def test_complete_update_account_empty_json(self):
         self.post_user()
         self.login()
 
@@ -342,12 +302,11 @@ class AccountAPITests(TestCase):
             "first_name": "",
             "last_name": "",
             "email": "",
-            "is_active": True,
             "location": "",
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
         # Need five fields (mandatory)
-        self.assertEqual(len(r.data), 5)
+        self.assertEqual(len(r.data), 4)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
@@ -355,8 +314,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "")
         self.assertEqual(r.data["last_name"], "")
         self.assertEqual(r.data["email"], "test@test.com")
-        self.assertEqual(r.data["is_active"], True)
-        self.assertEqual(r.data["location"], "")
+        self.assertEqual(r.data["location"], {'city': '', 'region': '', 'street': '', 'country': ''})
 
     def test_change_password_not_logged_in(self):
         self.post_user()
@@ -499,40 +457,48 @@ class AccountAPITests(TestCase):
 
     def test_change_location_not_logged_in(self):
         self.post_user()
-        r = self.c.patch("/api/account/", data=json.dumps({
-            "location": "location"
+        r = self.c.patch("/api/account/location", data=json.dumps({
+            "street": "street",
+            "city": "city",
+            "country": "country",
+            "region": "region"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 401)
 
-        self.login()
-
-        r = self.c.get("/api/account/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["location"], "")
-
-    def test_change_location_logged_in(self):
+    def test_change_location_location_and_coordinates_changed(self):
         self.post_user()
         self.login()
-        r = self.c.patch("/api/account/", data=json.dumps({
-            "location": "location"
-        }), content_type="application/json")
+
+        location = {
+            "street": "street",
+            "city": "city",
+            "country": "country",
+            "region": "region"
+        }
+
+        r = self.c.put("/api/account/location/", data=json.dumps(location), content_type="application/json")
         self.assertEqual(r.status_code, 200)
 
         r = self.c.get("/api/account/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["location"], "location")
+        self.assertEqual(r.data["location"], location)
 
-    def test_change_location_empty_json_logged_in(self):
+    def test_change_location_patch_refused(self):
+        self.post_user()
+        self.login()
+
+        r = self.c.patch("/api/account/location/", data=json.dumps({
+            "street": "street"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 405)
+
+    def test_change_location_empty_json(self):
         self.post_user()
         self.login()
         r = self.c.put("/api/account/", data=json.dumps({
-            "location": ""
+            "location": {}
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
-
-        r = self.c.get("/api/account/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["location"], "")
 
     def test_405_when_get_on_password(self):
         self.post_user()
@@ -609,3 +575,29 @@ class CSRFTests(TestCase):
         self.assertEqual(r.status_code, 200)"""
 
 
+class CoordinatesTests(TestCase):
+
+    def get_coordinates(self):
+        return User.objects.get_by_natural_key(self.user.username).coordinates
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="username", password="password")
+        self.client.login(username="username", password="password")
+
+    def test_coordinates_0_at_beginning(self):
+        c = self.get_coordinates()
+        self.assertEqual(c.latitude, 0)
+        self.assertEqual(c.longitude, 0)
+
+    def test_coordinates_change_after_location_modification(self):
+        r = self.client.put("/api/account/location/", data=json.dumps({
+            "street": "street",
+            "city": "city",
+            "country": "country",
+            "region": "region"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+
+        c = self.get_coordinates()
+        self.assertNotEqual(c.latitude, 0)
+        self.assertNotEqual(c.longitude, 0)

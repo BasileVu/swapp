@@ -1,12 +1,6 @@
 import json
 
-import logging
-import tempfile
-from io import BytesIO
-from tempfile import NamedTemporaryFile
-
 from PIL import Image as ImagePil
-from django.core.files.base import ContentFile
 from django.test import Client
 from django.test import TestCase
 from items.models import *
@@ -49,15 +43,29 @@ class ItemAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list(), like_set=list()):
         return self.c.post("/api/items/", data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "image_set": image_set
+            "image_set": image_set,
+            "like_set": like_set
         }), content_type="application/json")
+
+    def post_like(self, user, item):
+        return self.client.post("/api/likes/", data=json.dumps({
+            "user": user,
+            "item": item
+        }), content_type="application/json")
+
+    def post_image(self, item):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
 
     def get_items(self):
         return self.c.get("/api/items/", content_type="application/json")
@@ -65,14 +73,15 @@ class ItemAPITests(TestCase):
     def get_item(self, id_item=1):
         return self.c.get("/api/items/" + str(id_item) + "/", content_type="application/json")
 
-    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list()):
+    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list(), like_set=list()):
         return self.c.put("/api/items/" + str(id_item) + "/", data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "image_set": image_set
+            "image_set": image_set,
+            "like_set": like_set
         }), content_type="application/json")
 
     def delete_item(self, id_item=1):
@@ -127,7 +136,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
         self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
+        self.assertEqual(r.data['category']['name'], "Test2")
         r = self.put_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
@@ -152,7 +161,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
         self.assertEqual(r.data['price_max'], 3)
-        self.assertEqual(r.data['category'], 2)
+        self.assertEqual(r.data['category']['name'], "Test2")
         r = self.patch_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
@@ -169,6 +178,43 @@ class ItemAPITests(TestCase):
         self.assertEqual(len(r.data), 0)
         r = self.delete_item(id_item=10)
         self.assertEqual(r.status_code, 404)
+
+    def test_get_items_should_return_like_set_category_name_and_image_set_with_name(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_like(1, 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_items()
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1);
+        self.assertEqual(r.data[0]['name'], "test")
+        self.assertEqual(r.data[0]['description'], "test")
+        self.assertEqual(r.data[0]['price_min'], 1)
+        self.assertEqual(r.data[0]['price_max'], 2)
+        self.assertEqual(r.data[0]['category']['name'], "Test")
+        self.assertIn("/media/test", r.data[0]['image_set'][0]["image"])
+        self.assertEqual(r.data[0]['like_set'][0]["user"], 1)
+
+    def test_get_item_should_return_like_set_category_name_and_image_set_with_name(self):
+        self.client.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_like(1, 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_item(id_item=r.data['id'])
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['name'], "test")
+        self.assertEqual(r.data['description'], "test")
+        self.assertEqual(r.data['price_min'], 1)
+        self.assertEqual(r.data['price_max'], 2)
+        self.assertEqual(r.data['category']['name'], "Test")
+        self.assertIn("/media/test", r.data['image_set'][0]["image"])
+        self.assertEqual(r.data['like_set'][0]["user"], 1)
     '''
     def test_post_item_user_location_not_specified(self):
         self.current_user.userprofile.location = ""

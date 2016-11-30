@@ -22,4 +22,5 @@ urlpatterns = [
     url(r"^api/users/$", views.create_user, name="create_user"),
     url(r"^api/account/$", views.UserAccount.as_view(), name="user_account"),
     url(r"^api/account/password", views.change_password, name="change_password"),
+    url(r"^api/account/location", views.LocationView.as_view(), name="location"),
 ]
