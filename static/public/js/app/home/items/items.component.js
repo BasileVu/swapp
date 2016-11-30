@@ -23,12 +23,19 @@ var ItemsComponent = (function () {
         this.itemsService.getItems()
             .then(function (items) { return _this.items = items; }, function (error) { return _this.errorMessage = error; });
     };
+    ItemsComponent.prototype.gotoDetail = function (id) {
+        var _this = this;
+        console.log("clicked. id: " + id);
+        this.itemsService.getItem(id)
+            .then(function (item) { return _this.itemsService.selectItem(item); }, function (error) { return _this.errorMessage = error; });
+    };
     ItemsComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'items',
             encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './items.component.html'
+            templateUrl: './items.component.html',
+            providers: [items_service_1.ItemsService]
         }), 
         __metadata('design:paramtypes', [items_service_1.ItemsService])
     ], ItemsComponent);

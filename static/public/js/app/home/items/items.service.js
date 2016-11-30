@@ -10,13 +10,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
+var Subject_1 = require('rxjs/Subject');
 var ItemsService = (function () {
     function ItemsService(http) {
         this.http = http;
+        // Observable string sources
+        this.itemSelectedSource = new Subject_1.Subject();
+        // Observable string streams
+        this.itemSelected$ = this.itemSelectedSource.asObservable();
         this.itemsUrl = '/api/items/'; // URL to web API
     }
+    // Service message commands
+    ItemsService.prototype.selectItem = function (item) {
+        this.itemSelectedSource.next(item);
+    };
     ItemsService.prototype.getItems = function () {
         return this.http.get(this.itemsUrl)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    };
+    ItemsService.prototype.getItem = function (id) {
+        return this.http.get('/api/items/2')
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

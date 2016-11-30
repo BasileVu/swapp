@@ -1,17 +1,36 @@
-import {Injectable} from '@angular/core';
-import {Headers, Http, Response} from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Headers, Http, Response } from '@angular/http';
+import { Subject }    from 'rxjs/Subject';
 
 import {Item} from "./item";
 
 @Injectable()
 export class ItemsService {
 
+    // Observable string sources
+    private itemSelectedSource = new Subject<Item>();
+
+    // Observable string streams
+    itemSelected$ = this.itemSelectedSource.asObservable();
+
     private itemsUrl = '/api/items/';  // URL to web API
 
     constructor (private http: Http) {}
 
+    // Service message commands
+    selectItem(item: Item) {
+        this.itemSelectedSource.next(item);
+    }
+
     getItems (): Promise<Item[]> {
         return this.http.get(this.itemsUrl)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    getItem (id: number): Promise<Item> {
+        return this.http.get('/api/items/2')
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

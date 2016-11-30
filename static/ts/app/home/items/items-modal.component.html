@@ -52,14 +52,12 @@
                         </div>
                     </div>
                     <div class="title-wrapper">
-                        <h2>Title</h2>
+                        <h2 *ngIf="item != undefined">{{ item.name }}</h2>
                     </div>
                     <div class="row details">
                         <div class="col-lg-7 description">
                             <h5>Description</h5>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, aut culpa debitis dignissimos doloremque exercitationem illo in iste itaque iusto laudantium maxime minima nemo omnis sapiente! Magnam nam suscipit totam.</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur consequatur, eius esse excepturi facere fuga illum iusto, nobis, quibusdam repellat repellendus soluta vel veniam? Dolorum eligendi nam nesciunt quia sapiente!</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam autem delectus deserunt dolorem eum hic in maiores natus neque provident quasi quod rerum, sequi tempora, tenetur ullam unde vel voluptatibus.</p>
+                            <p>{{ item.description }}</p>
                         </div>
                         <div class="col-lg-5 specifics">
                             <h5 class="infos">Infos</h5>
@@ -82,7 +80,7 @@
                             <div class="row category">
                                 <a href="#">
                                     <i class="fa fa-folder"></i>
-                                    Business & Industrial
+                                    {{ item.category.name }}
                                 </a>
                             </div>
                             <div class="key-val">
@@ -91,7 +89,7 @@
                                         Estimed price
                                     </div>
                                     <div class="right col-xs-6">
-                                        1400 chf
+                                        {{ (item.price_min + item.price_max) / 2 }} chf
                                     </div>
                                 </div>
                                 <div class="row">

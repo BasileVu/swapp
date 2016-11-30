@@ -2,19 +2,20 @@ import {Component, ViewEncapsulation, OnInit} from '@angular/core';
 
 import {ItemsService} from "./items.service";
 
-// Add the RxJS Observable operators.
 import {Item} from "./item";
 
 @Component({
     moduleId: module.id,
     selector: 'items',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './items.component.html'
+    templateUrl: './items.component.html',
+    providers: [ItemsService]
 })
 export class ItemsComponent implements OnInit {
 
     errorMessage: string = "No items available for now";
     items: Array<Item>;
+
     constructor (private itemsService: ItemsService) {}
 
     ngOnInit() {
@@ -25,6 +26,14 @@ export class ItemsComponent implements OnInit {
         this.itemsService.getItems()
             .then(
                 items => this.items = items,
+                error =>  this.errorMessage = <any>error);
+    }
+
+    gotoDetail(id: number): void {
+        console.log("clicked. id: " + id);
+        this.itemsService.getItem(id)
+            .then(
+                item => this.itemsService.selectItem(item),
                 error =>  this.errorMessage = <any>error);
     }
 }
