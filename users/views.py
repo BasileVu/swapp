@@ -8,14 +8,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from rest_framework import generics
+
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework import generics, mixins
 
-from users.models import UserProfile
-from users.serializers import UserAccountSerializer
+from users.models import UserProfile, Location
+from users.serializers import UserAccountSerializer, LocationSerializer
 
 
 # TODO delete when not user anymore
@@ -153,8 +154,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
-            "location": user_profile.location,
-            "is_active": user.is_active,
+            "location": LocationSerializer(user.location).data,
             "last_modification_date": user_profile.last_modification_date,
             "categories": [c.id for c in user_profile.categories.all()],
             "items": [i.id for i in user_profile.item_set.all()],
@@ -164,13 +164,6 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
     # FIXME two errors occur when we launch the tests (two users can't have the same username)
     def update(self, request, *args, **kwargs):
-        # FIXME improve that with direct serializer
-        location = request.data.get("location")
-
-        if location is not None:
-            request.user.userprofile.location = location
-            request.user.userprofile.save()
-
         try:
             return super(UserAccount, self).update(request, *args, **kwargs)
         except IntegrityError as e:
@@ -202,3 +195,20 @@ def change_password(request):
     request.user.set_password(new_password)
     request.user.save()
     return Response(status=status.HTTP_200_OK)
+
+
+class LocationView(mixins.UpdateModelMixin, generics.GenericAPIView):
+    serializer_class = LocationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user.location
+
+    def put(self, request, *args, **kwargs):
+        # FIXME update coordinates using google maps api
+        c = request.user.coordinates
+        c.latitude = 42
+        c.longitude = 42
+        c.save()
+
+        return self.update(request, *args, **kwargs)
