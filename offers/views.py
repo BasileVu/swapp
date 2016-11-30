@@ -1,7 +1,4 @@
-from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.response import Response
-
 from offers.models import Offer
 from offers.serializers import OfferSerializer
 
