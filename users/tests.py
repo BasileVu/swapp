@@ -68,14 +68,14 @@ class AccountAPITests(TestCase):
         r = self.post_user()
         self.assertEqual(r.status_code, 409)
 
-    def test_incomplete_json(self):
+    def test_user_creation_incomplete_json(self):
         r = self.client.post("/api/users/", data=json.dumps({
             "username": "username"
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
 
-    def test_empty_json(self):
-        r = self.post_user(username="", password="")
+    def test_user_creation_empty_json(self):
+        r = self.post_user(username="", first_name="", last_name="", email="", password="")
         self.assertEqual(r.status_code, 400)
 
     def test_login_incorrect(self):

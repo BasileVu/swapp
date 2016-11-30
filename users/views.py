@@ -103,18 +103,10 @@ def create_user(request):
 
 @api_view(['POST'])
 def login_user(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        username = data["username"]
-        password = data["password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
+    serializer = LoginUserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    # Check if not empty fields
-    if not username or not password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
-
-    user = authenticate(username=username, password=password)
+    user = authenticate(**serializer.validated_data)
     if user is not None:
         login(request, user)
         return Response(status=status.HTTP_200_OK)
