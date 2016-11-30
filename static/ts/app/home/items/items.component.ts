@@ -14,7 +14,7 @@ import {Item} from "./item";
 export class ItemsComponent implements OnInit {
 
     errorMessage: string = "No items available for now";
-    items: Item[];
+    items: Array<Item>;
     constructor (private itemsService: ItemsService) {}
 
     ngOnInit() {

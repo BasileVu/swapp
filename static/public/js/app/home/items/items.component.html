@@ -5,9 +5,10 @@
 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items">
     <div class="inner-item open-modal-item-x">
-        <img class="img-fluid" src="http://placehold.it/600x600"/>
+        <img *ngIf="item.image_set[0] === undefined" class="img-fluid" src="http://placehold.it/600x600"/>
+        <img *ngIf="item.image_set[0] != undefined" class="img-fluid" src="{{ item.image_set[0].image }}"/>
         <div class="infos">
-            <a href="#"><i class="fa fa-folder"></i>Catégorie</a>
+            <a href="#"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
             <a href="#"><i class="fa fa-map-marker"></i>Lieu</a>
         </div>
         <div class="row user">
@@ -38,14 +39,10 @@
                 </li>
             </ul>
         </div>
-        <div class="swap btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
+        <div class="swap btn btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
         <div class="share btn btn-primary"><i class="fa fa-share"></i></div>
     </div>
 </div>
-
-
-
-
 
 
 <div id="view-item-x" class="modal fade view-item">
