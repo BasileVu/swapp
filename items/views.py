@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from items.models import Like
@@ -14,6 +15,8 @@ from items.serializers import *
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -47,14 +50,6 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.userprofile)
-
-    def has_permission(self, request, view):
-        if request.method == 'GET':
-            return True
-        if request.method == 'PUT' or request.method == "PATCH" or request.method == "DELETE":
-            return view.owner == request.user
-        if request.method == 'POST':
-            return request.user.is_authenticated()
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
