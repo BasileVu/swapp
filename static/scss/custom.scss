@@ -269,9 +269,25 @@ body {
     }
   }
 }
-.view-item {
 
+// Register and Update modal ////////////////////////////////////
+#register-update-modal {
+  .modal-panel {
+    padding: 2*$grid-gutter-width;
+  }
+  h3 {
+    margin: (2*$grid-gutter-width) 0 $grid-gutter-width;
+  }
+  .col-img {
+    padding: 0 (2*$grid-gutter-width);
+  }
+  .col-img-frame {
+    width: 60%;
+    margin: (2*$grid-gutter-width) auto;
+  }
 }
+
+// Advanced search modal ////////////////////////////////////
 #advanced-search-modal {
   form {
     padding: (2*$grid-gutter-width);
@@ -302,7 +318,8 @@ body {
   border: 1px solid $brand-primary;
   color: $brand-primary;
 }
-// Header menu
+
+// Header menu ////////////////////////////////////
 #header-navbar {
   background-color: white !important;
   border-bottom: 3px solid $brand-primary-lighten;

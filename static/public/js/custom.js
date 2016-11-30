@@ -65,6 +65,13 @@ $('document').ready(function() {
         });
     });
 
+    // open user registration modal ////////////
+    var headerMenuProfile = $('#header-menu-profile');
+    var registerUpdateModal = $('#register-update-modal');
+    headerMenuProfile.click(function () {
+        registerUpdateModal.modal('show');
+    });
+
     // display modal ///////////////////////////
     var theItemModal = $('#view-item-x');
     // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
