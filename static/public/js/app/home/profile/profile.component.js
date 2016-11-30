@@ -9,13 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var authentication_service_1 = require('../../shared/authentication/authentication.service');
 var ProfileComponent = (function () {
-    function ProfileComponent(authService) {
-        this.authService = authService;
+    function ProfileComponent() {
     }
     ProfileComponent.prototype.ngOnInit = function () {
-        this.hidden = !this.authService.checkCredentials();
     };
     ProfileComponent = __decorate([
         core_1.Component({
@@ -24,7 +21,7 @@ var ProfileComponent = (function () {
             encapsulation: core_1.ViewEncapsulation.None,
             templateUrl: './profile.component.html'
         }), 
-        __metadata('design:paramtypes', [authentication_service_1.AuthService])
+        __metadata('design:paramtypes', [])
     ], ProfileComponent);
     return ProfileComponent;
 }());
