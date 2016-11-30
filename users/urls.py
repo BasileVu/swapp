@@ -1,6 +1,10 @@
 from django.conf.urls import url
 
+from swapp.ShareAPIRootRouter import SharedAPIRootRouter
 from . import views
+
+def api_urls():
+    return SharedAPIRootRouter.shared_router.urls
 
 app_name = "users"
 urlpatterns = [
