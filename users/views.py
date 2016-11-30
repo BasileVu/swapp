@@ -1,21 +1,17 @@
-import json
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import generics, mixins
 
-from users.models import UserProfile, Location
 from users.serializers import *
 
 
@@ -94,7 +90,7 @@ def create_user(request):
     try:
         user = User.objects.create_user(**serializer.validated_data)
     except IntegrityError:
-        return Response(status=status.HTTP_409_CONFLICT)
+        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
 
     response = Response(status=status.HTTP_201_CREATED)
     response["Location"] = "/api/users/%d/" % user.id

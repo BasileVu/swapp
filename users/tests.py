@@ -41,23 +41,6 @@ class AccountAPITests(TestCase):
             "password": password
         }), content_type="application/json")
 
-    def create_elements_with_user_link(self, name="test", pk=1):
-        u = User.objects.get(pk=pk)
-
-        c = Category(name=name)
-        c.save()
-        u.userprofile.categories.add(c)
-
-        i = Item(name="test", description="test", price_min=50, price_max=60, creation_date=timezone.now(),
-                 archived=False, owner=u.userprofile, category=c)
-        i.save()
-
-        n = Note(user=u.userprofile, text="test", note=4)
-        n.save()
-
-        l = Like(user=u.userprofile, item=i)
-        l.save()
-
     def test_user_creation(self):
         r = self.post_user()
         self.assertEqual(r.status_code, 201)
@@ -122,7 +105,15 @@ class AccountAPITests(TestCase):
     def test_get_account_info_logged_in(self):
         self.post_user()
         self.login()
-        self.create_elements_with_user_link()
+
+        # add some data related to user
+        u = User.objects.get(pk=1)
+        c = Category.objects.create(name="category")
+        u.userprofile.categories.add(c)
+        i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
+                                creation_date=timezone.now(), archived=False, owner=u.userprofile, category=c)
+        Note.objects.create(user=u.userprofile, text="test", note=4)
+        Like.objects.create(user=u.userprofile, item=i)
 
         r = self.client.get("/api/account/")
 
@@ -266,7 +257,6 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, 400)
         self.assertEqual("password" in r.data, False)
-        # Need 3 fields (mandatory)
         self.assertEqual(len(r.data), 3)
 
         r = self.client.get("/api/account/")
