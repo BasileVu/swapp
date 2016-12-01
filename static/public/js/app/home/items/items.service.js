@@ -31,7 +31,7 @@ var ItemsService = (function () {
             .catch(this.handleError);
     };
     ItemsService.prototype.getItem = function (id) {
-        return this.http.get('/api/items/2')
+        return this.http.get('/api/items/' + id)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

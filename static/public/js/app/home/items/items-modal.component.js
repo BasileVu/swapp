@@ -10,13 +10,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var items_service_1 = require('./items.service');
+var item_1 = require("./item");
 var ItemsModalComponent = (function () {
     function ItemsModalComponent(itemsService) {
-        var _this = this;
         this.itemsService = itemsService;
-        this.subscription = itemsService.itemSelected$.subscribe(function (item) { _this.item = item; });
     }
     ItemsModalComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.item = new item_1.Item(); // Initiate an empty item. hack to avoid errors
+        this.subscription = this.itemsService.itemSelected$.subscribe(function (item) { return _this.item = item; });
     };
     ItemsModalComponent.prototype.ngOnDestroy = function () {
         // prevent memory leak when component is destroyed

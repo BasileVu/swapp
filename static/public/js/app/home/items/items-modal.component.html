@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="title-wrapper">
-                        <h2 *ngIf="item != undefined">{{ item.name }}</h2>
+                        <h2>{{ item.name }}</h2>
                     </div>
                     <div class="row details">
                         <div class="col-lg-7 description">
@@ -66,7 +66,7 @@
                                     <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
                                 </div>
                                 <div class="col-lg-9 col-md-10">
-                                    <h5><a href="#">Name Lastname</a> <i class="check fa fa-check"></i></h5>
+                                    <h5><a href="#">Name lastanem</a> <i class="check fa fa-check"></i></h5>
                                 </div>
                             </div>
                             <div class="row evaluation">
@@ -89,7 +89,7 @@
                                         Estimed price
                                     </div>
                                     <div class="right col-xs-6">
-                                        {{ (item.price_min + item.price_max) / 2 }} chf
+                                        {{ (item.price_min + item.price_max) / 2 | number:'.2' }} chf
                                     </div>
                                 </div>
                                 <div class="row">

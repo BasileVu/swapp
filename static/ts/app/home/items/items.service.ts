@@ -30,7 +30,7 @@ export class ItemsService {
     }
 
     getItem (id: number): Promise<Item> {
-        return this.http.get('/api/items/2')
+        return this.http.get('/api/items/' + id)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

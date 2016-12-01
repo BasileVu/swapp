@@ -15,13 +15,13 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     item: Item;
     subscription: Subscription;
 
-    constructor(private itemsService: ItemsService) {
-        this.subscription = itemsService.itemSelected$.subscribe(
-            item => { this.item = item; }
-        );
-    }
+    constructor(private itemsService: ItemsService) { }
 
     ngOnInit() {
+        this.item = new Item(); // Initiate an empty item. hack to avoid errors
+        this.subscription = this.itemsService.itemSelected$.subscribe(
+            item => this.item = item
+        );
     }
 
     ngOnDestroy() {

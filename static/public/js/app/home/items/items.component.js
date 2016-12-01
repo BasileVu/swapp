@@ -26,8 +26,12 @@ var ItemsComponent = (function () {
     ItemsComponent.prototype.gotoDetail = function (id) {
         var _this = this;
         console.log("clicked. id: " + id);
-        this.itemsService.getItem(id)
-            .then(function (item) { return _this.itemsService.selectItem(item); }, function (error) { return _this.errorMessage = error; });
+        var service = this.itemsService;
+        service.getItem(id)
+            .then(function (item) {
+            _this.selectedItem = item;
+            service.selectItem(_this.selectedItem);
+        }, function (error) { return _this.errorMessage = error; });
     };
     ItemsComponent = __decorate([
         core_1.Component({
