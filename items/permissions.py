@@ -1,11 +1,11 @@
 from rest_framework import permissions
 
+SAFE_METHODS = ["GET", "HEAD", "OPTION"]
 
-class IsPermitted(permissions.BasePermission):
+
+class ReadOnlyIfNotConnected(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
+        if request.method in SAFE_METHODS:
             return True
-        if request.method == 'PUT' or request.method == "PATCH" or request.method == "DELETE":
-            return obj.owner == request.user
-        if request.method == 'POST':
+        else:
             return request.user.is_authenticated()
