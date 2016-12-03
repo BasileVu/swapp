@@ -542,3 +542,27 @@ class CoordinatesTests(TestCase):
         c = self.get_coordinates()
         self.assertNotEqual(c.latitude, 0)
         self.assertNotEqual(c.longitude, 0)
+
+
+class PublicAccountInfoTests(TestCase):
+    def test_get_user_info(self):
+        u = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
+                                     email="test@test.com", password="password")
+        u.location.city = "a"
+        u.location.region = "b"
+        u.location.country = "c"
+        u.location.save()
+
+        r = self.client.get("/api/users/%d/" % (u.id + 1))
+        self.assertEquals(r.status_code, 404)
+
+        r = self.client.get("/api/users/%d/" % u.id)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["first_name"], "first_name")
+        self.assertEqual(r.data["last_name"], "last_name")
+        self.assertEqual(r.data["username"], "username")
+        self.assertEqual(r.data["location"], "a, b, c")
+        self.assertListEqual(r.data["categories"], [])
+        self.assertListEqual(r.data["items"], [])
+        self.assertListEqual(r.data["notes"], [])
+        self.assertListEqual(r.data["likes"], [])
