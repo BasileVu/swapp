@@ -553,10 +553,10 @@ class PublicAccountInfoTests(TestCase):
         u.location.country = "c"
         u.location.save()
 
-        r = self.client.get("/api/users/%d/" % (u.id + 1))
+        r = self.client.get("/api/users/%s/" % (u.username + "42"))
         self.assertEquals(r.status_code, 404)
 
-        r = self.client.get("/api/users/%d/" % u.id)
+        r = self.client.get("/api/users/%s/" % u.username)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")

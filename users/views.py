@@ -187,8 +187,8 @@ class LocationView(mixins.UpdateModelMixin, generics.GenericAPIView):
 
 
 @api_view(["GET"])
-def get_public_account_info(request, id):
-    user = get_object_or_404(User, pk=id)
+def get_public_account_info(request, username):
+    user = get_object_or_404(User, username=username)
     user_profile = user.userprofile
 
     return Response({
