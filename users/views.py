@@ -1,22 +1,18 @@
-import json
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie
 
+from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import generics, mixins
 
-from users.models import UserProfile, Location
-from users.serializers import UserAccountSerializer, LocationSerializer
+from users.serializers import *
 
 
 # TODO delete when not user anymore
@@ -88,23 +84,13 @@ def get_csrf_token(request):
 
 @api_view(["POST"])
 def create_user(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        username = data["username"]
-        email = data["email"]
-        password = data["password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
-
-    # Check if not empty fields
-    if not username or not password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={
-            "error": "fields '" + username + "' and '" + password + "' can't be empty"})
+    serializer = UserCreateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
     try:
-        user = User.objects.create_user(username=username, email=email, password=password)
+        user = User.objects.create_user(**serializer.validated_data)
     except IntegrityError:
-        return Response(status=status.HTTP_409_CONFLICT)
+        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
 
     response = Response(status=status.HTTP_201_CREATED)
     response["Location"] = "/api/users/%d/" % user.id
@@ -113,18 +99,10 @@ def create_user(request):
 
 @api_view(['POST'])
 def login_user(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        username = data["username"]
-        password = data["password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
+    serializer = LoginUserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    # Check if not empty fields
-    if not username or not password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
-
-    user = authenticate(username=username, password=password)
+    user = authenticate(**serializer.validated_data)
     if user is not None:
         login(request, user)
         return Response(status=status.HTTP_200_OK)
@@ -141,7 +119,7 @@ def logout_user(request):
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserAccountSerializer
+    serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
@@ -176,22 +154,15 @@ def change_password(request):
     """
     An endpoint for changing password.
     """
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        old_password = data["old_password"]
-        new_password = data["new_password"]
-    except KeyError as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "field " + str(e) + " is incorrect"})
+    serializer = ChangePasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    # Check if not empty fields
-    if not old_password or not new_password:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "fields can't be empty"})
+    old_password = serializer.validated_data["old_password"]
+    new_password = serializer.validated_data["new_password"]
 
-    # Check old password
     if not request.user.check_password(old_password):
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
 
-    # set_password also hashes the password that the user will get
     request.user.set_password(new_password)
     request.user.save()
     return Response(status=status.HTTP_200_OK)
