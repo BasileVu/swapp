@@ -456,51 +456,6 @@ class AccountAPITests(TestCase):
         time.sleep(0.2)
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
-    def test_change_location_not_logged_in(self):
-        self.post_user()
-        r = self.client.patch("/api/account/location", data=json.dumps({
-            "street": "street",
-            "city": "city",
-            "country": "country",
-            "region": "region"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, 401)
-
-    def test_change_location_location_and_coordinates_changed(self):
-        self.post_user()
-        self.login()
-
-        location = {
-            "street": "street",
-            "city": "city",
-            "country": "country",
-            "region": "region"
-        }
-
-        r = self.client.put("/api/account/location/", data=json.dumps(location), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
-
-        r = self.client.get("/api/account/")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data["location"], location)
-
-    def test_change_location_patch_refused(self):
-        self.post_user()
-        self.login()
-
-        r = self.client.patch("/api/account/location/", data=json.dumps({
-            "street": "street"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
-
-    def test_change_location_empty_json(self):
-        self.post_user()
-        self.login()
-        r = self.client.put("/api/account/", data=json.dumps({
-            "location": {}
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, 400)
-
     def test_405_when_get_on_password(self):
         self.post_user()
         self.login()
@@ -516,7 +471,19 @@ class CSRFTests(TestCase):
         self.assertIn("csrftoken", self.client.cookies)
 
 
-class CoordinatesTests(TestCase):
+class LocationCoordinatesTests(TestCase):
+
+    new_location = {
+        "street": "Route de Cheseaux 1",
+        "city": "Yverdon-les-Bains",
+        "region": "VD",
+        "country": "Switzerland",
+    }
+
+    def put_location(self):
+        return self.client.patch("/api/account/location/",
+                                 data=json.dumps(self.new_location),
+                                 content_type="application/json")
 
     def get_coordinates(self):
         return User.objects.get_by_natural_key(self.user.username).coordinates
@@ -525,18 +492,56 @@ class CoordinatesTests(TestCase):
         self.user = User.objects.create_user(username="username", password="password")
         self.client.login(username="username", password="password")
 
+    def test_change_location_not_logged_in(self):
+        self.client.logout()
+        r = self.put_location()
+        self.assertEqual(r.status_code, 401)
+
+    def test_change_location(self):
+        r = self.put_location()
+        self.assertEqual(r.status_code, 200)
+
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data["location"], self.new_location)
+
+    def test_change_location_empty_json(self):
+        r = self.client.put("/api/account/location/", data=json.dumps({
+            "location": {}
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_change_location_empty_json_fields(self):
+        r = self.client.put("/api/account/location/", data=json.dumps({
+            "location": {
+                "street": "",
+                "city": "",
+                "region": "",
+                "country": ""
+            }
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
     def test_coordinates_0_at_beginning(self):
         c = self.get_coordinates()
         self.assertEqual(c.latitude, 0)
         self.assertEqual(c.longitude, 0)
 
-    def test_coordinates_change_after_location_modification(self):
-        r = self.client.put("/api/account/location/", data=json.dumps({
-            "street": "street",
-            "city": "city",
-            "country": "country",
-            "region": "region"
+    def test_coordinates_do_not_change_after_zero_results_location_modification(self):
+        r = self.client.patch("/api/account/location/", data=json.dumps({
+            "street": "fnupinom",
+            "city": "fnupinom",
+            "region": "fnupinom",
+            "country": "fnupinom",
         }), content_type="application/json")
+        self.assertEqual(r.status_code, 400)
+
+        c = self.get_coordinates()
+        self.assertEqual(c.latitude, 0)
+        self.assertEqual(c.longitude, 0)
+
+    def test_coordinates_change_after_valid_location_modification(self):
+        r = self.put_location()
         self.assertEqual(r.status_code, 200)
 
         c = self.get_coordinates()

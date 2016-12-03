@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from swapp.gmaps_api_utils import get_coordinates
+
 
 class UserProfile(models.Model):
     """
@@ -33,9 +35,9 @@ class Coordinates(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, signal, created, **kwargs):
+def create_user_related(sender, instance, signal, created, **kwargs):
     """
-    Handler to create user profile when an user is created.
+    Handler to create user-related tables when user created: user profile, location and coordinates.
     """
     if created:
         UserProfile.objects.create(user=instance, last_modification_date=timezone.now())
@@ -43,7 +45,7 @@ def create_user_profile(sender, instance, signal, created, **kwargs):
         Coordinates.objects.create(user=instance)
     else:
         # When we make a modification on the User (fields), we change the field "last_modification_date"
-        # whit the new datetime.
+        # with the new datetime.
         instance.userprofile.save()
 
 
