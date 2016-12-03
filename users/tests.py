@@ -562,7 +562,6 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(r.data["last_name"], "last_name")
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["location"], "a, b, c")
-        self.assertListEqual(r.data["categories"], [])
         self.assertListEqual(r.data["items"], [])
         self.assertListEqual(r.data["notes"], [])
         self.assertListEqual(r.data["likes"], [])

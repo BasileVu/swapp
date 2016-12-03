@@ -197,7 +197,6 @@ def get_public_account_info(request, id):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
-        "categories": [c.id for c in user_profile.categories.all()],
         "items": [i.id for i in user_profile.item_set.all()],
         "notes": [n.id for n in user_profile.note_set.all()],
         "likes": [l.id for l in user_profile.like_set.all()],
