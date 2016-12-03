@@ -10,6 +10,7 @@ from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from users.serializers import *
@@ -105,7 +106,7 @@ def login_user(request):
     user = authenticate(**serializer.validated_data)
     if user is not None:
         login(request, user)
-        return Response(status=status.HTTP_200_OK)
+        return Response()
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
 
@@ -126,7 +127,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
         user = request.user
         user_profile = request.user.userprofile
 
-        return Response(status=status.HTTP_200_OK, data={
+        return Response({
             "id": user.id,
             "username": user.username,
             "first_name": user.first_name,
@@ -183,3 +184,20 @@ class LocationView(mixins.UpdateModelMixin, generics.GenericAPIView):
         c.save()
 
         return self.update(request, *args, **kwargs)
+
+
+@api_view(["GET"])
+def get_public_account_info(request, username):
+    user = get_object_or_404(User, username=username)
+    user_profile = user.userprofile
+
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
+        "items": [i.id for i in user_profile.item_set.all()],
+        "notes": [n.id for n in user_profile.note_set.all()],
+        "likes": [l.id for l in user_profile.like_set.all()],
+    })
