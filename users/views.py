@@ -138,9 +138,9 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "location": LocationSerializer(user.location).data,
             "last_modification_date": user_profile.last_modification_date,
             "categories": [c.id for c in user_profile.categories.all()],
-            "items": [i.id for i in user_profile.item_set.all()],
-            "notes": [n.id for n in user_profile.note_set.all()],
-            "likes": [l.id for l in user_profile.like_set.all()],
+            "items": [i.id for i in user.item_set.all()],
+            "notes": [n.id for n in user.note_set.all()],
+            "likes": [l.id for l in user.like_set.all()],
         })
 
     # FIXME two errors occur when we launch the tests (two users can't have the same username)
@@ -196,7 +196,6 @@ class LocationView(generics.UpdateAPIView):
 @api_view(["GET"])
 def get_public_account_info(request, username):
     user = get_object_or_404(User, username=username)
-    user_profile = user.userprofile
 
     return Response({
         "id": user.id,
@@ -204,7 +203,7 @@ def get_public_account_info(request, username):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
-        "items": [i.id for i in user_profile.item_set.all()],
-        "notes": [n.id for n in user_profile.note_set.all()],
-        "likes": [l.id for l in user_profile.like_set.all()],
+        "items": [i.id for i in user.item_set.all()],
+        "notes": [n.id for n in user.note_set.all()],
+        "likes": [l.id for l in user.like_set.all()],
     })

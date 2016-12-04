@@ -111,9 +111,9 @@ class AccountAPITests(TestCase):
         c = Category.objects.create(name="category")
         u.userprofile.categories.add(c)
         i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
-                                creation_date=timezone.now(), archived=False, owner=u.userprofile, category=c)
-        Note.objects.create(user=u.userprofile, text="test", note=4)
-        Like.objects.create(user=u.userprofile, item=i)
+                                creation_date=timezone.now(), archived=False, owner=u, category=c)
+        Note.objects.create(user=u, text="test", note=4)
+        Like.objects.create(user=u, item=i)
 
         r = self.client.get("/api/account/")
 

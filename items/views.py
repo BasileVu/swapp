@@ -1,4 +1,7 @@
+import math
+
 from django.db.models import Q
+from django.db import connection, transaction
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
@@ -8,9 +11,28 @@ from rest_framework.response import Response
 
 from items.models import Like
 from items.serializers import *
+from swapp import settings
 
 
 # TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
+from swapp.gmaps_api_utils import compute_distance
+
+
+def get_item_ids_near(latitude, longitude, radius, order_by_distance=False):
+    connection.connection.create_function('compute_distance', 4, compute_distance)
+
+    query = """
+        SELECT items_item.id,
+          compute_distance(%f, %f, users_coordinates.latitude, users_coordinates.longitude) AS distance
+        FROM items_item
+          INNER JOIN auth_user ON items_item.owner_id = auth_user.id
+          INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id
+        WHERE distance < %d""" % (latitude, longitude, int(radius))
+
+    if order_by_distance:
+        query += " ORDER BY distance"
+
+    return [i.id for i in Item.objects.raw(query)]
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -26,8 +48,9 @@ class ItemViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         q = self.request.query_params.get("q", "")
         category_name = self.request.query_params.get("category", None)
-        latitude = self.request.query_params.get("lat", 0)  # TODO
-        longitude = self.request.query_params.get("lon", 0)  # TODO
+        latitude = self.request.query_params.get("lat", None)
+        longitude = self.request.query_params.get("lon", None)
+        radius = self.request.query_params.get("radius", None)
         price_min = self.request.query_params.get("price_min", 0)
         price_max = self.request.query_params.get("price_max", None)
         order_by = self.request.query_params.get("order_by", None)  # TODO
@@ -46,10 +69,18 @@ class ItemViewSet(viewsets.ModelViewSet):
         if price_max is not None:
             queryset = queryset.filter(price_max__lte=int(price_max))
 
+        if latitude is not None and longitude is not None:
+
+            # TODO some input checks!s
+
+            if radius is None:
+                radius = 100000
+            queryset = queryset.filter(id__in=get_item_ids_near(float(latitude), float(longitude), radius))
+
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user.userprofile)
+        serializer.save(owner=self.request.user)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):

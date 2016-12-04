@@ -17,10 +17,10 @@ class OfferAPITests(TestCase):
         c2 = Category.objects.create(name="Test2")
 
         self.other_user = User.objects.create_user(username="user1", email="test@test.com",
-                                                   password="password").userprofile
+                                                   password="password")
 
         self.create_item(c1, self.other_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
-        self.create_item(c2, self.current_user.userprofile, name="Shirt", description="My old shirt", price_min=5,
+        self.create_item(c2, self.current_user, name="Shirt", description="My old shirt", price_min=5,
                          price_max=30)
 
     def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
@@ -98,6 +98,7 @@ class OfferAPITests(TestCase):
 
         r = self.get_offer(id_offer=r.data['id'])
         self.assertEqual(r.status_code, 200)
+
         r = self.get_offer(id_offer=10)
         self.assertEqual(r.status_code, 404)
 
@@ -105,11 +106,14 @@ class OfferAPITests(TestCase):
         self.login()
         r = self.post_offer(2, 1)
         self.assertEqual(r.status_code, 201)
+
         id_offer = r.data['id']
         r = self.put_offer(1, item_given=2, item_received=1, accepted=True, status=1, comment="Test2")
         self.assertEqual(r.status_code, 200)
+
         r = self.get_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, 200)
+
         self.assertEqual(r.data['item_given'], 2)
         self.assertEqual(r.data['item_received'], 1)
         self.assertEqual(r.data['accepted'], True)
@@ -122,19 +126,26 @@ class OfferAPITests(TestCase):
         self.login()
         r = self.post_offer(2, 1)
         self.assertEqual(r.status_code, 201)
+
         id_offer = r.data['id']
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_given": 2}))
         self.assertEqual(r.status_code, 200)
+
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_received": 1}))
         self.assertEqual(r.status_code, 200)
+
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
         self.assertEqual(r.status_code, 200)
+
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"status": 1}))
         self.assertEqual(r.status_code, 200)
+
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"comment": "Test2"}))
         self.assertEqual(r.status_code, 200)
+
         r = self.get_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, 200)
+
         self.assertEqual(r.data['item_given'], 2)
         self.assertEqual(r.data['item_received'], 1)
         self.assertEqual(r.data['accepted'], True)
@@ -147,11 +158,13 @@ class OfferAPITests(TestCase):
         self.login()
         r = self.post_offer(2, 1)
         self.assertEqual(r.status_code, 201)
+
         id_offer = r.data['id']
         r = self.get_offers()
         self.assertEqual(len(r.data), 1)
         r = self.delete_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, 204)
+
         r = self.get_offers()
         self.assertEqual(len(r.data), 0)
         r = self.delete_offer(id_offer=10)
