@@ -43,38 +43,35 @@ class ItemViewSet(viewsets.ModelViewSet):
         return ItemSerializer
 
     def list(self, request, *args, **kwargs):
-        q = self.request.query_params.get("q", "")
-        category_name = self.request.query_params.get("category", None)
-        latitude = self.request.query_params.get("lat", None)
-        longitude = self.request.query_params.get("lon", None)
-        radius = self.request.query_params.get("radius", None)
-        price_min = self.request.query_params.get("price_min", 0)
-        price_max = self.request.query_params.get("price_max", None)
-        order_by = self.request.query_params.get("order_by", None)  # TODO
-        limit = self.request.query_params.get("limit", None)  # TODO
-        page = self.request.query_params.get("page", None)  # TODO
+        serializer = SearchItemsSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
 
-        try:
-            queryset = Item.objects.filter(
-                Q(name__icontains=q) | Q(description__icontains=q),
-                price_min__gte=int(price_min)
-            )
+        q = serializer.validated_data["q"]
+        price_min = serializer.validated_data["price_min"]
+        price_max = serializer.validated_data["price_max"]
+        category = serializer.validated_data["category"]
+        lat = serializer.validated_data["lat"]
+        lon = serializer.validated_data["lon"]
+        radius = serializer.validated_data["radius"]
 
-            if category_name is not None:
-                category_list = Category.objects.filter(name=category_name)
-                queryset = queryset.filter(category__in=category_list)
+        queryset = Item.objects.filter(
+            Q(name__icontains=q) | Q(description__icontains=q),
+            price_min__gte=price_min
+        )
 
-            if price_max is not None:
-                queryset = queryset.filter(price_max__lte=int(price_max))
+        if category is not None:
+            category_list = Category.objects.filter(name=category)
+            queryset = queryset.filter(category__in=category_list)
 
-            if latitude is not None and longitude is not None:
-                if radius is None:
-                    radius = 100000  # FIXME earth perimeter/2
-                queryset = queryset.filter(id__in=get_item_ids_near(float(latitude), float(longitude), float(radius)))
+        if price_max is not None:
+            queryset = queryset.filter(price_max__lte=int(price_max))
 
-            return Response(AggregatedItemSerializer(queryset, many=True).data)
-        except ValueError as e:
-            return Response(status=400, data={"error": "Invalid parameter %s." % str(e).split(":", 1)[1].strip(" ")})
+        if lat is not None and lon is not None:
+            if radius is None:
+                radius = 100000  # FIXME earth perimeter/2
+            queryset = queryset.filter(id__in=get_item_ids_near(float(lat), float(lon), float(radius)))
+
+        return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
