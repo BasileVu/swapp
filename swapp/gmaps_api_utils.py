@@ -1,9 +1,10 @@
-from math import sin, cos, sqrt, asin, radians
+from math import sin, cos, sqrt, asin, radians, pi
 
 import requests
 
 GEOCODE_PREFIX = "https://maps.googleapis.com/maps/api/geocode/json"
 EARTH_RADIUS = 6371  # km
+MAX_RADIUS = pi * EARTH_RADIUS
 
 
 def get_coordinates(location):

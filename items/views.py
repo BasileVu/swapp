@@ -64,12 +64,10 @@ class ItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(category__in=category_list)
 
         if price_max is not None:
-            queryset = queryset.filter(price_max__lte=int(price_max))
+            queryset = queryset.filter(price_max__lte=price_max)
 
         if lat is not None and lon is not None:
-            if radius is None:
-                radius = 100000  # FIXME earth perimeter/2
-            queryset = queryset.filter(id__in=get_item_ids_near(float(lat), float(lon), float(radius)))
+            queryset = queryset.filter(id__in=get_item_ids_near(lat, lon, radius))
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
