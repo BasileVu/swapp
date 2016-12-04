@@ -1,35 +1,12 @@
-import math
-
+from django.db.models import F, FloatField
+from django.db.models import Func
 from django.db.models import Q
-from django.db import connection, transaction
-from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from items.models import Like
 from items.serializers import *
-from swapp import settings
-
-
-# TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
-from swapp.gmaps_api_utils import compute_distance
-
-
-def get_item_ids_near(latitude, longitude, radius):
-    connection.connection.create_function('compute_distance', 4, compute_distance)
-
-    query = """
-        SELECT items_item.id,
-          compute_distance(%f, %f, users_coordinates.latitude, users_coordinates.longitude) AS distance
-        FROM items_item
-          INNER JOIN auth_user ON items_item.owner_id = auth_user.id
-          INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id
-        WHERE distance < %d;""" % (latitude, longitude, radius)
-
-    return [i.id for i in Item.objects.raw(query)]
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -67,7 +44,13 @@ class ItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(price_max__lte=price_max)
 
         if lat is not None and lon is not None:
-            queryset = queryset.filter(id__in=get_item_ids_near(lat, lon, radius))
+            # add "distance" field to each object
+            queryset = queryset.annotate(
+                distance=Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                              function="compute_distance", output_field=FloatField())
+            )
+
+            queryset = queryset.filter(distance__lte=radius)
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
