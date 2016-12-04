@@ -18,7 +18,7 @@ from swapp import settings
 from swapp.gmaps_api_utils import compute_distance
 
 
-def get_item_ids_near(latitude, longitude, radius, order_by_distance=False):
+def get_item_ids_near(latitude, longitude, radius):
     connection.connection.create_function('compute_distance', 4, compute_distance)
 
     query = """
@@ -27,10 +27,7 @@ def get_item_ids_near(latitude, longitude, radius, order_by_distance=False):
         FROM items_item
           INNER JOIN auth_user ON items_item.owner_id = auth_user.id
           INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id
-        WHERE distance < %d""" % (latitude, longitude, int(radius))
-
-    if order_by_distance:
-        query += " ORDER BY distance"
+        WHERE distance < %d;""" % (latitude, longitude, radius)
 
     return [i.id for i in Item.objects.raw(query)]
 
@@ -57,27 +54,27 @@ class ItemViewSet(viewsets.ModelViewSet):
         limit = self.request.query_params.get("limit", None)  # TODO
         page = self.request.query_params.get("page", None)  # TODO
 
-        queryset = Item.objects.filter(
-            Q(name__icontains=q) | Q(description__icontains=q),
-            price_min__gte=int(price_min)
-        )
+        try:
+            queryset = Item.objects.filter(
+                Q(name__icontains=q) | Q(description__icontains=q),
+                price_min__gte=int(price_min)
+            )
 
-        if category_name is not None:
-            category_list = Category.objects.filter(name=category_name)
-            queryset = queryset.filter(category__in=category_list)
+            if category_name is not None:
+                category_list = Category.objects.filter(name=category_name)
+                queryset = queryset.filter(category__in=category_list)
 
-        if price_max is not None:
-            queryset = queryset.filter(price_max__lte=int(price_max))
+            if price_max is not None:
+                queryset = queryset.filter(price_max__lte=int(price_max))
 
-        if latitude is not None and longitude is not None:
+            if latitude is not None and longitude is not None:
+                if radius is None:
+                    radius = 100000  # FIXME earth perimeter/2
+                queryset = queryset.filter(id__in=get_item_ids_near(float(latitude), float(longitude), float(radius)))
 
-            # TODO some input checks!s
-
-            if radius is None:
-                radius = 100000
-            queryset = queryset.filter(id__in=get_item_ids_near(float(latitude), float(longitude), radius))
-
-        return Response(AggregatedItemSerializer(queryset, many=True).data)
+            return Response(AggregatedItemSerializer(queryset, many=True).data)
+        except ValueError as e:
+            return Response(status=400, data={"error": "Invalid parameter %s." % str(e).split(":", 1)[1].strip(" ")})
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

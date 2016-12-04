@@ -699,3 +699,20 @@ class ItemSearchApiTests(TestCase):
         r = self.client.get(self.url + "?lat=%f&lon=%f&radius=1" % (self.latitude, self.longitude))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 2)
+
+        r = self.client.get(self.url + "?lat=%f&lon=%f&radius=0.1" % (self.latitude, self.longitude))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+
+    def test_wrong_parameter_format(self):
+        r = self.client.get(self.url + "?price_min=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?price_max=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?lat=test&lon=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?lat=test&lon=test&radius=test")
+        self.assertEqual(r.status_code, 400)
