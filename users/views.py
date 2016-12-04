@@ -10,9 +10,11 @@ from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
 
@@ -169,21 +171,26 @@ def change_password(request):
     return Response(status=status.HTTP_200_OK)
 
 
-class LocationView(mixins.UpdateModelMixin, generics.GenericAPIView):
+class LocationView(generics.UpdateAPIView):
     serializer_class = LocationSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
         return self.request.user.location
 
-    def put(self, request, *args, **kwargs):
-        # FIXME update coordinates using google maps api
-        c = request.user.coordinates
-        c.latitude = 42
-        c.longitude = 42
-        c.save()
+    def perform_update(self, serializer):
+        serializer.save()
 
-        return self.update(request, *args, **kwargs)
+        u = self.request.user
+        data = get_coordinates(u.location)
+
+        if len(data) == 0:
+            raise ValidationError("Could not find any match for specified location.")
+
+        c = u.coordinates
+        c.latitude = data[0]["lat"]
+        c.longitude = data[0]["lng"]
+        c.save()
 
 
 @api_view(["GET"])
