@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.forms import forms
 from django.utils import timezone
 
@@ -14,7 +15,7 @@ class Item(models.Model):
     archived = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
 
-    owner = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
 
     def __str__(self):
@@ -38,7 +39,7 @@ class Category(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):

@@ -53,7 +53,7 @@ class Note(models.Model):
     """
     Defines the note that can be attributed to an user after a proposition was made.
     """
-    user = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
     note = models.IntegerField(default=0)
 

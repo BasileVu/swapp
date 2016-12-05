@@ -4,20 +4,19 @@ from PIL import Image as ImagePil
 from django.test import TestCase
 
 from items.models import *
+from swapp.gmaps_api_utils import compute_distance
 from users.models import *
 
 
 class ItemTests(TestCase):
     def test_item_creation(self):
-        User.objects.create_user("username", "test@test.com", "password")
+        u = User.objects.create_user("username", "test@test.com", "password")
         self.assertEqual(UserProfile.objects.count(), 1)
 
-        Category.objects.create(name="test")
+        c = Category.objects.create(name="test")
         self.assertEqual(Category.objects.count(), 1)
 
-        Item.objects.create(name="test", description="test", price_min=1, price_max=2, archived=0,
-                            category=Category.objects.get(id=1),
-                            owner=UserProfile.objects.get(id=1))
+        Item.objects.create(name="test", description="test", price_min=1, price_max=2, archived=0, category=c, owner=u)
         self.assertEqual(Item.objects.count(), 1)
 
 
@@ -317,8 +316,8 @@ class ImageAPITests(TestCase):
         self.current_user.userprofile.save()
 
         c = Category.objects.create(name="Test")
-        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2,
-                                     archived=False, category=c, owner=self.current_user.userprofile)
+        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False, category=c,
+                            owner=self.current_user)
 
         self.login()
 
@@ -466,10 +465,10 @@ class LikeAPITests(TestCase):
         c2 = Category.objects.create(name="Test2")
 
         self.other_user = User.objects.create_user(username="user1", email="test@test.com",
-                                                   password="password").userprofile
+                                                   password="password")
 
         self.create_item(c1, self.other_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
-        self.create_item(c2, self.current_user.userprofile, name="Shirt", description="My old shirt", price_min=5,
+        self.create_item(c2, self.current_user, name="Shirt", description="My old shirt", price_min=5,
                          price_max=30)
 
     def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
@@ -563,8 +562,22 @@ class ItemSearchApiTests(TestCase):
                                    archived=archived, category=category, owner=owner)
 
     def setUp(self):
-        u1 = User.objects.create_user(username="user1", email="test@test.com", password="password").userprofile
-        u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password").userprofile
+        u1 = User.objects.create_user(username="user1", email="test@test.com", password="password")
+        u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
+
+        # Cheseaux
+        u1.coordinates.latitude = 46.7793801
+        u1.coordinates.longitude = 6.659497600000001
+        u1.coordinates.save()
+
+        # St-Roch
+        u2.coordinates.latitude = 46.7812274
+        u2.coordinates.longitude = 6.6473097
+        u2.coordinates.save()
+
+        # Maison d'ailleurs
+        self.latitude = 46.77866239999999
+        self.longitude = 6.6419655
 
         c1 = Category.objects.create(name="Test")
         c2 = Category.objects.create(name="Test2")
@@ -677,3 +690,29 @@ class ItemSearchApiTests(TestCase):
         r = self.client.get(self.url + "?price_min=0&price_max=1000")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
+
+    def test_list_item_latitude_longitude_radius(self):
+        r = self.client.get(self.url + "?lat=%f&lon=%f" % (self.latitude, self.longitude))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 5)
+
+        r = self.client.get(self.url + "?lat=%f&lon=%f&radius=1" % (self.latitude, self.longitude))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 2)
+
+        r = self.client.get(self.url + "?lat=%f&lon=%f&radius=0.1" % (self.latitude, self.longitude))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+
+    def test_wrong_parameter_format(self):
+        r = self.client.get(self.url + "?price_min=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?price_max=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?lat=test&lon=test")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.client.get(self.url + "?lat=test&lon=test&radius=test")
+        self.assertEqual(r.status_code, 400)
