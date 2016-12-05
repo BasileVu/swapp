@@ -2,10 +2,16 @@ import json
 
 from PIL import Image as ImagePil
 from django.test import TestCase
+from django.db.utils import IntegrityError
 
 from items.models import *
-from swapp.gmaps_api_utils import compute_distance
 from users.models import *
+
+
+class CategoryTests(TestCase):
+    def test_category_name_unique(self):
+        Category.objects.create(name="test")
+        self.assertRaises(IntegrityError, Category.objects.create, name="test")
 
 
 class ItemTests(TestCase):
