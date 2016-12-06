@@ -52,16 +52,14 @@ class ItemViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(distance__lte=radius)
 
-        if order_by == "name":
-            queryset = queryset.order_by("name")
-        elif order_by == "category":
-            queryset = queryset.order_by("category__name")
-        elif order_by == "price_min":
-            queryset = queryset.order_by("price_min")
-        elif order_by == "price_max":
-            queryset = queryset.order_by("-price_max")
-        elif order_by == "range":
-            queryset = queryset.order_by("distance")
+        strings_order_by = {
+            "name": "name",
+            "category": "category__name",
+            "price_min": "price_min",
+            "price_max": "-price_max",
+            "range": "distance"
+        }
+        queryset = queryset.order_by(strings_order_by[order_by])
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
