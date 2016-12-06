@@ -74,6 +74,6 @@ class SearchItemsSerializer(serializers.Serializer):
     radius = serializers.FloatField(default=MAX_RADIUS)
     price_min = serializers.FloatField(default=0)
     price_max = serializers.FloatField(default=None)
-    order_by = serializers.CharField(default=None)
+    order_by = serializers.CharField(default="name")
     limit = serializers.IntegerField(default=None)
     page = serializers.IntegerField(default=None)
