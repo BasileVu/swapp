@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from notifications.models import Notification
-
 
 class Offer(models.Model):
     accepted = models.BooleanField()

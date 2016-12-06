@@ -44,8 +44,8 @@ def new_offer_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when an offer is created.
     """
     if created:
-        notification = Notification.objects.create(content="New offer for item: " + instance.item_receveid.name,
-                                                   read=False, date=timezone.now(), user=instance.item_receveid.owner)
+        notification = Notification.objects.create(content="New offer for item: " + instance.item_received.name,
+                                                   read=False, date=timezone.now(), user=instance.item_received.owner)
         offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
         NewOfferNotification.objects.create(offer_notification=offer_notification)
 
