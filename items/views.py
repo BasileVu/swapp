@@ -24,12 +24,13 @@ class ItemViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         q = serializer.validated_data["q"]
+        category = serializer.validated_data["category"]
         price_min = serializer.validated_data["price_min"]
         price_max = serializer.validated_data["price_max"]
-        category = serializer.validated_data["category"]
         lat = serializer.validated_data["lat"]
         lon = serializer.validated_data["lon"]
         radius = serializer.validated_data["radius"]
+        order_by = serializer.validated_data["order_by"]
 
         queryset = Item.objects.filter(
             Q(name__icontains=q) | Q(description__icontains=q),
@@ -37,8 +38,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         )
 
         if category is not None:
-            category_list = Category.objects.filter(name=category)
-            queryset = queryset.filter(category__in=category_list)
+            queryset = queryset.filter(category__name=category)
 
         if price_max is not None:
             queryset = queryset.filter(price_max__lte=price_max)
@@ -51,6 +51,17 @@ class ItemViewSet(viewsets.ModelViewSet):
             )
 
             queryset = queryset.filter(distance__lte=radius)
+
+        if order_by == "name":
+            queryset = queryset.order_by("name")
+        elif order_by == "category":
+            queryset = queryset.order_by("category__name")
+        elif order_by == "price_min":
+            queryset = queryset.order_by("price_min")
+        elif order_by == "price_max":
+            queryset = queryset.order_by("-price_max")
+        elif order_by == "range":
+            queryset = queryset.order_by("distance")
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 

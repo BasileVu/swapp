@@ -250,7 +250,7 @@ class ItemAPITests(TestCase):
 
         r = self.get_items()
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 1);
+        self.assertEqual(len(r.data), 1)
         self.assertEqual(r.data[0]['name'], "test")
         self.assertEqual(r.data[0]['description'], "test")
         self.assertEqual(r.data[0]['price_min'], 1)
@@ -600,27 +600,6 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
-    def test_list_item_category(self):
-        r = self.client.get(self.url + "?category=category")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 0)
-
-        r = self.client.get(self.url + "?category=test")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 0)
-
-        r = self.client.get(self.url + "?category=Test")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 2)
-
-        r = self.client.get(self.url + "?category=Test2")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 2)
-
-        r = self.client.get(self.url + "?category=Test3")
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data), 1)
-
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
         self.assertEqual(r.status_code, 200)
@@ -634,7 +613,29 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 2)
 
-    def test_list_item_price_min(self):
+    def test_list_item_category_not_existing(self):
+        r = self.client.get(self.url + "?category=category")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+
+        r = self.client.get(self.url + "?category=test")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 0)
+
+    def test_list_item_category(self):
+        r = self.client.get(self.url + "?category=Test")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 2)
+
+        r = self.client.get(self.url + "?category=Test2")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 2)
+
+        r = self.client.get(self.url + "?category=Test3")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 1)
+
+    def test_list_item_price_min_lower_bound(self):
         r = self.client.get(self.url + "?price_min=0")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
@@ -643,23 +644,27 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
+    def test_list_item_price_min(self):
         r = self.client.get(self.url + "?price_min=10")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 4)
 
+    def test_list_item_price_min_upper_bound(self):
         r = self.client.get(self.url + "?price_min=1000")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
 
-    def test_list_item_price_max(self):
+    def test_list_item_price_max_lower_bound(self):
         r = self.client.get(self.url + "?price_max=5")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
 
+    def test_list_item_price_max(self):
         r = self.client.get(self.url + "?price_max=30")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 2)
 
+    def test_list_item_price_max_upper_bound(self):
         r = self.client.get(self.url + "?price_max=1000")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
@@ -668,7 +673,7 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
-    def test_list_item_price_range(self):
+    def test_list_item_no_matching_for_price_range(self):
         r = self.client.get(self.url + "?price_min=0&price_max=0")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
@@ -681,6 +686,7 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
 
+    def test_list_item_price_range(self):
         r = self.client.get(self.url + "?price_min=5&price_max=30")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 2)
@@ -697,15 +703,17 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
-    def test_list_item_latitude_longitude_radius(self):
+    def test_list_item_latitude_longitude(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f" % (self.latitude, self.longitude))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
+    def test_list_item_latitude_longitude_radius(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f&radius=1" % (self.latitude, self.longitude))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 2)
 
+    def test_list_item_latitude_longitude_radius_too_small(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f&radius=0.1" % (self.latitude, self.longitude))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 0)
@@ -722,3 +730,85 @@ class ItemSearchApiTests(TestCase):
 
         r = self.client.get(self.url + "?lat=test&lon=test&radius=test")
         self.assertEqual(r.status_code, 400)
+
+    def test_order_by_name(self):
+        r = self.client.get(self.url + "?order_by=name")
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.data[0]["name"], "New mouse")
+        self.assertEquals(r.data[1]["name"], "Piano")
+        self.assertEquals(r.data[2]["name"], "Ring")
+        self.assertEquals(r.data[3]["name"], "Shirt")
+        self.assertEquals(r.data[4]["name"], "Shoes")
+
+    def test_order_by_category(self):
+        r = self.client.get(self.url + "?order_by=category")
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.data[0]["name"], "Shoes")
+        self.assertEquals(r.data[1]["name"], "New mouse")
+        self.assertEquals(r.data[2]["name"], "Shirt")
+        self.assertEquals(r.data[3]["name"], "Piano")
+        self.assertEquals(r.data[4]["name"], "Ring")
+
+    def test_order_by_price_min(self):
+        r = self.client.get(self.url + "?order_by=price_min")
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.data[0]["name"], "Shirt")
+        self.assertEquals(r.data[1]["name"], "Shoes")
+        self.assertEquals(r.data[2]["name"], "New mouse")
+        self.assertEquals(r.data[3]["name"], "Ring")
+        self.assertEquals(r.data[4]["name"], "Piano")
+
+    def test_order_by_price_max(self):
+        r = self.client.get(self.url + "?order_by=price_max")
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.data[0]["name"], "Piano")
+        self.assertEquals(r.data[1]["name"], "Ring")
+        self.assertEquals(r.data[2]["name"], "New mouse")
+        self.assertEquals(r.data[3]["name"], "Shoes")
+        self.assertEquals(r.data[4]["name"], "Shirt")
+
+    def test_order_by_range(self):
+        r = self.client.get(self.url + "?lat=%f&lon=%f&order_by=range" % (self.latitude, self.longitude))
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.data[0]["name"], "New mouse")
+        self.assertEquals(r.data[1]["name"], "Piano")
+        self.assertEquals(r.data[2]["name"], "Shoes")
+        self.assertEquals(r.data[3]["name"], "Shirt")
+        self.assertEquals(r.data[4]["name"], "Ring")
+
+    def test_all_filters(self):
+        r = self.client.get(self.url +
+                            "?q=s"
+                            "&category=Test"
+                            "&price_min=5"
+                            "&price_max=30"
+                            "&lat=%f&lon=%f&radius=10"
+                            "&order_by=name"
+                            % (self.latitude, self.longitude))
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(len(r.data), 1)
+        self.assertEquals(r.data[0]["name"], "Shoes")
+
+        r = self.client.get(self.url +
+                            "?q=s"
+                            "&category=Test2"
+                            "&price_min=5"
+                            "&price_max=30"
+                            "&lat=%f&lon=%f&radius=10"
+                            "&order_by=name"
+                            % (self.latitude, self.longitude))
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(len(r.data), 1)
+        self.assertEquals(r.data[0]["name"], "Shirt")
+
+        r = self.client.get(self.url +
+                            "?q=s"
+                            "&category=Test"
+                            "&price_min=5"
+                            "&price_max=100"
+                            "&lat=%f&lon=%f&radius=1"
+                            "&order_by=name"
+                            % (self.latitude, self.longitude))
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(len(r.data), 1)
+        self.assertEquals(r.data[0]["name"], "New mouse")
