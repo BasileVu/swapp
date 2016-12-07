@@ -52,14 +52,13 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
-    """def validate(self, data):
-        if 'item_given' in data and self.context['request'].user != data['item_given'].owner:
-            raise serializers.ValidationError("Item given is not owned by the current user")
-        if 'item_received' in data and self.context['request'].user == data['item_received'].owner:
-            raise serializers.ValidationError("Item received is already owned by the current user")
-        return data"""
-
     class Meta:
         model = Note
-        fields = ('id', 'user', 'offer', 'text', 'note')
+        fields = ('id', 'offer', 'text', 'note')
+        read_only_fields = ('user',)
 
+
+class NoteUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ('text', 'note')

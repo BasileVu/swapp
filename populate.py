@@ -12,8 +12,8 @@ def create_item(category, owner, name="Test", description="Test", price_min=1, p
 								   price_max=price_max, archived=archived, category=category, owner=owner)
 
 if __name__ == '__main__':    
-	u1 = User.objects.create_user(username="user1", email="test@test.com", password="password").userprofile
-	u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password").userprofile
+	u1 = User.objects.create_user(username="user1", email="test@test.com", password="password")
+	u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
 
 	c1 = Category.objects.create(name="Test")
 	c2 = Category.objects.create(name="Test2")

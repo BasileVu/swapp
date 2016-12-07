@@ -210,32 +210,33 @@ def get_public_account_info(request, username):
     })
 
 
-class NoteViewSet(viewsets.ModelViewSet):
+class NoteViewSet(mixins.RetrieveModelMixin,
+                  mixins.DestroyModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
     def perform_create(self, serializer):
         # Will be done on every save
-        offer = Offer.objects.get(offer=serializer.offer)
+
+        serializer.is_valid(raise_exception=True)
+        offer = serializer.validated_data["offer"]
+
         if offer.item_given.owner == self.request.user:
-            serializer.user = offer.item_received.owner
+            serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:
-            serializer.user = offer.item_given.owner
+            serializer.validated_data["user"] = offer.item_given.owner
         else:
-            raise APIException("You are not linked to this offer.")
-        if len(Note.objects.get(offer=serializer.offer, user=serializer.user)) > 0:
-            raise APIException("The user has already noted the offer.")
+            raise ValidationError("You are not linked to this offer")
+
+        if Note.objects.filter(offer=offer, user=serializer.validated_data["user"]).count() > 0:
+            raise ValidationError("You have already noted this offer")
         serializer.save()
 
-    def perform_update(self, serializer):
-        # Will be done on every save
-        offer = Offer.objects.get(offer=serializer.offer)
-        if offer.item_given.owner == self.request.user:
-            serializer.user = offer.item_received.owner
-        elif offer.item_received.owner == self.request.user:
-            serializer.user = offer.item_given.owner
-        else:
-            raise APIException("You are not linked to this offer.")
-        if len(Note.objects.get(offer=serializer.offer, user=serializer.user)) > 0:
-            raise APIException("The user has already noted the offer.")
-        serializer.save()
+
+class NoteUpdateViewSet(mixins.UpdateModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteUpdateSerializer
