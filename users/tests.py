@@ -570,3 +570,72 @@ class PublicAccountInfoTests(TestCase):
         self.assertListEqual(r.data["items"], [])
         self.assertListEqual(r.data["notes"], [])
         self.assertListEqual(r.data["likes"], [])
+
+
+class NoteAPITests(TestCase):
+    def setUp(self):
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.location = "location"
+        self.current_user.userprofile.save()
+
+        c1 = Category.objects.create(name="Test")
+
+        self.other_user = User.objects.create_user(username="user1", email="test@test.com",
+                                                   password="password")
+
+        self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
+        self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
+                                        price_max=30)
+        self.offer = Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem, item_received=self.hisItem);
+
+    def login(self):
+        self.client.login(username="username", password="password")
+
+    def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
+        return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
+                                   archived=archived, category=category, owner=owner)
+
+    def post_note(self, offer=1, text="Test", note=0):
+        return self.client.post("/api/notes/", data=json.dumps({
+            "offer": offer,
+            "text": text,
+            "note": note
+        }), content_type="application/json")
+
+    def get_likes(self):
+        return self.client.get("/api/likes/", content_type="application/json")
+
+    def get_like(self, id_like):
+        return self.client.get("/api/likes/" + str(id_like) + "/", content_type="application/json")
+
+    def delete_like(self, id_like):
+        return self.client.delete("/api/items/" + str(id_like) + "/", content_type="application/json")
+
+    def test_post_note(self):
+        self.login()
+        r = self.post_note(1, "test", 1)
+        self.assertEqual(r.status_code, 201)
+
+    def test_get_note(self):
+        self.login()
+
+    def test_get_notes(self):
+        self.login()
+
+    def test_post_note_under_0(self):
+        self.login()
+
+    def test_post_note_over_5(self):
+        self.login()
+
+    def test_post_two_times_the_same_note(self):
+        self.login()
+
+    def test_put_note(self):
+        self.login()
+
+    def test_patch_note(self):
+        self.login()
+
+    def test_post_note_should_be_refused_if_offer_is_not_accepted(self):
+        self.login()
