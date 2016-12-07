@@ -11,7 +11,7 @@ from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -213,3 +213,29 @@ def get_public_account_info(request, username):
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+
+    def perform_create(self, serializer):
+        # Will be done on every save
+        offer = Offer.objects.get(offer=serializer.offer)
+        if offer.item_given.owner == self.request.user:
+            serializer.user = offer.item_received.owner
+        elif offer.item_received.owner == self.request.user:
+            serializer.user = offer.item_given.owner
+        else:
+            raise APIException("You are not linked to this offer.")
+        if len(Note.objects.get(offer=serializer.offer, user=serializer.user)) > 0:
+            raise APIException("The user has already noted the offer.")
+        serializer.save()
+
+    def perform_update(self, serializer):
+        # Will be done on every save
+        offer = Offer.objects.get(offer=serializer.offer)
+        if offer.item_given.owner == self.request.user:
+            serializer.user = offer.item_received.owner
+        elif offer.item_received.owner == self.request.user:
+            serializer.user = offer.item_given.owner
+        else:
+            raise APIException("You are not linked to this offer.")
+        if len(Note.objects.get(offer=serializer.offer, user=serializer.user)) > 0:
+            raise APIException("The user has already noted the offer.")
+        serializer.save()

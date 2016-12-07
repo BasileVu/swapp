@@ -56,7 +56,7 @@ class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
-    note = models.IntegerField(default=0)
+    note = models.IntegerField(default=0, min_value=0, max_value=5)
 
     def __str__(self):
         return self.text
