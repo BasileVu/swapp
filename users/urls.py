@@ -7,7 +7,6 @@ app_name = "users"
 
 router = DefaultRouter()
 router.register(r'api/notes', views.NoteViewSet)
-router.register(r'api/notes', views.NoteUpdateViewSet)
 
 urlpatterns = [
     url(r"^register/$", views.register_view, name="register"),  # TODO delete when not used anymore

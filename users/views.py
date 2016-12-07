@@ -210,13 +210,13 @@ def get_public_account_info(request, username):
     })
 
 
-class NoteViewSet(mixins.RetrieveModelMixin,
-                  mixins.DestroyModelMixin,
-                  mixins.ListModelMixin,
-                  mixins.CreateModelMixin,
-                  viewsets.GenericViewSet):
+class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
-    serializer_class = NoteSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'update':
+            return NoteUpdateSerializer
+        return NoteSerializer
 
     def perform_create(self, serializer):
         # Will be done on every save
@@ -224,6 +224,8 @@ class NoteViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         offer = serializer.validated_data["offer"]
 
+        if offer.accepted is not True:
+            raise ValidationError("You can't not an offer if it has not been accepted")
         if offer.item_given.owner == self.request.user:
             serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:
@@ -234,9 +236,3 @@ class NoteViewSet(mixins.RetrieveModelMixin,
         if Note.objects.filter(offer=offer, user=serializer.validated_data["user"]).count() > 0:
             raise ValidationError("You have already noted this offer")
         serializer.save()
-
-
-class NoteUpdateViewSet(mixins.UpdateModelMixin,
-                        viewsets.GenericViewSet):
-    queryset = Note.objects.all()
-    serializer_class = NoteUpdateSerializer

@@ -49,17 +49,6 @@ def create_user_related(sender, instance, signal, created, **kwargs):
         instance.userprofile.save()
 
 
-class IntegerRangeField(models.IntegerField):
-    def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
-        self.min_value, self.max_value = min_value, max_value
-        models.IntegerField.__init__(self, verbose_name, name, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
-        defaults.update(kwargs)
-        return super(IntegerRangeField, self).formfield(**defaults)
-
-
 class Note(models.Model):
     """
     Defines the note that can be attributed to an user after a proposition was made.
@@ -67,7 +56,7 @@ class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
-    note = IntegerRangeField(default=0, min_value=0, max_value=5)
+    note = models.IntegerField(default=0)
 
     def __str__(self):
         return self.text
