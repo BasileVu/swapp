@@ -51,11 +51,15 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ('street', 'city', 'region', 'country')
 
 
-# TODO to adapt
-"""class NoteSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
+class NoteSerializer(serializers.ModelSerializer):
+    """def validate(self, data):
+        if 'item_given' in data and self.context['request'].user != data['item_given'].owner:
+            raise serializers.ValidationError("Item given is not owned by the current user")
+        if 'item_received' in data and self.context['request'].user == data['item_received'].owner:
+            raise serializers.ValidationError("Item received is already owned by the current user")
+        return data"""
 
     class Meta:
         model = Note
-        fields = ('id', 'user_id', 'text', 'note')"""
+        fields = ('id', 'user', 'offer', 'text', 'note')
 

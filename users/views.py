@@ -9,6 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -207,3 +208,8 @@ def get_public_account_info(request, username):
         "notes": [n.id for n in user.note_set.all()],
         "likes": [l.id for l in user.like_set.all()],
     })
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
