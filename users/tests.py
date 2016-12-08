@@ -586,7 +586,9 @@ class NoteAPITests(TestCase):
         self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
         self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
                                         price_max=30)
-        self.offer = Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem, item_received=self.hisItem);
+        Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem, item_received=self.hisItem)
+        Offer.objects.create(id=2, accepted=0, status=1, comment="test", item_given=self.myItem,
+                                          item_received=self.hisItem);
 
     def login(self):
         self.client.login(username="username", password="password")
@@ -602,14 +604,26 @@ class NoteAPITests(TestCase):
             "note": note
         }), content_type="application/json")
 
-    def get_likes(self):
-        return self.client.get("/api/likes/", content_type="application/json")
+    def get_notes(self):
+        return self.client.get("/api/notes/", content_type="application/json")
 
-    def get_like(self, id_like):
-        return self.client.get("/api/likes/" + str(id_like) + "/", content_type="application/json")
+    def get_note(self, id_note):
+        return self.client.get("/api/notes/" + str(id_note) + "/", content_type="application/json")
 
-    def delete_like(self, id_like):
-        return self.client.delete("/api/items/" + str(id_like) + "/", content_type="application/json")
+    def delete_note(self, id_note):
+        return self.client.delete("/api/notes/" + str(id_note) + "/", content_type="application/json")
+
+    def put_note(self, id_note, text="Test", note=0):
+        return self.client.put("/api/notes/" + str(id_note) + "/", data=json.dumps({
+            "text": text,
+            "note": note
+        }), content_type="application/json")
+
+    def patch_note(self, id_note, text="Test", note=0):
+        return self.client.patch("/api/notes/" + str(id_note) + "/", data=json.dumps({
+            "text": text,
+            "note": note
+        }), content_type="application/json")
 
     def test_post_note(self):
         self.login()
@@ -618,24 +632,74 @@ class NoteAPITests(TestCase):
 
     def test_get_note(self):
         self.login()
+        r = self.get_note(1)
+        self.assertEqual(r.status_code, 404)
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_note(1)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["user"], 2)
+        self.assertEqual(r.data["offer"], 1)
+        self.assertEqual(r.data["note"], 1)
+        self.assertEqual(r.data["text"], "Test")
+        self.assertEqual(r.status_code, 200)
 
     def test_get_notes(self):
         self.login()
+        r = self.get_notes()
+        self.assertEqual(len(r.data), 0)
+        self.assertEqual(r.status_code, 200)
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.get_notes()
+        self.assertEqual(len(r.data), 1)
+        self.assertEqual(r.data[0]["id"], 1)
+        self.assertEqual(r.data[0]["user"], 2)
+        self.assertEqual(r.data[0]["offer"], 1)
+        self.assertEqual(r.data[0]["note"], 1)
+        self.assertEqual(r.data[0]["text"], "Test")
+        self.assertEqual(r.status_code, 200)
 
     def test_post_note_under_0(self):
         self.login()
+        r = self.post_note(1, "Test", -1)
+        self.assertEqual(r.status_code, 400)
 
     def test_post_note_over_5(self):
         self.login()
+        r = self.post_note(1, "Test", 6)
+        self.assertEqual(r.status_code, 400)
 
     def test_post_two_times_the_same_note(self):
         self.login()
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 400)
 
     def test_put_note(self):
         self.login()
+        r = self.put_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 404)
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.put_note(1, "Test2", 2)
+        self.assertEqual(r.data["note"], 2)
+        self.assertEqual(r.data["text"], "Test2")
+        self.assertEqual(r.status_code, 200)
 
     def test_patch_note(self):
         self.login()
+        r = self.patch_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 404)
+        r = self.post_note(1, "Test", 1)
+        self.assertEqual(r.status_code, 201)
+        r = self.patch_note(1, "Test2", 2)
+        self.assertEqual(r.data["note"], 2)
+        self.assertEqual(r.data["text"], "Test2")
+        self.assertEqual(r.status_code, 200)
 
     def test_post_note_should_be_refused_if_offer_is_not_accepted(self):
         self.login()
+        r = self.post_note(2, "test", 1)
+        self.assertEqual(r.status_code, 400)
