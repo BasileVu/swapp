@@ -5464,6 +5464,9 @@ a.text-danger:focus, a.text-danger:hover {
 body {
   box-shadow: inset 0 200px 120px 0 #fcf8f1; }
 
+hr {
+  border-top: 1px solid #eed5a9; }
+
 .btn-group-justified {
   display: table;
   width: 100%;
@@ -5657,12 +5660,29 @@ body {
   padding: 20px; }
 #register-user-modal h3, #update-user-modal h3 {
   margin: 20px 0 10px; }
-#register-user-modal .col-img, #update-user-modal .col-img {
-  padding-right: 20px; }
+#register-user-modal .col-2, #update-user-modal .col-2 {
+  padding-left: 20px; }
 #register-user-modal .col-img-frame, #update-user-modal .col-img-frame {
-  width: 60%;
+  width: 40%;
   margin: 40px auto; }
 #register-user-modal .submit, #update-user-modal .submit {
+  margin-top: 20px; }
+
+#add-item-modal .modal-panel {
+  padding: 20px; }
+#add-item-modal h3 {
+  margin: 20px 0 10px; }
+#add-item-modal .col-2 {
+  padding-left: 20px; }
+#add-item-modal .img-infos {
+  font-style: italic;
+  font-weight: 300; }
+#add-item-modal .col-img-frame {
+  width: 60%;
+  margin: 20px auto 10px; }
+  #add-item-modal .col-img-frame img {
+    border-radius: 0.25rem; }
+#add-item-modal .submit {
   margin-top: 20px; }
 
 #advanced-search-modal form {
@@ -5858,5 +5878,10 @@ body {
     text-align: center;
     font-weight: 300;
     margin-bottom: 20px; }
+
+.btn-secondary-color {
+  background-color: #eed5a9;
+  border: none;
+  color: #373a3c; }
 
 /*# sourceMappingURL=styles.css.map */

@@ -1,6 +1,9 @@
 body {
   box-shadow: inset 0 200px 120px 0 lighten($brand-secondary-lighten, 5);
 }
+hr {
+  border-top: 1px solid $brand-secondary;
+}
 .btn-group-justified {
   display: table;
   width: 100%;
@@ -278,12 +281,40 @@ body {
   h3 {
     margin: (2*$grid-gutter-width) 0 $grid-gutter-width;
   }
-  .col-img {
-    padding-right: (2*$grid-gutter-width);
+  .col-2 {
+    padding-left: (2*$grid-gutter-width);
+  }
+  .col-img-frame {
+    width: 40%;
+    margin: (4*$grid-gutter-width) auto;
+  }
+  .submit {
+    margin-top: 2*$grid-gutter-width;
+  }
+}
+
+// Add and Update item modal ////////////////////////////////
+#add-item-modal {
+  .modal-panel {
+    padding: (2*$grid-gutter-width);
+  }
+  h3 {
+    margin: (2*$grid-gutter-width) 0 $grid-gutter-width;
+  }
+  .col-2 {
+    padding-left: (2*$grid-gutter-width);
+  }
+  .img-infos {
+    font-style: italic;
+    font-weight: 300;
   }
   .col-img-frame {
     width: 60%;
-    margin: (4*$grid-gutter-width) auto;
+    margin: (2*$grid-gutter-width) auto $grid-gutter-width;
+
+    img {
+      border-radius: $border-radius;
+    }
   }
   .submit {
     margin-top: 2*$grid-gutter-width;
@@ -546,4 +577,11 @@ body {
     font-weight: 300;
     margin-bottom: 2*$grid-gutter-width;
   }
+}
+
+// Brand secondary button colorized /////////////////////////
+.btn-secondary-color {
+  background-color: $brand-secondary;
+  border: none;
+  color: $gray-dark;
 }

@@ -65,11 +65,20 @@ $('document').ready(function() {
         });
     });
 
-    // open user registration modal ////////////
+    // open user registration modal /////////////////
     var headerMenuProfile = $('#header-menu-profile');
-    var registerUpdateModal = $('#register-user-modal');
+    var userModal = $('#register-user-modal');
     headerMenuProfile.click(function () {
-        registerUpdateModal.modal('show');
+        userModal.modal('show');
+    });
+
+    // open item creation modal /////////////////////
+    var addItemButtons = $('.open-new-item-modal');
+    var newItemModal = $('#add-item-modal');
+    addItemButtons.each(function () {
+        $(this).click(function () {
+            newItemModal.modal('show');
+        });
     });
 
     // display item modal ///////////////////////////
