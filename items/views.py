@@ -63,14 +63,17 @@ class ItemViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(distance__lte=radius)
 
-        strings_order_by = {
-            "name": "name",
-            "category": "category__name",
-            "price_min": "price_min",
-            "price_max": "-price_max",
-            "range": "distance",
-            "date": "creation_date"
-        }
+        if order_by is None:
+            queryset = queryset.order_by("creation_date")
+        else:
+            strings_order_by = {
+                    "name": "name",
+                    "category": "category__name",
+                    "price_min": "price_min",
+                    "price_max": "-price_max",
+                    "range": "distance",
+                    "date": "creation_date"
+                }
         queryset = queryset.order_by(strings_order_by[order_by])
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
