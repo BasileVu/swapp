@@ -65,19 +65,21 @@ $('document').ready(function() {
         });
     });
 
-    // open user registration modal /////////////////
-    var headerMenuProfile = $('#header-menu-profile');
-    var userModal = $('#register-user-modal');
-    headerMenuProfile.click(function () {
-        userModal.modal('show');
-    });
-
     // open item creation modal /////////////////////
     var addItemButtons = $('.open-new-item-modal');
     var newItemModal = $('#add-item-modal');
     addItemButtons.each(function () {
         $(this).click(function () {
             newItemModal.modal('show');
+        });
+    });
+
+    // open user profile modal /////////////////////
+    var openUpdateProfileButtons = $('.open-update-profile-modal');
+    var updateProfileModal = $('#update-user-modal');
+    openUpdateProfileButtons.each(function () {
+        $(this).click(function () {
+            updateProfileModal.modal('show');
         });
     });
 
