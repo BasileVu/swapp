@@ -1,5 +1,4 @@
 from django.utils import timezone
-from rest_framework import permissions
 from rest_framework import viewsets
 
 from notifications.models import Notification, OfferNotification, AcceptedOfferNotification, RefusedOfferNotification
@@ -10,7 +9,6 @@ from offers.serializers import OfferSerializer
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_update(self, serializer):
         offer = serializer.save()
