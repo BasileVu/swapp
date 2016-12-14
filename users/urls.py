@@ -1,13 +1,6 @@
 from django.conf.urls import url
 
-from swapp.ShareAPIRootRouter import SharedAPIRootRouter
 from . import views
-
-import items.urls
-import offers.urls
-
-def api_urls():
-    return SharedAPIRootRouter.shared_router.urls
 
 app_name = "users"
 urlpatterns = [
@@ -20,7 +13,8 @@ urlpatterns = [
     url(r"^api/login/$", views.login_user, name="login_user"),
     url(r"^api/logout/$", views.logout_user, name="logout_user"),
     url(r"^api/users/$", views.create_user, name="create_user"),
+    url(r"^api/users/(?P<username>.+)/$", views.get_public_account_info, name="get_public_account_info"),
     url(r"^api/account/$", views.UserAccount.as_view(), name="user_account"),
-    url(r"^api/account/password", views.change_password, name="change_password"),
-    url(r"^api/account/location", views.LocationView.as_view(), name="location"),
+    url(r"^api/account/password/", views.change_password, name="change_password"),
+    url(r"^api/account/location/", views.LocationView.as_view(), name="location"),
 ]

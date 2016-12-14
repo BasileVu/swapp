@@ -1,16 +1,12 @@
+from django.db.models import F, FloatField
+from django.db.models import Func
 from django.db.models import Q
-from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from items.models import Like
 from items.serializers import *
-
-
-# TODO : Validators for example price_min < price_max : http://www.django-rest-framework.org/api-guide/validators/
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -24,32 +20,51 @@ class ItemViewSet(viewsets.ModelViewSet):
         return ItemSerializer
 
     def list(self, request, *args, **kwargs):
-        q = self.request.query_params.get("q", "")
-        category_name = self.request.query_params.get("category", None)
-        latitude = self.request.query_params.get("lat", 0)  # TODO
-        longitude = self.request.query_params.get("lon", 0)  # TODO
-        price_min = self.request.query_params.get("price_min", 0)
-        price_max = self.request.query_params.get("price_max", None)
-        order_by = self.request.query_params.get("order_by", None)  # TODO
-        limit = self.request.query_params.get("limit", None)  # TODO
-        page = self.request.query_params.get("page", None)  # TODO
+        serializer = SearchItemsSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        q = serializer.validated_data["q"]
+        category = serializer.validated_data["category"]
+        price_min = serializer.validated_data["price_min"]
+        price_max = serializer.validated_data["price_max"]
+        lat = serializer.validated_data["lat"]
+        lon = serializer.validated_data["lon"]
+        radius = serializer.validated_data["radius"]
+        order_by = serializer.validated_data["order_by"]
 
         queryset = Item.objects.filter(
             Q(name__icontains=q) | Q(description__icontains=q),
-            price_min__gte=int(price_min)
+            price_min__gte=price_min
         )
 
-        if category_name is not None:
-            category_list = Category.objects.filter(name=category_name)
-            queryset = queryset.filter(category__in=category_list)
+        if category is not None:
+            queryset = queryset.filter(category__name=category)
 
         if price_max is not None:
-            queryset = queryset.filter(price_max__lte=int(price_max))
+            queryset = queryset.filter(price_max__lte=price_max)
+
+        if lat is not None and lon is not None:
+            # add "distance" field to each object
+            queryset = queryset.annotate(
+                distance=Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                              function="compute_distance", output_field=FloatField())
+            )
+
+            queryset = queryset.filter(distance__lte=radius)
+
+        strings_order_by = {
+            "name": "name",
+            "category": "category__name",
+            "price_min": "price_min",
+            "price_max": "-price_max",
+            "range": "distance"
+        }
+        queryset = queryset.order_by(strings_order_by[order_by])
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user.userprofile)
+        serializer.save(owner=self.request.user)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):

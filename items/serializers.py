@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
+from comments.serializers import CommentItemSerializer
 from items.models import Category, Item, Image, Like
+from offers.serializers import OfferItemSerializer
+from swapp.gmaps_api_utils import MAX_RADIUS
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -44,7 +47,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
+        fields = ('id', 'name', 'description', 'views', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
                   'category', 'image_set', 'like_set')
         read_only_fields = ('owner',)
 
@@ -53,9 +56,24 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     image_set = ImageItemSerializer(many=True)
     like_set = LikeItemSerializer(many=True)
+    comment_set = CommentItemSerializer(many=True)
+    offers_received = OfferItemSerializer(many=True)
 
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
-                  'category', 'image_set', 'like_set')
+                  'category', 'views', 'image_set', 'like_set', 'comment_set', 'offers_received')
         read_only_fields = ('owner',)
+
+
+class SearchItemsSerializer(serializers.Serializer):
+    q = serializers.CharField(default="")
+    category = serializers.CharField(default=None)
+    lat = serializers.FloatField(default=None)
+    lon = serializers.FloatField(default=None)
+    radius = serializers.FloatField(default=MAX_RADIUS)
+    price_min = serializers.FloatField(default=0)
+    price_max = serializers.FloatField(default=None)
+    order_by = serializers.CharField(default="name")
+    limit = serializers.IntegerField(default=None)
+    page = serializers.IntegerField(default=None)
