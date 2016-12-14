@@ -3,7 +3,8 @@ import json
 import time
 from django.test import Client, TestCase
 
-from items.models import Category, Item, Like
+from items.models import *
+from offers.models import *
 from users.models import *
 
 
@@ -112,7 +113,8 @@ class AccountAPITests(TestCase):
         u.userprofile.categories.add(c)
         i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
                                 creation_date=timezone.now(), archived=False, owner=u, category=c)
-        Note.objects.create(user=u, text="test", note=4)
+        o = Offer.objects.create(accepted=True, status=True, item_given=i, item_received=i)
+        Note.objects.create(user=u, offer=o, text="test", note=4)
         Like.objects.create(user=u, item=i)
 
         r = self.client.get("/api/account/")
