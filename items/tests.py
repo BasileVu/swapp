@@ -600,6 +600,15 @@ class ItemSearchApiTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.data), 5)
 
+    def test_list_item_no_archived_items(self):
+        i = Item.objects.get(id=1)
+        i.archived = True
+        i.save()
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.data), 4)
+
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
         self.assertEqual(r.status_code, 200)
