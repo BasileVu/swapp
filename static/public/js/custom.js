@@ -19,7 +19,7 @@ $('document').ready(function() {
     });
 
     // home inventory ///////////////////////////
-    $('#home-inventory').flickity({
+    var inventory = $('.home-inventory').flickity({
         // options
         cellAlign: 'center',
         contain: true,
@@ -74,13 +74,42 @@ $('document').ready(function() {
         });
     });
 
-    // open user profile modal /////////////////////
+    // open user edition modal /////////////////////
     var openUpdateProfileButtons = $('.open-update-profile-modal');
     var updateProfileModal = $('#update-user-modal');
     openUpdateProfileButtons.each(function () {
         $(this).click(function () {
             updateProfileModal.modal('show');
         });
+    });
+
+    // open user profile modal /////////////////////
+    var openProfileButtons = $('.open-profile-modal');
+    var profileModal = $('#user-profile-modal');
+    openProfileButtons.each(function () {
+        $(this).click(function () {
+            profileModal.modal('show');
+        });
+    });
+    profileModal.on('show.bs.modal', function (e) {
+        setTimeout(function () {
+            inventory.flickity('resize');
+
+            // profile map
+            var map = new google.maps.Map(document.getElementById('profile-map'), {
+                center: {lat: -34.197, lng: 150.844},
+                scrollwheel: false,
+                zoom: 8
+            });
+            var marker = new google.maps.Marker({
+                map: map,
+                position: {lat: -34.197, lng: 150.844}
+            });
+            var infowindow = new google.maps.InfoWindow({
+                content: '<h3 class="map-title">Adresse complète</h3>'
+            });
+            infowindow.open(map, marker);
+        }, 300)
     });
 
     // display item modal ///////////////////////////
@@ -111,19 +140,19 @@ $('document').ready(function() {
                 scrollwheel: false,
                 zoom: 8
             });
-            var marker = new google.maps.Marker({
+            new google.maps.Marker({
                 map: map,
                 position: {lat: -34.197, lng: 150.844}
             });
-            var marker = new google.maps.Marker({
+            new google.maps.Marker({
                 map: map,
                 position: {lat: -34.308, lng: 150.679},
             });
-            var marker = new google.maps.Marker({
+            new google.maps.Marker({
                 map: map,
                 position: {lat: -34.390, lng: 150.664}
             });
-            var circle = new google.maps.Circle({
+            new google.maps.Circle({
                 map: map,
                 center: {lat: -34.397, lng: 150.644},
                 radius: 100000,    // 10 miles in metres

@@ -5484,6 +5484,9 @@ hr {
     .btn-group-justified .btn-group .dropdown-menu {
       left: auto; }
 
+.evaluation .star {
+  color: #80c870; }
+
 .modal {
   cursor: zoom-out;
   background-image: url("../../static/images/fondmodal.jpg");
@@ -5578,8 +5581,6 @@ hr {
           border-top: 1px solid #eed5a9;
           text-align: center;
           font-weight: 300; }
-          .modal .container .content .details .evaluation .star, .modal .container .content .details .category .star {
-            color: #80c870; }
         .modal .container .content .details .key-val {
           margin-top: 30px; }
           .modal .container .content .details .key-val .row {
@@ -5698,12 +5699,32 @@ hr {
 #advanced-search-modal .map {
   margin-top: 40px; }
 #advanced-search-modal #search-modal-map {
-  height: 400px; }
+  height: 550px; }
 
 .btn-reversed {
   background-color: transparent;
   border: 1px solid #40b2cd;
   color: #40b2cd; }
+
+#user-profile-modal .infos {
+  padding: 30px 10px; }
+  #user-profile-modal .infos img {
+    margin: 20px 0; }
+#user-profile-modal .personal-inventory {
+  margin: 30px 5px; }
+#user-profile-modal ol {
+  margin-top: 30px; }
+#user-profile-modal .inventory-separation {
+  margin: -27px -5px 0;
+  border-top: 1px solid #eed5a9; }
+#user-profile-modal #profile-map {
+  height: 400px; }
+#user-profile-modal .gm-style-iw + div {
+  display: none; }
+#user-profile-modal .map-title {
+  text-align: center;
+  margin: 0;
+  padding: 20px; }
 
 #header-navbar {
   background-color: white !important;
@@ -5755,20 +5776,19 @@ hr {
     display: block;
     text-align: center;
     margin: 20px 0; }
+  .personal-inventory .inventory-separation {
+    margin-top: -27px;
+    border-top: 1px solid #f8eedc; }
 
-#inventory-separation {
-  margin-top: -27px;
-  border-top: 1px solid #f8eedc; }
-
-#home-inventory {
+.home-inventory {
   overflow: hidden; }
-  #home-inventory:focus {
+  .home-inventory:focus {
     outline: none; }
-  #home-inventory ol {
+  .home-inventory ol {
     margin-top: 20px;
     padding: 0;
     text-align: center; }
-    #home-inventory ol li {
+    .home-inventory ol li {
       display: inline-block;
       width: 10px;
       height: 10px;
@@ -5776,19 +5796,19 @@ hr {
       background-color: #f8eedc;
       margin: 0 10px;
       cursor: pointer; }
-    #home-inventory ol .is-selected {
+    .home-inventory ol .is-selected {
       background-color: #40b2cd; }
-  #home-inventory .carousel-cell {
+  .home-inventory .carousel-cell {
     position: relative; }
-    #home-inventory .carousel-cell a {
+    .home-inventory .carousel-cell a {
       border-radius: 0.25rem;
       overflow: hidden;
       border: 1px solid #eed5a9;
       display: block; }
-      #home-inventory .carousel-cell a span {
+      .home-inventory .carousel-cell a span {
         padding: 10px;
         display: block; }
-    #home-inventory .carousel-cell a.delete {
+    .home-inventory .carousel-cell a.delete {
       border: none;
       text-align: center;
       color: #d9534f;

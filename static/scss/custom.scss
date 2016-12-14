@@ -22,6 +22,11 @@ hr {
     }
   }
 }
+.evaluation {
+  .star {
+    color: $brand-success;
+  }
+}
 .modal {
   cursor: zoom-out;
   background-image: url("../../static/images/fondmodal.jpg");
@@ -153,10 +158,6 @@ hr {
           border-top: 1px solid $brand-secondary;
           text-align: center;
           font-weight: 300;
-
-          .star {
-            color: $brand-success;
-          }
         }
         .key-val {
           margin-top: 3*$grid-gutter-width;
@@ -238,7 +239,7 @@ hr {
           }
         }
         .bottom-link {
-            padding: 0 $grid-gutter-width $grid-gutter-width;
+          padding: 0 $grid-gutter-width $grid-gutter-width;
         }
       }
       .comments {
@@ -263,10 +264,10 @@ hr {
             margin: 0;
           }
           .writer-infos {
-              font-size: $font-size-sm;
-              font-style: italic;
-              font-weight: 300;
-            }
+            font-size: $font-size-sm;
+            font-style: italic;
+            font-weight: 300;
+          }
         }
       }
     }
@@ -344,13 +345,45 @@ hr {
     margin-top: 4*$grid-gutter-width;
   }
   #search-modal-map {
-    height: 400px;
+    height: 550px;
   }
 }
 .btn-reversed {
   background-color: transparent;
   border: 1px solid $brand-primary;
   color: $brand-primary;
+}
+
+// Profile Modal //////////////////////////////////
+#user-profile-modal {
+  .infos {
+    padding: 30px $grid-gutter-width;
+
+    img {
+      margin: 20px 0;
+    }
+  }
+  .personal-inventory {
+    margin: 30px 5px;
+  }
+  ol {
+    margin-top: 30px;
+  }
+  .inventory-separation {
+    margin: -27px -5px 0;
+    border-top: 1px solid $brand-secondary;
+  }
+  #profile-map {
+    height: 400px;
+  }
+  .gm-style-iw + div {
+    display: none;
+  }
+  .map-title {
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
 }
 
 // Header menu ////////////////////////////////////
@@ -410,12 +443,12 @@ hr {
     text-align: center;
     margin: (2*$grid-gutter-width) 0;
   }
+  .inventory-separation {
+    margin-top: -27px;
+    border-top: 1px solid $brand-secondary-lighten;
+  }
 }
-#inventory-separation {
-  margin-top: -27px;
-  border-top: 1px solid $brand-secondary-lighten;
-}
-#home-inventory {
+.home-inventory {
   overflow: hidden;
 
   &:focus {
