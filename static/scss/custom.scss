@@ -386,6 +386,27 @@ hr {
   }
 }
 
+// Notification modal /////////////////////////////
+#notification-modal {
+  .notification {
+    padding: $grid-gutter-width;
+    border-top: 1px solid $brand-secondary;
+    margin: 0;
+    display: block;
+
+    p {
+      margin: 15px $grid-gutter-width 5px;
+    }
+    .date {
+      margin: 0 $grid-gutter-width;
+      color: $gray-lighter;
+    }
+  }
+  .notification:first-child {
+    border-top: none;
+  }
+}
+
 // Header menu ////////////////////////////////////
 #header-navbar {
   background-color: white !important;

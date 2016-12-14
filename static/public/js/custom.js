@@ -112,6 +112,15 @@ $('document').ready(function() {
         }, 300)
     });
 
+    // open notif modal /////////////////////
+    var openNotifButtons = $('.open-notif-modal');
+    var notifModal = $('#notification-modal');
+    openNotifButtons.each(function () {
+        $(this).click(function () {
+            notifModal.modal('show');
+        });
+    });
+
     // display item modal ///////////////////////////
     var theItemModal = $('#view-item-x');
     // show.bs.modal would be better, but not working in bootstrap 4 alpha 4

@@ -5726,6 +5726,19 @@ hr {
   margin: 0;
   padding: 20px; }
 
+#notification-modal .notification {
+  padding: 10px;
+  border-top: 1px solid #eed5a9;
+  margin: 0;
+  display: block; }
+  #notification-modal .notification p {
+    margin: 15px 10px 5px; }
+  #notification-modal .notification .date {
+    margin: 0 10px;
+    color: #cacccd; }
+#notification-modal .notification:first-child {
+  border-top: none; }
+
 #header-navbar {
   background-color: white !important;
   border-bottom: 3px solid #91d3e2; }
