@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
 from users.models import *
 
@@ -51,11 +52,18 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ('street', 'city', 'region', 'country')
 
 
-# TODO to adapt
-"""class NoteSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
+class NoteSerializer(serializers.ModelSerializer):
+    note = IntegerField(max_value=5, min_value=0)
 
     class Meta:
         model = Note
-        fields = ('id', 'user_id', 'text', 'note')"""
+        fields = ('id', 'user', 'offer', 'text', 'note')
+        read_only_fields = ('user',)
 
+
+class NoteUpdateSerializer(serializers.ModelSerializer):
+    note = IntegerField(max_value=5, min_value=0)
+
+    class Meta:
+        model = Note
+        fields = ('text', 'note')
