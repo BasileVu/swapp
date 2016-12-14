@@ -34,7 +34,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
         queryset = Item.objects.filter(
             Q(name__icontains=q) | Q(description__icontains=q),
-            price_min__gte=price_min
+            price_min__gte=price_min, archived=False
         )
 
         if category is not None:
