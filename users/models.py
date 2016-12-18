@@ -26,7 +26,7 @@ class Consultation(models.Model):
     date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.user.username
+        return self.user.username
 
 
 class Location(models.Model):
