@@ -103,12 +103,8 @@ class ItemAPITests(TestCase):
         self.login()
 
         r = self.post_item(price_min=2, price_max=1)
-<<<<<<< 66626590cae944f1c25df68e4f6a61b17d487986
-        self.assertEqual(r.status_code, 400)
-        self.assertEquals(Item.objects.count(), 0)
-=======
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
->>>>>>> Refactor to use only rest_framework status code for tests
+        self.assertEquals(Item.objects.count(), 0)
 
     def test_post_item_json_data_invalid(self):
         self.login()
@@ -178,7 +174,7 @@ class ItemAPITests(TestCase):
 
         id_item = r.data['id']
         r = self.patch_item(id_item=id_item, data=json.dumps({"name": "test2"}))
-        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_patch_item_logged_in(self):
         self.login()
@@ -215,11 +211,10 @@ class ItemAPITests(TestCase):
     def test_cannot_set_min_price_greater_than_max_price(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-<<<<<<< 66626590cae944f1c25df68e4f6a61b17d487986
 
         id = r.data["id"]
         r = self.patch_item(id_item=id, data=json.dumps({"price_min": 3}))
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.get_item(id_item=id)
         self.assertEquals(r.data['price_min'], 1)
@@ -233,7 +228,7 @@ class ItemAPITests(TestCase):
         print("max_price = 0")
         r = self.patch_item(id_item=id, data=json.dumps({"price_max": 0}))
         print("before patch")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.get_item(id_item=id)
         self.assertEquals(r.data['price_max'], 2)
@@ -241,10 +236,7 @@ class ItemAPITests(TestCase):
     def test_delete_item_not_logged_in(self):
         self.login()
         r = self.post_item(price_min=1, price_max=2)
-        self.assertEqual(r.status_code, 201)
-=======
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
->>>>>>> Refactor to use only rest_framework status code for tests
         self.client.logout()
 
         id_item = r.data['id']
@@ -252,7 +244,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(len(r.data), 1)
 
         r = self.delete_item(id_item=id_item)
-        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_item(self):
         self.login()
@@ -790,16 +782,25 @@ class ItemSearchApiTests(TestCase):
 
     def test_order_by_name(self):
         r = self.client.get(self.url + "?order_by=name")
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item4.name)
         self.assertEquals(r.data[1]["name"], self.item5.name)
         self.assertEquals(r.data[2]["name"], self.item3.name)
         self.assertEquals(r.data[3]["name"], self.item2.name)
         self.assertEquals(r.data[4]["name"], self.item1.name)
 
+    def test_order_by_date(self):
+        r = self.client.get(self.url + "?order_by=date")
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
+        self.assertEquals(r.data[0]["name"], "Shoes")
+        self.assertEquals(r.data[1]["name"], "Shirt")
+        self.assertEquals(r.data[2]["name"], "Ring")
+        self.assertEquals(r.data[3]["name"], "New mouse")
+        self.assertEquals(r.data[4]["name"], "Piano")
+
     def test_order_by_category(self):
         r = self.client.get(self.url + "?order_by=category")
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item1.name)
         self.assertEquals(r.data[1]["name"], self.item4.name)
         self.assertEquals(r.data[2]["name"], self.item2.name)
@@ -808,7 +809,7 @@ class ItemSearchApiTests(TestCase):
 
     def test_order_by_price_min(self):
         r = self.client.get(self.url + "?order_by=price_min")
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item2.name)
         self.assertEquals(r.data[1]["name"], self.item1.name)
         self.assertEquals(r.data[2]["name"], self.item4.name)
@@ -817,7 +818,7 @@ class ItemSearchApiTests(TestCase):
 
     def test_order_by_price_max(self):
         r = self.client.get(self.url + "?order_by=price_max")
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item5.name)
         self.assertEquals(r.data[1]["name"], self.item3.name)
         self.assertEquals(r.data[2]["name"], self.item4.name)
@@ -826,7 +827,7 @@ class ItemSearchApiTests(TestCase):
 
     def test_order_by_range(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f&order_by=range" % (self.latitude, self.longitude))
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item4.name)
         self.assertEquals(r.data[1]["name"], self.item5.name)
         self.assertEquals(r.data[2]["name"], self.item1.name)
@@ -849,7 +850,7 @@ class ItemSearchApiTests(TestCase):
         self.item5.save()
 
         r = self.client.get(self.url + "?order_by=date")
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(r.data[0]["name"], self.item3.name)
         self.assertEquals(r.data[1]["name"], self.item2.name)
         self.assertEquals(r.data[2]["name"], self.item1.name)

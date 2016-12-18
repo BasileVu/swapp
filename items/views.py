@@ -89,7 +89,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                     "range": "distance",
                     "date": "creation_date"
                 }
-        queryset = queryset.order_by(strings_order_by[order_by])
+            queryset = queryset.order_by(strings_order_by[order_by])
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
