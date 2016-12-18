@@ -315,6 +315,19 @@ class ItemAPITests(TestCase):
         self.assertIn("/media/test", r.data['image_set'][0]["image"])
         self.assertEqual(r.data['like_set'][0]["user"], 1)
 
+    def test_get_item_should_increment_views(self):
+        self.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+
+        r = self.get_item(id_item=r.data['id'])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data['views'], 1)
+
+        r = self.get_item(id_item=r.data['id'])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data['views'], 2)
+
     # FIXME
     '''
     def test_post_item_user_location_not_specified(self):
