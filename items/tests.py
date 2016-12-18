@@ -763,15 +763,6 @@ class ItemSearchApiTests(TestCase):
         self.assertEquals(r.data[3]["name"], "Shirt")
         self.assertEquals(r.data[4]["name"], "Shoes")
 
-    def test_order_by_date(self):
-        r = self.client.get(self.url + "?order_by=date")
-        self.assertEquals(r.status_code, status.HTTP_200_OK)
-        self.assertEquals(r.data[0]["name"], "Shoes")
-        self.assertEquals(r.data[1]["name"], "Shirt")
-        self.assertEquals(r.data[2]["name"], "Ring")
-        self.assertEquals(r.data[3]["name"], "New mouse")
-        self.assertEquals(r.data[4]["name"], "Piano")
-
     def test_order_by_category(self):
         r = self.client.get(self.url + "?order_by=category")
         self.assertEquals(r.status_code, status.HTTP_200_OK)

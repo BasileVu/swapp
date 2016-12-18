@@ -71,7 +71,6 @@ class ItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.order_by("creation_date")
         else:
             strings_order_by = {
-                "date": "creation_date",
                 "name": "name",
                 "category": "category__name",
                 "price_min": "price_min",
