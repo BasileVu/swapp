@@ -103,6 +103,7 @@ class ItemAPITests(TestCase):
 
         r = self.post_item(price_min=2, price_max=1)
         self.assertEqual(r.status_code, 400)
+        self.assertEquals(Item.objects.count(), 0)
 
     def test_post_item_json_data_invalid(self):
         self.login()
@@ -206,9 +207,34 @@ class ItemAPITests(TestCase):
         r = self.patch_item(id_item=10)
         self.assertEqual(r.status_code, 404)
 
-    def test_delete_item_not_logged_in(self):
+    def test_cannot_set_min_price_greater_than_max_price(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+
+        id = r.data["id"]
+        r = self.patch_item(id_item=id, data=json.dumps({"price_min": 3}))
+        self.assertEqual(r.status_code, 400)
+
+        r = self.get_item(id_item=id)
+        self.assertEquals(r.data['price_min'], 1)
+
+    def test_cannot_set_max_price_smaller_than_min_price(self):
+        self.login()
+        r = self.post_item(price_min=1, price_max=2)
+
+        id = r.data["id"]
+
+        print("max_price = 0")
+        r = self.patch_item(id_item=id, data=json.dumps({"price_max": 0}))
+        print("before patch")
+        self.assertEqual(r.status_code, 400)
+
+        r = self.get_item(id_item=id)
+        self.assertEquals(r.data['price_max'], 2)
+
+    def test_delete_item_not_logged_in(self):
+        self.login()
+        r = self.post_item(price_min=1, price_max=2)
         self.assertEqual(r.status_code, 201)
         self.client.logout()
 
