@@ -714,3 +714,36 @@ class NoteAPITests(TestCase):
         self.login()
         r = self.post_note(2, "test", 1)
         self.assertEqual(r.status_code, 400)
+
+
+class ConsultationTests(TestCase):
+    url = "/api/items/"
+
+    def setUp(self):
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user.userprofile.save()
+
+        c = Category.objects.create(name="Test")
+        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False, category=c,
+                            owner=self.current_user)
+
+    def login(self):
+        self.client.login(username="username", password="password")
+
+    def get_item(self, id_item=1):
+        return self.client.get(self.url + str(id_item) + "/", content_type="application/json")
+
+    def test_not_logged_user_consultation_should_do_nothing(self):
+
+        r = self.get_item()
+        self.assertEqual(r.status_code, 200)
+
+        self.assertEqual(len(Consultation.objects.all()), 0)
+
+    def test_logged_user_consultation_should_add_consultation(self):
+        self.login()
+        r = self.get_item()
+        self.assertEqual(r.status_code, 200)
+
+        self.assertEqual(len(Consultation.objects.all()), 1)
+        consultation = Consultation.objects.first()

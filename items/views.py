@@ -25,9 +25,9 @@ class ItemViewSet(viewsets.ModelViewSet):
         queryset = Item.objects.all()
         item = get_object_or_404(queryset, pk=pk)
 
-        if self.request.user is not None:
+        if request.user.is_authenticated():
             Consultation.objects.create(user=self.request.user, item=item)
-
+        
         serializer = AggregatedItemSerializer(item)
         return Response(serializer.data)
 
