@@ -3,10 +3,12 @@ from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from items.serializers import *
+from users.models import Consultation
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -18,6 +20,16 @@ class ItemViewSet(viewsets.ModelViewSet):
         if self.action == 'list' or self.action == 'retrieve':
             return AggregatedItemSerializer
         return ItemSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Item.objects.all()
+        item = get_object_or_404(queryset, pk=pk)
+
+        if self.request.user is not None:
+            Consultation.objects.create(user=self.request.user, item=item)
+
+        serializer = ItemSerializer(item)
+        return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
@@ -53,7 +65,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(distance__lte=radius)
 
         if order_by is None:
-            queryset = queryset.order_by("date")
+            queryset = queryset.order_by("creation_date")
         else:
             strings_order_by = {
                 "name": "name",
