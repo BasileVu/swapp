@@ -20,6 +20,15 @@ class UserProfile(models.Model):
         return "User profile of " + self.user.username
 
 
+class Consultation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.user.username
+
+
 class Location(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     street = models.CharField(max_length=50)
