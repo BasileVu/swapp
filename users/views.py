@@ -180,19 +180,18 @@ class LocationView(generics.UpdateAPIView):
         return self.request.user.location
 
     def perform_update(self, serializer):
-        serializer.save()
-
-        u = self.request.user
-        data = get_coordinates(u.location)
+        data = get_coordinates(Location(**serializer.validated_data))
 
         if len(data) == 0:
             raise ValidationError("Could not find any match for specified location.")
 
+        u = self.request.user
         c = u.coordinates
         c.latitude = data[0]["lat"]
         c.longitude = data[0]["lng"]
         c.save()
 
+        serializer.save()
 
 @api_view(["GET"])
 def get_public_account_info(request, username):

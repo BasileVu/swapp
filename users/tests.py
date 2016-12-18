@@ -1,10 +1,9 @@
 import json
-
 import time
+
 from django.test import Client, TestCase
 
 from items.models import *
-from offers.models import *
 from users.models import *
 
 
@@ -487,6 +486,9 @@ class LocationCoordinatesTests(TestCase):
                                  data=json.dumps(self.new_location),
                                  content_type="application/json")
 
+    def get_location(self):
+        return User.objects.get_by_natural_key(self.user.username).location
+
     def get_coordinates(self):
         return User.objects.get_by_natural_key(self.user.username).coordinates
 
@@ -529,7 +531,7 @@ class LocationCoordinatesTests(TestCase):
         self.assertEqual(c.latitude, 0)
         self.assertEqual(c.longitude, 0)
 
-    def test_coordinates_do_not_change_after_zero_results_location_modification(self):
+    def test_coordinates_and_location_do_not_change_after_zero_results_location_modification(self):
         r = self.client.patch("/api/account/location/", data=json.dumps({
             "street": "fnupinom",
             "city": "fnupinom",
@@ -541,6 +543,13 @@ class LocationCoordinatesTests(TestCase):
         c = self.get_coordinates()
         self.assertEqual(c.latitude, 0)
         self.assertEqual(c.longitude, 0)
+
+        l = self.get_location()
+        self.assertNotEqual(l.street, "fnupinom")
+        self.assertNotEqual(l.city, "fnupinom")
+        self.assertNotEqual(l.region, "fnupinom")
+        self.assertNotEqual(l.country, "fnupinom")
+
 
     def test_coordinates_change_after_valid_location_modification(self):
         r = self.put_location()
