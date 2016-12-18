@@ -57,7 +57,8 @@ class ItemViewSet(viewsets.ModelViewSet):
             "category": "category__name",
             "price_min": "price_min",
             "price_max": "-price_max",
-            "range": "distance"
+            "range": "distance",
+            "date": "creation_date"
         }
         queryset = queryset.order_by(strings_order_by[order_by])
 
