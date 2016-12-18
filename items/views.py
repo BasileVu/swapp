@@ -3,6 +3,7 @@ from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -13,6 +14,16 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def check_prices(self, price_min, price_max):
+        if price_min is not None and price_min < 0:
+            raise ValidationError("Price min is negative")
+
+        if price_max is not None and price_max < 0:
+            raise ValidationError("Price max is negative")
+
+        if price_min is not None and price_max is not None and price_min > price_max:
+            raise ValidationError("Price min is higher than price max")
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -65,7 +76,18 @@ class ItemViewSet(viewsets.ModelViewSet):
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
+        price_min = serializer.validated_data.get("price_min", None)
+        price_max = serializer.validated_data.get("price_max", None)
+
+        self.check_prices(price_min, price_max)
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)
+        price_max = serializer.validated_data.get("price_max", serializer.instance.price_max)
+
+        self.check_prices(price_min, price_max)
+        serializer.save()
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
