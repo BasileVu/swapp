@@ -39,7 +39,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         if self.request.user is not None:
             Consultation.objects.create(user=self.request.user, item=item)
 
-        serializer = ItemSerializer(item)
+        serializer = AggregatedItemSerializer(item)
         return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
