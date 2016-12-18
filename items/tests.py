@@ -3,6 +3,7 @@ import json
 from PIL import Image as ImagePil
 from django.test import TestCase
 from django.db.utils import IntegrityError
+from rest_framework import status
 
 from items.models import *
 from users.models import *
@@ -96,49 +97,53 @@ class ItemAPITests(TestCase):
         self.login()
 
         r = self.post_item()
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_post_item_price_min_bigger_than_price_max(self):
         self.login()
 
         r = self.post_item(price_min=2, price_max=1)
+<<<<<<< 66626590cae944f1c25df68e4f6a61b17d487986
         self.assertEqual(r.status_code, 400)
         self.assertEquals(Item.objects.count(), 0)
+=======
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+>>>>>>> Refactor to use only rest_framework status code for tests
 
     def test_post_item_json_data_invalid(self):
         self.login()
 
         r = self.client.post(self.url, data=json.dumps({}), content_type="application/json")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_items(self):
         r = self.get_items()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
         self.login()
         r = self.post_item()
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_items()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
     def test_get_item(self):
         self.login()
 
         r = self.post_item()
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         r = self.get_item(id_item=r.data['id'])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_item_not_logged_in(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         self.client.logout()
 
         id_item = r.data['id']
@@ -148,14 +153,14 @@ class ItemAPITests(TestCase):
     def test_put_item_logged_in(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_item = r.data['id']
         r = self.put_item(id_item=id_item, name="test2", description="test2", price_min=2, price_max=3, category=2)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_item(id_item=id_item)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data['name'], "test2")
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
@@ -163,12 +168,12 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['category']['name'], "test2")
 
         r = self.put_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_patch_item_not_logged_in(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         self.client.logout()
 
         id_item = r.data['id']
@@ -178,26 +183,26 @@ class ItemAPITests(TestCase):
     def test_patch_item_logged_in(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_item = r.data['id']
         r = self.patch_item(id_item=id_item, data=json.dumps({"name": "test2"}))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_item(id_item=id_item, data=json.dumps({"description": "test2"}))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_item(id_item=id_item, data=json.dumps({"price_min": 2}))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_item(id_item=id_item, data=json.dumps({"price_max": 3}))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_item(id_item=id_item, data=json.dumps({"category": 2}))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_item(id_item=id_item)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data['name'], "test2")
         self.assertEqual(r.data['description'], "test2")
         self.assertEqual(r.data['price_min'], 2)
@@ -205,11 +210,12 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.data['category']['name'], "test2")
 
         r = self.patch_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_cannot_set_min_price_greater_than_max_price(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+<<<<<<< 66626590cae944f1c25df68e4f6a61b17d487986
 
         id = r.data["id"]
         r = self.patch_item(id_item=id, data=json.dumps({"price_min": 3}))
@@ -236,6 +242,9 @@ class ItemAPITests(TestCase):
         self.login()
         r = self.post_item(price_min=1, price_max=2)
         self.assertEqual(r.status_code, 201)
+=======
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+>>>>>>> Refactor to use only rest_framework status code for tests
         self.client.logout()
 
         id_item = r.data['id']
@@ -248,34 +257,34 @@ class ItemAPITests(TestCase):
     def test_delete_item(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_item = r.data['id']
         r = self.get_items()
         self.assertEqual(len(r.data), 1)
 
         r = self.delete_item(id_item=id_item)
-        self.assertEqual(r.status_code, 204)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         r = self.get_items()
         self.assertEqual(len(r.data), 0)
 
         r = self.delete_item(id_item=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_items_should_return_like_set_category_name_and_image_set_with_name(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.post_like(1, 1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_items()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
         self.assertEqual(r.data[0]['name'], "test")
         self.assertEqual(r.data[0]['description'], "test")
@@ -288,16 +297,16 @@ class ItemAPITests(TestCase):
     def test_get_item_should_return_like_set_category_name_and_image_set_with_name(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.post_like(1, 1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_item(id_item=r.data['id'])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data['name'], "test")
         self.assertEqual(r.data['description'], "test")
         self.assertEqual(r.data['price_min'], 1)
@@ -312,7 +321,7 @@ class ItemAPITests(TestCase):
         self.current_user.userprofile.location = ""
         self.current_user.userprofile.save()
         r = self.post_item()
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
     '''
     '''
     def test_archive_item(self):
@@ -323,9 +332,9 @@ class ItemAPITests(TestCase):
             "price_max": 2,
             "category": 1
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_unarchive_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
@@ -335,9 +344,9 @@ class ItemAPITests(TestCase):
             "price_max": 2,
             "category": 1
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
     '''
 
 
@@ -376,31 +385,31 @@ class ImageAPITests(TestCase):
     def test_post_image(self):
         self.login()
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_get_image(self):
         r = self.get_image()
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(len(r.data), 1)
 
         self.login()
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_image()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
 
     def test_post_get_image(self):
         self.login()
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_image(id_image=r.data['id'])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_image(id_image=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied_offer(self):
         self.login()
@@ -408,30 +417,30 @@ class ImageAPITests(TestCase):
         r = self.client.put("/api/likes/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         r = self.client.patch("/api/likes/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_delete_image(self):
         self.login()
         r = self.post_image(1)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_image = r.data['id']
         r = self.get_images()
         self.assertEqual(len(r.data), 1)
 
         r = self.delete_image(id_image=id_image)
-        self.assertEqual(r.status_code, 204)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         r = self.get_images()
         self.assertEqual(len(r.data), 0)
 
         r = self.delete_image(id_image=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class CategoryAPITests(TestCase):
@@ -455,15 +464,15 @@ class CategoryAPITests(TestCase):
 
     def test_get_categories(self):
         r = self.get_categories()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
     def test_get_category(self):
         r = self.get_category(id_category=1)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_category(id_category=100)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_delete_put_patch_should_not_work_category(self):
         self.login()
@@ -471,20 +480,20 @@ class CategoryAPITests(TestCase):
         r = self.client.post("/api/categories/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         r = self.client.put("/api/categories/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         r = self.client.patch("/api/categories/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         r = self.client.delete("/api/categories/1/", content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class LikeAPITests(TestCase):
@@ -528,49 +537,49 @@ class LikeAPITests(TestCase):
     def test_post_like(self):
         self.login()
         r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_get_likes(self):
         r = self.get_likes()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
         self.login()
         r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_likes()
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
     def test_get_like(self):
         self.login()
         r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_like(id_like=r.data['id'])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_like(id_like=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_like(self):
         self.login()
         r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_item = r.data['id']
         r = self.get_likes()
         self.assertEqual(len(r.data), 1)
 
         r = self.delete_like(id_like=id_item)
-        self.assertEqual(r.status_code, 204)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         r = self.get_likes()
         self.assertEqual(len(r.data), 0)
 
         r = self.delete_like(id_like=10)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied(self):
         self.login()
@@ -578,12 +587,12 @@ class LikeAPITests(TestCase):
         r = self.client.put("/api/likes/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         r = self.client.patch("/api/likes/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ItemSearchApiTests(TestCase):
@@ -623,7 +632,7 @@ class ItemSearchApiTests(TestCase):
 
     def test_list_item_no_filter(self):
         r = self.client.get(self.url)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
     def test_list_item_no_archived_items(self):
@@ -632,139 +641,139 @@ class ItemSearchApiTests(TestCase):
         i.save()
 
         r = self.client.get(self.url)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
 
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
 
         r = self.client.get(self.url + "?q=shoes")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
         r = self.client.get(self.url + "?q=sh")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
     def test_list_item_category_not_existing(self):
         r = self.client.get(self.url + "?category=category")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.url + "?category=test")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
     def test_list_item_category(self):
         r = self.client.get(self.url + "?category=Test")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
         r = self.client.get(self.url + "?category=Test2")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
         r = self.client.get(self.url + "?category=Test3")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
     def test_list_item_price_min_lower_bound(self):
         r = self.client.get(self.url + "?price_min=0")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
         r = self.client.get(self.url + "?price_min=5")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
     def test_list_item_price_min(self):
         r = self.client.get(self.url + "?price_min=10")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
 
     def test_list_item_price_min_upper_bound(self):
         r = self.client.get(self.url + "?price_min=1000")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
     def test_list_item_price_max_lower_bound(self):
         r = self.client.get(self.url + "?price_max=5")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
     def test_list_item_price_max(self):
         r = self.client.get(self.url + "?price_max=30")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
     def test_list_item_price_max_upper_bound(self):
         r = self.client.get(self.url + "?price_max=1000")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
         r = self.client.get(self.url + "?price_max=10000")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
     def test_list_item_no_matching_for_price_range(self):
         r = self.client.get(self.url + "?price_min=0&price_max=0")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.url + "?price_min=0&price_max=5")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.url + "?price_min=5&price_max=5")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
     def test_list_item_price_range(self):
         r = self.client.get(self.url + "?price_min=5&price_max=30")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
         r = self.client.get(self.url + "?price_min=10&price_max=30")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
         r = self.client.get(self.url + "?price_min=500&price_max=10000")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
 
         r = self.client.get(self.url + "?price_min=0&price_max=1000")
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
     def test_list_item_latitude_longitude(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f" % (self.latitude, self.longitude))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
     def test_list_item_latitude_longitude_radius(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f&radius=1" % (self.latitude, self.longitude))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
 
     def test_list_item_latitude_longitude_radius_too_small(self):
         r = self.client.get(self.url + "?lat=%f&lon=%f&radius=0.1" % (self.latitude, self.longitude))
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
     def test_wrong_parameter_format(self):
         r = self.client.get(self.url + "?price_min=test")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.client.get(self.url + "?price_max=test")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.client.get(self.url + "?lat=test&lon=test")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.client.get(self.url + "?lat=test&lon=test&radius=test")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_order_by_name(self):
         r = self.client.get(self.url + "?order_by=name")
@@ -843,7 +852,7 @@ class ItemSearchApiTests(TestCase):
                             "&lat=%f&lon=%f&radius=10"
                             "&order_by=name"
                             % (self.latitude, self.longitude))
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(len(r.data), 1)
         self.assertEquals(r.data[0]["name"], self.item1.name)
 
@@ -855,7 +864,7 @@ class ItemSearchApiTests(TestCase):
                             "&lat=%f&lon=%f&radius=10"
                             "&order_by=name"
                             % (self.latitude, self.longitude))
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(len(r.data), 1)
         self.assertEquals(r.data[0]["name"], self.item2.name)
 
@@ -867,6 +876,6 @@ class ItemSearchApiTests(TestCase):
                             "&lat=%f&lon=%f&radius=1"
                             "&order_by=name"
                             % (self.latitude, self.longitude))
-        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
         self.assertEquals(len(r.data), 1)
         self.assertEquals(r.data[0]["name"], self.item4.name)
