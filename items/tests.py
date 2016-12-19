@@ -224,10 +224,7 @@ class ItemAPITests(TestCase):
         r = self.post_item(price_min=1, price_max=2)
 
         id = r.data["id"]
-
-        print("max_price = 0")
         r = self.patch_item(id_item=id, data=json.dumps({"price_max": 0}))
-        print("before patch")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
         r = self.get_item(id_item=id)
