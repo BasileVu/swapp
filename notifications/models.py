@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from comments.models import Comment
 from offers.models import Offer
+from private_messages.models import Message
 from users.models import Note
 
 
@@ -21,7 +22,34 @@ class Notification(models.Model):
 
 class MessageNotification(models.Model):
     notification = models.OneToOneField(Notification, on_delete=models.CASCADE)
-    note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    message = models.OneToOneField(Message, on_delete=models.CASCADE)
+
+
+@receiver(post_save, sender=Message)
+def new_message_notification(sender, instance, signal, created, **kwargs):
+    """
+    Handler to create a notification when a message is created.
+    """
+    if created:
+        notification = Notification.objects.create(content="New message for item: " + instance.item.name,
+                                                   read=False, date=timezone.now(), user=instance.item.owner)
+        MessageNotification.objects.create(notification=notification, message=instance)
+
+
+class NoteNotification(models.Model):
+    notification = models.OneToOneField(Notification, on_delete=models.CASCADE)
+    note = models.OneToOneField(Comment, on_delete=models.CASCADE)
+
+
+@receiver(post_save, sender=Note)
+def new_note_notification(sender, instance, signal, created, **kwargs):
+    """
+    Handler to create a notification when a note is given (created).
+    """
+    if created:
+        notification = Notification.objects.create(content="New note " + instance.note + " with text: " + instance.text,
+                                                   read=False, date=timezone.now(), user=instance.user)
+        NoteNotification.objects.create(notification=notification, note=instance)
 
 
 class CommentNotification(models.Model):

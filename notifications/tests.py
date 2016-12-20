@@ -5,12 +5,13 @@ from django.test import TestCase
 
 from items.models import Category, Item
 from notifications.models import Notification, OfferNotification, NewOfferNotification, AcceptedOfferNotification, \
-    RefusedOfferNotification, CommentNotification
+    RefusedOfferNotification, CommentNotification, MessageNotification
 
 
 class NotificationAPITest(TestCase):
     url_offers = "/api/offers/"
     url_comments = "/api/comments/"
+    url_messages = "/api/messages/"
 
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
@@ -56,6 +57,13 @@ class NotificationAPITest(TestCase):
     def post_comment(self, user_id, item_id, content="comment test"):
         return self.client.post(self.url_comments, data=json.dumps({
             "content": content,
+            "user": user_id,
+            "item": item_id
+        }), content_type="application/json")
+
+    def post_message(self, user_id, item_id, message="message test"):
+        return self.client.post(self.url_messages, data=json.dumps({
+            "text": message,
             "user": user_id,
             "item": item_id
         }), content_type="application/json")
@@ -135,3 +143,23 @@ class NotificationAPITest(TestCase):
         self.assertEqual(Notification.objects.count(), 4)
         self.assertEqual(Notification.objects.get(pk=1).user.username, "user1")
         self.assertEqual(CommentNotification.objects.count(), 4)
+
+    def test_new_note_notification(self):
+        self.client.login(username="username", password="password")
+
+        # TODO : implement note functionality
+
+    def test_new_message_notification(self):
+        self.client.login(username="username", password="password")
+
+        r = self.post_message(2, 1)
+        print(r.status_code)
+        r = self.post_message(2, 2)
+        print(r.status_code)
+        print(r.data)
+        self.post_message(2, 3)
+        self.post_message(2, 4)
+
+        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.get(pk=1).user.username, "username")
+        self.assertEqual(MessageNotification.objects.count(), 4)
