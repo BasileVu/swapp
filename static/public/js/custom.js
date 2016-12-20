@@ -30,6 +30,30 @@ $('document').ready(function() {
         adaptiveHeight: true
     });
 
+    // swapp inventories /////////////////////////
+    var swapp_inventory_mine = $('.swapp-inventory-mine').flickity({
+        // options
+        cellAlign: 'center',
+        contain: true,
+        imagesLoaded: true,
+        wrapAround: true,
+        groupCells: '100%',
+        prevNextButtons: false,
+        adaptiveHeight: true,
+        pageDots: true
+    });
+    var swapp_inventory_yours = $('.swapp-inventory-yours').flickity({
+        // options
+        cellAlign: 'center',
+        contain: true,
+        imagesLoaded: true,
+        wrapAround: true,
+        groupCells: '100%',
+        prevNextButtons: false,
+        adaptiveHeight: true,
+        pageDots: true
+    });
+
     // modal slider ///////////////////////////
     var modalCarousel = $('.modal-carousel').flickity({
         cellAlign: 'center',
@@ -118,6 +142,30 @@ $('document').ready(function() {
     openNotifButtons.each(function () {
         $(this).click(function () {
             notifModal.modal('show');
+        });
+    });
+
+    // open send proposition modal /////////////////////
+    var openSendPropositionButtons = $('.open-send-proposition-modal');
+    var sendPropositionModal = $('#send-proposition-modal');
+    openSendPropositionButtons.each(function () {
+        $(this).click(function () {
+            sendPropositionModal.modal('show');
+        });
+    });
+    sendPropositionModal.on('show.bs.modal', function (e) {
+        setTimeout(function () {
+            swapp_inventory_mine.flickity('resize');
+            swapp_inventory_yours.flickity('resize');
+        }, 300)
+    });
+
+    // open accept proposition modal /////////////////////
+    var openAcceptPropositionButtons = $('.open-accept-proposition-modal');
+    var acceptPropositionModal = $('#accept-proposition-modal');
+    openAcceptPropositionButtons.each(function () {
+        $(this).click(function () {
+            acceptPropositionModal.modal('show');
         });
     });
 

@@ -5483,9 +5483,31 @@ hr {
     .btn-group-justified .btn .dropdown-menu,
     .btn-group-justified .btn-group .dropdown-menu {
       left: auto; }
+  .btn-group-justified .btn {
+    border-left: 1px solid white; }
+  .btn-group-justified .btn:first-child {
+    border-left: none; }
 
 .evaluation .star {
   color: #80c870; }
+
+.carousel-cell {
+  position: relative; }
+  .carousel-cell a {
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border: 1px solid #eed5a9;
+    display: block; }
+    .carousel-cell a span {
+      padding: 10px;
+      display: block; }
+  .carousel-cell a.delete {
+    border: none;
+    text-align: center;
+    color: #d9534f;
+    position: absolute;
+    top: 3px;
+    right: 13px; }
 
 .modal {
   cursor: zoom-out;
@@ -5739,6 +5761,83 @@ hr {
 #notification-modal .notification:first-child {
   border-top: none; }
 
+#send-proposition-modal .flickity-viewport {
+  cursor: move; }
+
+#send-proposition-modal .my-inventory, #accept-proposition-modal .my-inventory {
+  border-bottom: 1px solid #eed5a9; }
+@media (min-width: 992px) {
+  #send-proposition-modal .my-inventory, #accept-proposition-modal .my-inventory {
+    border-bottom: none;
+    border-right: 1px solid #eed5a9; } }
+#send-proposition-modal .my-inventory, #send-proposition-modal .your-inventory, #accept-proposition-modal .my-inventory, #accept-proposition-modal .your-inventory {
+  padding: 20px; }
+  #send-proposition-modal .my-inventory .swap, #send-proposition-modal .your-inventory .swap, #accept-proposition-modal .my-inventory .swap, #accept-proposition-modal .your-inventory .swap {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    margin-top: -50px; }
+  #send-proposition-modal .my-inventory .inventory, #send-proposition-modal .your-inventory .inventory, #accept-proposition-modal .my-inventory .inventory, #accept-proposition-modal .your-inventory .inventory {
+    padding: 40px 0;
+    overflow: hidden;
+    position: relative; }
+    #send-proposition-modal .my-inventory .inventory:focus, #send-proposition-modal .your-inventory .inventory:focus, #accept-proposition-modal .my-inventory .inventory:focus, #accept-proposition-modal .your-inventory .inventory:focus {
+      outline: none; }
+    #send-proposition-modal .my-inventory .inventory ol, #send-proposition-modal .your-inventory .inventory ol, #accept-proposition-modal .my-inventory .inventory ol, #accept-proposition-modal .your-inventory .inventory ol {
+      margin-top: 20px;
+      padding: 0;
+      text-align: center; }
+      #send-proposition-modal .my-inventory .inventory ol li, #send-proposition-modal .your-inventory .inventory ol li, #accept-proposition-modal .my-inventory .inventory ol li, #accept-proposition-modal .your-inventory .inventory ol li {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 100%;
+        background-color: #f8eedc;
+        margin: 0 10px;
+        cursor: pointer; }
+      #send-proposition-modal .my-inventory .inventory ol .is-selected, #send-proposition-modal .your-inventory .inventory ol .is-selected, #accept-proposition-modal .my-inventory .inventory ol .is-selected, #accept-proposition-modal .your-inventory .inventory ol .is-selected {
+        background-color: #40b2cd; }
+#send-proposition-modal .title, #accept-proposition-modal .title {
+  margin-top: 28px; }
+#send-proposition-modal .actions, #accept-proposition-modal .actions {
+  margin-top: 22px; }
+#send-proposition-modal .swap, #accept-proposition-modal .swap {
+  width: 100px;
+  height: 100px;
+  background-color: #40b2cd;
+  color: white;
+  border-radius: 100%;
+  transition: 1s;
+  display: block;
+  margin: 0 auto;
+  padding-top: 35px; }
+  #send-proposition-modal .swap:hover, #accept-proposition-modal .swap:hover {
+    text-decoration: none;
+    transform: rotate(180deg); }
+  #send-proposition-modal .swap i, #accept-proposition-modal .swap i {
+    display: block;
+    text-align: center;
+    font-size: 30px; }
+#send-proposition-modal .accept, #send-proposition-modal .refuse, #accept-proposition-modal .accept, #accept-proposition-modal .refuse {
+  width: 100px;
+  height: 100px;
+  background-color: #40b2cd;
+  color: white;
+  border-radius: 100%;
+  transition: 1s;
+  margin: 40px;
+  padding-top: 35px;
+  display: inline-block; }
+  #send-proposition-modal .accept:hover, #send-proposition-modal .refuse:hover, #accept-proposition-modal .accept:hover, #accept-proposition-modal .refuse:hover {
+    text-decoration: none;
+    transform: scale(1.1); }
+  #send-proposition-modal .accept i, #send-proposition-modal .refuse i, #accept-proposition-modal .accept i, #accept-proposition-modal .refuse i {
+    display: block;
+    text-align: center;
+    font-size: 30px; }
+#send-proposition-modal .refuse, #accept-proposition-modal .refuse {
+  background-color: #eed5a9; }
+
 #header-navbar {
   background-color: white !important;
   border-bottom: 3px solid #91d3e2; }
@@ -5811,23 +5910,6 @@ hr {
       cursor: pointer; }
     .home-inventory ol .is-selected {
       background-color: #40b2cd; }
-  .home-inventory .carousel-cell {
-    position: relative; }
-    .home-inventory .carousel-cell a {
-      border-radius: 0.25rem;
-      overflow: hidden;
-      border: 1px solid #eed5a9;
-      display: block; }
-      .home-inventory .carousel-cell a span {
-        padding: 10px;
-        display: block; }
-    .home-inventory .carousel-cell a.delete {
-      border: none;
-      text-align: center;
-      color: #d9534f;
-      position: absolute;
-      top: 3px;
-      right: 13px; }
 
 #content-main {
   padding-top: 30px; }

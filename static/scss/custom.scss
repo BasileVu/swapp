@@ -21,10 +21,38 @@ hr {
       left: auto;
     }
   }
+  .btn {
+    border-left: 1px solid white;
+  }
+  .btn:first-child {
+    border-left: none;
+  }
 }
 .evaluation {
   .star {
     color: $brand-success;
+  }
+}
+.carousel-cell {
+  position: relative;
+  a {
+    @include border-radius($border-radius);
+    overflow: hidden;
+    border: 1px solid $brand-secondary;
+    display: block;
+
+    span {
+      padding: $grid-gutter-width;
+      display: block;
+    }
+  }
+  a.delete {
+    border: none;
+    text-align: center;
+    color: $brand-danger;
+    position: absolute;
+    top: 3px;
+    right: $grid-gutter-width + 3px;
   }
 }
 .modal {
@@ -407,6 +435,116 @@ hr {
   }
 }
 
+// Send proposition modal ////////////////////////
+#send-proposition-modal {
+  .flickity-viewport {
+    cursor: move;
+  }
+}
+#send-proposition-modal, #accept-proposition-modal {
+  .my-inventory {
+    border-bottom: 1px solid $brand-secondary;
+  }
+  @include media-breakpoint-up(lg) {
+    .my-inventory {
+      border-bottom: none;
+      border-right: 1px solid $brand-secondary;
+    }
+  }
+
+  .my-inventory, .your-inventory {
+    padding: 2 * $grid-gutter-width;
+
+    .swap {
+      position: absolute;
+      left: -50px;
+      top: 50%;
+      margin-top: -50px;
+    }
+
+    .inventory {
+      padding: 40px 0;
+      overflow: hidden;
+      position: relative;
+
+      &:focus {
+        outline: none;
+      }
+      ol {
+        margin-top: 2*$grid-gutter-width;
+        padding: 0;
+        text-align: center;
+
+        li {
+          display: inline-block;
+          width: $grid-gutter-width;
+          height: $grid-gutter-width;
+          @include border-radius(100%);
+          background-color: $brand-secondary-lighten;
+          margin: 0 $grid-gutter-width;
+          cursor: pointer;
+        }
+        .is-selected {
+          background-color: $brand-primary;
+        }
+      }
+    }
+  }
+  .title {
+    margin-top: 28px;
+  }
+  .actions {
+    margin-top: 22px;
+  }
+  .swap {
+    width: 100px;
+    height: 100px;
+    background-color: $brand-primary;
+    color: white;
+    border-radius: 100%;
+    transition: 1s;
+    display: block;
+    margin: 0 auto;
+    padding-top: 35px;
+
+    &:hover {
+      text-decoration: none;
+      transform: rotate(180deg);
+    }
+
+    i {
+      display: block;
+      text-align: center;
+      font-size: 30px;
+    }
+  }
+  .accept, .refuse {
+    width: 100px;
+    height: 100px;
+    background-color: $brand-primary;
+    color: white;
+    border-radius: 100%;
+    transition: 1s;
+    margin: 40px;
+    padding-top: 35px;
+    display: inline-block;
+
+    &:hover {
+      text-decoration: none;
+      transform: scale(1.1);
+    }
+
+    i {
+      display: block;
+      text-align: center;
+      font-size: 30px;
+    }
+  }
+  .refuse {
+    background-color: $brand-secondary;
+  }
+}
+
 // Header menu ////////////////////////////////////
 #header-navbar {
   background-color: white !important;
@@ -491,28 +629,6 @@ hr {
     }
     .is-selected {
       background-color: $brand-primary;
-    }
-  }
-  .carousel-cell {
-    position: relative;
-    a {
-      @include border-radius($border-radius);
-      overflow: hidden;
-      border: 1px solid $brand-secondary;
-      display: block;
-
-      span {
-        padding: $grid-gutter-width;
-        display: block;
-      }
-    }
-    a.delete {
-      border: none;
-      text-align: center;
-      color: $brand-danger;
-      position: absolute;
-      top: 3px;
-      right: $grid-gutter-width + 3px;
     }
   }
 }
