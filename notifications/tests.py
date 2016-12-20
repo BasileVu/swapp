@@ -5,11 +5,12 @@ from django.test import TestCase
 
 from items.models import Category, Item
 from notifications.models import Notification, OfferNotification, NewOfferNotification, AcceptedOfferNotification, \
-    RefusedOfferNotification
+    RefusedOfferNotification, CommentNotification
 
 
 class NotificationAPITest(TestCase):
-    url = "/api/offers/"
+    url_offers = "/api/offers/"
+    url_comments = "/api/comments/"
 
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
@@ -39,7 +40,7 @@ class NotificationAPITest(TestCase):
                             owner=self.other_user, category=c2)
 
     def post_offer(self, item_given, item_received, accepted=False, status=0, comment="test"):
-        return self.client.post(self.url, data=json.dumps({
+        return self.client.post(self.url_offers, data=json.dumps({
             "accepted": accepted,
             "status": status,
             "comment": comment,
@@ -48,8 +49,15 @@ class NotificationAPITest(TestCase):
         }), content_type="application/json")
 
     def patch_offer(self, offer_id, accepted):
-        return self.client.patch(self.url + str(offer_id) + "/", data=json.dumps({
+        return self.client.patch(self.url_offers + str(offer_id) + "/", data=json.dumps({
             "accepted": accepted
+        }), content_type="application/json")
+
+    def post_comment(self, user_id, item_id, content="comment test"):
+        return self.client.post(self.url_comments, data=json.dumps({
+            "content": content,
+            "user": user_id,
+            "item": item_id
         }), content_type="application/json")
 
     def test_new_offer_creation_notification(self):
@@ -112,4 +120,18 @@ class NotificationAPITest(TestCase):
         self.assertEqual(OfferNotification.objects.count(), 4)
         self.assertEqual(OfferNotification.objects.get(pk=1).offer.id, 1)
         self.assertEqual(OfferNotification.objects.get(pk=2).offer.id, 2)
+        self.assertEqual(OfferNotification.objects.get(pk=3).offer.id, 1)
+        self.assertEqual(OfferNotification.objects.get(pk=4).offer.id, 2)
         self.assertEqual(RefusedOfferNotification.objects.count(), 2)
+
+    def test_new_comment_notification(self):
+        self.client.login(username="username", password="password")
+
+        self.post_comment(1, 5)
+        self.post_comment(1, 6)
+        self.post_comment(1, 7)
+        self.post_comment(1, 8)
+
+        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.get(pk=1).user.username, "user1")
+        self.assertEqual(CommentNotification.objects.count(), 4)

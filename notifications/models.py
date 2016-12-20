@@ -26,7 +26,19 @@ class MessageNotification(models.Model):
 
 class CommentNotification(models.Model):
     notification = models.OneToOneField(Notification, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    comment = models.OneToOneField(Comment, on_delete=models.CASCADE)
+
+
+@receiver(post_save, sender=Comment)
+def new_comment_notification(sender, instance, signal, created, **kwargs):
+    """
+    Handler to create a notification when a comment is created.
+    """
+    if created:
+        notification = Notification.objects.create(content=instance.user.username + " has commented your item: "
+                                                   + instance.item.name,
+                                                   read=False, date=timezone.now(), user=instance.item.owner)
+        CommentNotification.objects.create(notification=notification, comment=instance)
 
 
 class OfferNotification(models.Model):
