@@ -81,4 +81,7 @@ module.exports = function(grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['copy', 'sass', 'watch']);
+
+    // Build without watch
+    grunt.registerTask('build', ['copy', 'sass']);
 };
