@@ -1,18 +1,16 @@
 import json
 
 from django.contrib.auth.models import User
-from django.test import Client
 from django.test import TestCase
 from rest_framework import status
 
 from items.models import Category, Item
+from offers.models import Offer
 
 
 class OfferAPITests(TestCase):
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
-        self.current_user.userprofile.location = "location"
-        self.current_user.userprofile.save()
 
         c1 = Category.objects.create(name="Test")
         c2 = Category.objects.create(name="Test2")
@@ -20,9 +18,12 @@ class OfferAPITests(TestCase):
         self.other_user = User.objects.create_user(username="user1", email="test@test.com",
                                                    password="password")
 
-        self.create_item(c1, self.other_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
-        self.create_item(c2, self.current_user, name="Shirt", description="My old shirt", price_min=5,
-                         price_max=30)
+        self.item1 = self.create_item(c1, self.current_user, name="Pencil", description="Not used", price_min=1,
+                                      price_max=2)
+        self.item2 = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10,
+                                      price_max=30)
+        self.item3 = self.create_item(c2, self.other_user, name="Shirt", description="My old shirt", price_min=5,
+                                      price_max=30)
 
     def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
         return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
@@ -34,13 +35,13 @@ class OfferAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_offer(self, item_given, item_received, accepted=False, status=0, comment="Test"):
+    def post_offer(self, id_item_given, id_item_received, accepted=False, status=0, comment="Test"):
         return self.client.post("/api/offers/", data=json.dumps({
             "accepted": accepted,
             "status": status,
             "comment":  comment,
-            "item_given": item_given,
-            "item_received": item_received
+            "item_given": id_item_given,
+            "item_received": id_item_received
         }), content_type="application/json")
 
     def get_offers(self):
@@ -49,13 +50,13 @@ class OfferAPITests(TestCase):
     def get_offer(self, id_offer=1):
         return self.client.get("/api/offers/" + str(id_offer) + "/", content_type="application/json")
 
-    def put_offer(self, id_offer, item_given, item_received, accepted=False, status=0, comment="Test"):
+    def put_offer(self, id_offer, id_item_given, id_item_received, accepted=False, status=0, comment="Test"):
         return self.client.put("/api/offers/" + str(id_offer) + "/", data=json.dumps({
             "accepted": accepted,
             "status": status,
             "comment":  comment,
-            "item_given": item_given,
-            "item_received": item_received
+            "item_given": id_item_given,
+            "item_received": id_item_received
         }), content_type="application/json")
 
     def delete_offer(self, id_offer=1):
@@ -66,18 +67,24 @@ class OfferAPITests(TestCase):
 
     def test_post_offer(self):
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_post_offer_on_self_item(self):
         self.login()
-        r = self.post_offer(1, 1)
-        self.assertEqual(r.status_code, 400)
+        r = self.post_offer(self.item2.id, self.item2.id)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_offer_on_object_not_owned(self):
         self.login()
-        r = self.post_offer(1, 2)
-        self.assertEqual(r.status_code, 400)
+        r = self.post_offer(self.item3.id, self.item2.id)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_offer_on_invalid_price_range(self):
+        self.login()
+        r = self.post_offer(self.item1.id, self.item3.id)
+        self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(Offer.objects.count(), 0)
 
     def test_get_offers(self):
         r = self.get_offers()
@@ -85,7 +92,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(len(r.data), 0)
 
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_offers()
@@ -94,7 +101,7 @@ class OfferAPITests(TestCase):
 
     def test_get_offer(self):
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_offer(id_offer=r.data['id'])
@@ -105,34 +112,34 @@ class OfferAPITests(TestCase):
 
     def test_put_offer(self):
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data['id']
-        r = self.put_offer(1, item_given=2, item_received=1, accepted=True, status=1, comment="Test2")
+        r = self.put_offer(1, self.item2.id, self.item3.id, accepted=True, status=1, comment="Test2")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         self.assertEqual(r.data['item_given'], 2)
-        self.assertEqual(r.data['item_received'], 1)
+        self.assertEqual(r.data['item_received'], 3)
         self.assertEqual(r.data['accepted'], True)
         self.assertEqual(r.data['status'], 1)
         self.assertEqual(r.data['comment'], "Test2")
-        r = self.put_offer(10, 2, 1)
+        r = self.put_offer(10, self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_patch_offer(self):
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data['id']
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_given": 2}))
+        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_given": self.item2.id}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_received": 1}))
+        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_received": self.item3.id}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
@@ -147,17 +154,30 @@ class OfferAPITests(TestCase):
         r = self.get_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(r.data['item_given'], 2)
-        self.assertEqual(r.data['item_received'], 1)
+        self.assertEqual(r.data['item_given'], self.item2.id)
+        self.assertEqual(r.data['item_received'], self.item3.id)
         self.assertEqual(r.data['accepted'], True)
         self.assertEqual(r.data['status'], 1)
         self.assertEqual(r.data['comment'], "Test2")
-        r = self.patch_offer(id_offer=10)
+
+    def test_patch_offer_not_existing(self):
+        self.login()
+        r = self.patch_offer(id_offer=1)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+
+    def patch_offer_price_range_not_matching(self):
+        self.login()
+        r = self.post_offer(self.item2.id, self.item3.id)
+        offer = Offer.objects.get(pk=r.data["id"])
+        r = self.patch_offer(id_offer=offer.id, data=json.dumps({"item_given": self.item1.id}))
+        
+        self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(offer.item_given.id, self.item2.id)
 
     def test_delete_offer(self):
         self.login()
-        r = self.post_offer(2, 1)
+        r = self.post_offer(self.item2.id, self.item3.id)
+        self.post_offer(self.item1.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data['id']
@@ -168,5 +188,5 @@ class OfferAPITests(TestCase):
 
         r = self.get_offers()
         self.assertEqual(len(r.data), 0)
-        r = self.delete_offer(id_offer=10)
+        r = self.delete_offer(id_offer=1)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)

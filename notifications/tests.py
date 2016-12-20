@@ -47,7 +47,7 @@ class NotificationAPITest(TestCase):
     def test_new_offer_creation_notification(self):
         self.client.login(username="username", password="password")
 
-        self.post_offer(1, 8)
+        self.post_offer(1, 7)
         self.post_offer(2, 6)
         self.assertEqual(Notification.objects.count(), 2)
         self.assertEqual(Notification.objects.get(pk=1).user.username, "user1")
