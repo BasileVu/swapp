@@ -13,7 +13,7 @@ from users.models import Note
 class Notification(models.Model):
     content = models.CharField(max_length=100)
     read = models.BooleanField()
-    date = models.DateTimeField('date published')
+    date = models.DateTimeField('date published', default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -31,8 +31,8 @@ def new_message_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when a message is created.
     """
     if created:
-        notification = Notification.objects.create(content="New message for item: " + instance.item.name,
-                                                   read=False, date=timezone.now(), user=instance.item.owner)
+        notification = Notification.objects.create(content="New private message",
+                                                   read=False, date=timezone.now(), user=instance.user_to)
         MessageNotification.objects.create(notification=notification, message=instance)
 
 

@@ -61,11 +61,11 @@ class NotificationAPITest(TestCase):
             "item": item_id
         }), content_type="application/json")
 
-    def post_message(self, user_id, item_id, message="message test"):
+    def post_message(self, user_id_from, user_id_to, message="message test"):
         return self.client.post(self.url_messages, data=json.dumps({
             "text": message,
-            "user": user_id,
-            "item": item_id
+            "user_from": user_id_from,
+            "user_to": user_id_to
         }), content_type="application/json")
 
     def test_new_offer_creation_notification(self):
@@ -152,13 +152,10 @@ class NotificationAPITest(TestCase):
     def test_new_message_notification(self):
         self.client.login(username="username", password="password")
 
-        r = self.post_message(2, 1)
-        print(r.status_code)
-        r = self.post_message(2, 2)
-        print(r.status_code)
-        print(r.data)
-        self.post_message(2, 3)
-        self.post_message(2, 4)
+        self.post_message(2, 1)
+        self.post_message(2, 1)
+        self.post_message(1, 2)
+        self.post_message(1, 2)
 
         self.assertEqual(Notification.objects.count(), 4)
         self.assertEqual(Notification.objects.get(pk=1).user.username, "username")
