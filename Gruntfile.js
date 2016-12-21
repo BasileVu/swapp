@@ -112,12 +112,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
-<<<<<<< HEAD
-    grunt.registerTask('default', ['copy', 'sass', 'ts']);
-=======
     grunt.registerTask('default', ['copy', 'sass', 'watch']);
 
     // Build without watch
     grunt.registerTask('build', ['copy', 'sass']);
->>>>>>> master
 };
