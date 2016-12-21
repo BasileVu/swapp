@@ -39,12 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 
+    'private_messages',
     'comments',
     'pages.home',
     'items',
     'notifications',
     'offers',
-    'private_messages',
     'search',
     'users',
     'menus.header_menu',

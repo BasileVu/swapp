@@ -1,12 +1,6 @@
-from django.conf.urls import url, include
-
-from swapp.ShareAPIRootRouter import SharedAPIRootRouter
+from rest_framework.routers import DefaultRouter
 from . import views
 
-router = SharedAPIRootRouter()
-router.register(r'offers', views.OfferViewSet, base_name="offers")
-
-app_name = "offers"
-urlpatterns = [
-    url(r'^', include(router.urls)),
-]
+router = DefaultRouter()
+router.register(r'offers', views.OfferViewSet)
+urlpatterns = router.urls

@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from offers.models import Offer
+
 
 class UserProfile(models.Model):
     """
@@ -16,6 +18,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return "User profile of " + self.user.username
+
+
+class Consultation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
 
 
 class Location(models.Model):
@@ -33,9 +44,9 @@ class Coordinates(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, signal, created, **kwargs):
+def create_user_related(sender, instance, signal, created, **kwargs):
     """
-    Handler to create user profile when an user is created.
+    Handler to create user-related tables when user created: user profile, location and coordinates.
     """
     if created:
         UserProfile.objects.create(user=instance, last_modification_date=timezone.now())
@@ -43,7 +54,7 @@ def create_user_profile(sender, instance, signal, created, **kwargs):
         Coordinates.objects.create(user=instance)
     else:
         # When we make a modification on the User (fields), we change the field "last_modification_date"
-        # whit the new datetime.
+        # with the new datetime.
         instance.userprofile.save()
 
 
@@ -51,7 +62,8 @@ class Note(models.Model):
     """
     Defines the note that can be attributed to an user after a proposition was made.
     """
-    user = models.ForeignKey("users.UserProfile", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
     note = models.IntegerField(default=0)
 

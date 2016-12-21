@@ -1,28 +1,44 @@
 from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
 from users.models import *
 
 
-class UserAccountSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=True)
+    first_name = serializers.CharField(write_only=True, required=True)
+    last_name = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(write_only=True, required=True)
     last_name = serializers.CharField(write_only=True, required=True)
     email = serializers.EmailField(write_only=True, required=True)
 
     class Meta:
-        model = UserProfile
-        fields = (
-            'username', 'first_name', 'last_name', 'email'
-        )
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')
 
 
-# TODO to adapt
-"""class NoteSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(source="user.id", queryset=User.objects.all())
+class LoginUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model = Note
-        fields = ('id', 'user_id', 'text', 'note')"""
+        model = User
+        fields = ('username', 'password')
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True)
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -34,3 +50,20 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('street', 'city', 'region', 'country')
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    note = IntegerField(max_value=5, min_value=0)
+
+    class Meta:
+        model = Note
+        fields = ('id', 'user', 'offer', 'text', 'note')
+        read_only_fields = ('user',)
+
+
+class NoteUpdateSerializer(serializers.ModelSerializer):
+    note = IntegerField(max_value=5, min_value=0)
+
+    class Meta:
+        model = Note
+        fields = ('text', 'note')
