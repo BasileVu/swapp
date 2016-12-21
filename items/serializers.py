@@ -37,14 +37,6 @@ class LikeItemSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    def validate(self, data):
-        """
-        Check that the start is before the stop.
-        """
-        if 'price_min' in data and 'price_max' in data and data['price_min'] > data['price_max']:
-            raise serializers.ValidationError("Price min is higher than price max")
-        return data
-
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'views', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',

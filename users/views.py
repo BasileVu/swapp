@@ -9,8 +9,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics, mixins
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -179,18 +180,18 @@ class LocationView(generics.UpdateAPIView):
         return self.request.user.location
 
     def perform_update(self, serializer):
-        serializer.save()
-
-        u = self.request.user
-        data = get_coordinates(u.location)
+        data = get_coordinates(Location(**serializer.validated_data))
 
         if len(data) == 0:
             raise ValidationError("Could not find any match for specified location.")
 
+        u = self.request.user
         c = u.coordinates
         c.latitude = data[0]["lat"]
         c.longitude = data[0]["lng"]
         c.save()
+
+        serializer.save()
 
 
 @api_view(["GET"])
@@ -207,3 +208,31 @@ def get_public_account_info(request, username):
         "notes": [n.id for n in user.note_set.all()],
         "likes": [l.id for l in user.like_set.all()],
     })
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    queryset = Note.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'update':
+            return NoteUpdateSerializer
+        return NoteSerializer
+
+    def perform_create(self, serializer):
+        # Will be done on every save
+
+        serializer.is_valid(raise_exception=True)
+        offer = serializer.validated_data["offer"]
+
+        if offer.accepted is not True:
+            raise ValidationError("You can't not an offer if it has not been accepted")
+        if offer.item_given.owner == self.request.user:
+            serializer.validated_data["user"] = offer.item_received.owner
+        elif offer.item_received.owner == self.request.user:
+            serializer.validated_data["user"] = offer.item_given.owner
+        else:
+            raise ValidationError("You are not linked to this offer")
+
+        if Note.objects.filter(offer=offer, user=serializer.validated_data["user"]).count() > 0:
+            raise ValidationError("You have already noted this offer")
+        serializer.save()
