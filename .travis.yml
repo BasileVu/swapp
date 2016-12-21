@@ -15,4 +15,4 @@ install:
 script: 
   - "python manage.py migrate"
   - "python manage.py test"
-  - "grunt"
+  - "grunt build"

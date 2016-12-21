@@ -49,7 +49,7 @@ def new_note_notification(sender, instance, signal, created, **kwargs):
     if created:
         notification = Notification.objects.create(content="New note " + str(instance.note) + " with text: "
                                                            + instance.text, read=False, date=timezone.now(),
-                                                   user=instance.user)
+                                                   user=instance.offer.item_received.owner)
         NoteNotification.objects.create(notification=notification, note=instance)
 
 

@@ -1,8 +1,13 @@
 from django.conf.urls import url
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
 app_name = "users"
+
+router = DefaultRouter()
+router.register(r'api/notes', views.NoteViewSet)
+
 urlpatterns = [
     url(r"^register/$", views.register_view, name="register"),  # TODO delete when not used anymore
     url(r"^login/$", views.login_view, name="login"),  # TODO delete when not used anymore
@@ -17,4 +22,4 @@ urlpatterns = [
     url(r"^api/account/$", views.UserAccount.as_view(), name="user_account"),
     url(r"^api/account/password/", views.change_password, name="change_password"),
     url(r"^api/account/location/", views.LocationView.as_view(), name="location"),
-]
+] + router.urls

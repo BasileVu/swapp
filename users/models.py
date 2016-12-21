@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from offers.models import Offer
+
 
 class UserProfile(models.Model):
     """
@@ -16,6 +18,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return "User profile of " + self.user.username
+
+
+class Consultation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
 
 
 class Location(models.Model):
@@ -52,6 +63,7 @@ class Note(models.Model):
     Defines the note that can be attributed to an user after a proposition was made.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
     note = models.IntegerField(default=0)
 
