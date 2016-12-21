@@ -38,7 +38,7 @@ def new_message_notification(sender, instance, signal, created, **kwargs):
 
 class NoteNotification(models.Model):
     notification = models.OneToOneField(Notification, on_delete=models.CASCADE)
-    note = models.OneToOneField(Comment, on_delete=models.CASCADE)
+    note = models.OneToOneField(Note, on_delete=models.CASCADE)
 
 
 @receiver(post_save, sender=Note)
@@ -47,8 +47,9 @@ def new_note_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when a note is given (created).
     """
     if created:
-        notification = Notification.objects.create(content="New note " + instance.note + " with text: " + instance.text,
-                                                   read=False, date=timezone.now(), user=instance.user)
+        notification = Notification.objects.create(content="New note " + str(instance.note) + " with text: "
+                                                           + instance.text, read=False, date=timezone.now(),
+                                                   user=instance.user)
         NoteNotification.objects.create(notification=notification, note=instance)
 
 
