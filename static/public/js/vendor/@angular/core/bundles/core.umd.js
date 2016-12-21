@@ -1,5 +1,5 @@
 /**
- * @license Angular v2.2.0
+ * @license Angular v2.2.4
  * (c) 2010-2016 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -75,6 +75,7 @@
         return o !== null && (typeof o === 'function' || typeof o === 'object');
     }
     function print(obj) {
+        // tslint:disable-next-line:no-console
         console.log(obj);
     }
     function warn(obj) {
@@ -1604,8 +1605,11 @@
                 return type.parameters;
             }
             // API of tsickle for lowering decorators to properties on the class.
-            if (type.ctorParameters) {
-                var ctorParameters = type.ctorParameters;
+            var tsickleCtorParams = type.ctorParameters;
+            if (tsickleCtorParams) {
+                // Newer tsickle uses a function closure
+                // Retain the non-function case for compatibility with older tsickle
+                var ctorParameters = typeof tsickleCtorParams === 'function' ? tsickleCtorParams() : tsickleCtorParams;
                 var paramTypes = ctorParameters.map(function (ctorParam) { return ctorParam && ctorParam.type; });
                 var paramAnnotations = ctorParameters.map(function (ctorParam) {
                     return ctorParam && convertTsickleDecoratorIntoMetadata(ctorParam.decorators);
@@ -1819,7 +1823,7 @@
             /**
              * Factory function which can return an instance of an object represented by a key.
              */
-            factory,
+            factory, 
             /**
              * Arguments (dependencies) to the `factory` function.
              */
@@ -7678,7 +7682,7 @@
             this._finished = false;
             this._started = false;
         };
-        AnimationGroupPlayer.prototype.setPosition = function (p /** TODO #9100 */) {
+        AnimationGroupPlayer.prototype.setPosition = function (p) {
             this._players.forEach(function (player) { player.setPosition(p); });
         };
         AnimationGroupPlayer.prototype.getPosition = function () {
@@ -7689,6 +7693,11 @@
             });
             return min;
         };
+        Object.defineProperty(AnimationGroupPlayer.prototype, "players", {
+            get: function () { return this._players; },
+            enumerable: true,
+            configurable: true
+        });
         return AnimationGroupPlayer;
     }());
 
@@ -7751,7 +7760,7 @@
         NoOpAnimationPlayer.prototype.finish = function () { this._onFinish(); };
         NoOpAnimationPlayer.prototype.destroy = function () { };
         NoOpAnimationPlayer.prototype.reset = function () { };
-        NoOpAnimationPlayer.prototype.setPosition = function (p /** TODO #9100 */) { };
+        NoOpAnimationPlayer.prototype.setPosition = function (p) { };
         NoOpAnimationPlayer.prototype.getPosition = function () { return 0; };
         return NoOpAnimationPlayer;
     }());
@@ -7838,8 +7847,13 @@
                 this._activePlayer = new NoOpAnimationPlayer();
             }
         };
-        AnimationSequencePlayer.prototype.setPosition = function (p /** TODO #9100 */) { this._players[0].setPosition(p); };
+        AnimationSequencePlayer.prototype.setPosition = function (p) { this._players[0].setPosition(p); };
         AnimationSequencePlayer.prototype.getPosition = function () { return this._players[0].getPosition(); };
+        Object.defineProperty(AnimationSequencePlayer.prototype, "players", {
+            get: function () { return this._players; },
+            enumerable: true,
+            configurable: true
+        });
         return AnimationSequencePlayer;
     }());
 
@@ -8570,6 +8584,7 @@
         if (hasExtraFirstStyles) {
             firstKeyframe.styles.styles.push(extraFirstKeyframeStyles);
         }
+        collectAndResolveStyles(collectedStyles, [finalStateStyles]);
         return keyframes;
     }
     function clearStyles(styles) {
@@ -8812,8 +8827,9 @@
             this._delegate.invokeElementMethod(renderElement, methodName, args);
         };
         DebugDomRenderer.prototype.setText = function (renderNode, text) { this._delegate.setText(renderNode, text); };
-        DebugDomRenderer.prototype.animate = function (element, startingStyles, keyframes, duration, delay, easing) {
-            return this._delegate.animate(element, startingStyles, keyframes, duration, delay, easing);
+        DebugDomRenderer.prototype.animate = function (element, startingStyles, keyframes, duration, delay, easing, previousPlayers) {
+            if (previousPlayers === void 0) { previousPlayers = []; }
+            return this._delegate.animate(element, startingStyles, keyframes, duration, delay, easing, previousPlayers);
         };
         return DebugDomRenderer;
     }());
@@ -9009,20 +9025,30 @@
             queueAnimationGlobally(player);
             this._players.set(element, animationName, player);
         };
-        AnimationViewContext.prototype.cancelActiveAnimation = function (element, animationName, removeAllAnimations) {
+        AnimationViewContext.prototype.getAnimationPlayers = function (element, animationName, removeAllAnimations) {
             if (removeAllAnimations === void 0) { removeAllAnimations = false; }
+            var players = [];
             if (removeAllAnimations) {
-                this._players.findAllPlayersByElement(element).forEach(function (player) { return player.destroy(); });
+                this._players.findAllPlayersByElement(element).forEach(function (player) { _recursePlayers(player, players); });
             }
             else {
-                var player = this._players.find(element, animationName);
-                if (player) {
-                    player.destroy();
+                var currentPlayer = this._players.find(element, animationName);
+                if (currentPlayer) {
+                    _recursePlayers(currentPlayer, players);
                 }
             }
+            return players;
         };
         return AnimationViewContext;
     }());
+    function _recursePlayers(player, collectedPlayers) {
+        if ((player instanceof AnimationGroupPlayer) || (player instanceof AnimationSequencePlayer)) {
+            player.players.forEach(function (player) { return _recursePlayers(player, collectedPlayers); });
+        }
+        else {
+            collectedPlayers.push(player);
+        }
+    }
 
     /**
      * @license
@@ -9253,7 +9279,10 @@
                     this.visitRootNodesInternal(this._directRenderer.insertBefore, nextSibling);
                 }
                 else {
-                    this.visitRootNodesInternal(this._directRenderer.appendChild, this._directRenderer.parentElement(prevNode));
+                    var parentElement = this._directRenderer.parentElement(prevNode);
+                    if (parentElement) {
+                        this.visitRootNodesInternal(this._directRenderer.appendChild, parentElement);
+                    }
                 }
             }
             else {

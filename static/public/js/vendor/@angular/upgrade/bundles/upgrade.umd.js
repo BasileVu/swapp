@@ -1,5 +1,5 @@
 /**
- * @license Angular v2.2.0
+ * @license Angular v2.2.4
  * (c) 2010-2016 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -267,7 +267,13 @@
 
     function onError(e) {
         // TODO: (misko): We seem to not have a stack trace here!
-        console.log(e, e.stack);
+        if (console.error) {
+            console.error(e, e.stack);
+        }
+        else {
+            // tslint:disable-next-line:no-console
+            console.log(e, e.stack);
+        }
         throw e;
     }
     function controllerKey(name) {
@@ -305,7 +311,8 @@
                     ],
                     ngOnInit: function () { },
                     ngOnChanges: function () { },
-                    ngDoCheck: function () { }
+                    ngDoCheck: function () { },
+                    ngOnDestroy: function () { },
                 });
         }
         UpgradeNg1ComponentAdapterBuilder.prototype.extractDirective = function (injector) {
@@ -507,15 +514,18 @@
             }
         };
         UpgradeNg1ComponentAdapter.prototype.ngOnChanges = function (changes) {
-            for (var name_3 in changes) {
-                if (changes.hasOwnProperty(name_3)) {
-                    var change = changes[name_3];
-                    this.setComponentProperty(name_3, change.currentValue);
-                }
+            var _this = this;
+            var ng1Changes = {};
+            Object.keys(changes).forEach(function (name) {
+                var change = changes[name];
+                _this.setComponentProperty(name, change.currentValue);
+                ng1Changes[_this.propertyMap[name]] = change;
+            });
+            if (this.destinationObj.$onChanges) {
+                this.destinationObj.$onChanges(ng1Changes);
             }
         };
         UpgradeNg1ComponentAdapter.prototype.ngDoCheck = function () {
-            var count = 0;
             var destinationObj = this.destinationObj;
             var lastValues = this.checkLastValues;
             var checkProperties = this.checkProperties;
@@ -531,7 +541,14 @@
                     }
                 }
             }
-            return count;
+            if (this.destinationObj.$doCheck && this.directive.controller) {
+                this.destinationObj.$doCheck();
+            }
+        };
+        UpgradeNg1ComponentAdapter.prototype.ngOnDestroy = function () {
+            if (this.destinationObj.$onDestroy && this.directive.controller) {
+                this.destinationObj.$onDestroy();
+            }
         };
         UpgradeNg1ComponentAdapter.prototype.setComponentProperty = function (name, value) {
             this.destinationObj[this.propertyMap[name]] = value;
@@ -547,23 +564,23 @@
                 return undefined;
             }
             else if (typeof require == 'string') {
-                var name_4 = require;
+                var name_3 = require;
                 var isOptional = false;
                 var startParent = false;
                 var searchParents = false;
-                if (name_4.charAt(0) == '?') {
+                if (name_3.charAt(0) == '?') {
                     isOptional = true;
-                    name_4 = name_4.substr(1);
+                    name_3 = name_3.substr(1);
                 }
-                if (name_4.charAt(0) == '^') {
+                if (name_3.charAt(0) == '^') {
                     searchParents = true;
-                    name_4 = name_4.substr(1);
+                    name_3 = name_3.substr(1);
                 }
-                if (name_4.charAt(0) == '^') {
+                if (name_3.charAt(0) == '^') {
                     startParent = true;
-                    name_4 = name_4.substr(1);
+                    name_3 = name_3.substr(1);
                 }
-                var key = controllerKey(name_4);
+                var key = controllerKey(name_3);
                 if (startParent)
                     $element = $element.parent();
                 var dep = searchParents ? $element.inheritedData(key) : $element.data(key);
@@ -918,17 +935,16 @@
                         provide.decorator(NG1_TESTABILITY, [
                             '$delegate',
                             function (testabilityDelegate) {
-                                var _this = this;
                                 var originalWhenStable = testabilityDelegate.whenStable;
+                                // Cannot use arrow function below because we need the context
                                 var newWhenStable = function (callback) {
-                                    var whenStableContext = _this;
-                                    originalWhenStable.call(_this, function () {
+                                    originalWhenStable.call(this, function () {
                                         var ng2Testability = moduleRef.injector.get(_angular_core.Testability);
                                         if (ng2Testability.isStable()) {
                                             callback.apply(this, arguments);
                                         }
                                         else {
-                                            ng2Testability.whenStable(newWhenStable.bind(whenStableContext, callback));
+                                            ng2Testability.whenStable(newWhenStable.bind(this, callback));
                                         }
                                     });
                                 };
@@ -990,8 +1006,10 @@
                 if (windowAngular.resumeBootstrap) {
                     var originalResumeBootstrap_1 = windowAngular.resumeBootstrap;
                     windowAngular.resumeBootstrap = function () {
+                        var _this = this;
+                        var args = arguments;
                         windowAngular.resumeBootstrap = originalResumeBootstrap_1;
-                        windowAngular.resumeBootstrap.apply(this, arguments);
+                        ngZone.run(function () { windowAngular.resumeBootstrap.apply(_this, args); });
                         resolve();
                     };
                 }

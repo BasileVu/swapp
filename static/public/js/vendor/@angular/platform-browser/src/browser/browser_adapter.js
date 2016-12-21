@@ -85,6 +85,7 @@ export var BrowserDomAdapter = (function (_super) {
     };
     BrowserDomAdapter.prototype.log = function (error) {
         if (window.console) {
+            // tslint:disable-next-line:no-console
             window.console.log && window.console.log(error);
         }
     };

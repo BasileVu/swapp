@@ -8,8 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var search_service_1 = require('./search.service');
+var core_1 = require("@angular/core");
+var search_service_1 = require("./search.service");
+var search_1 = require("./search");
 var SearchComponent = (function () {
     function SearchComponent(searchService) {
         this.searchService = searchService;
@@ -23,17 +24,23 @@ var SearchComponent = (function () {
         this.searchService.getCategories()
             .then(function (categories) { return _this.categories = categories; }, function (error) { return _this.errorMessage = error; });
     };
-    SearchComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'search',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './search.component.html',
-            providers: [search_service_1.SearchService]
-        }), 
-        __metadata('design:paramtypes', [search_service_1.SearchService])
-    ], SearchComponent);
+    SearchComponent.prototype.search = function (q, category) {
+        var _this = this;
+        console.log(q.value);
+        this.searchService.search(new search_1.Search(q.value, category))
+            .then(function (items) { return console.log(items); }, function (error) { return _this.errorMessage = error; });
+    };
     return SearchComponent;
 }());
+SearchComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'search',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './search.component.html',
+        providers: [search_service_1.SearchService]
+    }),
+    __metadata("design:paramtypes", [search_service_1.SearchService])
+], SearchComponent);
 exports.SearchComponent = SearchComponent;
 //# sourceMappingURL=search.component.js.map

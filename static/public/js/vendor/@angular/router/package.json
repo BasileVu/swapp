@@ -10,24 +10,24 @@
         "spec": ">=3.2.0 <3.3.0",
         "type": "range"
       },
-      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
+      "C:\\Users\\antoi\\Documents\\swapp"
     ]
   ],
   "_from": "@angular/router@>=3.2.0 <3.3.0",
-  "_id": "@angular/router@3.2.0",
+  "_id": "@angular/router@3.2.4",
   "_inCache": true,
   "_installable": true,
   "_location": "/@angular/router",
-  "_nodeVersion": "6.7.0",
+  "_nodeVersion": "6.2.0",
   "_npmOperationalInternal": {
     "host": "packages-12-west.internal.npmjs.com",
-    "tmp": "tmp/router-3.2.0.tgz_1479151724663_0.9491433929651976"
+    "tmp": "tmp/router-3.2.4.tgz_1480548334303_0.037519824923947453"
   },
   "_npmUser": {
     "name": "angular",
     "email": "angular-core+npm@google.com"
   },
-  "_npmVersion": "3.10.3",
+  "_npmVersion": "3.8.9",
   "_phantomChildren": {},
   "_requested": {
     "raw": "@angular/router@~3.2.0",
@@ -41,11 +41,11 @@
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/@angular/router/-/router-3.2.0.tgz",
-  "_shasum": "522585357ff9216e3ffae47e9045b3c150d00c7f",
+  "_resolved": "https://registry.npmjs.org/@angular/router/-/router-3.2.4.tgz",
+  "_shasum": "dfec71ad072ec031364ba5d08bd6fe03fd5beadc",
   "_shrinkwrap": null,
   "_spec": "@angular/router@~3.2.0",
-  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
+  "_where": "C:\\Users\\antoi\\Documents\\swapp",
   "author": {
     "name": "angular"
   },
@@ -57,8 +57,8 @@
   "devDependencies": {},
   "directories": {},
   "dist": {
-    "shasum": "522585357ff9216e3ffae47e9045b3c150d00c7f",
-    "tarball": "https://registry.npmjs.org/@angular/router/-/router-3.2.0.tgz"
+    "shasum": "dfec71ad072ec031364ba5d08bd6fe03fd5beadc",
+    "tarball": "https://registry.npmjs.org/@angular/router/-/router-3.2.4.tgz"
   },
   "homepage": "https://github.com/angular/angular/blob/master/modules/%40angular/router/README.md",
   "keywords": [
@@ -78,10 +78,9 @@
   "name": "@angular/router",
   "optionalDependencies": {},
   "peerDependencies": {
-    "@angular/core": "2.2.0",
-    "@angular/common": "2.2.0",
-    "@angular/platform-browser": "2.2.0",
-    "@angular/upgrade": "2.2.0",
+    "@angular/core": "2.2.4",
+    "@angular/common": "2.2.4",
+    "@angular/platform-browser": "2.2.4",
     "rxjs": "5.0.0-beta.12"
   },
   "readme": "ERROR: No README data found!",
@@ -91,5 +90,5 @@
   },
   "scripts": {},
   "typings": "index.d.ts",
-  "version": "3.2.0"
+  "version": "3.2.4"
 }

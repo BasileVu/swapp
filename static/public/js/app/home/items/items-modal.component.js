@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var items_service_1 = require('./items.service');
+var core_1 = require("@angular/core");
+var items_service_1 = require("./items.service");
 var item_1 = require("./item");
 var ItemsModalComponent = (function () {
     function ItemsModalComponent(itemsService) {
@@ -24,16 +24,16 @@ var ItemsModalComponent = (function () {
         // prevent memory leak when component is destroyed
         this.subscription.unsubscribe();
     };
-    ItemsModalComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'items-modal',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './items-modal.component.html'
-        }), 
-        __metadata('design:paramtypes', [items_service_1.ItemsService])
-    ], ItemsModalComponent);
     return ItemsModalComponent;
 }());
+ItemsModalComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'items-modal',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './items-modal.component.html'
+    }),
+    __metadata("design:paramtypes", [items_service_1.ItemsService])
+], ItemsModalComponent);
 exports.ItemsModalComponent = ItemsModalComponent;
 //# sourceMappingURL=items-modal.component.js.map

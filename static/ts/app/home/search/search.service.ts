@@ -1,16 +1,29 @@
 import {Injectable} from '@angular/core';
-import { Headers, Http, Response } from '@angular/http';
+import {Headers, Http, Response, URLSearchParams} from '@angular/http';
 
 import { Category } from './category';
+import {Item} from "../items/item";
+import {Search} from "./search";
 
 @Injectable()
 export class SearchService {
 
-    private itemsUrl = '/api/categories/';  // URL to web API
+    private categoriesUrl = '/api/categories/';  // URL to web API
+    private itemsUrl = '/api/items/';
 
     constructor (private http: Http) {}
 
     getCategories (): Promise<Category[]> {
+        return this.http.get(this.categoriesUrl)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    search (search: Search): Promise<Item[]> {
+        let params: URLSearchParams = new URLSearchParams();
+        params.set('q', search.q);
+        params.set('category', search.category);
         return this.http.get(this.itemsUrl)
             .toPromise()
             .then(this.extractData)

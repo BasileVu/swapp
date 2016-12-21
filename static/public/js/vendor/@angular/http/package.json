@@ -10,24 +10,24 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
+      "C:\\Users\\antoi\\Documents\\swapp"
     ]
   ],
   "_from": "@angular/http@>=2.2.0 <2.3.0",
-  "_id": "@angular/http@2.2.0",
+  "_id": "@angular/http@2.2.4",
   "_inCache": true,
   "_installable": true,
   "_location": "/@angular/http",
-  "_nodeVersion": "6.7.0",
+  "_nodeVersion": "6.2.0",
   "_npmOperationalInternal": {
     "host": "packages-18-east.internal.npmjs.com",
-    "tmp": "tmp/http-2.2.0.tgz_1479151701275_0.818110637133941"
+    "tmp": "tmp/http-2.2.4.tgz_1480548312981_0.927597489906475"
   },
   "_npmUser": {
     "name": "angular",
     "email": "angular-core+npm@google.com"
   },
-  "_npmVersion": "3.10.3",
+  "_npmVersion": "3.8.9",
   "_phantomChildren": {},
   "_requested": {
     "raw": "@angular/http@~2.2.0",
@@ -41,11 +41,11 @@
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/@angular/http/-/http-2.2.0.tgz",
-  "_shasum": "7e44c820692be03b8c882531dbd697ee04a4e993",
+  "_resolved": "https://registry.npmjs.org/@angular/http/-/http-2.2.4.tgz",
+  "_shasum": "ccfeb3f805e0628f6bb9efa129ef432d79548c63",
   "_shrinkwrap": null,
   "_spec": "@angular/http@~2.2.0",
-  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
+  "_where": "C:\\Users\\antoi\\Documents\\swapp",
   "author": {
     "name": "angular"
   },
@@ -57,8 +57,8 @@
   "devDependencies": {},
   "directories": {},
   "dist": {
-    "shasum": "7e44c820692be03b8c882531dbd697ee04a4e993",
-    "tarball": "https://registry.npmjs.org/@angular/http/-/http-2.2.0.tgz"
+    "shasum": "ccfeb3f805e0628f6bb9efa129ef432d79548c63",
+    "tarball": "https://registry.npmjs.org/@angular/http/-/http-2.2.4.tgz"
   },
   "homepage": "https://github.com/angular/angular#readme",
   "license": "MIT",
@@ -74,8 +74,8 @@
   "optionalDependencies": {},
   "peerDependencies": {
     "rxjs": "5.0.0-beta.12",
-    "@angular/core": "2.2.0",
-    "@angular/platform-browser": "2.2.0"
+    "@angular/core": "2.2.4",
+    "@angular/platform-browser": "2.2.4"
   },
   "readme": "ERROR: No README data found!",
   "repository": {
@@ -84,5 +84,5 @@
   },
   "scripts": {},
   "typings": "index.d.ts",
-  "version": "2.2.0"
+  "version": "2.2.4"
 }

@@ -10,24 +10,24 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
+      "C:\\Users\\antoi\\Documents\\swapp"
     ]
   ],
   "_from": "@angular/forms@>=2.2.0 <2.3.0",
-  "_id": "@angular/forms@2.2.0",
+  "_id": "@angular/forms@2.2.4",
   "_inCache": true,
   "_installable": true,
   "_location": "/@angular/forms",
-  "_nodeVersion": "6.7.0",
+  "_nodeVersion": "6.2.0",
   "_npmOperationalInternal": {
     "host": "packages-12-west.internal.npmjs.com",
-    "tmp": "tmp/forms-2.2.0.tgz_1479151696159_0.5600095849949867"
+    "tmp": "tmp/forms-2.2.4.tgz_1480548308023_0.5244711386039853"
   },
   "_npmUser": {
     "name": "angular",
     "email": "angular-core+npm@google.com"
   },
-  "_npmVersion": "3.10.3",
+  "_npmVersion": "3.8.9",
   "_phantomChildren": {},
   "_requested": {
     "raw": "@angular/forms@~2.2.0",
@@ -39,13 +39,14 @@
     "type": "range"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/@angular/forms/-/forms-2.2.0.tgz",
-  "_shasum": "1e11781c740445ab5d08fd54f3b0d6f25d4ba34d",
+  "_resolved": "https://registry.npmjs.org/@angular/forms/-/forms-2.2.4.tgz",
+  "_shasum": "95f15ca1938879298ccc0ef8a3e9ef5e750e31ef",
   "_shrinkwrap": null,
   "_spec": "@angular/forms@~2.2.0",
-  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
+  "_where": "C:\\Users\\antoi\\Documents\\swapp",
   "author": {
     "name": "angular"
   },
@@ -57,8 +58,8 @@
   "devDependencies": {},
   "directories": {},
   "dist": {
-    "shasum": "1e11781c740445ab5d08fd54f3b0d6f25d4ba34d",
-    "tarball": "https://registry.npmjs.org/@angular/forms/-/forms-2.2.0.tgz"
+    "shasum": "95f15ca1938879298ccc0ef8a3e9ef5e750e31ef",
+    "tarball": "https://registry.npmjs.org/@angular/forms/-/forms-2.2.4.tgz"
   },
   "homepage": "https://github.com/angular/angular#readme",
   "license": "MIT",
@@ -73,8 +74,8 @@
   "name": "@angular/forms",
   "optionalDependencies": {},
   "peerDependencies": {
-    "@angular/core": "2.2.0",
-    "@angular/common": "2.2.0"
+    "@angular/core": "2.2.4",
+    "@angular/common": "2.2.4"
   },
   "readme": "ERROR: No README data found!",
   "repository": {
@@ -83,5 +84,5 @@
   },
   "scripts": {},
   "typings": "index.d.ts",
-  "version": "2.2.0"
+  "version": "2.2.4"
 }

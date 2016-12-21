@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Headers, Http, Response } from '@angular/http';
+import {Headers, Http, Response, URLSearchParams} from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 
 import {Item} from "./item";

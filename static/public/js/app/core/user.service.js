@@ -17,7 +17,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var core_1 = require('@angular/core');
+var core_1 = require("@angular/core");
 var nextId = 1;
 var UserServiceConfig = (function () {
     function UserServiceConfig() {
@@ -55,13 +55,13 @@ var UserService = (function () {
         enumerable: true,
         configurable: true
     });
-    UserService = __decorate([
-        core_1.Injectable(),
-        __param(0, core_1.Optional()), 
-        __metadata('design:paramtypes', [UserServiceConfig])
-    ], UserService);
     return UserService;
 }());
+UserService = __decorate([
+    core_1.Injectable(),
+    __param(0, core_1.Optional()),
+    __metadata("design:paramtypes", [UserServiceConfig])
+], UserService);
 exports.UserService = UserService;
 /*
  Copyright 2016 Google Inc. All Rights Reserved.

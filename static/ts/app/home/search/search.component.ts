@@ -2,6 +2,8 @@ import {Component, ViewEncapsulation} from '@angular/core';
 
 import { SearchService } from './search.service';
 import { Category } from './category';
+import { Search } from "./search";
+import {FormBuilder} from "@angular/forms";
 
 @Component({
     moduleId: module.id,
@@ -26,5 +28,13 @@ export class SearchComponent {
             .then(
                 categories => this.categories = categories,
                 error =>  this.errorMessage = <any>error);
+    }
+
+    search(q, category){
+        console.log(q.value);
+        this.searchService.search(new Search(q.value, category))
+            .then(
+                items => console.log(items),
+                error => this.errorMessage = <any>error);
     }
 }
