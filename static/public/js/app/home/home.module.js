@@ -19,6 +19,13 @@ var items_component_1 = require('./items/items.component');
 var search_component_1 = require('./search/search.component');
 var search_modal_component_1 = require('./search-modal/search-modal.component');
 var items_modal_component_1 = require('./items/items-modal.component');
+var add_item_modal_component_1 = require('./inventory/add-item-modal.component');
+var update_profile_modal_component_1 = require('./profile/update-profile-modal.component');
+var profile_modal_component_1 = require('./profile/profile-modal.component');
+var register_user_modal_component_1 = require('./register/register-user-modal.component');
+var send_proposition_modal_component_1 = require('./offers/send-proposition-modal.component');
+var accept_proposition_modal_component_1 = require('./offers/accept-proposition-modal.component');
+var notification_modal_component_1 = require('./profile/notification-modal.component');
 var inventory_service_1 = require('./inventory/inventory.service');
 var profile_service_1 = require('./profile/profile.service');
 var items_service_1 = require('./items/items.service');
@@ -40,7 +47,14 @@ var HomeModule = (function () {
                 search_component_1.SearchComponent,
                 search_modal_component_1.SearchModalComponent,
                 items_modal_component_1.ItemsModalComponent,
-                home_component_1.HomeComponent
+                home_component_1.HomeComponent,
+                add_item_modal_component_1.AddItemModalComponent,
+                update_profile_modal_component_1.UpdateProfileModalComponent,
+                profile_modal_component_1.ProfileModalComponent,
+                register_user_modal_component_1.RegisterUserModalComponent,
+                notification_modal_component_1.NotificationModalComponent,
+                send_proposition_modal_component_1.SendPropositionModalComponent,
+                accept_proposition_modal_component_1.AcceptPropositionModalComponent
             ],
             providers: [
                 inventory_service_1.InventoryService,

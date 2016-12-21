@@ -11,6 +11,13 @@ import { ItemsComponent } from './items/items.component';
 import { SearchComponent } from './search/search.component';
 import { SearchModalComponent } from './search-modal/search-modal.component';
 import { ItemsModalComponent } from './items/items-modal.component';
+import { AddItemModalComponent } from './inventory/add-item-modal.component';
+import { UpdateProfileModalComponent } from './profile/update-profile-modal.component';
+import { ProfileModalComponent } from './profile/profile-modal.component';
+import { RegisterUserModalComponent } from './register/register-user-modal.component';
+import { SendPropositionModalComponent } from './offers/send-proposition-modal.component';
+import { AcceptPropositionModalComponent } from './offers/accept-proposition-modal.component';
+import { NotificationModalComponent } from './profile/notification-modal.component';
 
 import { InventoryService } from './inventory/inventory.service';
 import { ProfileService } from './profile/profile.service';
@@ -30,7 +37,14 @@ import { SearchService } from './search/search.service';
         SearchComponent,
         SearchModalComponent,
         ItemsModalComponent,
-        HomeComponent
+        HomeComponent,
+        AddItemModalComponent,
+        UpdateProfileModalComponent,
+        ProfileModalComponent,
+        RegisterUserModalComponent,
+        NotificationModalComponent,
+        SendPropositionModalComponent,
+        AcceptPropositionModalComponent
     ],
     providers: [
         InventoryService,

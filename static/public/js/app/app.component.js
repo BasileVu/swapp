@@ -51,7 +51,7 @@ var AppComponent = (function () {
                     grid.isotope('layout');
                 });
                 // home inventory ///////////////////////////
-                $('#home-inventory').flickity({
+                var inventory = $('.home-inventory').flickity({
                     // options
                     cellAlign: 'center',
                     contain: true,
@@ -60,6 +60,29 @@ var AppComponent = (function () {
                     groupCells: '100%',
                     prevNextButtons: false,
                     adaptiveHeight: true
+                });
+                // swapp inventories /////////////////////////
+                var swapp_inventory_mine = $('.swapp-inventory-mine').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true,
+                    pageDots: true
+                });
+                var swapp_inventory_yours = $('.swapp-inventory-yours').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true,
+                    pageDots: true
                 });
                 // modal slider ///////////////////////////
                 var modalCarousel = $('.modal-carousel').flickity({
@@ -91,7 +114,80 @@ var AppComponent = (function () {
                         scrollTop: scrollY
                     });
                 });
-                // display modal ///////////////////////////
+                // open item creation modal /////////////////////
+                var addItemButtons = $('.open-new-item-modal');
+                var newItemModal = $('#add-item-modal');
+                addItemButtons.each(function () {
+                    $(this).click(function () {
+                        newItemModal.modal('show');
+                    });
+                });
+                // open user edition modal /////////////////////
+                var openUpdateProfileButtons = $('.open-update-profile-modal');
+                var updateProfileModal = $('#update-user-modal');
+                openUpdateProfileButtons.each(function () {
+                    $(this).click(function () {
+                        updateProfileModal.modal('show');
+                    });
+                });
+                // open user profile modal /////////////////////
+                var openProfileButtons = $('.open-profile-modal');
+                var profileModal = $('#user-profile-modal');
+                openProfileButtons.each(function () {
+                    $(this).click(function () {
+                        profileModal.modal('show');
+                    });
+                });
+                profileModal.on('show.bs.modal', function (e) {
+                    setTimeout(function () {
+                        inventory.flickity('resize');
+                        // profile map
+                        var map = new google.maps.Map(document.getElementById('profile-map'), {
+                            center: { lat: -34.197, lng: 150.844 },
+                            scrollwheel: false,
+                            zoom: 8
+                        });
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: { lat: -34.197, lng: 150.844 }
+                        });
+                        var infowindow = new google.maps.InfoWindow({
+                            content: '<h3 class="map-title">Adresse complète</h3>'
+                        });
+                        infowindow.open(map, marker);
+                    }, 300);
+                });
+                // open notif modal /////////////////////
+                var openNotifButtons = $('.open-notif-modal');
+                var notifModal = $('#notification-modal');
+                openNotifButtons.each(function () {
+                    $(this).click(function () {
+                        notifModal.modal('show');
+                    });
+                });
+                // open send proposition modal /////////////////////
+                var openSendPropositionButtons = $('.open-send-proposition-modal');
+                var sendPropositionModal = $('#send-proposition-modal');
+                openSendPropositionButtons.each(function () {
+                    $(this).click(function () {
+                        sendPropositionModal.modal('show');
+                    });
+                });
+                sendPropositionModal.on('show.bs.modal', function (e) {
+                    setTimeout(function () {
+                        swapp_inventory_mine.flickity('resize');
+                        swapp_inventory_yours.flickity('resize');
+                    }, 300);
+                });
+                // open accept proposition modal /////////////////////
+                var openAcceptPropositionButtons = $('.open-accept-proposition-modal');
+                var acceptPropositionModal = $('#accept-proposition-modal');
+                openAcceptPropositionButtons.each(function () {
+                    $(this).click(function () {
+                        acceptPropositionModal.modal('show');
+                    });
+                });
+                // display item modal ///////////////////////////
                 var theItemModal = $('#view-item-x');
                 // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
                 theItemModal.on('show.bs.modal', function (e) {
@@ -118,19 +214,19 @@ var AppComponent = (function () {
                             scrollwheel: false,
                             zoom: 8
                         });
-                        var marker = new google.maps.Marker({
+                        new google.maps.Marker({
                             map: map,
                             position: { lat: -34.197, lng: 150.844 }
                         });
-                        var marker = new google.maps.Marker({
+                        new google.maps.Marker({
                             map: map,
                             position: { lat: -34.308, lng: 150.679 },
                         });
-                        var marker = new google.maps.Marker({
+                        new google.maps.Marker({
                             map: map,
                             position: { lat: -34.390, lng: 150.664 }
                         });
-                        var circle = new google.maps.Circle({
+                        new google.maps.Circle({
                             map: map,
                             center: { lat: -34.397, lng: 150.644 },
                             radius: 100000,

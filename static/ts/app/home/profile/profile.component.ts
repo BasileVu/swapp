@@ -9,7 +9,6 @@ import {Component, ViewEncapsulation} from '@angular/core';
 
 export class ProfileComponent {
 
-    
     constructor() {}
 
     ngOnInit() {
