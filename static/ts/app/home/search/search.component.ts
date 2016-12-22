@@ -16,11 +16,21 @@ export class SearchComponent {
 
     errorMessage: string = "No category available for now";
     categories: Category[];
+    selectedCategory: string = "";
 
     constructor (private searchService: SearchService, private itemsService: ItemsService) {}
 
     ngOnInit() {
         this.getCategories();
+    }
+
+    selectCategory(event){
+        var target = event.target || event.srcElement || event.currentTarget;
+        this.selectedCategory = target.innerText;
+
+        console.log(event);
+
+        console.log(this.selectedCategory);
     }
 
     getCategories() {
@@ -30,9 +40,9 @@ export class SearchComponent {
                 error =>  this.errorMessage = <any>error);
     }
 
-    search(q, category){
+    search(q){
         console.log(q.value);
-        this.searchService.search(new Search(q.value, category))
+        this.searchService.search(new Search(q.value, this.selectedCategory))
             .then(
                 items => { this.itemsService.updateItems(items); console.log(items);},
                 error => this.errorMessage = <any>error);

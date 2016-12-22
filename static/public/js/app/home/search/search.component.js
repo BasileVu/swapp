@@ -17,19 +17,26 @@ var SearchComponent = (function () {
         this.searchService = searchService;
         this.itemsService = itemsService;
         this.errorMessage = "No category available for now";
+        this.selectedCategory = "";
     }
     SearchComponent.prototype.ngOnInit = function () {
         this.getCategories();
+    };
+    SearchComponent.prototype.selectCategory = function (event) {
+        var target = event.target || event.srcElement || event.currentTarget;
+        this.selectedCategory = target.innerText;
+        console.log(event);
+        console.log(this.selectedCategory);
     };
     SearchComponent.prototype.getCategories = function () {
         var _this = this;
         this.searchService.getCategories()
             .then(function (categories) { return _this.categories = categories; }, function (error) { return _this.errorMessage = error; });
     };
-    SearchComponent.prototype.search = function (q, category) {
+    SearchComponent.prototype.search = function (q) {
         var _this = this;
         console.log(q.value);
-        this.searchService.search(new search_1.Search(q.value, category))
+        this.searchService.search(new search_1.Search(q.value, this.selectedCategory))
             .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
     return SearchComponent;

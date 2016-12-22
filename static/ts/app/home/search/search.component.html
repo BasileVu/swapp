@@ -21,12 +21,12 @@
                             <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                         </button>
                         <div class="dropdown-menu">
-                            <option class="dropdown-item" href="#" *ngFor="let category of categories">{{ category.name }}</option>
+                            <div class="dropdown-item" (click)="selectCategory($event)" *ngFor="let category of categories">{{ category.name }}</div>
                         </div>
                     </div>
                     <input #q type="text" class="form-control">
                     <span class="input-group-btn">
-                        <button class="btn btn-secondary" type="submit" (click)="search(q,category)"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-secondary" type="submit" (click)="search(q)"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
             </div>
