@@ -9,7 +9,7 @@ import { InventoryComponent } from './inventory/inventory.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ItemsComponent } from './items/items.component';
 import { SearchComponent } from './search/search.component';
-import { SearchModalComponent } from './search-modal/search-modal.component';
+import { SearchModalComponent } from './search/search-modal.component';
 import { ItemsModalComponent } from './items/items-modal.component';
 import { AddItemModalComponent } from './inventory/add-item-modal.component';
 import { UpdateProfileModalComponent } from './profile/update-profile-modal.component';

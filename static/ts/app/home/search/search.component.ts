@@ -3,7 +3,6 @@ import {Component, ViewEncapsulation} from '@angular/core';
 import { SearchService } from './search.service';
 import { Category } from './category';
 import { Search } from "./search";
-import {FormBuilder} from "@angular/forms";
 
 @Component({
     moduleId: module.id,

@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
-var search_service_1 = require("./../search/search.service");
+var core_1 = require('@angular/core');
+var search_service_1 = require('./../search/search.service');
 var SearchModalComponent = (function () {
     function SearchModalComponent(searchService) {
         this.searchService = searchService;
@@ -23,16 +23,16 @@ var SearchModalComponent = (function () {
         this.searchService.getCategories()
             .then(function (categories) { return _this.categories = categories; }, function (error) { return _this.errorMessage = error; });
     };
+    SearchModalComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'search-modal',
+            encapsulation: core_1.ViewEncapsulation.None,
+            templateUrl: './search-modal.component.html'
+        }), 
+        __metadata('design:paramtypes', [search_service_1.SearchService])
+    ], SearchModalComponent);
     return SearchModalComponent;
 }());
-SearchModalComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'search-modal',
-        encapsulation: core_1.ViewEncapsulation.None,
-        templateUrl: './search-modal.component.html'
-    }),
-    __metadata("design:paramtypes", [search_service_1.SearchService])
-], SearchModalComponent);
 exports.SearchModalComponent = SearchModalComponent;
 //# sourceMappingURL=search-modal.component.js.map
