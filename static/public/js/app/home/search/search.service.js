@@ -26,7 +26,7 @@ var SearchService = (function () {
         var params = new http_1.URLSearchParams();
         params.set('q', search.q);
         params.set('category', search.category);
-        return this.http.get(this.itemsUrl)
+        return this.http.get(this.itemsUrl, { search: params })
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

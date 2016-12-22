@@ -16,7 +16,12 @@ var ItemsComponent = (function () {
         this.errorMessage = "No items available for now";
     }
     ItemsComponent.prototype.ngOnInit = function () {
+        var _this = this;
         this.getItems();
+        this.itemsService.getItemsSubject().subscribe(function (items) {
+            console.log('Welcome');
+            _this.items = items;
+        });
     };
     ItemsComponent.prototype.getItems = function () {
         var _this = this;
@@ -41,7 +46,7 @@ ItemsComponent = __decorate([
         selector: 'items',
         encapsulation: core_1.ViewEncapsulation.None,
         templateUrl: './items.component.html',
-        providers: [items_service_1.ItemsService]
+        providers: []
     }),
     __metadata("design:paramtypes", [items_service_1.ItemsService])
 ], ItemsComponent);

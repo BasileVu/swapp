@@ -10,12 +10,13 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "D:\\HEIG-S5\\PDG\\swapp"
+      "C:\\Users\\antoi\\Documents\\swapp"
     ]
   ],
   "_from": "@angular/platform-browser@>=2.2.0 <2.3.0",
   "_id": "@angular/platform-browser@2.2.4",
   "_inCache": true,
+  "_installable": true,
   "_location": "/@angular/platform-browser",
   "_nodeVersion": "6.2.0",
   "_npmOperationalInternal": {
@@ -44,7 +45,7 @@
   "_shasum": "6041e02c7ed62622c926060869506705f79fb5fb",
   "_shrinkwrap": null,
   "_spec": "@angular/platform-browser@~2.2.0",
-  "_where": "D:\\HEIG-S5\\PDG\\swapp",
+  "_where": "C:\\Users\\antoi\\Documents\\swapp",
   "author": {
     "name": "angular"
   },

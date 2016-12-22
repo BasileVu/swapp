@@ -11,9 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 var search_service_1 = require("./search.service");
 var search_1 = require("./search");
+var items_service_1 = require("../items/items.service");
 var SearchComponent = (function () {
-    function SearchComponent(searchService) {
+    function SearchComponent(searchService, itemsService) {
         this.searchService = searchService;
+        this.itemsService = itemsService;
         this.errorMessage = "No category available for now";
     }
     SearchComponent.prototype.ngOnInit = function () {
@@ -28,7 +30,7 @@ var SearchComponent = (function () {
         var _this = this;
         console.log(q.value);
         this.searchService.search(new search_1.Search(q.value, category))
-            .then(function (items) { return console.log(items); }, function (error) { return _this.errorMessage = error; });
+            .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
     return SearchComponent;
 }());
@@ -40,7 +42,7 @@ SearchComponent = __decorate([
         templateUrl: './search.component.html',
         providers: [search_service_1.SearchService]
     }),
-    __metadata("design:paramtypes", [search_service_1.SearchService])
+    __metadata("design:paramtypes", [search_service_1.SearchService, items_service_1.ItemsService])
 ], SearchComponent);
 exports.SearchComponent = SearchComponent;
 //# sourceMappingURL=search.component.js.map

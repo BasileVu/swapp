@@ -10,12 +10,13 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "D:\\HEIG-S5\\PDG\\swapp"
+      "C:\\Users\\antoi\\Documents\\swapp"
     ]
   ],
   "_from": "@angular/common@>=2.2.0 <2.3.0",
   "_id": "@angular/common@2.2.4",
   "_inCache": true,
+  "_installable": true,
   "_location": "/@angular/common",
   "_nodeVersion": "6.2.0",
   "_npmOperationalInternal": {
@@ -44,7 +45,7 @@
   "_shasum": "0e798cce826ba304d3b29556527a1a531f407159",
   "_shrinkwrap": null,
   "_spec": "@angular/common@~2.2.0",
-  "_where": "D:\\HEIG-S5\\PDG\\swapp",
+  "_where": "C:\\Users\\antoi\\Documents\\swapp",
   "author": {
     "name": "angular"
   },

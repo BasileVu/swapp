@@ -3,13 +3,14 @@ import {Component, ViewEncapsulation, OnInit} from '@angular/core';
 import { ItemsService } from "./items.service";
 
 import { Item } from "./item";
+import {Subscription} from "rxjs";
 
 @Component({
     moduleId: module.id,
     selector: 'items',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './items.component.html',
-    providers: [ItemsService]
+    providers: []
 })
 export class ItemsComponent implements OnInit {
 
@@ -21,6 +22,10 @@ export class ItemsComponent implements OnInit {
 
     ngOnInit() {
         this.getItems();
+        this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
+            console.log('Welcome');
+            this.items = items;
+        });
     }
 
     getItems() {
@@ -32,7 +37,7 @@ export class ItemsComponent implements OnInit {
 
     gotoDetail(id: number): void {
         console.log("clicked. id: " + id);
-        
+
         let service = this.itemsService;
         service.getItem(id)
             .then(

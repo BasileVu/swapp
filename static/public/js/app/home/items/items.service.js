@@ -18,11 +18,18 @@ var ItemsService = (function () {
         this.itemSelectedSource = new Subject_1.Subject();
         // Observable string streams
         this.itemSelected$ = this.itemSelectedSource.asObservable();
+        this.itemsSubject = new Subject_1.Subject();
         this.itemsUrl = '/api/items/'; // URL to web API
     }
     // Service message commands
     ItemsService.prototype.selectItem = function (item) {
         this.itemSelectedSource.next(item);
+    };
+    ItemsService.prototype.updateItems = function (items) {
+        this.itemsSubject.next(items);
+    };
+    ItemsService.prototype.getItemsSubject = function () {
+        return this.itemsSubject.asObservable();
     };
     ItemsService.prototype.getItems = function () {
         return this.http.get(this.itemsUrl)

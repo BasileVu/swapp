@@ -3,6 +3,7 @@ import { Http, Response } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 
 import {Item} from "./item";
+import {Observable} from "rxjs";
 
 @Injectable()
 export class ItemsService {
@@ -13,6 +14,8 @@ export class ItemsService {
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
 
+    private itemsSubject: Subject<Item[]> = new Subject<Item[]>();
+
     private itemsUrl = '/api/items/';  // URL to web API
 
     constructor (private http: Http) {}
@@ -20,6 +23,14 @@ export class ItemsService {
     // Service message commands
     selectItem(item: Item) {
         this.itemSelectedSource.next(item);
+    }
+
+    updateItems(items: Item[]){
+        this.itemsSubject.next(items);
+    }
+
+    getItemsSubject(): Observable<Item[]> {
+        return this.itemsSubject.asObservable();
     }
 
     getItems (): Promise<Item[]> {
