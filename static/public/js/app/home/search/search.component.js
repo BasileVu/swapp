@@ -10,33 +10,53 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var search_service_1 = require("./search.service");
+var category_1 = require("./category");
 var search_1 = require("./search");
 var items_service_1 = require("../items/items.service");
+var OrderBy_1 = require("./OrderBy");
 var SearchComponent = (function () {
     function SearchComponent(searchService, itemsService) {
         this.searchService = searchService;
         this.itemsService = itemsService;
         this.errorMessage = "No category available for now";
-        this.selectedCategory = "";
+        this.allCategories = new category_1.Category("All categories");
+        this.selectedCategory = new category_1.Category("All categories");
+        this.selectedOrderBy = new OrderBy_1.OrderBy("Recommended", "");
+        this.orderBys = [
+            new OrderBy_1.OrderBy("Recommended", ""),
+            new OrderBy_1.OrderBy("Newest", "date"),
+            new OrderBy_1.OrderBy("Name", "name"),
+            new OrderBy_1.OrderBy("Category name", "category"),
+            new OrderBy_1.OrderBy("Most expensive", "price_min"),
+            new OrderBy_1.OrderBy("Cheapest", "price_max"),
+            new OrderBy_1.OrderBy("Closest", "range"),
+        ];
     }
     SearchComponent.prototype.ngOnInit = function () {
         this.getCategories();
     };
-    SearchComponent.prototype.selectCategory = function (event) {
-        var target = event.target || event.srcElement || event.currentTarget;
-        this.selectedCategory = target.innerText;
-        console.log(event);
-        console.log(this.selectedCategory);
+    SearchComponent.prototype.selectCategory = function (category) {
+        this.selectedCategory = category;
+    };
+    SearchComponent.prototype.selectOrderBy = function (OrderBy) {
+        this.selectedOrderBy = OrderBy;
     };
     SearchComponent.prototype.getCategories = function () {
         var _this = this;
         this.searchService.getCategories()
-            .then(function (categories) { return _this.categories = categories; }, function (error) { return _this.errorMessage = error; });
+            .then(function (categories) {
+            _this.categories = categories;
+            _this.categories.unshift(_this.allCategories);
+        }, function (error) { return _this.errorMessage = error; });
     };
     SearchComponent.prototype.search = function (q) {
         var _this = this;
         console.log(q.value);
-        this.searchService.search(new search_1.Search(q.value, this.selectedCategory))
+        var category = "";
+        if (this.selectedCategory.name != this.allCategories.name) {
+            category = this.selectedCategory.name;
+        }
+        this.searchService.search(new search_1.Search(q.value, category, this.selectedOrderBy.value))
             .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
     return SearchComponent;

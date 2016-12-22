@@ -1,6 +1,7 @@
 export class Search {
   constructor(
     public q: string,
-    public category: string
+    public category: string,
+    public orderBy: string
   ) {  }
 }

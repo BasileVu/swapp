@@ -4,6 +4,7 @@ import { SearchService } from './search.service';
 import { Category } from './category';
 import { Search } from "./search";
 import {ItemsService} from "../items/items.service";
+import {OrderBy} from "./OrderBy";
 
 @Component({
     moduleId: module.id,
@@ -16,7 +17,18 @@ export class SearchComponent {
 
     errorMessage: string = "No category available for now";
     categories: Category[];
-    selectedCategory: string = "";
+    allCategories: Category = new Category("All categories");
+    selectedCategory: Category = new Category("All categories");
+    selectedOrderBy = new OrderBy("Recommended", "");
+    orderBys: OrderBy[] = [
+        new OrderBy("Recommended", ""),
+        new OrderBy("Newest", "date"),
+        new OrderBy("Name", "name"),
+        new OrderBy("Category name", "category"),
+        new OrderBy("Cheapest", "price_min"),
+        new OrderBy("Most expensive", "price_max"),
+        new OrderBy("Closest", "range"),
+    ];
 
     constructor (private searchService: SearchService, private itemsService: ItemsService) {}
 
@@ -24,25 +36,31 @@ export class SearchComponent {
         this.getCategories();
     }
 
-    selectCategory(event){
-        var target = event.target || event.srcElement || event.currentTarget;
-        this.selectedCategory = target.innerText;
+    selectCategory(category: Category){
+        this.selectedCategory = category;
+    }
 
-        console.log(event);
-
-        console.log(this.selectedCategory);
+    selectOrderBy(OrderBy: OrderBy){
+        this.selectedOrderBy = OrderBy;
     }
 
     getCategories() {
         this.searchService.getCategories()
             .then(
-                categories => this.categories = categories,
+                 categories => {
+                     this.categories = categories;
+                     this.categories.unshift(this.allCategories);
+                 },
                 error =>  this.errorMessage = <any>error);
     }
 
     search(q){
         console.log(q.value);
-        this.searchService.search(new Search(q.value, this.selectedCategory))
+        var category = "";
+        if(this.selectedCategory.name != this.allCategories.name){
+            category = this.selectedCategory.name;
+        }
+        this.searchService.search(new Search(q.value, category, this.selectedOrderBy.value))
             .then(
                 items => { this.itemsService.updateItems(items); console.log(items);},
                 error => this.errorMessage = <any>error);

@@ -19,7 +19,6 @@ var ItemsComponent = (function () {
         var _this = this;
         this.getItems();
         this.itemsService.getItemsSubject().subscribe(function (items) {
-            console.log('Welcome');
             _this.items = items;
         });
     };

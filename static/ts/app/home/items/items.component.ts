@@ -23,7 +23,6 @@ export class ItemsComponent implements OnInit {
     ngOnInit() {
         this.getItems();
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
-            console.log('Welcome');
             this.items = items;
         });
     }

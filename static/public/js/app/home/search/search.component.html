@@ -5,23 +5,20 @@
                 <div class="input-group">
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="hidden-sm-down">Recommanded</span>
+                            <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
                             <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Recommanded</a>
-                            <a class="dropdown-item" href="#">Trends</a>
-                            <a class="dropdown-item" href="#">More recents</a>
-                            <a class="dropdown-item" href="#">Nearest</a>
+                            <div class="dropdown-item" *ngFor="let orderBy of orderBys" (click)="selectOrderBy(orderBy)">{{ orderBy.name }}</div>
                         </div>
                     </div>
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="hidden-sm-down">All categories</span>
+                            <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
                             <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                         </button>
                         <div class="dropdown-menu">
-                            <div class="dropdown-item" (click)="selectCategory($event)" *ngFor="let category of categories">{{ category.name }}</div>
+                            <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
                         </div>
                     </div>
                     <input #q type="text" class="form-control">

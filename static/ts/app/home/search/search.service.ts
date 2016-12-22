@@ -24,6 +24,7 @@ export class SearchService {
         let params: URLSearchParams = new URLSearchParams();
         params.set('q', search.q);
         params.set('category', search.category);
+        params.set('order_by', search.orderBy);
         return this.http.get(this.itemsUrl, { search: params })
             .toPromise()
             .then(this.extractData)
