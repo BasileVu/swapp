@@ -8,62 +8,30 @@
                             <div class="input-group input-group-lg">
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">Recommanded</span>
+                                        <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Recommanded</a>
-                                        <a class="dropdown-item" href="#">Trends</a>
-                                        <a class="dropdown-item" href="#">More recents</a>
-                                        <a class="dropdown-item" href="#">Nearest</a>
+                                        <div class="dropdown-item" *ngFor="let orderBy of orderBys" (click)="selectOrderBy(orderBy)">{{ orderBy.name }}</div>
                                     </div>
                                 </div>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">All categories</span>
+                                        <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Antiques</a>
-                                        <a class="dropdown-item" href="#">Art</a>
-                                        <a class="dropdown-item" href="#">Baby</a>
-                                        <a class="dropdown-item" href="#">Books</a>
-                                        <a class="dropdown-item" href="#">Business & Industrial</a>
-                                        <a class="dropdown-item" href="#">Cameras & Photo</a>
-                                        <a class="dropdown-item" href="#">Cell Phones & Accessories</a>
-                                        <a class="dropdown-item" href="#">Clothing, Shoes & Accessories</a>
-                                        <a class="dropdown-item" href="#">Coins & Paper Money</a>
-                                        <a class="dropdown-item" href="#">Collectibles</a>
-                                        <a class="dropdown-item" href="#">Computers/Tablets & Networking</a>
-                                        <a class="dropdown-item" href="#">Consumer Electronics</a>
-                                        <a class="dropdown-item" href="#">Crafts</a>
-                                        <a class="dropdown-item" href="#">Dolls & Bears</a>
-                                        <a class="dropdown-item" href="#">DVDs & Movies</a>
-                                        <a class="dropdown-item" href="#">Gift Cards, Coupons & Tickets</a>
-                                        <a class="dropdown-item" href="#">Health & Beauty</a>
-                                        <a class="dropdown-item" href="#">Home & Garden</a>
-                                        <a class="dropdown-item" href="#">Jewelry & Watches</a>
-                                        <a class="dropdown-item" href="#">Jobs & Services</a>
-                                        <a class="dropdown-item" href="#">Music</a>
-                                        <a class="dropdown-item" href="#">Musical Instruments & Gear</a>
-                                        <a class="dropdown-item" href="#">Pet Supplies</a>
-                                        <a class="dropdown-item" href="#">Pottery & Glass</a>
-                                        <a class="dropdown-item" href="#">Sporting Goods</a>
-                                        <a class="dropdown-item" href="#">Toys & Hobbies</a>
-                                        <a class="dropdown-item" href="#">Travel</a>
-                                        <a class="dropdown-item" href="#">Vehicles, Auto, Motos</a>
-                                        <a class="dropdown-item" href="#">Video Games & Consoles</a>
-                                        <a class="dropdown-item" href="#">Everything else</a>
+                                        <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control">
+                                <input #q type="text" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-3 col-xs-2 advanced open-modal-advanced-search">
-                            <a href="#" class="btn btn-block btn-lg btn-primary">
+                            <button type="submit" class="btn btn-block btn-lg btn-primary" (click)="search(q)">
                                 <span class="hidden-sm-down"><i class="fa fa-search"></i> Search</span>
                                 <span class="hidden-md-up"><i class="fa fa-search"></i></span>
-                            </a>
+                            </button>
                         </div>
                         <div class="col-xs-12 labels">
                             <div class="form-group row min-price">

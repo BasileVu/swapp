@@ -27,8 +27,8 @@ var SearchComponent = (function () {
             new OrderBy_1.OrderBy("Newest", "date"),
             new OrderBy_1.OrderBy("Name", "name"),
             new OrderBy_1.OrderBy("Category name", "category"),
-            new OrderBy_1.OrderBy("Most expensive", "price_min"),
-            new OrderBy_1.OrderBy("Cheapest", "price_max"),
+            new OrderBy_1.OrderBy("Cheapest", "price_min"),
+            new OrderBy_1.OrderBy("Most expensive", "price_max"),
             new OrderBy_1.OrderBy("Closest", "range"),
         ];
     }
