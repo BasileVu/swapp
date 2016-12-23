@@ -20,6 +20,25 @@ var ItemsComponent = (function () {
         this.getItems();
         this.itemsService.getItemsSubject().subscribe(function (items) {
             _this.items = items;
+            //grid.arrange();
+            // home grid ///////////////////////////
+            var grid = $('.grid').isotope({
+                // options
+                itemSelector: '.grid-item',
+                layoutMode: 'masonry'
+            });
+            // layout only when images are loaded
+            grid.imagesLoaded().progress(function () {
+                grid.isotope('layout');
+            });
+            // display items details when hovered
+            $('.grid-item').hover(function () {
+                $(this).addClass('hovered');
+                grid.isotope('layout');
+            }, function () {
+                $(this).removeClass('hovered');
+                grid.isotope('layout');
+            });
         });
     };
     ItemsComponent.prototype.getItems = function () {

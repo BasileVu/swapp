@@ -5,6 +5,8 @@ import { ItemsService } from "./items.service";
 import { Item } from "./item";
 import {Subscription} from "rxjs";
 
+declare var $:any;
+
 @Component({
     moduleId: module.id,
     selector: 'items',
@@ -24,6 +26,25 @@ export class ItemsComponent implements OnInit {
         this.getItems();
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
             this.items = items;
+            //grid.arrange();
+            // home grid ///////////////////////////
+            var grid = $('.grid').isotope({
+                // options
+                itemSelector: '.grid-item',
+                layoutMode: 'masonry'
+            });
+            // layout only when images are loaded
+            grid.imagesLoaded().progress( function() {
+                grid.isotope('layout');
+            });
+            // display items details when hovered
+            $('.grid-item').hover(function () {
+                $(this).addClass('hovered');
+                grid.isotope('layout');
+            }, function () {
+                $(this).removeClass('hovered');
+                grid.isotope('layout');
+            });
         });
     }
 
