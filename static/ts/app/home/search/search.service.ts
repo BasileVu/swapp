@@ -20,11 +20,14 @@ export class SearchService {
             .catch(this.handleError);
     }
 
-    search (search: Search): Promise<Item[]> {
+    search (s: Search): Promise<Item[]> {
         let params: URLSearchParams = new URLSearchParams();
-        params.set('q', search.q);
-        params.set('category', search.category);
-        params.set('order_by', search.orderBy);
+        params.set('q', s.q);
+        params.set('category', s.category);
+        params.set('order_by', s.orderBy.value);
+        params.set('price_min', s.price_min);
+        params.set('price_max', s.price_max);
+        params.set('range', s.range);
         return this.http.get(this.itemsUrl, { search: params })
             .toPromise()
             .then(this.extractData)

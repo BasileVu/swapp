@@ -32,6 +32,7 @@ var SearchModalComponent = (function () {
             new orderby_1.OrderBy("Closest", "range"),
         ];
         this.hideModal = false;
+        this.model = new search_1.Search();
     }
     SearchModalComponent.prototype.ngOnInit = function () {
         this.getCategories();
@@ -50,14 +51,15 @@ var SearchModalComponent = (function () {
             _this.categories.unshift(_this.allCategories);
         }, function (error) { return _this.errorMessage = error; });
     };
-    SearchModalComponent.prototype.search = function (q) {
+    SearchModalComponent.prototype.search = function () {
         var _this = this;
-        console.log(q.value);
-        var category = "";
+        console.log(this.model);
+        this.model.category = "";
         if (this.selectedCategory.name != this.allCategories.name) {
-            category = this.selectedCategory.name;
+            this.model.category = this.selectedCategory.name;
         }
-        this.searchService.search(new search_1.Search(q.value, category, this.selectedOrderBy.value))
+        this.model.orderBy = this.selectedOrderBy;
+        this.searchService.search(this.model)
             .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
     return SearchModalComponent;

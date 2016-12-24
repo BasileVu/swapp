@@ -21,9 +21,9 @@
                             <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
                         </div>
                     </div>
-                    <input #q type="text" class="form-control">
+                    <input #q type="text" [(ngModel)]="model.q" class="form-control" name="q">
                     <span class="input-group-btn">
-                        <button class="btn btn-secondary" type="submit" (click)="search(q)"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-secondary" type="submit" (click)="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
             </div>

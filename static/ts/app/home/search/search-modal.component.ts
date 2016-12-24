@@ -29,6 +29,7 @@ export class SearchModalComponent {
         new OrderBy("Closest", "range"),
     ];
     hideModal: boolean = false;
+    model: Search = new Search();
 
     constructor (private searchService: SearchService, private itemsService: ItemsService) {}
 
@@ -54,13 +55,14 @@ export class SearchModalComponent {
                 error =>  this.errorMessage = <any>error);
     }
 
-    search(q){
-        console.log(q.value);
-        var category = "";
+    search(){
+        console.log(this.model);
+        this.model.category = "";
         if(this.selectedCategory.name != this.allCategories.name){
-            category = this.selectedCategory.name;
+            this.model.category = this.selectedCategory.name;
         }
-        this.searchService.search(new Search(q.value, category, this.selectedOrderBy.value))
+        this.model.orderBy = this.selectedOrderBy;
+        this.searchService.search(this.model)
             .then(
                 items => { this.itemsService.updateItems(items); console.log(items);},
                 error => this.errorMessage = <any>error);

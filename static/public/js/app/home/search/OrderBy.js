@@ -7,4 +7,4 @@ var OrderBy = (function () {
     return OrderBy;
 }());
 exports.OrderBy = OrderBy;
-//# sourceMappingURL=OrderBy.js.map
+//# sourceMappingURL=orderby.js.map

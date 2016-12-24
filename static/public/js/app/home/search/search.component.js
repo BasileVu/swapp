@@ -31,6 +31,7 @@ var SearchComponent = (function () {
             new OrderBy_1.OrderBy("Most expensive", "price_max"),
             new OrderBy_1.OrderBy("Closest", "range"),
         ];
+        this.model = new search_1.Search();
     }
     SearchComponent.prototype.ngOnInit = function () {
         this.getCategories();
@@ -49,14 +50,14 @@ var SearchComponent = (function () {
             _this.categories.unshift(_this.allCategories);
         }, function (error) { return _this.errorMessage = error; });
     };
-    SearchComponent.prototype.search = function (q) {
+    SearchComponent.prototype.search = function () {
         var _this = this;
-        console.log(q.value);
-        var category = "";
+        this.model.category = "";
         if (this.selectedCategory.name != this.allCategories.name) {
-            category = this.selectedCategory.name;
+            this.model.category = this.selectedCategory.name;
         }
-        this.searchService.search(new search_1.Search(q.value, category, this.selectedOrderBy.value))
+        this.model.orderBy = this.selectedOrderBy;
+        this.searchService.search(this.model)
             .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
     return SearchComponent;
