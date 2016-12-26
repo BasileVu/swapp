@@ -504,6 +504,7 @@ class LocationCoordinatesTests(TestCase):
 
     def test_change_location(self):
         r = self.put_location()
+        print(r.data)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.client.get("/api/account/")
@@ -554,6 +555,7 @@ class LocationCoordinatesTests(TestCase):
 
     def test_coordinates_change_after_valid_location_modification(self):
         r = self.put_location()
+        print(r.data)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         c = self.get_coordinates()

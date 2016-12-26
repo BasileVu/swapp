@@ -83,11 +83,13 @@ class OwnUserAccountMixin:
 @api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
+    """Returns a CSRF token needed when querying the API."""
     return Response()
 
 
 @api_view(["POST"])
 def create_user(request):
+    """Creates a new account."""
     serializer = UserCreateSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -103,6 +105,7 @@ def create_user(request):
 
 @api_view(['POST'])
 def login_user(request):
+    """Logs in an user."""
     serializer = LoginUserSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -117,16 +120,20 @@ def login_user(request):
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
+    """Logs out an user."""
     logout(request)
     return Response(status=status.HTTP_200_OK)
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
+    """Allows to get account info and update them."""
+
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        """Returns the private info of an account."""
         user = request.user
         user_profile = request.user.userprofile
 
@@ -146,6 +153,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
     # FIXME two errors occur when we launch the tests (two users can't have the same username)
     def update(self, request, *args, **kwargs):
+        """Updates the account info of the current logged in user."""
         try:
             return super(UserAccount, self).update(request, *args, **kwargs)
         except IntegrityError as e:
