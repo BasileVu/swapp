@@ -88,7 +88,7 @@ def get_csrf_token(request):
 
 
 class CreateUser(generics.CreateAPIView):
-    """Creates an account for an user with the given creadentials."""
+    """Creates an account for an user with the given credentials."""
     serializer_class = UserCreateSerializer
 
     def post(self, request, *args, **kwargs):
@@ -131,7 +131,7 @@ def logout_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
-    """Allows to get account info and update them."""
+    """Allows to get the current's account info and update them."""
 
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
@@ -169,7 +169,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
-    An endpoint for changing password.
+    Changes the current user's password.
     """
     serializer = ChangePasswordSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -209,6 +209,7 @@ class LocationView(generics.UpdateAPIView):
 
 @api_view(["GET"])
 def get_public_account_info(request, username):
+    """Returns the user's public info."""
     user = get_object_or_404(User, username=username)
 
     return Response({
