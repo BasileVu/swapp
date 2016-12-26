@@ -87,20 +87,22 @@ def get_csrf_token(request):
     return Response()
 
 
-@api_view(["POST"])
-def create_user(request):
-    """Creates a new account."""
-    serializer = UserCreateSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+class CreateUser(generics.CreateAPIView):
+    """Creates an account for an user with the given creadentials."""
+    serializer_class = UserCreateSerializer
 
-    try:
-        user = User.objects.create_user(**serializer.validated_data)
-    except IntegrityError:
-        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    response = Response(status=status.HTTP_201_CREATED)
-    response["Location"] = "/api/users/%d/" % user.id
-    return response
+        try:
+            user = User.objects.create_user(**serializer.validated_data)
+        except IntegrityError:
+            return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
+
+        response = Response(status=status.HTTP_201_CREATED)
+        response["Location"] = "/api/users/%d/" % user.id
+        return response
 
 
 @api_view(['POST'])
