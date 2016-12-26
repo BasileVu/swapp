@@ -598,9 +598,10 @@ class NoteAPITests(TestCase):
         self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
         self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
                                         price_max=30)
-        Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem, item_received=self.hisItem)
+        Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem,
+                             item_received=self.hisItem)
         Offer.objects.create(id=2, accepted=0, status=1, comment="test", item_given=self.myItem,
-                                          item_received=self.hisItem);
+                             item_received=self.hisItem)
 
     def login(self):
         self.client.login(username="username", password="password")

@@ -225,7 +225,7 @@ class NoteViewSet(viewsets.ModelViewSet):
         offer = serializer.validated_data["offer"]
 
         if offer.accepted is not True:
-            raise ValidationError("You can't not an offer if it has not been accepted")
+            raise ValidationError("You can't not make a note if the offer has not been accepted")
         if offer.item_given.owner == self.request.user:
             serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:
