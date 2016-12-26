@@ -83,50 +83,62 @@ class OwnUserAccountMixin:
 @api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
+    """Returns a CSRF token needed when querying the API."""
     return Response()
 
 
-@api_view(["POST"])
-def create_user(request):
-    serializer = UserCreateSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+class CreateUser(generics.CreateAPIView):
+    """Creates an account for an user with the given credentials."""
+    serializer_class = UserCreateSerializer
 
-    try:
-        user = User.objects.create_user(**serializer.validated_data)
-    except IntegrityError:
-        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    response = Response(status=status.HTTP_201_CREATED)
-    response["Location"] = "/api/users/%d/" % user.id
-    return response
+        try:
+            user = User.objects.create_user(**serializer.validated_data)
+        except IntegrityError:
+            return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
+
+        response = Response(status=status.HTTP_201_CREATED)
+        response["Location"] = "/api/users/%d/" % user.id
+        return response
 
 
-@api_view(['POST'])
-def login_user(request):
-    serializer = LoginUserSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+class Login(generics.CreateAPIView):
+    """Logs in an user."""
 
-    user = authenticate(**serializer.validated_data)
-    if user is not None:
-        login(request, user)
-        return Response()
-    else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
+    serializer_class = LoginUserSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = authenticate(**serializer.validated_data)
+        if user is not None:
+            login(request, user)
+            return Response()
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
 
 
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
+    """Logs out an user."""
     logout(request)
     return Response(status=status.HTTP_200_OK)
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
+    """Allows to get the current's account info and update them."""
+
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        """Returns the private info of an account."""
         user = request.user
         user_profile = request.user.userprofile
 
@@ -146,6 +158,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
     # FIXME two errors occur when we launch the tests (two users can't have the same username)
     def update(self, request, *args, **kwargs):
+        """Updates the account info of the current logged in user."""
         try:
             return super(UserAccount, self).update(request, *args, **kwargs)
         except IntegrityError as e:
@@ -156,7 +169,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
-    An endpoint for changing password.
+    Changes the current user's password.
     """
     serializer = ChangePasswordSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -196,6 +209,7 @@ class LocationView(generics.UpdateAPIView):
 
 @api_view(["GET"])
 def get_public_account_info(request, username):
+    """Returns the user's public info."""
     user = get_object_or_404(User, username=username)
 
     return Response({
