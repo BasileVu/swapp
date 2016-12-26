@@ -347,16 +347,17 @@ export var UpgradeAdapter = (function () {
                     provide.decorator(NG1_TESTABILITY, [
                         '$delegate',
                         function (testabilityDelegate) {
+                            var _this = this;
                             var originalWhenStable = testabilityDelegate.whenStable;
-                            // Cannot use arrow function below because we need the context
                             var newWhenStable = function (callback) {
-                                originalWhenStable.call(this, function () {
+                                var whenStableContext = _this;
+                                originalWhenStable.call(_this, function () {
                                     var ng2Testability = moduleRef.injector.get(Testability);
                                     if (ng2Testability.isStable()) {
                                         callback.apply(this, arguments);
                                     }
                                     else {
-                                        ng2Testability.whenStable(newWhenStable.bind(this, callback));
+                                        ng2Testability.whenStable(newWhenStable.bind(whenStableContext, callback));
                                     }
                                 });
                             };
@@ -418,10 +419,8 @@ export var UpgradeAdapter = (function () {
             if (windowAngular.resumeBootstrap) {
                 var originalResumeBootstrap_1 = windowAngular.resumeBootstrap;
                 windowAngular.resumeBootstrap = function () {
-                    var _this = this;
-                    var args = arguments;
                     windowAngular.resumeBootstrap = originalResumeBootstrap_1;
-                    ngZone.run(function () { windowAngular.resumeBootstrap.apply(_this, args); });
+                    windowAngular.resumeBootstrap.apply(this, arguments);
                     resolve();
                 };
             }

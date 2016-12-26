@@ -8,9 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
-var search_service_1 = require("./search.service");
-var category_1 = require("./category");
+var core_1 = require('@angular/core');
+var search_service_1 = require('./search.service');
+var category_1 = require('./category');
 var orderby_1 = require("./orderby");
 var items_service_1 = require("../items/items.service");
 var search_1 = require("./search");
@@ -62,16 +62,16 @@ var SearchModalComponent = (function () {
         this.searchService.search(this.model)
             .then(function (items) { _this.itemsService.updateItems(items); console.log(items); }, function (error) { return _this.errorMessage = error; });
     };
+    SearchModalComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'search-modal',
+            encapsulation: core_1.ViewEncapsulation.None,
+            templateUrl: './search-modal.component.html'
+        }), 
+        __metadata('design:paramtypes', [search_service_1.SearchService, items_service_1.ItemsService])
+    ], SearchModalComponent);
     return SearchModalComponent;
 }());
-SearchModalComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'search-modal',
-        encapsulation: core_1.ViewEncapsulation.None,
-        templateUrl: './search-modal.component.html'
-    }),
-    __metadata("design:paramtypes", [search_service_1.SearchService, items_service_1.ItemsService])
-], SearchModalComponent);
 exports.SearchModalComponent = SearchModalComponent;
 //# sourceMappingURL=search-modal.component.js.map

@@ -4,16 +4,17 @@
 
 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items">
-    <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id)">
+    <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id, item.owner)">
         <img *ngIf="item.image_set[0] === undefined" class="img-fluid" src="http://placehold.it/600x600"/>
         <img *ngIf="item.image_set[0] != undefined" class="img-fluid" src="{{ item.image_set[0].image }}"/>
         <div class="infos">
             <a href="#"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
-            <a href="#"><i class="fa fa-map-marker"></i>Lieu</a>
+            <a href="#"><i class="fa fa-map-marker"></i>{{ item.city }}, {{ item.country }}</a>
         </div>
         <div class="row user">
             <div class="col-xs-3">
-                <img class="avatar img-fluid" src="http://placehold.it/50x50"/>
+                <img *ngIf="item.owner_image_url === undefined" class="avatar img-fluid" src="http://placehold.it/50x50"/>
+                <img *ngIf="item.owner_image_url != undefined" class="avatar img-fluid" src="{{ item.owner_image_url }}"/>
             </div>
             <div class="col-xs-9">
                 {{ item.name }}
@@ -23,19 +24,19 @@
             <ul class="list-inline">
                 <li class="list-inline-item">
                     <i class="fa fa-refresh"></i><br>
-                    22
+                    {{ item.offer_received }}
                 </li>
                 <li class="list-inline-item">
                     <i class="fa fa-comment"></i><br>
-                    6
+                    {{ item.comments }}
                 </li>
                 <li class="list-inline-item">
                     <i class="fa fa-eye"></i><br>
-                    123
+                    {{ item.views }}
                 </li>
                 <li class="list-inline-item">
                     <i class="fa fa-heart"></i><br>
-                    5
+                    {{ item.likes }}
                 </li>
             </ul>
         </div>

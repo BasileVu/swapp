@@ -3,6 +3,8 @@ import {Component, ViewEncapsulation, OnInit} from '@angular/core';
 import { ItemsService } from "./items.service";
 
 import { Item } from "./item";
+import { Owner } from "./owner";
+import { Comment } from "./comment";
 import {Subscription} from "rxjs";
 
 declare var $:any;
@@ -19,6 +21,8 @@ export class ItemsComponent implements OnInit {
     errorMessage: string = "No items available for now";
     items: Array<Item>;
     selectedItem: Item;
+    selectedOwner: Owner;
+    selectedComments: Array<Comment>;
 
     constructor (private itemsService: ItemsService) {}
 
@@ -55,15 +59,31 @@ export class ItemsComponent implements OnInit {
                 error =>  this.errorMessage = <any>error);
     }
 
-    gotoDetail(id: number): void {
-        console.log("clicked. id: " + id);
+    gotoDetail(item_id: number, owner_id: number): void {
+        console.log("clicked. item_id: " + item_id + " owner_id: " + owner_id);
 
         let service = this.itemsService;
-        service.getItem(id)
+        service.getItem(item_id)
             .then(
                 item => {
                     this.selectedItem = item;
-                    service.selectItem(this.selectedItem)
+                    service.selectItem(this.selectedItem);
+                },
+                error => this.errorMessage = <any>error);
+        
+        service.getOwner(owner_id)
+            .then(
+                owner => {
+                    this.selectedOwner = owner;
+                    service.selectOwner(this.selectedOwner);
+                },
+                error => this.errorMessage = <any>error);
+
+        service.getComments(item_id)
+            .then(
+                comments => {
+                    this.selectedComments = comments;
+                    service.selectComments(this.selectedComments);
                 },
                 error => this.errorMessage = <any>error);
     }

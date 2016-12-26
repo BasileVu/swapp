@@ -212,10 +212,7 @@ export var AppView = (function () {
                 this.visitRootNodesInternal(this._directRenderer.insertBefore, nextSibling);
             }
             else {
-                var parentElement = this._directRenderer.parentElement(prevNode);
-                if (parentElement) {
-                    this.visitRootNodesInternal(this._directRenderer.appendChild, parentElement);
-                }
+                this.visitRootNodesInternal(this._directRenderer.appendChild, this._directRenderer.parentElement(prevNode));
             }
         }
         else {

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { stringToArrayBuffer } from './http_utils';
+import { isJsObject, stringToArrayBuffer } from './http_utils';
 import { URLSearchParams } from './url_search_params';
 /**
  * HTTP request body used by both {@link Request} and {@link Response}
@@ -39,7 +39,7 @@ export var Body = (function () {
         if (this._body === null) {
             return '';
         }
-        if (typeof this._body === 'object') {
+        if (isJsObject(this._body)) {
             return JSON.stringify(this._body, null, 2);
         }
         return this._body.toString();

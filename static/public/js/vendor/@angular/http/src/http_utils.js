@@ -44,4 +44,5 @@ export function stringToArrayBuffer(input) {
     }
     return view.buffer;
 }
+export { isJsObject } from '../src/facade/lang';
 //# sourceMappingURL=http_utils.js.map

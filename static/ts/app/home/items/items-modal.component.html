@@ -66,7 +66,7 @@
                                     <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
                                 </div>
                                 <div class="col-lg-9 col-md-10">
-                                    <h5><a href="#">Name lastanem</a> <i class="check fa fa-check"></i></h5>
+                                    <h5><a href="#">{{ owner.username }}</a> <i class="check fa fa-check"></i></h5>
                                 </div>
                             </div>
                             <div class="row evaluation">
@@ -75,7 +75,7 @@
                                 <i class="star fa fa-star"></i>
                                 <i class="star fa fa-star"></i>
                                 <i class="star fa fa-star-o"></i>
-                                (<a href="#">123 votes</a>)
+                                (<a href="#">{{ owner.number_of_vote }} votes</a>)
                             </div>
                             <div class="row category">
                                 <a href="#">
@@ -92,28 +92,14 @@
                                         {{ (item.price_min + item.price_max) / 2 | number:'.2' }} chf
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" 
+                                    *ngFor="let keyInfo of item.key_informations; let last = last"
+                                    [ngClass]="{last: last}">
                                     <div class="left col-xs-6">
-                                        Condition
+                                        {{keyInfo.key}}
                                     </div>
                                     <div class="right col-xs-6">
-                                        new
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="left col-xs-6">
-                                        Brand
-                                    </div>
-                                    <div class="right col-xs-6">
-                                        Addidas
-                                    </div>
-                                </div>
-                                <div class="row last">
-                                    <div class="left col-xs-6">
-                                        Color
-                                    </div>
-                                    <div class="right col-xs-6">
-                                        green
+                                        {{keyInfo.value}}
                                     </div>
                                 </div>
                                 <div class="row interests last">
@@ -122,9 +108,7 @@
                                     </div>
                                     <div class="right col-xs-6">
                                         <ul>
-                                            <li>Elem1</li>
-                                            <li>Elem2</li>
-                                            <li>Elem3</li>
+                                            <li *ngFor="let interest of owner.interested_in">{{ interest }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -133,7 +117,7 @@
                                         Delivery from
                                     </div>
                                     <div class="right col-xs-6">
-                                        Address
+                                        {{ owner.delivery_address }}
                                     </div>
                                 </div>
                                 <div class="row last">
@@ -142,9 +126,7 @@
                                     </div>
                                     <div class="right col-xs-6">
                                         <ul>
-                                            <li>Method1</li>
-                                            <li>Method2</li>
-                                            <li>Method3</li>
+                                            <li *ngFor="let method of owner.delivery_methods">{{ method }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -152,16 +134,16 @@
                             <div class="row reactions">
                                 <ul class="list-inline">
                                     <li class="list-inline-item">
-                                        <i class="fa fa-refresh"></i> 22
+                                        <i class="fa fa-refresh"></i> {{item.offer_received}}
                                     </li>
                                     <li class="list-inline-item">
-                                        <i class="fa fa-comment"></i> 6
+                                        <i class="fa fa-comment"></i> {{item.comments}}
                                     </li>
                                     <li class="list-inline-item">
-                                        <i class="fa fa-eye"></i> 123
+                                        <i class="fa fa-eye"></i> {{item.views}}
                                     </li>
                                     <li class="list-inline-item">
-                                        <i class="fa fa-heart"></i> 5
+                                        <i class="fa fa-heart"></i> {{item.likes}}
                                     </li>
                                 </ul>
                             </div>
@@ -190,13 +172,14 @@
                             <textarea name="" placeholder="Write a comment..."></textarea>
                         </div>
                     </div>
-                    <div class="row comment">
+                    <div class="row comment"
+                        *ngFor="let comment of comments">
                         <div class="col-xs-1">
-                            <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
+                            <img class="img-fluid avatar" src="{{ comment.user_profile_picture_url }}"/>
                         </div>
                         <div class="col-xs-11">
-                            <p class="writer-infos"><a href="#">Name</a> november 14</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, animi atque culpa dignissimos dolor explicabo magni maxime ratione tenetur veritatis. Ab aliquam blanditiis culpa dicta est porro quisquam similique tenetur!</p>
+                            <p class="writer-infos"><a href="#">{{ comment.username }}</a> {{ comment.date }}</p>
+                            <p>{{ comment.content }}</p>
                         </div>
                     </div>
                     <div class="row comment">
@@ -265,23 +248,8 @@
                         <h5>Similar</h5>
                     </div>
                     <div class="row preview">
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <img class="img-fluid" src="http://placehold.it/300x300"/>
+                        <div class="col-sm-12 col-md-6" *ngFor="let similar of item.similar">
+                            <img class="img-fluid" src="{{ similar.image_url }}"/>
                         </div>
                     </div>
                     <div class="bottom-link">
@@ -297,4 +265,3 @@
         </a>
     </div>
 </div>
-

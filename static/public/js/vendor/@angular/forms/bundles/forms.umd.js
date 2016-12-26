@@ -1,5 +1,5 @@
 /**
- * @license Angular v2.2.4
+ * @license Angular v2.2.0
  * (c) 2010-2016 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -903,8 +903,8 @@
         };
         /** @internal */
         SelectControlValueAccessor.prototype._getOptionValue = function (valueString) {
-            var id = _extractId(valueString);
-            return this._optionMap.has(id) ? this._optionMap.get(id) : valueString;
+            var value = this._optionMap.get(_extractId(valueString));
+            return value != null ? value : valueString;
         };
         SelectControlValueAccessor.decorators = [
             { type: _angular_core.Directive, args: [{
@@ -1072,8 +1072,8 @@
         };
         /** @internal */
         SelectMultipleControlValueAccessor.prototype._getOptionValue = function (valueString) {
-            var id = _extractId$1(valueString);
-            return this._optionMap.has(id) ? this._optionMap.get(id)._value : valueString;
+            var opt = this._optionMap.get(_extractId$1(valueString));
+            return opt ? opt._value : valueString;
         };
         SelectMultipleControlValueAccessor.decorators = [
             { type: _angular_core.Directive, args: [{
@@ -4105,7 +4105,7 @@
         Object.defineProperty(RequiredValidator.prototype, "required", {
             get: function () { return this._required; },
             set: function (value) {
-                this._required = value != null && value !== false && "" + value !== 'false';
+                this._required = isPresent(value) && "" + value !== 'false';
                 if (this._onChange)
                     this._onChange();
             },
@@ -4120,7 +4120,7 @@
             { type: _angular_core.Directive, args: [{
                         selector: '[required][formControlName],[required][formControl],[required][ngModel]',
                         providers: [REQUIRED_VALIDATOR],
-                        host: { '[attr.required]': 'required ? "" : null' }
+                        host: { '[attr.required]': 'required? "" : null' }
                     },] },
         ];
         /** @nocollapse */
@@ -4151,8 +4151,11 @@
     var MinLengthValidator = (function () {
         function MinLengthValidator() {
         }
+        MinLengthValidator.prototype._createValidator = function () {
+            this._validator = Validators.minLength(parseInt(this.minlength, 10));
+        };
         MinLengthValidator.prototype.ngOnChanges = function (changes) {
-            if ('minlength' in changes) {
+            if (changes['minlength']) {
                 this._createValidator();
                 if (this._onChange)
                     this._onChange();
@@ -4162,14 +4165,11 @@
             return this.minlength == null ? null : this._validator(c);
         };
         MinLengthValidator.prototype.registerOnValidatorChange = function (fn) { this._onChange = fn; };
-        MinLengthValidator.prototype._createValidator = function () {
-            this._validator = Validators.minLength(parseInt(this.minlength, 10));
-        };
         MinLengthValidator.decorators = [
             { type: _angular_core.Directive, args: [{
                         selector: '[minlength][formControlName],[minlength][formControl],[minlength][ngModel]',
                         providers: [MIN_LENGTH_VALIDATOR],
-                        host: { '[attr.minlength]': 'minlength ? minlength : null' }
+                        host: { '[attr.minlength]': 'minlength? minlength : null' }
                     },] },
         ];
         /** @nocollapse */
@@ -4201,25 +4201,25 @@
     var MaxLengthValidator = (function () {
         function MaxLengthValidator() {
         }
+        MaxLengthValidator.prototype._createValidator = function () {
+            this._validator = Validators.maxLength(parseInt(this.maxlength, 10));
+        };
         MaxLengthValidator.prototype.ngOnChanges = function (changes) {
-            if ('maxlength' in changes) {
+            if (changes['maxlength']) {
                 this._createValidator();
                 if (this._onChange)
                     this._onChange();
             }
         };
         MaxLengthValidator.prototype.validate = function (c) {
-            return this.maxlength != null ? this._validator(c) : null;
+            return isPresent(this.maxlength) ? this._validator(c) : null;
         };
         MaxLengthValidator.prototype.registerOnValidatorChange = function (fn) { this._onChange = fn; };
-        MaxLengthValidator.prototype._createValidator = function () {
-            this._validator = Validators.maxLength(parseInt(this.maxlength, 10));
-        };
         MaxLengthValidator.decorators = [
             { type: _angular_core.Directive, args: [{
                         selector: '[maxlength][formControlName],[maxlength][formControl],[maxlength][ngModel]',
                         providers: [MAX_LENGTH_VALIDATOR],
-                        host: { '[attr.maxlength]': 'maxlength ? maxlength : null' }
+                        host: { '[attr.maxlength]': 'maxlength? maxlength : null' }
                     },] },
         ];
         /** @nocollapse */
@@ -4250,16 +4250,18 @@
     var PatternValidator = (function () {
         function PatternValidator() {
         }
+        PatternValidator.prototype._createValidator = function () { this._validator = Validators.pattern(this.pattern); };
         PatternValidator.prototype.ngOnChanges = function (changes) {
-            if ('pattern' in changes) {
+            if (changes['pattern']) {
                 this._createValidator();
                 if (this._onChange)
                     this._onChange();
             }
         };
-        PatternValidator.prototype.validate = function (c) { return this._validator(c); };
+        PatternValidator.prototype.validate = function (c) {
+            return this.pattern ? this._validator(c) : null;
+        };
         PatternValidator.prototype.registerOnValidatorChange = function (fn) { this._onChange = fn; };
-        PatternValidator.prototype._createValidator = function () { this._validator = Validators.pattern(this.pattern); };
         PatternValidator.decorators = [
             { type: _angular_core.Directive, args: [{
                         selector: '[pattern][formControlName],[pattern][formControl],[pattern][ngModel]',
@@ -4383,10 +4385,7 @@
         function InternalFormsSharedModule() {
         }
         InternalFormsSharedModule.decorators = [
-            { type: _angular_core.NgModule, args: [{
-                        declarations: SHARED_FORM_DIRECTIVES,
-                        exports: SHARED_FORM_DIRECTIVES,
-                    },] },
+            { type: _angular_core.NgModule, args: [{ declarations: SHARED_FORM_DIRECTIVES, exports: SHARED_FORM_DIRECTIVES },] },
         ];
         /** @nocollapse */
         InternalFormsSharedModule.ctorParameters = [];

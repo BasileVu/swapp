@@ -10,6 +10,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+import { isPresent } from '../src/facade/lang';
 import { Body } from './body';
 import { ContentType } from './enums';
 import { Headers } from './headers';
@@ -62,7 +63,7 @@ export var Request = (function (_super) {
         // TODO: assert that url is present
         var url = requestOptions.url;
         this.url = requestOptions.url;
-        if (requestOptions.search) {
+        if (isPresent(requestOptions.search)) {
             var search = requestOptions.search.toString();
             if (search.length > 0) {
                 var prefix = '?';
@@ -77,6 +78,7 @@ export var Request = (function (_super) {
         this.method = normalizeMethodName(requestOptions.method);
         // TODO(jeffbcross): implement behavior
         // Defaults to 'omit', consistent with browser
+        // TODO(jeffbcross): implement behavior
         this.headers = new Headers(requestOptions.headers);
         this.contentType = this.detectContentType();
         this.withCredentials = requestOptions.withCredentials;

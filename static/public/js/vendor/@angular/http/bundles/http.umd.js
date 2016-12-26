@@ -1,5 +1,5 @@
 /**
- * @license Angular v2.2.4
+ * @license Angular v2.2.0
  * (c) 2010-2016 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -27,6 +27,42 @@
         BrowserXhr.ctorParameters = [];
         return BrowserXhr;
     }());
+
+    /**
+     * @license
+     * Copyright Google Inc. All Rights Reserved.
+     *
+     * Use of this source code is governed by an MIT-style license that can be
+     * found in the LICENSE file at https://angular.io/license
+     */
+    var globalScope;
+    if (typeof window === 'undefined') {
+        if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+            // TODO: Replace any with WorkerGlobalScope from lib.webworker.d.ts #3492
+            globalScope = self;
+        }
+        else {
+            globalScope = global;
+        }
+    }
+    else {
+        globalScope = window;
+    }
+    // Need to declare a new variable for global here since TypeScript
+    // exports the original value of the symbol.
+    var global$1 = globalScope;
+    // TODO: remove calls to assert in production environment
+    // Note: Can't just export this and import in in other files
+    // as `assert` is a reserved keyword in Dart
+    global$1.assert = function assert(condition) {
+        // TODO: to be fixed properly via #2830, noop for now
+    };
+    function isPresent(obj) {
+        return obj != null;
+    }
+    function isJsObject(o) {
+        return o !== null && (typeof o === 'function' || typeof o === 'object');
+    }
 
     /**
      * @license
@@ -312,12 +348,12 @@
     var ResponseOptions = (function () {
         function ResponseOptions(_a) {
             var _b = _a === void 0 ? {} : _a, body = _b.body, status = _b.status, headers = _b.headers, statusText = _b.statusText, type = _b.type, url = _b.url;
-            this.body = body != null ? body : null;
-            this.status = status != null ? status : null;
-            this.headers = headers != null ? headers : null;
-            this.statusText = statusText != null ? statusText : null;
-            this.type = type != null ? type : null;
-            this.url = url != null ? url : null;
+            this.body = isPresent(body) ? body : null;
+            this.status = isPresent(status) ? status : null;
+            this.headers = isPresent(headers) ? headers : null;
+            this.statusText = isPresent(statusText) ? statusText : null;
+            this.type = isPresent(type) ? type : null;
+            this.url = isPresent(url) ? url : null;
         }
         /**
          * Creates a copy of the `ResponseOptions` instance, using the optional input as values to
@@ -346,12 +382,13 @@
          */
         ResponseOptions.prototype.merge = function (options) {
             return new ResponseOptions({
-                body: options && options.body != null ? options.body : this.body,
-                status: options && options.status != null ? options.status : this.status,
-                headers: options && options.headers != null ? options.headers : this.headers,
-                statusText: options && options.statusText != null ? options.statusText : this.statusText,
-                type: options && options.type != null ? options.type : this.type,
-                url: options && options.url != null ? options.url : this.url,
+                body: isPresent(options) && isPresent(options.body) ? options.body : this.body,
+                status: isPresent(options) && isPresent(options.status) ? options.status : this.status,
+                headers: isPresent(options) && isPresent(options.headers) ? options.headers : this.headers,
+                statusText: isPresent(options) && isPresent(options.statusText) ? options.statusText :
+                    this.statusText,
+                type: isPresent(options) && isPresent(options.type) ? options.type : this.type,
+                url: isPresent(options) && isPresent(options.url) ? options.url : this.url,
             });
         };
         return ResponseOptions;
@@ -704,7 +741,7 @@
             if (this._body === null) {
                 return '';
             }
-            if (typeof this._body === 'object') {
+            if (isJsObject(this._body)) {
                 return JSON.stringify(this._body, null, 2);
             }
             return this._body.toString();
@@ -787,9 +824,8 @@
     var JSONP_HOME = '__ng_jsonp__';
     var _jsonpConnections = null;
     function _getJsonpConnections() {
-        var w = typeof window == 'object' ? window : {};
         if (_jsonpConnections === null) {
-            _jsonpConnections = w[JSONP_HOME] = {};
+            _jsonpConnections = global$1[JSONP_HOME] = {};
         }
         return _jsonpConnections;
     }
@@ -887,14 +923,14 @@
                     _dom.cleanup(script);
                     if (!_this._finished) {
                         var responseOptions_1 = new ResponseOptions({ body: JSONP_ERR_NO_CALLBACK, type: exports.ResponseType.Error, url: url });
-                        if (baseResponseOptions) {
+                        if (isPresent(baseResponseOptions)) {
                             responseOptions_1 = baseResponseOptions.merge(responseOptions_1);
                         }
                         responseObserver.error(new Response(responseOptions_1));
                         return;
                     }
                     var responseOptions = new ResponseOptions({ body: _this._responseData, url: url });
-                    if (_this.baseResponseOptions) {
+                    if (isPresent(_this.baseResponseOptions)) {
                         responseOptions = _this.baseResponseOptions.merge(responseOptions);
                     }
                     responseObserver.next(new Response(responseOptions));
@@ -906,7 +942,7 @@
                     _this.readyState = exports.ReadyState.Done;
                     _dom.cleanup(script);
                     var responseOptions = new ResponseOptions({ body: error.message, type: exports.ResponseType.Error });
-                    if (baseResponseOptions) {
+                    if (isPresent(baseResponseOptions)) {
                         responseOptions = baseResponseOptions.merge(responseOptions);
                     }
                     responseObserver.error(new Response(responseOptions));
@@ -918,7 +954,9 @@
                     _this.readyState = exports.ReadyState.Cancelled;
                     script.removeEventListener('load', onLoad);
                     script.removeEventListener('error', onError);
-                    _this._dom.cleanup(script);
+                    if (isPresent(script)) {
+                        _this._dom.cleanup(script);
+                    }
                 };
             });
         }
@@ -983,37 +1021,31 @@
             this.response = new rxjs_Observable.Observable(function (responseObserver) {
                 var _xhr = browserXHR.build();
                 _xhr.open(exports.RequestMethod[req.method].toUpperCase(), req.url);
-                if (req.withCredentials != null) {
+                if (isPresent(req.withCredentials)) {
                     _xhr.withCredentials = req.withCredentials;
                 }
                 // load event handler
                 var onLoad = function () {
+                    // responseText is the old-school way of retrieving response (supported by IE8 & 9)
+                    // response/responseType properties were introduced in ResourceLoader Level2 spec (supported
+                    // by IE10)
+                    var body = _xhr.response === undefined ? _xhr.responseText : _xhr.response;
+                    // Implicitly strip a potential XSSI prefix.
+                    if (typeof body === 'string')
+                        body = body.replace(XSSI_PREFIX, '');
+                    var headers = Headers.fromResponseHeaderString(_xhr.getAllResponseHeaders());
+                    var url = getResponseURL(_xhr);
                     // normalize IE9 bug (http://bugs.jquery.com/ticket/1450)
                     var status = _xhr.status === 1223 ? 204 : _xhr.status;
-                    var body = null;
-                    // HTTP 204 means no content
-                    if (status !== 204) {
-                        // responseText is the old-school way of retrieving response (supported by IE8 & 9)
-                        // response/responseType properties were introduced in ResourceLoader Level2 spec
-                        // (supported by IE10)
-                        body = (typeof _xhr.response === 'undefined') ? _xhr.responseText : _xhr.response;
-                        // Implicitly strip a potential XSSI prefix.
-                        if (typeof body === 'string') {
-                            body = body.replace(XSSI_PREFIX, '');
-                        }
-                    }
                     // fix status code when it is 0 (0 status is undocumented).
                     // Occurs when accessing file resources or on Android 4.1 stock browser
                     // while retrieving files from application cache.
                     if (status === 0) {
                         status = body ? 200 : 0;
                     }
-                    var headers = Headers.fromResponseHeaderString(_xhr.getAllResponseHeaders());
-                    // IE 9 does not provide the way to get URL of response
-                    var url = getResponseURL(_xhr) || req.url;
                     var statusText = _xhr.statusText || 'OK';
                     var responseOptions = new ResponseOptions({ body: body, status: status, headers: headers, statusText: statusText, url: url });
-                    if (baseResponseOptions != null) {
+                    if (isPresent(baseResponseOptions)) {
                         responseOptions = baseResponseOptions.merge(responseOptions);
                     }
                     var response = new Response(responseOptions);
@@ -1034,17 +1066,17 @@
                         status: _xhr.status,
                         statusText: _xhr.statusText,
                     });
-                    if (baseResponseOptions != null) {
+                    if (isPresent(baseResponseOptions)) {
                         responseOptions = baseResponseOptions.merge(responseOptions);
                     }
                     responseObserver.error(new Response(responseOptions));
                 };
                 _this.setDetectedContentType(req, _xhr);
-                if (req.headers != null) {
+                if (isPresent(req.headers)) {
                     req.headers.forEach(function (values, name) { return _xhr.setRequestHeader(name, values.join(',')); });
                 }
                 // Select the correct buffer type to store the response
-                if (req.responseType != null && _xhr.responseType != null) {
+                if (isPresent(req.responseType) && isPresent(_xhr.responseType)) {
                     switch (req.responseType) {
                         case exports.ResponseContentType.ArrayBuffer:
                             _xhr.responseType = 'arraybuffer';
@@ -1072,9 +1104,9 @@
                 };
             });
         }
-        XHRConnection.prototype.setDetectedContentType = function (req /** TODO Request */, _xhr /** XMLHttpRequest */) {
+        XHRConnection.prototype.setDetectedContentType = function (req /** TODO #9100 */, _xhr /** TODO #9100 */) {
             // Skip if a custom Content-Type header is provided
-            if (req.headers != null && req.headers.get('Content-Type') != null) {
+            if (isPresent(req.headers) && isPresent(req.headers.get('Content-Type'))) {
                 return;
             }
             // Set the detected content type
@@ -1215,14 +1247,16 @@
     var RequestOptions = (function () {
         function RequestOptions(_a) {
             var _b = _a === void 0 ? {} : _a, method = _b.method, headers = _b.headers, body = _b.body, url = _b.url, search = _b.search, withCredentials = _b.withCredentials, responseType = _b.responseType;
-            this.method = method != null ? normalizeMethodName(method) : null;
-            this.headers = headers != null ? headers : null;
-            this.body = body != null ? body : null;
-            this.url = url != null ? url : null;
-            this.search =
-                search != null ? (typeof search === 'string' ? new URLSearchParams(search) : search) : null;
-            this.withCredentials = withCredentials != null ? withCredentials : null;
-            this.responseType = responseType != null ? responseType : null;
+            this.method = isPresent(method) ? normalizeMethodName(method) : null;
+            this.headers = isPresent(headers) ? headers : null;
+            this.body = isPresent(body) ? body : null;
+            this.url = isPresent(url) ? url : null;
+            this.search = isPresent(search) ?
+                (typeof search === 'string' ? new URLSearchParams((search)) :
+                    (search)) :
+                null;
+            this.withCredentials = isPresent(withCredentials) ? withCredentials : null;
+            this.responseType = isPresent(responseType) ? responseType : null;
         }
         /**
          * Creates a copy of the `RequestOptions` instance, using the optional input as values to override
@@ -1251,17 +1285,17 @@
          */
         RequestOptions.prototype.merge = function (options) {
             return new RequestOptions({
-                method: options && options.method != null ? options.method : this.method,
-                headers: options && options.headers != null ? options.headers : this.headers,
-                body: options && options.body != null ? options.body : this.body,
-                url: options && options.url != null ? options.url : this.url,
-                search: options && options.search != null ?
+                method: options && isPresent(options.method) ? options.method : this.method,
+                headers: options && isPresent(options.headers) ? options.headers : this.headers,
+                body: options && isPresent(options.body) ? options.body : this.body,
+                url: options && isPresent(options.url) ? options.url : this.url,
+                search: options && isPresent(options.search) ?
                     (typeof options.search === 'string' ? new URLSearchParams(options.search) :
-                        options.search.clone()) :
+                        (options.search).clone()) :
                     this.search,
-                withCredentials: options && options.withCredentials != null ? options.withCredentials :
+                withCredentials: options && isPresent(options.withCredentials) ? options.withCredentials :
                     this.withCredentials,
-                responseType: options && options.responseType != null ? options.responseType :
+                responseType: options && isPresent(options.responseType) ? options.responseType :
                     this.responseType
             });
         };
@@ -1385,7 +1419,7 @@
             // TODO: assert that url is present
             var url = requestOptions.url;
             this.url = requestOptions.url;
-            if (requestOptions.search) {
+            if (isPresent(requestOptions.search)) {
                 var search = requestOptions.search.toString();
                 if (search.length > 0) {
                     var prefix = '?';
@@ -1400,6 +1434,7 @@
             this.method = normalizeMethodName(requestOptions.method);
             // TODO(jeffbcross): implement behavior
             // Defaults to 'omit', consistent with browser
+            // TODO(jeffbcross): implement behavior
             this.headers = new Headers(requestOptions.headers);
             this.contentType = this.detectContentType();
             this.withCredentials = requestOptions.withCredentials;
@@ -1498,7 +1533,7 @@
     }
     function mergeOptions(defaultOpts, providedOpts, method, url) {
         var newOptions = defaultOpts;
-        if (providedOpts) {
+        if (isPresent(providedOpts)) {
             // Hack so Dart can used named parameters
             return newOptions.merge(new RequestOptions({
                 method: providedOpts.method || method,
@@ -1510,7 +1545,12 @@
                 responseType: providedOpts.responseType
             }));
         }
-        return newOptions.merge(new RequestOptions({ method: method, url: url }));
+        if (isPresent(method)) {
+            return newOptions.merge(new RequestOptions({ method: method, url: url }));
+        }
+        else {
+            return newOptions.merge(new RequestOptions({ url: url }));
+        }
     }
     /**
      * Performs http requests using `XMLHttpRequest` as the default backend.

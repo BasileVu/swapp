@@ -3,6 +3,8 @@ import { Http, Response } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 
 import {Item} from "./item";
+import {Owner} from "./owner";
+import {Comment} from "./comment";
 import {Observable} from "rxjs";
 
 @Injectable()
@@ -10,9 +12,13 @@ export class ItemsService {
 
     // Observable string sources
     private itemSelectedSource = new Subject<Item>();
+    private ownerSelectedSource = new Subject<Owner>();
+    private commentsSelectedSource = new Subject<Comment[]>();
 
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
+    ownerSelected$ = this.ownerSelectedSource.asObservable();
+    commentsSelected$ = this.commentsSelectedSource.asObservable();
 
     private itemsSubject: Subject<Item[]> = new Subject<Item[]>();
 
@@ -23,6 +29,14 @@ export class ItemsService {
     // Service message commands
     selectItem(item: Item) {
         this.itemSelectedSource.next(item);
+    }
+
+    selectOwner(owner: Owner) {
+        this.ownerSelectedSource.next(owner);
+    }
+
+    selectComments(comments: Comment[]) {
+        this.commentsSelectedSource.next(comments);
     }
 
     updateItems(items: Item[]){
@@ -41,7 +55,21 @@ export class ItemsService {
     }
 
     getItem (id: number): Promise<Item> {
-        return this.http.get('/api/items/' + id)
+        return this.http.get(this.itemsUrl + id)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    getOwner (owner_id: number): Promise<Owner> {
+        return this.http.get('/api/users/' + owner_id)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    getComments (item_id: number): Promise<Comment[]> {
+        return this.http.get(this.itemsUrl + item_id + '/comments')
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);
@@ -53,7 +81,7 @@ export class ItemsService {
     }
 
     private handleError (error: Response | any) {
-        // In a real world app, we might use a remote logging infrastructure
+        // TODO : In a real world app, we might use a remote logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {
             const body = error.json() || '';

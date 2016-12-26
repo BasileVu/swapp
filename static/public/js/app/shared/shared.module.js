@@ -8,26 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
-var common_1 = require("@angular/common");
-var forms_1 = require("@angular/forms");
-var awesome_pipe_1 = require("./awesome.pipe");
-var highlight_directive_1 = require("./highlight.directive");
-var authentication_service_1 = require("./authentication/authentication.service");
+var core_1 = require('@angular/core');
+var common_1 = require('@angular/common');
+var forms_1 = require('@angular/forms');
+var awesome_pipe_1 = require('./awesome.pipe');
+var highlight_directive_1 = require('./highlight.directive');
+var authentication_service_1 = require('./authentication/authentication.service');
 var SharedModule = (function () {
     function SharedModule() {
     }
+    SharedModule = __decorate([
+        core_1.NgModule({
+            imports: [common_1.CommonModule],
+            declarations: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective],
+            exports: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective,
+                common_1.CommonModule, forms_1.FormsModule, authentication_service_1.AuthService]
+        }), 
+        __metadata('design:paramtypes', [])
+    ], SharedModule);
     return SharedModule;
 }());
-SharedModule = __decorate([
-    core_1.NgModule({
-        imports: [common_1.CommonModule],
-        declarations: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective],
-        exports: [awesome_pipe_1.AwesomePipe, highlight_directive_1.HighlightDirective,
-            common_1.CommonModule, forms_1.FormsModule, authentication_service_1.AuthService]
-    }),
-    __metadata("design:paramtypes", [])
-], SharedModule);
 exports.SharedModule = SharedModule;
 /*
 Copyright 2016 Google Inc. All Rights Reserved.

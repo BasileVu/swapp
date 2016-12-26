@@ -85,7 +85,6 @@ export function isJsObject(o) {
     return o !== null && (typeof o === 'function' || typeof o === 'object');
 }
 export function print(obj) {
-    // tslint:disable-next-line:no-console
     console.log(obj);
 }
 export function warn(obj) {

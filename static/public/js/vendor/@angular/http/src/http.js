@@ -11,6 +11,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 import { Injectable } from '@angular/core';
+import { isPresent } from '../src/facade/lang';
 import { RequestOptions } from './base_request_options';
 import { RequestMethod } from './enums';
 import { ConnectionBackend } from './interfaces';
@@ -20,7 +21,7 @@ function httpRequest(backend, request) {
 }
 function mergeOptions(defaultOpts, providedOpts, method, url) {
     var newOptions = defaultOpts;
-    if (providedOpts) {
+    if (isPresent(providedOpts)) {
         // Hack so Dart can used named parameters
         return newOptions.merge(new RequestOptions({
             method: providedOpts.method || method,
@@ -32,7 +33,12 @@ function mergeOptions(defaultOpts, providedOpts, method, url) {
             responseType: providedOpts.responseType
         }));
     }
-    return newOptions.merge(new RequestOptions({ method: method, url: url }));
+    if (isPresent(method)) {
+        return newOptions.merge(new RequestOptions({ method: method, url: url }));
+    }
+    else {
+        return newOptions.merge(new RequestOptions({ url: url }));
+    }
 }
 /**
  * Performs http requests using `XMLHttpRequest` as the default backend.

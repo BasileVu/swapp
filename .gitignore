@@ -290,3 +290,5 @@ tests/report/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+
+static/public/js/app

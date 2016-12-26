@@ -40,8 +40,7 @@ export var UpgradeNg1ComponentAdapterBuilder = (function () {
                 ],
                 ngOnInit: function () { },
                 ngOnChanges: function () { },
-                ngDoCheck: function () { },
-                ngOnDestroy: function () { },
+                ngDoCheck: function () { }
             });
     }
     UpgradeNg1ComponentAdapterBuilder.prototype.extractDirective = function (injector) {
@@ -243,18 +242,15 @@ var UpgradeNg1ComponentAdapter = (function () {
         }
     };
     UpgradeNg1ComponentAdapter.prototype.ngOnChanges = function (changes) {
-        var _this = this;
-        var ng1Changes = {};
-        Object.keys(changes).forEach(function (name) {
-            var change = changes[name];
-            _this.setComponentProperty(name, change.currentValue);
-            ng1Changes[_this.propertyMap[name]] = change;
-        });
-        if (this.destinationObj.$onChanges) {
-            this.destinationObj.$onChanges(ng1Changes);
+        for (var name_3 in changes) {
+            if (changes.hasOwnProperty(name_3)) {
+                var change = changes[name_3];
+                this.setComponentProperty(name_3, change.currentValue);
+            }
         }
     };
     UpgradeNg1ComponentAdapter.prototype.ngDoCheck = function () {
+        var count = 0;
         var destinationObj = this.destinationObj;
         var lastValues = this.checkLastValues;
         var checkProperties = this.checkProperties;
@@ -270,14 +266,7 @@ var UpgradeNg1ComponentAdapter = (function () {
                 }
             }
         }
-        if (this.destinationObj.$doCheck && this.directive.controller) {
-            this.destinationObj.$doCheck();
-        }
-    };
-    UpgradeNg1ComponentAdapter.prototype.ngOnDestroy = function () {
-        if (this.destinationObj.$onDestroy && this.directive.controller) {
-            this.destinationObj.$onDestroy();
-        }
+        return count;
     };
     UpgradeNg1ComponentAdapter.prototype.setComponentProperty = function (name, value) {
         this.destinationObj[this.propertyMap[name]] = value;
@@ -293,23 +282,23 @@ var UpgradeNg1ComponentAdapter = (function () {
             return undefined;
         }
         else if (typeof require == 'string') {
-            var name_3 = require;
+            var name_4 = require;
             var isOptional = false;
             var startParent = false;
             var searchParents = false;
-            if (name_3.charAt(0) == '?') {
+            if (name_4.charAt(0) == '?') {
                 isOptional = true;
-                name_3 = name_3.substr(1);
+                name_4 = name_4.substr(1);
             }
-            if (name_3.charAt(0) == '^') {
+            if (name_4.charAt(0) == '^') {
                 searchParents = true;
-                name_3 = name_3.substr(1);
+                name_4 = name_4.substr(1);
             }
-            if (name_3.charAt(0) == '^') {
+            if (name_4.charAt(0) == '^') {
                 startParent = true;
-                name_3 = name_3.substr(1);
+                name_4 = name_4.substr(1);
             }
-            var key = controllerKey(name_3);
+            var key = controllerKey(name_4);
             if (startParent)
                 $element = $element.parent();
             var dep = searchParents ? $element.inheritedData(key) : $element.data(key);

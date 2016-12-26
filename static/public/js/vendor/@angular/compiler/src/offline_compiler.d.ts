@@ -13,23 +13,16 @@ export declare class SourceModule {
     source: string;
     constructor(fileUrl: string, moduleUrl: string, source: string);
 }
-export interface NgAnalyzedModules {
-    ngModules: CompileNgModuleMetadata[];
+export declare function analyzeNgModules(programStaticSymbols: StaticSymbol[], options: {
+    transitiveModules: boolean;
+}, metadataResolver: CompileMetadataResolver): Promise<{
     ngModuleByPipeOrDirective: Map<StaticSymbol, CompileNgModuleMetadata>;
     files: Array<{
         srcUrl: string;
         directives: StaticSymbol[];
         ngModules: StaticSymbol[];
     }>;
-    symbolsMissingModule?: StaticSymbol[];
-}
-export declare function analyzeNgModules(programStaticSymbols: StaticSymbol[], options: {
-    transitiveModules: boolean;
-}, metadataResolver: CompileMetadataResolver): NgAnalyzedModules;
-export declare function analyzeAndValidateNgModules(programStaticSymbols: StaticSymbol[], options: {
-    transitiveModules: boolean;
-}, metadataResolver: CompileMetadataResolver): NgAnalyzedModules;
-export declare function loadNgModuleDirectives(ngModules: CompileNgModuleMetadata[]): Promise<void>;
+}>;
 export declare class OfflineCompiler {
     private _metadataResolver;
     private _templateParser;

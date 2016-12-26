@@ -8,22 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
+var core_1 = require('@angular/core');
 var AcceptPropositionModalComponent = (function () {
     function AcceptPropositionModalComponent() {
     }
     AcceptPropositionModalComponent.prototype.ngOnInit = function () {
     };
+    AcceptPropositionModalComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'accept-proposition-modal',
+            encapsulation: core_1.ViewEncapsulation.None,
+            templateUrl: './accept-proposition-modal.component.html'
+        }), 
+        __metadata('design:paramtypes', [])
+    ], AcceptPropositionModalComponent);
     return AcceptPropositionModalComponent;
 }());
-AcceptPropositionModalComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'accept-proposition-modal',
-        encapsulation: core_1.ViewEncapsulation.None,
-        templateUrl: './accept-proposition-modal.component.html'
-    }),
-    __metadata("design:paramtypes", [])
-], AcceptPropositionModalComponent);
 exports.AcceptPropositionModalComponent = AcceptPropositionModalComponent;
 //# sourceMappingURL=accept-proposition-modal.component.js.map

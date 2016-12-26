@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
-require("./rxjs-operators");
+var core_1 = require('@angular/core');
+require('./rxjs-operators');
 var http_1 = require("@angular/http");
 var AppComponent = (function () {
     function AppComponent(http) {
@@ -241,15 +241,15 @@ var AppComponent = (function () {
             });
         }, 500);
     };
+    AppComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'my-app',
+            templateUrl: 'app.component.html'
+        }), 
+        __metadata('design:paramtypes', [http_1.Http])
+    ], AppComponent);
     return AppComponent;
 }());
-AppComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'my-app',
-        templateUrl: 'app.component.html'
-    }),
-    __metadata("design:paramtypes", [http_1.Http])
-], AppComponent);
 exports.AppComponent = AppComponent;
 //# sourceMappingURL=app.component.js.map

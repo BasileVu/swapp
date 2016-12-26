@@ -10,18 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 /* tslint:disable */
 // Exact copy of contact/highlight.directive except for color and message
-var core_1 = require("@angular/core");
+var core_1 = require('@angular/core');
 var HighlightDirective = (function () {
     function HighlightDirective(renderer, el) {
         renderer.setElementStyle(el.nativeElement, 'backgroundColor', 'white');
         console.log("* Shared highlight called for " + el.nativeElement.tagName);
     }
+    HighlightDirective = __decorate([
+        core_1.Directive({ selector: '[highlight], input' }), 
+        __metadata('design:paramtypes', [core_1.Renderer, core_1.ElementRef])
+    ], HighlightDirective);
     return HighlightDirective;
 }());
-HighlightDirective = __decorate([
-    core_1.Directive({ selector: '[highlight], input' }),
-    __metadata("design:paramtypes", [core_1.Renderer, core_1.ElementRef])
-], HighlightDirective);
 exports.HighlightDirective = HighlightDirective;
 /*
 Copyright 2016 Google Inc. All Rights Reserved.

@@ -10,24 +10,24 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "C:\\Users\\antoi\\Documents\\swapp"
+      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
     ]
   ],
   "_from": "@angular/platform-browser@>=2.2.0 <2.3.0",
-  "_id": "@angular/platform-browser@2.2.4",
+  "_id": "@angular/platform-browser@2.2.0",
   "_inCache": true,
   "_installable": true,
   "_location": "/@angular/platform-browser",
-  "_nodeVersion": "6.2.0",
+  "_nodeVersion": "6.7.0",
   "_npmOperationalInternal": {
-    "host": "packages-18-east.internal.npmjs.com",
-    "tmp": "tmp/platform-browser-2.2.4.tgz_1480548316380_0.2728964926209301"
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/platform-browser-2.2.0.tgz_1479151704719_0.8368440764024854"
   },
   "_npmUser": {
     "name": "angular",
     "email": "angular-core+npm@google.com"
   },
-  "_npmVersion": "3.8.9",
+  "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
     "raw": "@angular/platform-browser@~2.2.0",
@@ -41,11 +41,11 @@
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-2.2.4.tgz",
-  "_shasum": "6041e02c7ed62622c926060869506705f79fb5fb",
+  "_resolved": "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-2.2.0.tgz",
+  "_shasum": "6c39651ee861be9ca86ef6b7a21a160415b2ce8e",
   "_shrinkwrap": null,
   "_spec": "@angular/platform-browser@~2.2.0",
-  "_where": "C:\\Users\\antoi\\Documents\\swapp",
+  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
   "author": {
     "name": "angular"
   },
@@ -57,8 +57,8 @@
   "devDependencies": {},
   "directories": {},
   "dist": {
-    "shasum": "6041e02c7ed62622c926060869506705f79fb5fb",
-    "tarball": "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-2.2.4.tgz"
+    "shasum": "6c39651ee861be9ca86ef6b7a21a160415b2ce8e",
+    "tarball": "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-2.2.0.tgz"
   },
   "homepage": "https://github.com/angular/angular#readme",
   "license": "MIT",
@@ -73,8 +73,8 @@
   "name": "@angular/platform-browser",
   "optionalDependencies": {},
   "peerDependencies": {
-    "@angular/core": "2.2.4",
-    "@angular/common": "2.2.4"
+    "@angular/core": "2.2.0",
+    "@angular/common": "2.2.0"
   },
   "readme": "ERROR: No README data found!",
   "repository": {
@@ -83,5 +83,5 @@
   },
   "scripts": {},
   "typings": "index.d.ts",
-  "version": "2.2.4"
+  "version": "2.2.0"
 }

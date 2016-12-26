@@ -10,24 +10,24 @@
         "spec": ">=2.2.0 <2.3.0",
         "type": "range"
       },
-      "C:\\Users\\antoi\\Documents\\swapp"
+      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
     ]
   ],
   "_from": "@angular/upgrade@>=2.2.0 <2.3.0",
-  "_id": "@angular/upgrade@2.2.4",
+  "_id": "@angular/upgrade@2.2.0",
   "_inCache": true,
   "_installable": true,
   "_location": "/@angular/upgrade",
-  "_nodeVersion": "6.2.0",
+  "_nodeVersion": "6.7.0",
   "_npmOperationalInternal": {
     "host": "packages-18-east.internal.npmjs.com",
-    "tmp": "tmp/upgrade-2.2.4.tgz_1480548339075_0.7379621674772352"
+    "tmp": "tmp/upgrade-2.2.0.tgz_1479151729406_0.9772398241329938"
   },
   "_npmUser": {
     "name": "angular",
     "email": "angular-core+npm@google.com"
   },
-  "_npmVersion": "3.8.9",
+  "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
     "raw": "@angular/upgrade@~2.2.0",
@@ -41,11 +41,11 @@
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/@angular/upgrade/-/upgrade-2.2.4.tgz",
-  "_shasum": "f825b2fd6d133bdff9a759566809e4af635288be",
+  "_resolved": "https://registry.npmjs.org/@angular/upgrade/-/upgrade-2.2.0.tgz",
+  "_shasum": "29a5a71463eb036d96d23e2be30920f65b1cc19a",
   "_shrinkwrap": null,
   "_spec": "@angular/upgrade@~2.2.0",
-  "_where": "C:\\Users\\antoi\\Documents\\swapp",
+  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
   "author": {
     "name": "angular"
   },
@@ -57,8 +57,8 @@
   "devDependencies": {},
   "directories": {},
   "dist": {
-    "shasum": "f825b2fd6d133bdff9a759566809e4af635288be",
-    "tarball": "https://registry.npmjs.org/@angular/upgrade/-/upgrade-2.2.4.tgz"
+    "shasum": "29a5a71463eb036d96d23e2be30920f65b1cc19a",
+    "tarball": "https://registry.npmjs.org/@angular/upgrade/-/upgrade-2.2.0.tgz"
   },
   "homepage": "https://github.com/angular/angular#readme",
   "license": "MIT",
@@ -73,10 +73,10 @@
   "name": "@angular/upgrade",
   "optionalDependencies": {},
   "peerDependencies": {
-    "@angular/core": "2.2.4",
-    "@angular/compiler": "2.2.4",
-    "@angular/platform-browser": "2.2.4",
-    "@angular/platform-browser-dynamic": "2.2.4"
+    "@angular/core": "2.2.0",
+    "@angular/compiler": "2.2.0",
+    "@angular/platform-browser": "2.2.0",
+    "@angular/platform-browser-dynamic": "2.2.0"
   },
   "readme": "ERROR: No README data found!",
   "repository": {
@@ -85,5 +85,5 @@
   },
   "scripts": {},
   "typings": "index.d.ts",
-  "version": "2.2.4"
+  "version": "2.2.0"
 }

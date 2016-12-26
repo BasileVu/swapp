@@ -8,22 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
+var core_1 = require('@angular/core');
 var AddItemModalComponent = (function () {
     function AddItemModalComponent() {
     }
     AddItemModalComponent.prototype.ngOnInit = function () {
     };
+    AddItemModalComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'add-item-modal',
+            encapsulation: core_1.ViewEncapsulation.None,
+            templateUrl: './add-item-modal.component.html'
+        }), 
+        __metadata('design:paramtypes', [])
+    ], AddItemModalComponent);
     return AddItemModalComponent;
 }());
-AddItemModalComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'add-item-modal',
-        encapsulation: core_1.ViewEncapsulation.None,
-        templateUrl: './add-item-modal.component.html'
-    }),
-    __metadata("design:paramtypes", [])
-], AddItemModalComponent);
 exports.AddItemModalComponent = AddItemModalComponent;
 //# sourceMappingURL=add-item-modal.component.js.map

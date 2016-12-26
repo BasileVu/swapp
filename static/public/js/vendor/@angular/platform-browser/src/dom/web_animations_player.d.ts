@@ -16,16 +16,12 @@ export declare class WebAnimationsPlayer implements AnimationPlayer {
     private _finished;
     private _started;
     private _destroyed;
-    private _finalKeyframe;
     parentPlayer: AnimationPlayer;
-    previousStyles: {
-        [styleName: string]: string | number;
-    };
     constructor(element: any, keyframes: {
         [key: string]: string | number;
     }[], options: {
         [key: string]: string | number;
-    }, previousPlayers?: WebAnimationsPlayer[]);
+    });
     private _onFinish();
     init(): void;
     domPlayer: DomAnimatePlayer;
@@ -42,5 +38,4 @@ export declare class WebAnimationsPlayer implements AnimationPlayer {
     totalTime: number;
     setPosition(p: number): void;
     getPosition(): number;
-    private _captureStyles();
 }

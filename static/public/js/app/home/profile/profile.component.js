@@ -8,22 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require("@angular/core");
+var core_1 = require('@angular/core');
 var ProfileComponent = (function () {
     function ProfileComponent() {
     }
     ProfileComponent.prototype.ngOnInit = function () {
     };
+    ProfileComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            selector: 'profile',
+            encapsulation: core_1.ViewEncapsulation.None,
+            templateUrl: './profile.component.html'
+        }), 
+        __metadata('design:paramtypes', [])
+    ], ProfileComponent);
     return ProfileComponent;
 }());
-ProfileComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        selector: 'profile',
-        encapsulation: core_1.ViewEncapsulation.None,
-        templateUrl: './profile.component.html'
-    }),
-    __metadata("design:paramtypes", [])
-], ProfileComponent);
 exports.ProfileComponent = ProfileComponent;
 //# sourceMappingURL=profile.component.js.map
