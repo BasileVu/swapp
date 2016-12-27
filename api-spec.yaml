@@ -232,62 +232,85 @@ paths:
         400:
           description: Json malformed or location not existing
           
+  /notes:
+    post:
+      description: Create a new note.
+      parameters:
+      - in: body
+        name: body
+        description: The content of the note.
+        required: false
+        schema:
+          $ref: "#/definitions/Note"
+      responses:
+        201:
+          description: Successful operation
+        400:
+          description: Missing field or json malformed
+          
+  /notes/{id}:
+    get:
+      description: Get the info of the specify note.
+      parameters:
+      - in: path
+        name: id
+        description: id of the note
+        required: true
+        type: number
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            $ref: "#/definitions/Note"
+          
   /items:
     get:
       description: Gets unarchived `Item` objects.
       parameters:
-        -
+        - in: query
           name: q
-          in: query
           description: Query of user
           required: false
           type: string
           
-        -
+        - in: query
           name: category
-          in: query
           description: category of item wanted.
           required: false
           type: string
         
-        -
+        - in: query
           name: lat
-          in: query
           description: latitude of current point from where to search.
           required: false
           type: number
           
-        -
+        - in: query
           name: lon
-          in: query
           description: longitude of current point from where to search.
           required: false
           type: number
           
-        -
+        - in: query
           name: radius
-          in: query
           description: radius (in kilometers) in which items must be to appear in the result.
           required: false
           type: number
           
-        -
+        - in: query
           name: price_min
-          in: query
           description: lower bound of an item's price range taht must e respected in order for an item to appear in the result.
           required: false
           type: number
           
-        -
+        - in: query
           name: price_max
-          in: query
           description: upper bound of an item's price range taht must e respected in order for an item to appear in the result.
           required: false
           type: number
           
-        -
+        - in: query
           name: order_by
-          in: query
           description: define the sorting in the result.
           required: false
           type: string
@@ -296,13 +319,11 @@ paths:
         200:
           description: Successful operation
           schema:
-            title: ArrayOfItems
             type: array
             items:
               title: Item
               type: object
               properties:
-              
                 id:
                   type: number
                 name:
@@ -331,12 +352,12 @@ paths:
     post:
       description: Creates a new `Item`.
       parameters:
-        -
-          name: name
-          in: query # FIXME
-          description: The name of the item.
-          required: true
-          type: string
+        - in: body
+          name: body
+          description: The content of the note.
+          required: false
+          schema:
+            $ref: "#/definitions/Note"
             
       responses:
         201:
@@ -350,9 +371,8 @@ paths:
     get:
       description: Gets a detailed unarchived `Item` object.
       parameters:
-        -
+        - in: path
           name: id
-          in: path
           description: id of the item
           required: true
           type: number
@@ -360,7 +380,6 @@ paths:
         200:
           description: Successful operation
           schema:
-            title: ObjectDetail
             type: object
             properties:
               id:
@@ -418,3 +437,14 @@ definitions:
         type: string
       country:
         type: string
+  Note:
+    type: object
+    properties:
+      user:
+        type: number
+      offer:
+        type: number
+      text:
+        type: string
+      note:
+        type: number
