@@ -12,6 +12,13 @@ produces:
   - application/json
 
 paths:
+  /csrf:
+    get:
+      description: Gets a CSRF token required o use the api's route. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
+      responses:
+        200:
+          description: Successful operation. **Sets a cookie at the key "csrftoken".**
+
   /login:
     post:
       description: Logs an user in.
@@ -59,6 +66,45 @@ paths:
           description: Missing field or json malformed
         409:
           description: An user with the same susername already exists
+          
+  /users/{username}:
+    get:
+      description: Get the public account info of the given user.
+      parameters:
+        -
+          name: username
+          in: path
+          description: The username of the target user
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              username:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              location:
+                type: string
+              items:
+                type: array
+                items:
+                  type: number
+              notes:
+                type: array
+                items:
+                  type: number
+              likes:
+                type: array
+                items:
+                  type: number
           
   /account:
     get:
@@ -185,6 +231,7 @@ paths:
           description: Successful operation
         400:
           description: Json malformed or location not existing
+          
   /items:
     get:
       description: Gets unarchived `Item` objects.
@@ -299,8 +346,6 @@ paths:
               description: Location of the created object
               type: string
           
-            
-                  
   /items/{id}:
     get:
       description: Gets a detailed unarchived `Item` object.
