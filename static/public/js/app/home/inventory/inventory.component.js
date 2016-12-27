@@ -45,7 +45,25 @@ var InventoryComponent = (function () {
             moduleId: module.id,
             selector: 'inventory',
             encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './inventory.component.html'
+            templateUrl: './inventory.component.html',
+            animations: [
+                core_1.trigger('flyInOut', [
+                    core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
+                    core_1.transition('void => *', [
+                        core_1.style({
+                            opacity: 0,
+                            transform: 'translateX(0) scale(0)'
+                        }),
+                        core_1.animate(200)
+                    ]),
+                    core_1.transition('* => void', [
+                        core_1.animate(200, core_1.style({
+                            opacity: 0,
+                            transform: 'translateX(0) scale(0)'
+                        }))
+                    ])
+                ])
+            ]
         }), 
         __metadata('design:paramtypes', [authentication_service_1.AuthService])
     ], InventoryComponent);

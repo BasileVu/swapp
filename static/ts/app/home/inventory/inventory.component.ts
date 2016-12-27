@@ -1,5 +1,14 @@
 import {
-    Component, Input, ViewEncapsulation, OnInit, OnChanges
+    Component, 
+    Input, 
+    ViewEncapsulation, 
+    OnInit, 
+    OnChanges,
+    trigger,
+    state,
+    style,
+    transition,
+    animate,
 } from '@angular/core';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
@@ -10,7 +19,25 @@ declare var $:any;
     moduleId: module.id,
     selector: 'inventory',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './inventory.component.html'
+    templateUrl: './inventory.component.html',
+    animations: [
+        trigger('flyInOut', [
+            state('in', style({opacity: 1, transform: 'translateX(0)'})),
+            transition('void => *', [
+                style({
+                    opacity: 0,
+                    transform: 'translateX(0) scale(0)'
+                }),
+                animate(200)
+            ]),
+            transition('* => void', [
+                animate(200, style({
+                    opacity: 0,
+                    transform: 'translateX(0) scale(0)'
+                }))
+            ])
+        ])
+    ]
 })
 export class InventoryComponent implements OnInit, OnChanges {
 

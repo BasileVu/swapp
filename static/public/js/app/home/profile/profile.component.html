@@ -1,5 +1,5 @@
 <div id="home-profile" class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item">
-    <div [hidden]="!loggedIn">
+    <div *ngIf="loggedIn" [@flyInOut]>
         <div class="row identity">
             <div class="col-xs-2 col-sm-4">
                 <img class="avatar img-fluid" src="http://placehold.it/200x200"/>
@@ -39,7 +39,7 @@
     </div>
 
 
-    <div [hidden]="loggedIn">
+    <div *ngIf="!loggedIn" [@flyInOut]>
         <div class="row news">
             <div class="col-xs-12">
                 <h3>Welcome on Swapp</h3>

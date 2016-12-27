@@ -1,4 +1,13 @@
-import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import {
+    Component, 
+    ViewEncapsulation, 
+    OnInit,
+    trigger,
+    state,
+    style,
+    transition,
+    animate
+} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
@@ -7,8 +16,27 @@ import { User } from './user';
 @Component({
     moduleId: module.id,
     selector: 'profile',
+
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './profile.component.html'
+    templateUrl: './profile.component.html',
+    animations: [
+        trigger('flyInOut', [
+            state('in', style({opacity: 1, transform: 'translateX(0)'})),
+            transition('void => *', [
+                style({
+                    opacity: 0,
+                    transform: 'translateX(-100%)'
+                }),
+                animate('0.2s ease-in')
+            ]),
+            transition('* => void', [
+                animate('0.2s 10 ease-out', style({
+                    opacity: 0,
+                    transform: 'translateX(100%)'
+                }))
+            ])
+        ])
+    ]
 })
 
 export class ProfileComponent implements OnInit {

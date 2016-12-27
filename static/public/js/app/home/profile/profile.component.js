@@ -45,7 +45,25 @@ var ProfileComponent = (function () {
             moduleId: module.id,
             selector: 'profile',
             encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './profile.component.html'
+            templateUrl: './profile.component.html',
+            animations: [
+                core_1.trigger('flyInOut', [
+                    core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
+                    core_1.transition('void => *', [
+                        core_1.style({
+                            opacity: 0,
+                            transform: 'translateX(-100%)'
+                        }),
+                        core_1.animate('0.2s ease-in')
+                    ]),
+                    core_1.transition('* => void', [
+                        core_1.animate('0.2s 10 ease-out', core_1.style({
+                            opacity: 0,
+                            transform: 'translateX(100%)'
+                        }))
+                    ])
+                ])
+            ]
         }), 
         __metadata('design:paramtypes', [authentication_service_1.AuthService, forms_1.FormBuilder])
     ], ProfileComponent);
