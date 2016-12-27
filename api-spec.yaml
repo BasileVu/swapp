@@ -29,7 +29,7 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful response
+          description: Successful operation
         401:
           description: Invalid username/password combination or account not active
           
@@ -38,7 +38,7 @@ paths:
       description: Logs an user out.
       responses:
         200:
-          description: Successful response
+          description: Successful operation
         401:
           description: User is not logged in
 
@@ -54,7 +54,7 @@ paths:
             $ref: "#/definitions/User"
       responses:
         201:
-          description: Successful response
+          description: Successful operation
         400:
           description: Missing field or json malformed
         409:
@@ -65,7 +65,7 @@ paths:
       description: Get the account info of the current user logged in.
       responses:
         200:
-          description: Successful response
+          description: Successful operation
           schema:
             type: object
             properties:
@@ -80,16 +80,7 @@ paths:
               email:
                 type: string
               location:
-                type: object
-                properties:
-                  street:
-                    type: string
-                  city:
-                    type: string
-                  region:
-                    type: string
-                  country:
-                    type: string
+                  $ref: "#/definitions/Location"
               last_modification_date:
                 type: string
               categories:
@@ -111,7 +102,7 @@ paths:
         401:
           description: User is not logged in
     put:
-      description: Edit all the current user's account info.
+      description: Updates all the current user's account info.
       parameters:
         - in: body
           name: body
@@ -121,11 +112,13 @@ paths:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful response
+          description: Successful operation
+        400:
+          description: Missing field or json malformed
         401:
           description: User is not logged in
     patch:
-      description: Edit one or more of the current user's account info.
+      description: Partially updates the current user's account info.
       parameters:
         - in: body
           name: body
@@ -136,8 +129,62 @@ paths:
       responses:
         200:
           description: Successful response
+        400:
+          description: Json malformed
         401:
           description: User is not logged in
+          
+  /account/password:
+    put:
+      description: Updates the password of the current user logged in.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            type: object
+            properties:
+              old_password:
+                type: string
+              new_password:
+                type: string
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Missing field, json malformed or passwords not matching
+    
+  /account/location:
+    put:
+      description: Updates the location of the current user logged in.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            $ref: "#/definitions/Location"
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Missing field, json malformed or location not existing
+      
+    patch:
+      description: Partially updates the location of the current user logged in.
+      parameters:
+      - in: body
+        name: body
+        description: The account info to update.
+        required: false
+        schema:
+          $ref: "#/definitions/Location"
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Json malformed or location not existing
   /items:
     get:
       description: Gets unarchived `Item` objects.
@@ -200,7 +247,7 @@ paths:
           
       responses:
         200:
-          description: Successful response
+          description: Successful operation
           schema:
             title: ArrayOfItems
             type: array
@@ -246,18 +293,17 @@ paths:
             
       responses:
         201:
-          description: Created
+          description: Successful operation
           headers:
             Location: 
-              description: "Location of the created object"
+              description: Location of the created object
               type: string
           
             
                   
   /items/{id}:
     get:
-      description: |
-        Gets a detailed unarchived `Item` object.
+      description: Gets a detailed unarchived `Item` object.
       parameters:
         -
           name: id
@@ -267,7 +313,7 @@ paths:
           type: number
       responses:
         200:
-          description: Successful response
+          description: Successful operation
           schema:
             title: ObjectDetail
             type: object
@@ -314,4 +360,16 @@ definitions:
       email:
         type: string
       password:
+        type: string
+
+  Location:
+    type: object
+    properties:
+      street:
+        type: string
+      city:
+        type: string
+      region:
+        type: string
+      country:
         type: string
