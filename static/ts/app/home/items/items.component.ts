@@ -1,4 +1,4 @@
-import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import {Component, ViewEncapsulation, OnInit, OnChanges} from '@angular/core';
 
 import { ItemsService } from "./items.service";
 
@@ -16,7 +16,7 @@ declare var $:any;
     templateUrl: './items.component.html',
     providers: []
 })
-export class ItemsComponent implements OnInit {
+export class ItemsComponent implements OnInit, OnChanges {
 
     errorMessage: string = "No items available for now";
     items: Array<Item>;
@@ -50,6 +50,10 @@ export class ItemsComponent implements OnInit {
                 grid.isotope('layout');
             });
         });
+    }
+
+    ngOnChanges() {
+        console.log("changes");
     }
 
     getItems() {

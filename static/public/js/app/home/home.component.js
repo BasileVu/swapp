@@ -17,7 +17,8 @@ var HomeComponent = (function () {
         this.itemsService = itemsService;
     }
     HomeComponent.prototype.ngOnInit = function () {
-        this.hidden = !this.authService.checkCredentials();
+        var _this = this;
+        this.subscription = this.authService.loggedInSelected$.subscribe(function (loggedIn) { return _this.loggedIn = loggedIn; });
     };
     HomeComponent.prototype.ngAfterViewInit = function () {
     };

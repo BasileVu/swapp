@@ -8,6 +8,7 @@ import { UserService }      from '../core/user.service';
   templateUrl: 'title.component.html',
 })
 export class TitleComponent {
+
   @Input() subtitle = '';
   title = 'SWAPP';
   user = '';
@@ -15,6 +16,7 @@ export class TitleComponent {
   constructor(userService: UserService) {
     this.user = userService.userFirstName;
   }
+
 }
 
 

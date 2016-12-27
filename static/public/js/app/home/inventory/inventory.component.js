@@ -9,11 +9,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var authentication_service_1 = require('../../shared/authentication/authentication.service');
 var InventoryComponent = (function () {
-    function InventoryComponent() {
+    function InventoryComponent(authService) {
+        this.authService = authService;
     }
     InventoryComponent.prototype.ngOnInit = function () {
+        this.loggedIn = this.authService.isLoggedIn();
     };
+    InventoryComponent.prototype.ngOnChanges = function () {
+        console.log("change loggedIn=" + this.loggedIn);
+        // settimeout is an hack to have the inventory displayed nicely.
+        // It's probably due to the DOM elements which are not fully loaded
+        // on ngOnChanges so we wait a little time (100ms)
+        setTimeout(function () {
+            // home inventory ///////////////////////////
+            var inventory = $('.home-inventory').flickity({
+                // options
+                cellAlign: 'center',
+                contain: true,
+                imagesLoaded: true,
+                wrapAround: true,
+                groupCells: '100%',
+                prevNextButtons: false,
+                adaptiveHeight: true
+            });
+        }, 100);
+    };
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Boolean)
+    ], InventoryComponent.prototype, "loggedIn", void 0);
     InventoryComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
@@ -21,7 +47,7 @@ var InventoryComponent = (function () {
             encapsulation: core_1.ViewEncapsulation.None,
             templateUrl: './inventory.component.html'
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [authentication_service_1.AuthService])
     ], InventoryComponent);
     return InventoryComponent;
 }());

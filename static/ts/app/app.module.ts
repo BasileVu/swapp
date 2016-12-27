@@ -1,6 +1,6 @@
 import { NgModule }       from '@angular/core';
 import { BrowserModule }  from '@angular/platform-browser';
-import { HttpModule, JsonpModule } from '@angular/http';
+import { HttpModule, JsonpModule, XSRFStrategy, CookieXSRFStrategy } from '@angular/http';
 
 /* App Root */
 import { AppComponent }   from './app.component';
@@ -23,13 +23,16 @@ import { AppRoutingModule } from './app-routing.module';
         CoreModule.forRoot({userFirstName: 'John', userLastName: 'Smith'}),
         AppRoutingModule,
         HttpModule,
-        JsonpModule
+        JsonpModule,
     ],
     
     // Define other components in our module
     declarations: [ AppComponent ],
-
-    providers: [ AuthService ],
+    
+    providers: [ 
+        AuthService,
+        { provide: XSRFStrategy, useValue: new CookieXSRFStrategy('csrftoken', 'X-CSRFToken') }
+    ],
 
     // Define the root component
     bootstrap:    [ AppComponent ]

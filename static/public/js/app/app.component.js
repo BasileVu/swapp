@@ -11,13 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 require('./rxjs-operators');
 var http_1 = require("@angular/http");
+var authentication_service_1 = require('./shared/authentication/authentication.service');
 var AppComponent = (function () {
-    function AppComponent(http) {
+    function AppComponent(http, authService) {
         this.http = http;
+        this.authService = authService;
         this.subtitle = '(v1)';
     }
     AppComponent.prototype.ngOnInit = function () {
-        this.http.get("/api/csrf/");
+        var _this = this;
+        var csrf = this.http.get("/api/csrf/");
+        console.log(csrf);
+        this.loggedIn = this.authService.isLoggedIn();
+        // Listen for login changes
+        this.subscription = this.authService.loggedInSelected$.subscribe(function (loggedIn) { return _this.loggedIn = loggedIn; });
         // TODO : make a proper service to store geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
@@ -247,7 +254,7 @@ var AppComponent = (function () {
             selector: 'my-app',
             templateUrl: 'app.component.html'
         }), 
-        __metadata('design:paramtypes', [http_1.Http])
+        __metadata('design:paramtypes', [http_1.Http, authentication_service_1.AuthService])
     ], AppComponent);
     return AppComponent;
 }());

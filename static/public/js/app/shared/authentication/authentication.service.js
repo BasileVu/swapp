@@ -9,32 +9,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var User = (function () {
-    function User(email, password) {
-        this.email = email;
-        this.password = password;
-    }
-    return User;
-}());
-exports.User = User;
-// TODO : check on backend
-var users = [
-    new User('admin@admin.com', 'adm9'),
-    new User('user1@gmail.com', 'a23')
-];
+var http_1 = require('@angular/http');
+var Subject_1 = require('rxjs/Subject');
 var AuthService = (function () {
-    function AuthService() {
+    function AuthService(http) {
+        this.http = http;
+        // Observable source
+        this.loggedInSelectedSource = new Subject_1.Subject();
+        // Observable boolean streams
+        this.loggedInSelected$ = this.loggedInSelectedSource.asObservable();
+        this.loggedIn = false;
     }
+    // Service message commands
+    AuthService.prototype.selectLoggedIn = function (loggedIn) {
+        this.loggedInSelectedSource.next(loggedIn);
+    };
+    AuthService.prototype.isLoggedIn = function () {
+        return this.loggedIn;
+    };
     AuthService.prototype.logout = function () {
         localStorage.removeItem("user");
     };
     AuthService.prototype.login = function (username, password) {
-        /*var authenticatedUser = users.find(u => u.email === user.email);
-        if (authenticatedUser && authenticatedUser.password === user.password) {
-            localStorage.setItem("user", authenticatedUser);
-            return true;
-        }*/
-        return false;
+        var body = JSON.stringify({ username: username, password: password }); // Stringify payload
+        var headers = new http_1.Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        var options = new http_1.RequestOptions({ headers: headers }); // Create a request option
+        // No content to return, we just catch errors
+        return this.http.post('/api/login/', body, options)
+            .toPromise()
+            .catch(this.handleError);
+    };
+    /*
+        private extractData(res: Response) {
+            console.log("Response: " + res);
+            let body = res.json();
+            return body || { };
+        }
+    */
+    AuthService.prototype.handleError = function (error) {
+        // TODO : In a real world app, we might use a remote logging infrastructure
+        var errMsg;
+        if (error instanceof http_1.Response) {
+            var body = error.json() || '';
+            var err = body.error || JSON.stringify(body);
+            errMsg = error.status + " - " + (error.statusText || '') + " " + err;
+        }
+        else {
+            errMsg = error.message ? error.message : error.toString();
+        }
+        console.error("error: " + errMsg);
+        return Promise.reject(errMsg);
     };
     AuthService.prototype.checkCredentials = function () {
         //return localStorage.getItem("user") !== null;
@@ -42,7 +66,7 @@ var AuthService = (function () {
     };
     AuthService = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [http_1.Http])
     ], AuthService);
     return AuthService;
 }());

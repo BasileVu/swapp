@@ -1,7 +1,10 @@
 import {Component, OnInit, AfterViewInit} from '@angular/core';
 
 import './rxjs-operators';
-import {Http} from "@angular/http";
+import { Http } from "@angular/http";
+import { Subscription }   from 'rxjs/Subscription';
+
+import { AuthService } from './shared/authentication/authentication.service';
 
 declare var $:any;
 declare var google: any;
@@ -14,10 +17,22 @@ declare var google: any;
 export class AppComponent implements OnInit, AfterViewInit {
     subtitle = '(v1)';
 
-    constructor (private http: Http) {}
+    loggedIn: boolean;
+    subscription: Subscription;
+
+    constructor (private http: Http,
+                 private authService: AuthService) {}
 
     ngOnInit() {
-        this.http.get("/api/csrf/");
+        let csrf = this.http.get("/api/csrf/");
+        console.log(csrf);
+
+        this.loggedIn = this.authService.isLoggedIn();
+
+        // Listen for login changes
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => this.loggedIn = loggedIn
+        );
 
         // TODO : make a proper service to store geolocation
         if(navigator.geolocation){

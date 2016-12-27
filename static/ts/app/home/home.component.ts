@@ -2,6 +2,7 @@ import {Component, ViewEncapsulation, OnInit, AfterViewInit } from '@angular/cor
 
 import { AuthService } from '../shared/authentication/authentication.service';
 import {ItemsService} from "./items/items.service";
+import { Subscription }   from 'rxjs/Subscription';
 
 @Component({
     moduleId: module.id,
@@ -13,12 +14,15 @@ import {ItemsService} from "./items/items.service";
 
 export class HomeComponent implements OnInit, AfterViewInit {
 
-    hidden: boolean;
+    private loggedIn: boolean;
+    subscription: Subscription;
 
     constructor(private authService : AuthService, private itemsService: ItemsService){}
 
     ngOnInit() {
-        this.hidden = !this.authService.checkCredentials();
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => this.loggedIn = loggedIn
+        );
     }
 
     ngAfterViewInit() {

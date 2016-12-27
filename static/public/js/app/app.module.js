@@ -32,11 +32,14 @@ var AppModule = (function () {
                 core_module_1.CoreModule.forRoot({ userFirstName: 'John', userLastName: 'Smith' }),
                 app_routing_module_1.AppRoutingModule,
                 http_1.HttpModule,
-                http_1.JsonpModule
+                http_1.JsonpModule,
             ],
             // Define other components in our module
             declarations: [app_component_1.AppComponent],
-            providers: [authentication_service_1.AuthService],
+            providers: [
+                authentication_service_1.AuthService,
+                { provide: http_1.XSRFStrategy, useValue: new http_1.CookieXSRFStrategy('csrftoken', 'X-CSRFToken') }
+            ],
             // Define the root component
             bootstrap: [app_component_1.AppComponent]
         }), 

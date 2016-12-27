@@ -38,6 +38,7 @@ var HomeModule = (function () {
             imports: [
                 common_1.CommonModule,
                 forms_1.FormsModule,
+                forms_1.ReactiveFormsModule,
                 home_routing_1.routing,
             ],
             declarations: [

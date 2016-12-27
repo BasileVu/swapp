@@ -41,6 +41,9 @@ var ItemsComponent = (function () {
             });
         });
     };
+    ItemsComponent.prototype.ngOnChanges = function () {
+        console.log("changes");
+    };
     ItemsComponent.prototype.getItems = function () {
         var _this = this;
         this.itemsService.getItems()
