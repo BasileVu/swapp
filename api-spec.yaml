@@ -1,0 +1,181 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.0"
+  title: Swapp API
+
+# Describe your paths here
+paths:
+  # This is a path endpoint. Change it.
+  /items:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Gets unarchived `Item` objects.
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: q
+          in: query
+          description: Query of user
+          required: false
+          type: string
+          
+        -
+          name: category
+          in: query
+          description: category of item wanted.
+          required: false
+          type: string
+        
+        -
+          name: lat
+          in: query
+          description: latitude of current point from where to search.
+          required: false
+          type: number
+          
+        -
+          name: lon
+          in: query
+          description: longitude of current point from where to search.
+          required: false
+          type: number
+          
+        -
+          name: radius
+          in: query
+          description: radius (in kilometers) in which items must be to appear in the result.
+          required: false
+          type: number
+          
+        -
+          name: price_min
+          in: query
+          description: lower bound of an item's price range taht must e respected in order for an item to appear in the result.
+          required: false
+          type: number
+          
+        -
+          name: price_max
+          in: query
+          description: upper bound of an item's price range taht must e respected in order for an item to appear in the result.
+          required: false
+          type: number
+          
+        -
+          name: order_by
+          in: query
+          description: define the sorting in the result.
+          required: false
+          type: string
+          
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfItems
+            type: array
+            items:
+              title: Item
+              type: object
+              properties:
+              
+                id:
+                  type: number
+                name:
+                  type: string
+                creation_date:
+                  type: string
+                image_url:
+                  type: string
+                category:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                offer_received:
+                  type: number
+                views:
+                  type: number
+                comments:
+                  type: number
+                likes:
+                  type: number
+                owner_image_url:
+                  type: string
+                  
+    post:
+      description: Creates a new `Item`.
+      parameters:
+        -
+          name: name
+          in: query # FIXME
+          description: The name of the item.
+          required: true
+          type: string
+            
+      responses:
+        201:
+          description: Created
+          headers:
+            Location: 
+              description: "Location of the created object"
+              type: string
+          
+            
+                  
+  /items/{id}:
+    get:
+      description: |
+        Gets a detailed unarchived `Item` object.
+      parameters:
+        -
+          name: id
+          in: path
+          description: id of the item
+          required: true
+          type: number
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ObjectDetail
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+              description:
+                type: string
+              price_min:
+                type: number
+              price_max:
+                type: number
+              creation_date:
+                type: string
+              condition:
+                type: string
+              brand:
+                type: string
+              color:
+                type: string
+              owner:
+                type: string
+              number_of_vote:
+                type: number
+              category:
+                type: string
+              comments:
+                type: array
+                items:
+                  type: number
+                    
