@@ -9,19 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 // Exact copy of contact.awesome.pipe
-var core_1 = require('@angular/core');
+var core_1 = require("@angular/core");
 var AwesomePipe = (function () {
+    /** Precede the input string with the word "Awesome " */
     function AwesomePipe() {
     }
     AwesomePipe.prototype.transform = function (phrase) {
         return phrase ? 'Awesome ' + phrase : '';
     };
-    AwesomePipe = __decorate([
-        core_1.Pipe({ name: 'awesome' }), 
-        __metadata('design:paramtypes', [])
-    ], AwesomePipe);
     return AwesomePipe;
 }());
+AwesomePipe = __decorate([
+    core_1.Pipe({ name: 'awesome' }),
+    __metadata("design:paramtypes", [])
+], AwesomePipe);
 exports.AwesomePipe = AwesomePipe;
 /*
 Copyright 2016 Google Inc. All Rights Reserved.

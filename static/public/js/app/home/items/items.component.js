@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
+var core_1 = require("@angular/core");
 var items_service_1 = require("./items.service");
 var ItemsComponent = (function () {
     function ItemsComponent(itemsService) {
@@ -69,17 +69,17 @@ var ItemsComponent = (function () {
             service.selectComments(_this.selectedComments);
         }, function (error) { return _this.errorMessage = error; });
     };
-    ItemsComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'items',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './items.component.html',
-            providers: []
-        }), 
-        __metadata('design:paramtypes', [items_service_1.ItemsService])
-    ], ItemsComponent);
     return ItemsComponent;
 }());
+ItemsComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'items',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './items.component.html',
+        providers: []
+    }),
+    __metadata("design:paramtypes", [items_service_1.ItemsService])
+], ItemsComponent);
 exports.ItemsComponent = ItemsComponent;
 //# sourceMappingURL=items.component.js.map

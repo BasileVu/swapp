@@ -1,0 +1,129 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "ng2-img-cropper",
+        "scope": null,
+        "escapedName": "ng2-img-cropper",
+        "name": "ng2-img-cropper",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp"
+    ]
+  ],
+  "_from": "ng2-img-cropper@latest",
+  "_id": "ng2-img-cropper@0.7.6",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/ng2-img-cropper",
+  "_nodeVersion": "6.8.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/ng2-img-cropper-0.7.6.tgz_1481422005408_0.2021933610085398"
+  },
+  "_npmUser": {
+    "name": "cstefanache",
+    "email": "cornel.stefanache@gmail.com"
+  },
+  "_npmVersion": "3.10.8",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "ng2-img-cropper",
+    "scope": null,
+    "escapedName": "ng2-img-cropper",
+    "name": "ng2-img-cropper",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/ng2-img-cropper/-/ng2-img-cropper-0.7.6.tgz",
+  "_shasum": "814cb8c41f6734bc5933ac58f84a28c531272106",
+  "_shrinkwrap": null,
+  "_spec": "ng2-img-cropper",
+  "_where": "C:\\Users\\sebri\\Documents\\HEIG-VD\\SEM5\\PDG\\swapp",
+  "author": {
+    "name": "Cornel Stefanache"
+  },
+  "bugs": {
+    "url": "https://github.com/cstefanache/angular2-img-cropper/issues"
+  },
+  "dependencies": {},
+  "description": "Angular2 Image Cropper Component",
+  "devDependencies": {
+    "@angular/common": "~2.3.0",
+    "@angular/compiler": "~2.3.0",
+    "@angular/core": "~2.3.0",
+    "@angular/forms": "~2.3.0",
+    "@angular/http": "~2.3.0",
+    "@angular/platform-browser": "~2.3.0",
+    "@angular/platform-browser-dynamic": "~2.3.0",
+    "@types/es6-shim": "^0.31.32",
+    "angular-in-memory-web-api": "~0.1.17",
+    "concurrently": "^2.2.0",
+    "core-js": "^2.4.1",
+    "es6-shim": "^0.35.1",
+    "lite-server": "^2.2.2",
+    "ng2-tabs": "0.0.7",
+    "reflect-metadata": "^0.1.3",
+    "rxjs": "5.0.0-rc.4",
+    "systemjs": "0.19.27",
+    "typescript": "^2.0.2",
+    "typings": "^1.3.2",
+    "version": "^0.1.2",
+    "zone.js": "^0.7.2"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "814cb8c41f6734bc5933ac58f84a28c531272106",
+    "tarball": "https://registry.npmjs.org/ng2-img-cropper/-/ng2-img-cropper-0.7.6.tgz"
+  },
+  "gitHead": "117db70c698133a412f74a8c1451b5099dda9899",
+  "homepage": "https://github.com/cstefanache/angular2-img-cropper#readme",
+  "keywords": [
+    "angular2",
+    "image",
+    "cropper"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "cstefanache",
+      "email": "cornel.stefanache@gmail.com"
+    }
+  ],
+  "name": "ng2-img-cropper",
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "@angular/common": "^2.1.0",
+    "@angular/compiler": "^2.1.0",
+    "@angular/core": "^2.1.0"
+  },
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cstefanache/angular2-img-cropper.git"
+  },
+  "scripts": {
+    "all": "concurrently \"tsc -w \" \"tsc -p runtime -w \" \"npm run lite\" ",
+    "build": "tsc -p ./",
+    "compile": "npm run compile:ts",
+    "compile:ts": "tsc",
+    "lite": "lite-server",
+    "postversion": "git push --tags && git checkout master && git branch -D release && git push && npm publish",
+    "preversion": "npm test && npm run build",
+    "release:major": "npm version major && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:patch": "npm version patch && npm publish",
+    "start": "concurrently \"tsc -w \" \"tsc -p runtime -w \" \"npm run lite\" ",
+    "tsc": "tsc",
+    "version": "git commit -am \"Prerelease updates\" && git checkout -b release && git add -f ./",
+    "watch": "tsc -w "
+  },
+  "version": "0.7.6"
+}

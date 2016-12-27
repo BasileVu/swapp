@@ -23,7 +23,8 @@
       '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
       '@angular/upgrade': 'npm:@angular/upgrade/bundles/upgrade.umd.js',
       // other libraries
-      'rxjs':                      'npm:rxjs'
+      'rxjs':                      'npm:rxjs',
+      'ng2-img-cropper': 'npm:ng2-img-cropper'
     },
     // packages tells the System loader how to load when no filename and/or no extension
     packages: {
@@ -33,7 +34,8 @@
       },
       rxjs: {
         defaultExtension: 'js'
-      }
+      },
+      'ng2-img-cropper' :           { main: 'index.js', defaultExtension: 'js' }
     }
   });
 })(this);

@@ -36,6 +36,11 @@ module.exports = function(grunt) {
                         dest: 'static/public/js/vendor/rxjs/'
                     }, {
                         expand: true,
+                        cwd: 'node_modules/ng2-img-cropper/',
+                        src: ['**'],
+                        dest: 'static/public/js/vendor/ng2-img-cropper/'
+                    }, {
+                        expand: true,
                         cwd: 'static/ts/',
                         src: ['**', '!**/*.ts'],
                         dest: 'static/public/js/'

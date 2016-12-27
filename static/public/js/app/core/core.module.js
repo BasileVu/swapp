@@ -12,12 +12,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 /* tslint:disable:member-ordering no-unused-variable */
-var core_1 = require('@angular/core');
-var common_1 = require('@angular/common');
-var title_component_1 = require('./title.component');
-var user_service_1 = require('./user.service');
-var user_service_2 = require('./user.service');
-var CoreModule = (function () {
+var core_1 = require("@angular/core");
+var common_1 = require("@angular/common");
+var title_component_1 = require("./title.component");
+var user_service_1 = require("./user.service");
+var user_service_2 = require("./user.service");
+var CoreModule = CoreModule_1 = (function () {
     function CoreModule(parentModule) {
         if (parentModule) {
             throw new Error('CoreModule is already loaded. Import it in the AppModule only');
@@ -25,26 +25,26 @@ var CoreModule = (function () {
     }
     CoreModule.forRoot = function (config) {
         return {
-            ngModule: CoreModule,
+            ngModule: CoreModule_1,
             providers: [
                 { provide: user_service_2.UserServiceConfig, useValue: config }
             ]
         };
     };
-    CoreModule = __decorate([
-        core_1.NgModule({
-            imports: [common_1.CommonModule],
-            declarations: [title_component_1.TitleComponent],
-            exports: [title_component_1.TitleComponent],
-            providers: [user_service_1.UserService]
-        }),
-        __param(0, core_1.Optional()),
-        __param(0, core_1.SkipSelf()), 
-        __metadata('design:paramtypes', [CoreModule])
-    ], CoreModule);
     return CoreModule;
 }());
+CoreModule = CoreModule_1 = __decorate([
+    core_1.NgModule({
+        imports: [common_1.CommonModule],
+        declarations: [title_component_1.TitleComponent],
+        exports: [title_component_1.TitleComponent],
+        providers: [user_service_1.UserService]
+    }),
+    __param(0, core_1.Optional()), __param(0, core_1.SkipSelf()),
+    __metadata("design:paramtypes", [CoreModule])
+], CoreModule);
 exports.CoreModule = CoreModule;
+var CoreModule_1;
 /*
 Copyright 2016 Google Inc. All Rights Reserved.
 Use of this source code is governed by an MIT-style license that

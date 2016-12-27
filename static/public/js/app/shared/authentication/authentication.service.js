@@ -8,9 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var http_1 = require('@angular/http');
-var Subject_1 = require('rxjs/Subject');
+var core_1 = require("@angular/core");
+var http_1 = require("@angular/http");
+var Subject_1 = require("rxjs/Subject");
 var AuthService = (function () {
     function AuthService(http) {
         this.http = http;
@@ -39,6 +39,15 @@ var AuthService = (function () {
             .toPromise()
             .catch(this.handleError);
     };
+    AuthService.prototype.register = function (userCreationDTO) {
+        var body = JSON.stringify(userCreationDTO); // Stringify payload
+        var headers = new http_1.Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        var options = new http_1.RequestOptions({ headers: headers }); // Create a request option
+        // No content to return, we just catch errors
+        return this.http.post('/api/users/', body, options)
+            .toPromise()
+            .catch(this.handleError);
+    };
     /*
         private extractData(res: Response) {
             console.log("Response: " + res);
@@ -64,11 +73,11 @@ var AuthService = (function () {
         //return localStorage.getItem("user") !== null;
         return true;
     };
-    AuthService = __decorate([
-        core_1.Injectable(), 
-        __metadata('design:paramtypes', [http_1.Http])
-    ], AuthService);
     return AuthService;
 }());
+AuthService = __decorate([
+    core_1.Injectable(),
+    __metadata("design:paramtypes", [http_1.Http])
+], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=authentication.service.js.map

@@ -8,22 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
+var core_1 = require("@angular/core");
 var UpdateProfileModalComponent = (function () {
     function UpdateProfileModalComponent() {
     }
     UpdateProfileModalComponent.prototype.ngOnInit = function () {
     };
-    UpdateProfileModalComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'update-profile-modal',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './update-profile-modal.component.html'
-        }), 
-        __metadata('design:paramtypes', [])
-    ], UpdateProfileModalComponent);
     return UpdateProfileModalComponent;
 }());
+UpdateProfileModalComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'update-profile-modal',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './update-profile-modal.component.html'
+    }),
+    __metadata("design:paramtypes", [])
+], UpdateProfileModalComponent);
 exports.UpdateProfileModalComponent = UpdateProfileModalComponent;
 //# sourceMappingURL=update-profile-modal.component.js.map

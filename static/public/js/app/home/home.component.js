@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var authentication_service_1 = require('../shared/authentication/authentication.service');
+var core_1 = require("@angular/core");
+var authentication_service_1 = require("../shared/authentication/authentication.service");
 var items_service_1 = require("./items/items.service");
 var HomeComponent = (function () {
     function HomeComponent(authService, itemsService) {
@@ -22,17 +22,17 @@ var HomeComponent = (function () {
     };
     HomeComponent.prototype.ngAfterViewInit = function () {
     };
-    HomeComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'home',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './home.component.html',
-            providers: [items_service_1.ItemsService]
-        }), 
-        __metadata('design:paramtypes', [authentication_service_1.AuthService, items_service_1.ItemsService])
-    ], HomeComponent);
     return HomeComponent;
 }());
+HomeComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'home',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './home.component.html',
+        providers: [items_service_1.ItemsService]
+    }),
+    __metadata("design:paramtypes", [authentication_service_1.AuthService, items_service_1.ItemsService])
+], HomeComponent);
 exports.HomeComponent = HomeComponent;
 //# sourceMappingURL=home.component.js.map

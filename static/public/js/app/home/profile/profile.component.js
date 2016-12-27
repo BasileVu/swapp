@@ -8,9 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var forms_1 = require('@angular/forms');
-var authentication_service_1 = require('../../shared/authentication/authentication.service');
+var core_1 = require("@angular/core");
+var forms_1 = require("@angular/forms");
+var authentication_service_1 = require("../../shared/authentication/authentication.service");
 var ProfileComponent = (function () {
     function ProfileComponent(authService, formBuilder) {
         this.authService = authService;
@@ -104,34 +104,35 @@ var ProfileComponent = (function () {
         }, function (error) { return console.log("error caca: " + error); } // TODO : Toastr ? Message under form ?
         );
     };
-    ProfileComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'profile',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './profile.component.html',
-            animations: [
-                core_1.trigger('flyInOut', [
-                    core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
-                    core_1.transition('void => *', [
-                        core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(-100%)'
-                        }),
-                        core_1.animate('0.2s ease-in')
-                    ]),
-                    core_1.transition('* => void', [
-                        core_1.animate('0.2s 10 ease-out', core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(100%)'
-                        }))
-                    ])
-                ])
-            ]
-        }), 
-        __metadata('design:paramtypes', [authentication_service_1.AuthService, forms_1.FormBuilder])
-    ], ProfileComponent);
     return ProfileComponent;
 }());
+ProfileComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'profile',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './profile.component.html',
+        animations: [
+            core_1.trigger('flyInOut', [
+                core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
+                core_1.transition('void => *', [
+                    core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(-100%)'
+                    }),
+                    core_1.animate('0.2s ease-in')
+                ]),
+                core_1.transition('* => void', [
+                    core_1.animate('0.2s 10 ease-out', core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(100%)'
+                    }))
+                ])
+            ])
+        ]
+    }),
+    __metadata("design:paramtypes", [authentication_service_1.AuthService,
+        forms_1.FormBuilder])
+], ProfileComponent);
 exports.ProfileComponent = ProfileComponent;
 //# sourceMappingURL=profile.component.js.map

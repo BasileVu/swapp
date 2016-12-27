@@ -42,6 +42,17 @@ export class AuthService {
             .catch(this.handleError);
     }
 
+    register(userCreationDTO): Promise<any> {
+        let body = JSON.stringify(userCreationDTO); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        // No content to return, we just catch errors
+        return this.http.post('/api/users/', body, options)
+            .toPromise()
+            .catch(this.handleError);
+    }
+
 /*
     private extractData(res: Response) {
         console.log("Response: " + res);

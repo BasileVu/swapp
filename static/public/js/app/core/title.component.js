@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 // Exact copy of app/title.component.ts except import UserService from shared
-var core_1 = require('@angular/core');
-var user_service_1 = require('../core/user.service');
+var core_1 = require("@angular/core");
+var user_service_1 = require("../core/user.service");
 var TitleComponent = (function () {
     function TitleComponent(userService) {
         this.subtitle = '';
@@ -18,20 +18,20 @@ var TitleComponent = (function () {
         this.user = '';
         this.user = userService.userFirstName;
     }
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Object)
-    ], TitleComponent.prototype, "subtitle", void 0);
-    TitleComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'app-title',
-            templateUrl: 'title.component.html',
-        }), 
-        __metadata('design:paramtypes', [user_service_1.UserService])
-    ], TitleComponent);
     return TitleComponent;
 }());
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], TitleComponent.prototype, "subtitle", void 0);
+TitleComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'app-title',
+        templateUrl: 'title.component.html',
+    }),
+    __metadata("design:paramtypes", [user_service_1.UserService])
+], TitleComponent);
 exports.TitleComponent = TitleComponent;
 /*
 Copyright 2016 Google Inc. All Rights Reserved.

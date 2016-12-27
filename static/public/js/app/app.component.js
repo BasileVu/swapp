@@ -8,10 +8,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-require('./rxjs-operators');
+var core_1 = require("@angular/core");
+require("./rxjs-operators");
 var http_1 = require("@angular/http");
-var authentication_service_1 = require('./shared/authentication/authentication.service');
+var authentication_service_1 = require("./shared/authentication/authentication.service");
 var AppComponent = (function () {
     function AppComponent(http, authService) {
         this.http = http;
@@ -110,6 +110,14 @@ var AppComponent = (function () {
                         scrollTop: scrollY
                     });
                 });
+                // open user creation profile modal /////////////////////
+                var openCreateProfileButtons = $('.open-create-profile-modal');
+                var createProfileModal = $('#create-user-modal');
+                openCreateProfileButtons.each(function () {
+                    $(this).click(function () {
+                        createProfileModal.modal('show');
+                    });
+                });
                 // open item creation modal /////////////////////
                 var addItemButtons = $('.open-new-item-modal');
                 var newItemModal = $('#add-item-modal');
@@ -186,33 +194,34 @@ var AppComponent = (function () {
             });
         }, 500);
     };
-    AppComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'my-app',
-            templateUrl: 'app.component.html',
-            animations: [
-                core_1.trigger('flyInOut', [
-                    core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
-                    core_1.transition('void => *', [
-                        core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(-100%)'
-                        }),
-                        core_1.animate('0.2s ease-in')
-                    ]),
-                    core_1.transition('* => void', [
-                        core_1.animate('0.2s 10 ease-out', core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(100%)'
-                        }))
-                    ])
-                ])
-            ]
-        }), 
-        __metadata('design:paramtypes', [http_1.Http, authentication_service_1.AuthService])
-    ], AppComponent);
     return AppComponent;
 }());
+AppComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'my-app',
+        templateUrl: 'app.component.html',
+        animations: [
+            core_1.trigger('flyInOut', [
+                core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
+                core_1.transition('void => *', [
+                    core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(-100%)'
+                    }),
+                    core_1.animate('0.2s ease-in')
+                ]),
+                core_1.transition('* => void', [
+                    core_1.animate('0.2s 10 ease-out', core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(100%)'
+                    }))
+                ])
+            ])
+        ]
+    }),
+    __metadata("design:paramtypes", [http_1.Http,
+        authentication_service_1.AuthService])
+], AppComponent);
 exports.AppComponent = AppComponent;
 //# sourceMappingURL=app.component.js.map

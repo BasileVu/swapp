@@ -1,9 +1,8 @@
 /**
- * @license Angular v3.2.0
+ * @license Angular v3.2.4
  * (c) 2010-2016 Google, Inc. https://angular.io/
  * License: MIT
- */
-(function (global, factory) {
+ */(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/common'), require('@angular/core'), require('rxjs/BehaviorSubject'), require('rxjs/Subject'), require('rxjs/observable/from'), require('rxjs/observable/of'), require('rxjs/operator/concatMap'), require('rxjs/operator/every'), require('rxjs/operator/first'), require('rxjs/operator/map'), require('rxjs/operator/mergeMap'), require('rxjs/operator/reduce'), require('rxjs/Observable'), require('rxjs/operator/catch'), require('rxjs/operator/concatAll'), require('rxjs/util/EmptyError'), require('rxjs/observable/fromPromise'), require('rxjs/operator/last'), require('rxjs/operator/mergeAll'), require('@angular/platform-browser'), require('rxjs/operator/filter')) :
     typeof define === 'function' && define.amd ? define(['exports', '@angular/common', '@angular/core', 'rxjs/BehaviorSubject', 'rxjs/Subject', 'rxjs/observable/from', 'rxjs/observable/of', 'rxjs/operator/concatMap', 'rxjs/operator/every', 'rxjs/operator/first', 'rxjs/operator/map', 'rxjs/operator/mergeMap', 'rxjs/operator/reduce', 'rxjs/Observable', 'rxjs/operator/catch', 'rxjs/operator/concatAll', 'rxjs/util/EmptyError', 'rxjs/observable/fromPromise', 'rxjs/operator/last', 'rxjs/operator/mergeAll', '@angular/platform-browser', 'rxjs/operator/filter'], factory) :
     (factory((global.ng = global.ng || {}, global.ng.router = global.ng.router || {}),global.ng.common,global.ng.core,global.Rx,global.Rx,global.Rx.Observable,global.Rx.Observable,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx,global.Rx.Observable,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.ng.platformBrowser,global.Rx.Observable.prototype));
@@ -308,11 +307,11 @@
             /**
             * The root segment group of the URL tree.
              */
-            root,
+            root, 
             /**
              * The query params of the URL.
              */
-            queryParams,
+            queryParams, 
             /**
              * The fragment of the URL.
              */
@@ -339,7 +338,7 @@
             /**
              * The URL segments of this group. See {@link UrlSegment} for more information.
              */
-            segments,
+            segments, 
             /**
              * The list of children of this group.
              */
@@ -401,7 +400,7 @@
             /**
              * The path part of a URL segment.
              */
-            path,
+            path, 
             /**
              * The matrix parameters associated with a segment.
              */
@@ -756,27 +755,31 @@
         return NoMatch;
     }());
     var AbsoluteRedirect = (function () {
-        function AbsoluteRedirect(segments) {
-            this.segments = segments;
+        function AbsoluteRedirect(urlTree) {
+            this.urlTree = urlTree;
         }
         return AbsoluteRedirect;
     }());
     function noMatch(segmentGroup) {
         return new rxjs_Observable.Observable(function (obs) { return obs.error(new NoMatch(segmentGroup)); });
     }
-    function absoluteRedirect(segments) {
-        return new rxjs_Observable.Observable(function (obs) { return obs.error(new AbsoluteRedirect(segments)); });
+    function absoluteRedirect(newTree) {
+        return new rxjs_Observable.Observable(function (obs) { return obs.error(new AbsoluteRedirect(newTree)); });
+    }
+    function namedOutletsRedirect(redirectTo) {
+        return new rxjs_Observable.Observable(function (obs) { return obs.error(new Error("Only absolute redirects can have named outlets. redirectTo: '" + redirectTo + "'")); });
     }
     function canLoadFails(route) {
         return new rxjs_Observable.Observable(function (obs) { return obs.error(new NavigationCancelingError("Cannot load children because the guard of the route \"path: '" + route.path + "'\" returned false")); });
     }
-    function applyRedirects(injector, configLoader, urlTree, config) {
-        return new ApplyRedirects(injector, configLoader, urlTree, config).apply();
+    function applyRedirects(injector, configLoader, urlSerializer, urlTree, config) {
+        return new ApplyRedirects(injector, configLoader, urlSerializer, urlTree, config).apply();
     }
     var ApplyRedirects = (function () {
-        function ApplyRedirects(injector, configLoader, urlTree, config) {
+        function ApplyRedirects(injector, configLoader, urlSerializer, urlTree, config) {
             this.injector = injector;
             this.configLoader = configLoader;
+            this.urlSerializer = urlSerializer;
             this.urlTree = urlTree;
             this.config = config;
             this.allowRedirects = true;
@@ -784,14 +787,13 @@
         ApplyRedirects.prototype.apply = function () {
             var _this = this;
             var expanded$ = this.expandSegmentGroup(this.injector, this.config, this.urlTree.root, PRIMARY_OUTLET);
-            var urlTrees$ = rxjs_operator_map.map.call(expanded$, function (rootSegmentGroup) { return _this.createUrlTree(rootSegmentGroup); });
+            var urlTrees$ = rxjs_operator_map.map.call(expanded$, function (rootSegmentGroup) { return _this.createUrlTree(rootSegmentGroup, _this.urlTree.queryParams, _this.urlTree.fragment); });
             return rxjs_operator_catch._catch.call(urlTrees$, function (e) {
                 if (e instanceof AbsoluteRedirect) {
                     // after an absolute redirect we do not apply any more redirects!
                     _this.allowRedirects = false;
-                    var group = new UrlSegmentGroup([], (_a = {}, _a[PRIMARY_OUTLET] = new UrlSegmentGroup(e.segments, {}), _a));
                     // we need to run matching, so we can fetch all lazy-loaded modules
-                    return _this.match(group);
+                    return _this.match(e.urlTree);
                 }
                 else if (e instanceof NoMatch) {
                     throw _this.noMatchError(e);
@@ -799,13 +801,14 @@
                 else {
                     throw e;
                 }
-                var _a;
             });
         };
-        ApplyRedirects.prototype.match = function (segmentGroup) {
+        ApplyRedirects.prototype.match = function (tree) {
             var _this = this;
-            var expanded$ = this.expandSegmentGroup(this.injector, this.config, segmentGroup, PRIMARY_OUTLET);
-            var mapped$ = rxjs_operator_map.map.call(expanded$, function (rootSegmentGroup) { return _this.createUrlTree(rootSegmentGroup); });
+            var expanded$ = this.expandSegmentGroup(this.injector, this.config, tree.root, PRIMARY_OUTLET);
+            var mapped$ = rxjs_operator_map.map.call(expanded$, function (rootSegmentGroup) {
+                return _this.createUrlTree(rootSegmentGroup, tree.queryParams, tree.fragment);
+            });
             return rxjs_operator_catch._catch.call(mapped$, function (e) {
                 if (e instanceof NoMatch) {
                     throw _this.noMatchError(e);
@@ -818,11 +821,11 @@
         ApplyRedirects.prototype.noMatchError = function (e) {
             return new Error("Cannot match any routes. URL Segment: '" + e.segmentGroup + "'");
         };
-        ApplyRedirects.prototype.createUrlTree = function (rootCandidate) {
+        ApplyRedirects.prototype.createUrlTree = function (rootCandidate, queryParams, fragment) {
             var root = rootCandidate.segments.length > 0 ?
                 new UrlSegmentGroup([], (_a = {}, _a[PRIMARY_OUTLET] = rootCandidate, _a)) :
                 rootCandidate;
-            return new UrlTree(root, this.urlTree.queryParams, this.urlTree.fragment);
+            return new UrlTree(root, queryParams, fragment);
             var _a;
         };
         ApplyRedirects.prototype.expandSegmentGroup = function (injector, routes, segmentGroup, outlet) {
@@ -889,25 +892,31 @@
             }
         };
         ApplyRedirects.prototype.expandWildCardWithParamsAgainstRouteUsingRedirect = function (injector, routes, route, outlet) {
-            var newSegments = applyRedirectCommands([], route.redirectTo, {});
+            var _this = this;
+            var newTree = this.applyRedirectCommands([], route.redirectTo, {});
             if (route.redirectTo.startsWith('/')) {
-                return absoluteRedirect(newSegments);
+                return absoluteRedirect(newTree);
             }
             else {
-                var group = new UrlSegmentGroup(newSegments, {});
-                return this.expandSegment(injector, group, routes, newSegments, outlet, false);
+                return rxjs_operator_mergeMap.mergeMap.call(this.lineralizeSegments(route, newTree), function (newSegments) {
+                    var group = new UrlSegmentGroup(newSegments, {});
+                    return _this.expandSegment(injector, group, routes, newSegments, outlet, false);
+                });
             }
         };
         ApplyRedirects.prototype.expandRegularSegmentAgainstRouteUsingRedirect = function (injector, segmentGroup, routes, route, segments, outlet) {
+            var _this = this;
             var _a = match(segmentGroup, route, segments), matched = _a.matched, consumedSegments = _a.consumedSegments, lastChild = _a.lastChild, positionalParamSegments = _a.positionalParamSegments;
             if (!matched)
                 return noMatch(segmentGroup);
-            var newSegments = applyRedirectCommands(consumedSegments, route.redirectTo, positionalParamSegments);
+            var newTree = this.applyRedirectCommands(consumedSegments, route.redirectTo, positionalParamSegments);
             if (route.redirectTo.startsWith('/')) {
-                return absoluteRedirect(newSegments);
+                return absoluteRedirect(newTree);
             }
             else {
-                return this.expandSegment(injector, segmentGroup, routes, newSegments.concat(segments.slice(lastChild)), outlet, false);
+                return rxjs_operator_mergeMap.mergeMap.call(this.lineralizeSegments(route, newTree), function (newSegments) {
+                    return _this.expandSegment(injector, segmentGroup, routes, newSegments.concat(segments.slice(lastChild)), outlet, false);
+                });
             }
         };
         ApplyRedirects.prototype.matchSegmentAgainstRoute = function (injector, rawSegmentGroup, route, segments) {
@@ -974,6 +983,74 @@
                 return rxjs_observable_of.of(new LoadedRouterConfig([], injector, null, null));
             }
         };
+        ApplyRedirects.prototype.lineralizeSegments = function (route, urlTree) {
+            var res = [];
+            var c = urlTree.root;
+            while (true) {
+                res = res.concat(c.segments);
+                if (c.numberOfChildren === 0) {
+                    return rxjs_observable_of.of(res);
+                }
+                else if (c.numberOfChildren > 1 || !c.children[PRIMARY_OUTLET]) {
+                    return namedOutletsRedirect(route.redirectTo);
+                }
+                else {
+                    c = c.children[PRIMARY_OUTLET];
+                }
+            }
+        };
+        ApplyRedirects.prototype.applyRedirectCommands = function (segments, redirectTo, posParams) {
+            var t = this.urlSerializer.parse(redirectTo);
+            return this.applyRedirectCreatreUrlTree(redirectTo, this.urlSerializer.parse(redirectTo), segments, posParams);
+        };
+        ApplyRedirects.prototype.applyRedirectCreatreUrlTree = function (redirectTo, urlTree, segments, posParams) {
+            var newRoot = this.createSegmentGroup(redirectTo, urlTree.root, segments, posParams);
+            return new UrlTree(newRoot, this.createQueryParams(urlTree.queryParams, this.urlTree.queryParams), urlTree.fragment);
+        };
+        ApplyRedirects.prototype.createQueryParams = function (redirectToParams, actualParams) {
+            var res = {};
+            forEach(redirectToParams, function (v, k) {
+                if (v.startsWith(':')) {
+                    res[k] = actualParams[v.substring(1)];
+                }
+                else {
+                    res[k] = v;
+                }
+            });
+            return res;
+        };
+        ApplyRedirects.prototype.createSegmentGroup = function (redirectTo, group, segments, posParams) {
+            var _this = this;
+            var updatedSegments = this.createSegments(redirectTo, group.segments, segments, posParams);
+            var children = {};
+            forEach(group.children, function (child, name) {
+                children[name] = _this.createSegmentGroup(redirectTo, child, segments, posParams);
+            });
+            return new UrlSegmentGroup(updatedSegments, children);
+        };
+        ApplyRedirects.prototype.createSegments = function (redirectTo, redirectToSegments, actualSegments, posParams) {
+            var _this = this;
+            return redirectToSegments.map(function (s) { return s.path.startsWith(':') ? _this.findPosParam(redirectTo, s, posParams) :
+                _this.findOrReturn(s, actualSegments); });
+        };
+        ApplyRedirects.prototype.findPosParam = function (redirectTo, redirectToUrlSegment, posParams) {
+            var pos = posParams[redirectToUrlSegment.path.substring(1)];
+            if (!pos)
+                throw new Error("Cannot redirect to '" + redirectTo + "'. Cannot find '" + redirectToUrlSegment.path + "'.");
+            return pos;
+        };
+        ApplyRedirects.prototype.findOrReturn = function (redirectToUrlSegment, actualSegments) {
+            var idx = 0;
+            for (var _i = 0, actualSegments_1 = actualSegments; _i < actualSegments_1.length; _i++) {
+                var s = actualSegments_1[_i];
+                if (s.path === redirectToUrlSegment.path) {
+                    actualSegments.splice(idx);
+                    return s;
+                }
+                idx++;
+            }
+            return redirectToUrlSegment;
+        };
         return ApplyRedirects;
     }());
     function runGuards(injector, route) {
@@ -1011,38 +1088,6 @@
             lastChild: res.consumed.length,
             positionalParamSegments: res.posParams
         };
-    }
-    function applyRedirectCommands(segments, redirectTo, posParams) {
-        var r = redirectTo.startsWith('/') ? redirectTo.substring(1) : redirectTo;
-        if (r === '') {
-            return [];
-        }
-        else {
-            return createSegments(redirectTo, r.split('/'), segments, posParams);
-        }
-    }
-    function createSegments(redirectTo, parts, segments, posParams) {
-        return parts.map(function (p) { return p.startsWith(':') ? findPosParam(p, posParams, redirectTo) :
-            findOrCreateSegment(p, segments); });
-    }
-    function findPosParam(part, posParams, redirectTo) {
-        var paramName = part.substring(1);
-        var pos = posParams[paramName];
-        if (!pos)
-            throw new Error("Cannot redirect to '" + redirectTo + "'. Cannot find '" + part + "'.");
-        return pos;
-    }
-    function findOrCreateSegment(part, segments) {
-        var idx = 0;
-        for (var _i = 0, segments_1 = segments; _i < segments_1.length; _i++) {
-            var s = segments_1[_i];
-            if (s.path === part) {
-                segments.splice(idx);
-                return s;
-            }
-            idx++;
-        }
-        return new UrlSegment(part, {});
     }
     function split(segmentGroup, consumedSegments, slicedSegments, config) {
         if (slicedSegments.length > 0 &&
@@ -1287,7 +1332,7 @@
         /**
          * @internal
          */
-        function RouterState(root,
+        function RouterState(root, 
             /**
              * The current snapshot of the router state.
              */
@@ -1347,31 +1392,31 @@
              *  The URL segments matched by this route. The observable will emit a new value when
              *  the array of segments changes.
              */
-            url,
+            url, 
             /**
              * The matrix parameters scoped to this route. The observable will emit a new value when
              * the set of the parameters changes.
              */
-            params,
+            params, 
             /**
              * The query parameters shared by all the routes. The observable will emit a new value when
              * the set of the parameters changes.
              */
-            queryParams,
+            queryParams, 
             /**
              * The URL fragment shared by all the routes. The observable will emit a new value when
              * the URL fragment changes.
              */
-            fragment,
+            fragment, 
             /**
              * The static and resolved data of this route. The observable will emit a new value when
              * any of the resolvers returns a new object.
              */
-            data,
+            data, 
             /**
              * The outlet name of the route. It's a constant.
              */
-            outlet,
+            outlet, 
             /**
              * The component of the route. It's a constant.
              */
@@ -1498,27 +1543,27 @@
             /**
              *  The URL segments matched by this route.
              */
-            url,
+            url, 
             /**
              * The matrix parameters scoped to this route.
              */
-            params,
+            params, 
             /**
              * The query parameters shared by all the routes.
              */
-            queryParams,
+            queryParams, 
             /**
              * The URL fragment shared by all the routes.
              */
-            fragment,
+            fragment, 
             /**
              * The static and resolved data of this route.
              */
-            data,
+            data, 
             /**
              * The outlet name of the route.
              */
-            outlet,
+            outlet, 
             /**
              * The component of the route.
              */
@@ -2303,7 +2348,7 @@
         // TODO: vsavkin: make internal
         function NavigationStart(
             /** @docsNotRequired */
-            id,
+            id, 
             /** @docsNotRequired */
             url) {
             this.id = id;
@@ -2322,9 +2367,9 @@
         // TODO: vsavkin: make internal
         function NavigationEnd(
             /** @docsNotRequired */
-            id,
+            id, 
             /** @docsNotRequired */
-            url,
+            url, 
             /** @docsNotRequired */
             urlAfterRedirects) {
             this.id = id;
@@ -2346,9 +2391,9 @@
         // TODO: vsavkin: make internal
         function NavigationCancel(
             /** @docsNotRequired */
-            id,
+            id, 
             /** @docsNotRequired */
-            url,
+            url, 
             /** @docsNotRequired */
             reason) {
             this.id = id;
@@ -2368,9 +2413,9 @@
         // TODO: vsavkin: make internal
         function NavigationError(
             /** @docsNotRequired */
-            id,
+            id, 
             /** @docsNotRequired */
-            url,
+            url, 
             /** @docsNotRequired */
             error) {
             this.id = id;
@@ -2392,11 +2437,11 @@
         // TODO: vsavkin: make internal
         function RoutesRecognized(
             /** @docsNotRequired */
-            id,
+            id, 
             /** @docsNotRequired */
-            url,
+            url, 
             /** @docsNotRequired */
-            urlAfterRedirects,
+            urlAfterRedirects, 
             /** @docsNotRequired */
             state) {
             this.id = id;
@@ -2722,7 +2767,7 @@
             else if (urlTransition && prevRawUrl && this.urlHandlingStrategy.shouldProcessUrl(prevRawUrl)) {
                 this.routerEvents.next(new NavigationStart(id, this.serializeUrl(url)));
                 Promise.resolve()
-                    .then(function (_) { return _this.runNavigate(url, rawUrl, false, false, id, createEmptyState(url, _this.rootComponentType)); })
+                    .then(function (_) { return _this.runNavigate(url, rawUrl, false, false, id, createEmptyState(url, _this.rootComponentType).snapshot); })
                     .then(resolve, reject);
             }
             else {
@@ -2738,54 +2783,68 @@
                 return Promise.resolve(false);
             }
             return new Promise(function (resolvePromise, rejectPromise) {
-                var state;
-                var navigationIsSuccessful;
-                var preActivation;
-                var appliedUrl;
-                var storedState = _this.currentRouterState;
-                var storedUrl = _this.currentUrlTree;
-                var routerState$;
+                // create an observable of the url and route state snapshot
+                // this operation do not result in any side effects
+                var urlAndSnapshot$;
                 if (!precreatedState) {
-                    var redirectsApplied$ = applyRedirects(_this.injector, _this.configLoader, url, _this.config);
-                    var snapshot$ = rxjs_operator_mergeMap.mergeMap.call(redirectsApplied$, function (u) {
-                        appliedUrl = u;
-                        return recognize(_this.rootComponentType, _this.config, appliedUrl, _this.serializeUrl(appliedUrl));
-                    });
-                    var emitRecognzied$ = rxjs_operator_map.map.call(snapshot$, function (newRouterStateSnapshot) {
-                        _this.routerEvents.next(new RoutesRecognized(id, _this.serializeUrl(url), _this.serializeUrl(appliedUrl), newRouterStateSnapshot));
-                        return newRouterStateSnapshot;
-                    });
-                    routerState$ = rxjs_operator_map.map.call(emitRecognzied$, function (routerStateSnapshot) {
-                        return createRouterState(routerStateSnapshot, _this.currentRouterState);
+                    var redirectsApplied$ = applyRedirects(_this.injector, _this.configLoader, _this.urlSerializer, url, _this.config);
+                    urlAndSnapshot$ = rxjs_operator_mergeMap.mergeMap.call(redirectsApplied$, function (appliedUrl) {
+                        return rxjs_operator_map.map.call(recognize(_this.rootComponentType, _this.config, appliedUrl, _this.serializeUrl(appliedUrl)), function (snapshot) {
+                            _this.routerEvents.next(new RoutesRecognized(id, _this.serializeUrl(url), _this.serializeUrl(appliedUrl), snapshot));
+                            return { appliedUrl: appliedUrl, snapshot: snapshot };
+                        });
                     });
                 }
                 else {
-                    appliedUrl = url;
-                    routerState$ = rxjs_observable_of.of(precreatedState);
+                    urlAndSnapshot$ = rxjs_observable_of.of({ appliedUrl: url, snapshot: precreatedState });
                 }
-                var preactivation$ = rxjs_operator_map.map.call(routerState$, function (newState) {
-                    state = newState;
+                // run preactivation: guards and data resolvers
+                var preActivation;
+                var preactivationTraverse$ = rxjs_operator_map.map.call(urlAndSnapshot$, function (_a) {
+                    var appliedUrl = _a.appliedUrl, snapshot = _a.snapshot;
                     preActivation =
-                        new PreActivation(state.snapshot, _this.currentRouterState.snapshot, _this.injector);
+                        new PreActivation(snapshot, _this.currentRouterState.snapshot, _this.injector);
                     preActivation.traverse(_this.outletMap);
+                    return { appliedUrl: appliedUrl, snapshot: snapshot };
                 });
-                var preactivation2$ = rxjs_operator_mergeMap.mergeMap.call(preactivation$, function () {
+                var preactivationCheckGuards = rxjs_operator_mergeMap.mergeMap.call(preactivationTraverse$, function (_a) {
+                    var appliedUrl = _a.appliedUrl, snapshot = _a.snapshot;
                     if (_this.navigationId !== id)
                         return rxjs_observable_of.of(false);
-                    return preActivation.checkGuards();
+                    return rxjs_operator_map.map.call(preActivation.checkGuards(), function (shouldActivate) {
+                        return { appliedUrl: appliedUrl, snapshot: snapshot, shouldActivate: shouldActivate };
+                    });
                 });
-                var resolveData$ = rxjs_operator_mergeMap.mergeMap.call(preactivation2$, function (shouldActivate) {
+                var preactivationResolveData$ = rxjs_operator_mergeMap.mergeMap.call(preactivationCheckGuards, function (p) {
                     if (_this.navigationId !== id)
                         return rxjs_observable_of.of(false);
-                    if (shouldActivate) {
-                        return rxjs_operator_map.map.call(preActivation.resolveData(), function () { return shouldActivate; });
+                    if (p.shouldActivate) {
+                        return rxjs_operator_map.map.call(preActivation.resolveData(), function () { return p; });
                     }
                     else {
-                        return rxjs_observable_of.of(shouldActivate);
+                        return rxjs_observable_of.of(p);
                     }
                 });
-                resolveData$
-                    .forEach(function (shouldActivate) {
+                // create router state
+                // this operation has side effects => route state is being affected
+                var routerState$ = rxjs_operator_map.map.call(preactivationResolveData$, function (_a) {
+                    var appliedUrl = _a.appliedUrl, snapshot = _a.snapshot, shouldActivate = _a.shouldActivate;
+                    if (shouldActivate) {
+                        var state = createRouterState(snapshot, _this.currentRouterState);
+                        return { appliedUrl: appliedUrl, state: state, shouldActivate: shouldActivate };
+                    }
+                    else {
+                        return { appliedUrl: appliedUrl, state: null, shouldActivate: shouldActivate };
+                    }
+                });
+                // applied the new router state
+                // this operation has side effects
+                var navigationIsSuccessful;
+                var storedState = _this.currentRouterState;
+                var storedUrl = _this.currentUrlTree;
+                routerState$
+                    .forEach(function (_a) {
+                    var appliedUrl = _a.appliedUrl, state = _a.state, shouldActivate = _a.shouldActivate;
                     if (!shouldActivate || id !== _this.navigationId) {
                         navigationIsSuccessful = false;
                         return;
@@ -2808,7 +2867,7 @@
                     .then(function () {
                     _this.navigated = true;
                     if (navigationIsSuccessful) {
-                        _this.routerEvents.next(new NavigationEnd(id, _this.serializeUrl(url), _this.serializeUrl(appliedUrl)));
+                        _this.routerEvents.next(new NavigationEnd(id, _this.serializeUrl(url), _this.serializeUrl(_this.currentUrlTree)));
                         resolvePromise(true);
                     }
                     else {

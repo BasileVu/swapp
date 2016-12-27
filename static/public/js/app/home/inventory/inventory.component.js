@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var authentication_service_1 = require('../../shared/authentication/authentication.service');
+var core_1 = require("@angular/core");
+var authentication_service_1 = require("../../shared/authentication/authentication.service");
 var InventoryComponent = (function () {
     function InventoryComponent(authService) {
         this.authService = authService;
@@ -44,38 +44,38 @@ var InventoryComponent = (function () {
             });
         }, 100);
     };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Boolean)
-    ], InventoryComponent.prototype, "loggedIn", void 0);
-    InventoryComponent = __decorate([
-        core_1.Component({
-            moduleId: module.id,
-            selector: 'inventory',
-            encapsulation: core_1.ViewEncapsulation.None,
-            templateUrl: './inventory.component.html',
-            animations: [
-                core_1.trigger('flyInOut', [
-                    core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
-                    core_1.transition('void => *', [
-                        core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(0) scale(0)'
-                        }),
-                        core_1.animate(200)
-                    ]),
-                    core_1.transition('* => void', [
-                        core_1.animate(200, core_1.style({
-                            opacity: 0,
-                            transform: 'translateX(0) scale(0)'
-                        }))
-                    ])
-                ])
-            ]
-        }), 
-        __metadata('design:paramtypes', [authentication_service_1.AuthService])
-    ], InventoryComponent);
     return InventoryComponent;
 }());
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Boolean)
+], InventoryComponent.prototype, "loggedIn", void 0);
+InventoryComponent = __decorate([
+    core_1.Component({
+        moduleId: module.id,
+        selector: 'inventory',
+        encapsulation: core_1.ViewEncapsulation.None,
+        templateUrl: './inventory.component.html',
+        animations: [
+            core_1.trigger('flyInOut', [
+                core_1.state('in', core_1.style({ opacity: 1, transform: 'translateX(0)' })),
+                core_1.transition('void => *', [
+                    core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(0) scale(0)'
+                    }),
+                    core_1.animate(200)
+                ]),
+                core_1.transition('* => void', [
+                    core_1.animate(200, core_1.style({
+                        opacity: 0,
+                        transform: 'translateX(0) scale(0)'
+                    }))
+                ])
+            ])
+        ]
+    }),
+    __metadata("design:paramtypes", [authentication_service_1.AuthService])
+], InventoryComponent);
 exports.InventoryComponent = InventoryComponent;
 //# sourceMappingURL=inventory.component.js.map
