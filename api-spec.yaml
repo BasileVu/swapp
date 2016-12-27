@@ -1,25 +1,147 @@
-# Example YAML to get you started quickly.
-# Be aware that YAML has indentation based scoping.
-# Code completion support is available so start typing for available options.
 swagger: '2.0'
 
-# This is your document metadata
 info:
-  version: "0.0.0"
+  version: "1.0.0"
   title: Swapp API
+  description:
+    The swapp API specification. All endpoints are implicitely prefixed by __/api__ for the sake of readability.
+    
+consumes:
+  - application/json
+produces:
+  - application/json
 
-# Describe your paths here
 paths:
-  # This is a path endpoint. Change it.
-  /items:
-    # This is a HTTP operation
-    get:
-      # Describe this verb here. Note: you can use markdown
-      description: |
-        Gets unarchived `Item` objects.
-      # This is array of GET operation parameters:
+  /login:
+    post:
+      description: Logs an user in.
       parameters:
-        # An example parameter that is in query and is required
+        - in: body
+          name: body
+          description: The credentials of the user.
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Successful response
+        401:
+          description: Invalid username/password combination or account not active
+          
+  /logout:
+    get:
+      description: Logs an user out.
+      responses:
+        200:
+          description: Successful response
+        401:
+          description: User is not logged in
+
+  /users:
+    post:
+      description: Creates an user.
+      parameters:
+        - in: body
+          name: body
+          description: The account info of the user.
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: Successful response
+        400:
+          description: Missing field or json malformed
+        409:
+          description: An user with the same susername already exists
+          
+  /account:
+    get:
+      description: Get the account info of the current user logged in.
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              id: 
+                type: number
+              username:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              email:
+                type: string
+              location:
+                type: object
+                properties:
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  region:
+                    type: string
+                  country:
+                    type: string
+              last_modification_date:
+                type: string
+              categories:
+                type: array
+                items:
+                  type: number
+              items:
+                type: array
+                items:
+                  type: number
+              notes:
+                type: array
+                items:
+                  type: number
+              likes:
+                type: array
+                items:
+                  type: number
+        401:
+          description: User is not logged in
+    put:
+      description: Edit all the current user's account info.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Successful response
+        401:
+          description: User is not logged in
+    patch:
+      description: Edit one or more of the current user's account info.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: false
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Successful response
+        401:
+          description: User is not logged in
+  /items:
+    get:
+      description: Gets unarchived `Item` objects.
+      parameters:
         -
           name: q
           in: query
@@ -178,4 +300,18 @@ paths:
                 type: array
                 items:
                   type: number
-                    
+                  
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
