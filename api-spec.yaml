@@ -1,0 +1,450 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: Swapp API
+  description:
+    The swapp API specification. All endpoints are implicitely prefixed by __/api__ for the sake of readability.
+    
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /csrf:
+    get:
+      description: Gets a CSRF token required o use the api's route. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
+      responses:
+        200:
+          description: Successful operation. **Sets a cookie at the key "csrftoken".**
+
+  /login:
+    post:
+      description: Logs an user in.
+      parameters:
+        - in: body
+          name: body
+          description: The credentials of the user.
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Invalid username/password combination or account not active
+          
+  /logout:
+    get:
+      description: Logs an user out.
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: User is not logged in
+
+  /users:
+    post:
+      description: Creates an user.
+      parameters:
+        - in: body
+          name: body
+          description: The account info of the user.
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: Successful operation
+        400:
+          description: Missing field or json malformed
+        409:
+          description: An user with the same susername already exists
+          
+  /users/{username}:
+    get:
+      description: Get the public account info of the given user.
+      parameters:
+        -
+          name: username
+          in: path
+          description: The username of the target user
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              username:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              location:
+                type: string
+              items:
+                type: array
+                items:
+                  type: number
+              notes:
+                type: array
+                items:
+                  type: number
+              likes:
+                type: array
+                items:
+                  type: number
+          
+  /account:
+    get:
+      description: Get the account info of the current user logged in.
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            properties:
+              id: 
+                type: number
+              username:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              email:
+                type: string
+              location:
+                  $ref: "#/definitions/Location"
+              last_modification_date:
+                type: string
+              categories:
+                type: array
+                items:
+                  type: number
+              items:
+                type: array
+                items:
+                  type: number
+              notes:
+                type: array
+                items:
+                  type: number
+              likes:
+                type: array
+                items:
+                  type: number
+        401:
+          description: User is not logged in
+    put:
+      description: Updates all the current user's account info.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Missing field or json malformed
+        401:
+          description: User is not logged in
+    patch:
+      description: Partially updates the current user's account info.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: false
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Successful response
+        400:
+          description: Json malformed
+        401:
+          description: User is not logged in
+          
+  /account/password:
+    put:
+      description: Updates the password of the current user logged in.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            type: object
+            properties:
+              old_password:
+                type: string
+              new_password:
+                type: string
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Missing field, json malformed or passwords not matching
+    
+  /account/location:
+    put:
+      description: Updates the location of the current user logged in.
+      parameters:
+        - in: body
+          name: body
+          description: The account info to update.
+          required: true
+          schema:
+            $ref: "#/definitions/Location"
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Missing field, json malformed or location not existing
+      
+    patch:
+      description: Partially updates the location of the current user logged in.
+      parameters:
+      - in: body
+        name: body
+        description: The account info to update.
+        required: false
+        schema:
+          $ref: "#/definitions/Location"
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Json malformed or location not existing
+          
+  /notes:
+    post:
+      description: Create a new note.
+      parameters:
+      - in: body
+        name: body
+        description: The content of the note.
+        required: false
+        schema:
+          $ref: "#/definitions/Note"
+      responses:
+        201:
+          description: Successful operation
+        400:
+          description: Missing field or json malformed
+          
+  /notes/{id}:
+    get:
+      description: Get the info of the specify note.
+      parameters:
+      - in: path
+        name: id
+        description: id of the note
+        required: true
+        type: number
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            $ref: "#/definitions/Note"
+          
+  /items:
+    get:
+      description: Gets unarchived `Item` objects.
+      parameters:
+        - in: query
+          name: q
+          description: Query of user
+          required: false
+          type: string
+          
+        - in: query
+          name: category
+          description: category of item wanted.
+          required: false
+          type: string
+        
+        - in: query
+          name: lat
+          description: latitude of current point from where to search.
+          required: false
+          type: number
+          
+        - in: query
+          name: lon
+          description: longitude of current point from where to search.
+          required: false
+          type: number
+          
+        - in: query
+          name: radius
+          description: radius (in kilometers) in which items must be to appear in the result.
+          required: false
+          type: number
+          
+        - in: query
+          name: price_min
+          description: lower bound of an item's price range taht must e respected in order for an item to appear in the result.
+          required: false
+          type: number
+          
+        - in: query
+          name: price_max
+          description: upper bound of an item's price range taht must e respected in order for an item to appear in the result.
+          required: false
+          type: number
+          
+        - in: query
+          name: order_by
+          description: define the sorting in the result.
+          required: false
+          type: string
+          
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              title: Item
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+                creation_date:
+                  type: string
+                image_url:
+                  type: string
+                category:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                offer_received:
+                  type: number
+                views:
+                  type: number
+                comments:
+                  type: number
+                likes:
+                  type: number
+                owner_image_url:
+                  type: string
+                  
+    post:
+      description: Creates a new `Item`.
+      parameters:
+        - in: body
+          name: body
+          description: The content of the note.
+          required: false
+          schema:
+            $ref: "#/definitions/Note"
+            
+      responses:
+        201:
+          description: Successful operation
+          headers:
+            Location: 
+              description: Location of the created object
+              type: string
+          
+  /items/{id}:
+    get:
+      description: Gets a detailed unarchived `Item` object.
+      parameters:
+        - in: path
+          name: id
+          description: id of the item
+          required: true
+          type: number
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+              description:
+                type: string
+              price_min:
+                type: number
+              price_max:
+                type: number
+              creation_date:
+                type: string
+              condition:
+                type: string
+              brand:
+                type: string
+              color:
+                type: string
+              owner:
+                type: string
+              number_of_vote:
+                type: number
+              category:
+                type: string
+              comments:
+                type: array
+                items:
+                  type: number
+                  
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+
+  Location:
+    type: object
+    properties:
+      street:
+        type: string
+      city:
+        type: string
+      region:
+        type: string
+      country:
+        type: string
+  Note:
+    type: object
+    properties:
+      user:
+        type: number
+      offer:
+        type: number
+      text:
+        type: string
+      note:
+        type: number
