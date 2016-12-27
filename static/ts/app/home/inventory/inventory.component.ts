@@ -67,6 +67,15 @@ export class InventoryComponent implements OnInit, OnChanges {
                 prevNextButtons: false,
                 adaptiveHeight: true
             });
+
+            // open item creation modal /////////////////////
+            var addItemButtons = $('.open-new-item-modal');
+            var newItemModal = $('#add-item-modal');
+            addItemButtons.each(function () {
+                $(this).click(function () {
+                    newItemModal.modal('show');
+                });
+            });
         }, 100);
     }
 }

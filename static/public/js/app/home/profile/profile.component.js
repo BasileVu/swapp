@@ -37,6 +37,70 @@ var ProfileComponent = (function () {
             _this.authService.selectLoggedIn(_this.loggedIn);
             console.log("Successfully logged in 2/2");
             // this.toastr.success("Welcome username !", "Login succeed");
+            setTimeout(function () {
+                // home inventory ///////////////////////////
+                var inventory = $('.home-inventory').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true
+                });
+                // open user edition modal /////////////////////
+                var openUpdateProfileButtons = $('.open-update-profile-modal');
+                var updateProfileModal = $('#update-user-modal');
+                openUpdateProfileButtons.each(function () {
+                    $(this).click(function () {
+                        updateProfileModal.modal('show');
+                    });
+                });
+                // open user profile modal /////////////////////
+                var openProfileButtons = $('.open-profile-modal');
+                var profileModal = $('#user-profile-modal');
+                openProfileButtons.each(function () {
+                    $(this).click(function () {
+                        profileModal.modal('show');
+                    });
+                });
+                profileModal.on('show.bs.modal', function (e) {
+                    setTimeout(function () {
+                        inventory.flickity('resize');
+                        // profile map
+                        var map = new google.maps.Map(document.getElementById('profile-map'), {
+                            center: { lat: -34.197, lng: 150.844 },
+                            scrollwheel: false,
+                            zoom: 8
+                        });
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: { lat: -34.197, lng: 150.844 }
+                        });
+                        var infowindow = new google.maps.InfoWindow({
+                            content: '<h3 class="map-title">Adresse complète</h3>'
+                        });
+                        infowindow.open(map, marker);
+                    }, 300);
+                });
+                // open notif modal /////////////////////
+                var openNotifButtons = $('.open-notif-modal');
+                var notifModal = $('#notification-modal');
+                openNotifButtons.each(function () {
+                    $(this).click(function () {
+                        notifModal.modal('show');
+                    });
+                });
+                // open accept proposition modal /////////////////////
+                var openAcceptPropositionButtons = $('.open-accept-proposition-modal');
+                var acceptPropositionModal = $('#accept-proposition-modal');
+                openAcceptPropositionButtons.each(function () {
+                    $(this).click(function () {
+                        acceptPropositionModal.modal('show');
+                    });
+                });
+            }, 100);
         }, function (error) { return console.log("error caca: " + error); } // TODO : Toastr ? Message under form ?
         );
     };
