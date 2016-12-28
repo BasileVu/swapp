@@ -118,6 +118,7 @@ export class CreateAccountModalComponent implements OnInit {
         );
 
         if (user.password !== user.confirmPassword) {
+            this.toastr.error('Password confirmation is different', 'Passwords don\'t match');
             this.password.reset();
             this.confirmPassword.reset();
         } else {
@@ -132,7 +133,7 @@ export class CreateAccountModalComponent implements OnInit {
                         this.myEvent.emit(userLoginDTO);
                     }
                 },
-                error => console.log("error creating user: "+error) // TODO : Toastr ? Message under form ?
+                error => this.toastr.error(error, 'Error')
             );
         }
         
