@@ -50,7 +50,6 @@ export class InventoryComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges() {
-        console.log("change loggedIn=" + this.loggedIn);
 
         // settimeout is an hack to have the inventory displayed nicely.
         // It's probably due to the DOM elements which are not fully loaded

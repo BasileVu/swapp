@@ -1,9 +1,12 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation, EventEmitter, Output} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 import {CropperSettings} from 'ng2-img-cropper';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { UserCreationDTO } from './user-creation-dto';
+import { UserLoginDTO } from './user-login-dto';
+
+declare let $:any;
 
 @Component({
     moduleId: module.id,
@@ -37,6 +40,10 @@ import { UserCreationDTO } from './user-creation-dto';
 
 export class CreateAccountModalComponent implements OnInit {
 
+    // EventEmitter to call login function of the ProfileComponent after registering
+    @Output() myEvent = new EventEmitter();
+
+    // Form fields
     private registerForm: FormGroup;
     private username = new FormControl("", Validators.required);
     private email = new FormControl("", Validators.required);
@@ -48,6 +55,7 @@ export class CreateAccountModalComponent implements OnInit {
     private region = new FormControl("", Validators.required);
     private country = new FormControl("", Validators.required);
 
+    // profile picture
     data: any;
     cropperSettings: CropperSettings;
  
@@ -93,10 +101,6 @@ export class CreateAccountModalComponent implements OnInit {
     }
 
     register() {
-        console.log("register...");
-        console.log(this.data);
-        console.log(this.registerForm);
-
         let user = new UserCreationDTO(
             this.username.value,
             this.email.value,
@@ -110,15 +114,23 @@ export class CreateAccountModalComponent implements OnInit {
             this.data.image
         );
 
-        console.log(user);
-
-        this.authService.register(user).then(
-            res => {
-                console.log(res);
-            },
-            error => console.log("error creating user: "+error) // TODO : Toastr ? Message under form ?
-        );
-
+        if (user.password !== user.confirmPassword) {
+            this.password.reset();
+            this.confirmPassword.reset();
+        } else {
+            this.authService.register(user).then(
+                res => {
+                    console.log(res);
+                    if(res.status == 201) {
+                        $('#create-user-modal').modal('hide');
+                        let userLoginDTO = new UserLoginDTO(user.username, user.password);
+                        console.log(userLoginDTO);
+                        this.myEvent.emit(userLoginDTO);
+                    }
+                },
+                error => console.log("error creating user: "+error) // TODO : Toastr ? Message under form ?
+            );
+        }
         
     }
 }

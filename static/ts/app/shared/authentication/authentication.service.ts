@@ -31,8 +31,8 @@ export class AuthService {
         localStorage.removeItem("user");
     }
     
-    login(username, password): Promise<any> {
-        let body = JSON.stringify({ username:username, password:password }); // Stringify payload
+    login(userLoginDTO): Promise<any> {
+        let body = JSON.stringify(userLoginDTO); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option
 

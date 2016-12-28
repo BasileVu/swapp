@@ -18,7 +18,6 @@ var InventoryComponent = (function () {
         this.loggedIn = this.authService.isLoggedIn();
     };
     InventoryComponent.prototype.ngOnChanges = function () {
-        console.log("change loggedIn=" + this.loggedIn);
         // settimeout is an hack to have the inventory displayed nicely.
         // It's probably due to the DOM elements which are not fully loaded
         // on ngOnChanges so we wait a little time (100ms)

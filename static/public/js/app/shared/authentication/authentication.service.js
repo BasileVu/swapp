@@ -30,8 +30,8 @@ var AuthService = (function () {
     AuthService.prototype.logout = function () {
         localStorage.removeItem("user");
     };
-    AuthService.prototype.login = function (username, password) {
-        var body = JSON.stringify({ username: username, password: password }); // Stringify payload
+    AuthService.prototype.login = function (userLoginDTO) {
+        var body = JSON.stringify(userLoginDTO); // Stringify payload
         var headers = new http_1.Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         var options = new http_1.RequestOptions({ headers: headers }); // Create a request option
         // No content to return, we just catch errors

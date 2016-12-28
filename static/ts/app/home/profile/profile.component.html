@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="row location">
-            <form [formGroup]="loginForm" (ngSubmit)="login()">
+            <form [formGroup]="loginForm" (ngSubmit)="login({username:loginName.value, password:loginPass.value})">
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group row">

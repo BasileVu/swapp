@@ -63,18 +63,17 @@ export class ProfileComponent implements OnInit {
         });
     }
 
-    login() {
+    login($event) {
+        console.log($event);
         console.log("login " + this.loginName.value + " " + this.loginPass.value);
         //this.toastr.success("Welcome DamienRonchon !", "Login succeed");
         // TODO : for preview only
         //this.router.navigate(['./dashboard']);
 
-        this.authService.login(this.loginName.value, this.loginPass.value).then(
+        this.authService.login($event).then(
             res => {
                 this.loggedIn = true;
-                console.log("Successfully logged in 1/2");
                 this.authService.selectLoggedIn(this.loggedIn);
-                console.log("Successfully logged in 2/2");
                 // this.toastr.success("Welcome username !", "Login succeed");
 
                 setTimeout(function(){

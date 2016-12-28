@@ -5,14 +5,14 @@
         <inventory [loggedIn]="loggedIn"></inventory>
     </div>
     <div class="row grid" #classGrid>
-        <profile></profile>
+        <profile #profile></profile>
         <items></items>
     </div>
 </div>
 
 <search-modal></search-modal>
 <register-user-modal></register-user-modal>
-<create-account-modal></create-account-modal>
+<create-account-modal (myEvent)="profile.login($event)"></create-account-modal>
 <update-profile-modal></update-profile-modal>
 <profile-modal></profile-modal>
 <add-item-modal></add-item-modal>
