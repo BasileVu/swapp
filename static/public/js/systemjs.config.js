@@ -24,7 +24,8 @@
       '@angular/upgrade': 'npm:@angular/upgrade/bundles/upgrade.umd.js',
       // other libraries
       'rxjs':                      'npm:rxjs',
-      'ng2-img-cropper': 'npm:ng2-img-cropper'
+      'ng2-img-cropper': 'npm:ng2-img-cropper',
+      'ng2-toastr': 'npm:ng2-toastr'
     },
     // packages tells the System loader how to load when no filename and/or no extension
     packages: {
@@ -35,7 +36,13 @@
       rxjs: {
         defaultExtension: 'js'
       },
-      'ng2-img-cropper' :           { main: 'index.js', defaultExtension: 'js' }
+      'ng2-img-cropper' : { 
+        main: 'index.js', 
+        defaultExtension: 'js' 
+      },
+      'ng2-toastr' : {
+        defaultExtension: 'js'
+      }
     }
   });
 })(this);

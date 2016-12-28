@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewEncapsulation, EventEmitter, Output} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
+
 import {CropperSettings} from 'ng2-img-cropper';
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { UserCreationDTO } from './user-creation-dto';
@@ -60,7 +62,8 @@ export class CreateAccountModalComponent implements OnInit {
     cropperSettings: CropperSettings;
  
     constructor(private authService: AuthService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                public toastr: ToastsManager) {
  
         this.cropperSettings = new CropperSettings();
         this.cropperSettings.width = 140;
@@ -122,6 +125,7 @@ export class CreateAccountModalComponent implements OnInit {
                 res => {
                     console.log(res);
                     if(res.status == 201) {
+                        this.toastr.success('Account successfully created', 'Registration succeed!');
                         $('#create-user-modal').modal('hide');
                         let userLoginDTO = new UserLoginDTO(user.username, user.password);
                         console.log(userLoginDTO);

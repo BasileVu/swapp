@@ -17,6 +17,7 @@ var home_module_1 = require("./home/home.module");
 /* Feature Modules */
 var core_module_1 = require("./core/core.module");
 var authentication_service_1 = require("./shared/authentication/authentication.service");
+var ng2_toastr_1 = require("ng2-toastr/ng2-toastr");
 /* Routing Module */
 var app_routing_module_1 = require("./app-routing.module");
 // Declare the NgModule decorator
@@ -35,6 +36,7 @@ AppModule = __decorate([
             app_routing_module_1.AppRoutingModule,
             http_1.HttpModule,
             http_1.JsonpModule,
+            ng2_toastr_1.ToastModule
         ],
         // Define other components in our module
         declarations: [app_component_1.AppComponent],

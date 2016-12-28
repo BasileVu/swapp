@@ -11,12 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 require("./rxjs-operators");
 var http_1 = require("@angular/http");
+var ng2_toastr_1 = require("ng2-toastr/ng2-toastr");
 var authentication_service_1 = require("./shared/authentication/authentication.service");
 var AppComponent = (function () {
-    function AppComponent(http, authService) {
+    function AppComponent(http, authService, toastr, vRef) {
         this.http = http;
         this.authService = authService;
+        this.toastr = toastr;
         this.subtitle = '(v1)';
+        this.toastr.setRootViewContainerRef(vRef);
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -221,7 +224,8 @@ AppComponent = __decorate([
         ]
     }),
     __metadata("design:paramtypes", [http_1.Http,
-        authentication_service_1.AuthService])
+        authentication_service_1.AuthService,
+        ng2_toastr_1.ToastsManager, core_1.ViewContainerRef])
 ], AppComponent);
 exports.AppComponent = AppComponent;
 //# sourceMappingURL=app.component.js.map

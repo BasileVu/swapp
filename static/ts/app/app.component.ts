@@ -1,15 +1,16 @@
-import {Component, OnInit, AfterViewInit,
+import {Component, OnInit, AfterViewInit, ViewContainerRef,
     trigger,
     state,
     style,
     transition,
     animate,
-    keyframes
+    keyframes,
 } from '@angular/core';
 
 import './rxjs-operators';
 import { Http } from "@angular/http";
 import { Subscription }   from 'rxjs/Subscription';
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from './shared/authentication/authentication.service';
 
@@ -46,7 +47,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     subscription: Subscription;
 
     constructor (private http: Http,
-                 private authService: AuthService) {}
+                 private authService: AuthService,
+                 public toastr: ToastsManager, vRef: ViewContainerRef) {
+        this.toastr.setRootViewContainerRef(vRef);
+    }
 
     ngOnInit() {
         let csrf = this.http.get("/api/csrf/");

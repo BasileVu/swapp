@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
+
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { User } from './user';
 
@@ -52,7 +54,8 @@ export class ProfileComponent implements OnInit {
     private loginPass = new FormControl("", Validators.required);
 
     constructor(private authService: AuthService,
-                private formBuilder: FormBuilder) {}
+                private formBuilder: FormBuilder,
+                public toastr: ToastsManager) {}
 
     ngOnInit() {
         this.loggedIn = this.authService.isLoggedIn();
@@ -74,7 +77,7 @@ export class ProfileComponent implements OnInit {
             res => {
                 this.loggedIn = true;
                 this.authService.selectLoggedIn(this.loggedIn);
-                // this.toastr.success("Welcome username !", "Login succeed");
+                this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
 
                 setTimeout(function(){
                     // home inventory ///////////////////////////

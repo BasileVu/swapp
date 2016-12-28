@@ -10,11 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var forms_1 = require("@angular/forms");
+var ng2_toastr_1 = require("ng2-toastr/ng2-toastr");
 var authentication_service_1 = require("../../shared/authentication/authentication.service");
 var ProfileComponent = (function () {
-    function ProfileComponent(authService, formBuilder) {
+    function ProfileComponent(authService, formBuilder, toastr) {
         this.authService = authService;
         this.formBuilder = formBuilder;
+        this.toastr = toastr;
         this.loginName = new forms_1.FormControl("", forms_1.Validators.required);
         this.loginPass = new forms_1.FormControl("", forms_1.Validators.required);
     }
@@ -35,7 +37,7 @@ var ProfileComponent = (function () {
         this.authService.login($event).then(function (res) {
             _this.loggedIn = true;
             _this.authService.selectLoggedIn(_this.loggedIn);
-            // this.toastr.success("Welcome username !", "Login succeed");
+            _this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
             setTimeout(function () {
                 // home inventory ///////////////////////////
                 var inventory = $('.home-inventory').flickity({
@@ -131,7 +133,8 @@ ProfileComponent = __decorate([
         ]
     }),
     __metadata("design:paramtypes", [authentication_service_1.AuthService,
-        forms_1.FormBuilder])
+        forms_1.FormBuilder,
+        ng2_toastr_1.ToastsManager])
 ], ProfileComponent);
 exports.ProfileComponent = ProfileComponent;
 //# sourceMappingURL=profile.component.js.map

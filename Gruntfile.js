@@ -41,6 +41,11 @@ module.exports = function(grunt) {
                         dest: 'static/public/js/vendor/ng2-img-cropper/'
                     }, {
                         expand: true,
+                        cwd: 'node_modules/ng2-toastr/',
+                        src: ['**'],
+                        dest: 'static/public/js/vendor/ng2-toastr/'
+                    }, {
+                        expand: true,
                         cwd: 'static/ts/',
                         src: ['**', '!**/*.ts'],
                         dest: 'static/public/js/'
