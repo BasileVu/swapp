@@ -399,8 +399,8 @@ definitions:
   ItemCreationDTO:
     type: object
     properties:
-      user_id:
-        type: number
+      username:
+        type: string
       title:
         type: string
       price_min:
