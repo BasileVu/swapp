@@ -401,14 +401,14 @@ definitions:
     properties:
       username:
         type: string
-      title:
+      name:
         type: string
       price_min:
         type: number
       price_max:
         type: number
-      category_id:
-        type: number
+      category:
+        type: string
       description:
         type: string
       key_informations:
@@ -441,7 +441,7 @@ definitions:
         type: string
       id:
         type: number
-      title:
+      name:
         type: string
       description:
         type: string
@@ -488,7 +488,7 @@ definitions:
     properties:
       id:
         type: number
-      title:
+      name:
         type: string
       creation_date:
         type: string
