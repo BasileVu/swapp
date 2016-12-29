@@ -117,6 +117,8 @@ paths:
             properties:
               id: 
                 type: number
+              profile_picture_url:
+                type: string
               username:
                 type: string
               first_name:
