@@ -9,6 +9,11 @@ export class AuthService {
 
     private loggedIn: boolean;
 
+    // TODO : garder l'utilisateur (username et autres infos) tout le long de sa session
+    // Sauver l'utilisateur lors du login et créer des méthodes à disposition des composants
+    // pour récupérer cet utilisateur quand nécessaire
+    private user: User;
+
     // Observable source
     private loggedInSelectedSource = new Subject<boolean>();
     // Observable boolean streams
