@@ -10,9 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var authentication_service_1 = require("../../shared/authentication/authentication.service");
+var inventory_item_1 = require("./inventory-item");
 var InventoryComponent = (function () {
     function InventoryComponent(authService) {
         this.authService = authService;
+        this.inventory = new Array();
     }
     InventoryComponent.prototype.ngOnInit = function () {
         this.loggedIn = this.authService.isLoggedIn();
@@ -42,6 +44,13 @@ var InventoryComponent = (function () {
                 });
             });
         }, 100);
+    };
+    // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
+    InventoryComponent.prototype.addItemEvent = function ($event) {
+        var inventoryItem = new inventory_item_1.InventoryItem($event.url, $event.name, $event.images[0], $event.creation_date);
+        this.inventory.push(inventoryItem);
+        console.log("inventory:");
+        console.log(this.inventory);
     };
     return InventoryComponent;
 }());

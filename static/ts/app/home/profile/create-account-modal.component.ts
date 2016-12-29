@@ -106,25 +106,25 @@ export class CreateAccountModalComponent implements OnInit {
     }
 
     register() {
-        let user = new UserCreationDTO(
-            this.username.value,
-            this.email.value,
-            this.password.value,
-            this.confirmPassword.value,
-            this.firstName.value,
-            this.lastName.value,
-            this.address.value,
-            this.city.value,
-            this.region.value,
-            this.country.value,
-            this.data.image
-        );
-
-        if (user.password !== user.confirmPassword) {
+        if (this.password.value !== this.confirmPassword.value) {
             this.toastr.error('Password confirmation is different', 'Passwords don\'t match');
             this.password.reset();
             this.confirmPassword.reset();
         } else {
+            let user = new UserCreationDTO(
+                            this.username.value,
+                            this.email.value,
+                            this.password.value,
+                            this.confirmPassword.value,
+                            this.firstName.value,
+                            this.lastName.value,
+                            this.address.value,
+                            this.city.value,
+                            this.region.value,
+                            this.country.value,
+                            this.data.image
+                        );
+
             this.authService.register(user).then(
                 res => {
                     console.log(res);

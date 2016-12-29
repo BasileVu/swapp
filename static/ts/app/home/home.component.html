@@ -2,7 +2,7 @@
 
 <div id="content-main" class="container">
     <div class="row personal-inventory">
-        <inventory [loggedIn]="loggedIn"></inventory>
+        <inventory #inventory [loggedIn]="loggedIn"></inventory>
     </div>
     <div class="row grid" #classGrid>
         <profile #profile></profile>
@@ -15,7 +15,7 @@
 <create-account-modal (loginEvent)="profile.login($event)"></create-account-modal>
 <update-profile-modal></update-profile-modal>
 <profile-modal></profile-modal>
-<add-item-modal></add-item-modal>
+<add-item-modal (newItemEvent)="inventory.addItemEvent($event)"></add-item-modal>
 <notification-modal></notification-modal>
 <send-proposition-modal></send-proposition-modal>
 <accept-proposition-modal></accept-proposition-modal>

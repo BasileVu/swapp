@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
+import { InventoryItem } from './inventory-item';
 
 declare var $:any;
 
@@ -42,6 +43,8 @@ declare var $:any;
 export class InventoryComponent implements OnInit, OnChanges {
 
     @Input() loggedIn: boolean;
+
+    private inventory: Array<InventoryItem> = new Array();
     
     constructor(private authService: AuthService) { }
 
@@ -76,5 +79,19 @@ export class InventoryComponent implements OnInit, OnChanges {
                 });
             });
         }, 100);
+    }
+
+    // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
+    addItemEvent($event) {
+        let inventoryItem = new InventoryItem(
+            $event.url,
+            $event.name, 
+            $event.images[0], 
+            $event.creation_date);
+        
+        this.inventory.push(inventoryItem);
+
+        console.log("inventory:");
+        console.log(this.inventory);
     }
 }

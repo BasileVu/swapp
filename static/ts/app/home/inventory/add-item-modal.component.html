@@ -2,7 +2,7 @@
     <div class="container" role="document">
         <div class="row content">
             <div class="col-xs-12">
-                <form class="modal-panel">
+                <form class="modal-panel" [formGroup]="createItemForm" (ngSubmit)="createItem()">
                     <div class="row">
                         <div class="col-xs-12">
                             <h1>Add item to your inventory</h1>
@@ -12,22 +12,37 @@
                         <div class="col-md-4">
                             <h3>Images</h3>
                             <span class="img-infos">At least one image must be provided</span>
-                            <div class="col-img-frame">
+                            <input type="file" class="form-control" multiple (change)="fileChange(input)" #input />
+                            <div *ngIf="file_srcs.length === 0" class="col-img-frame" [@flyInOut]>
                                 <img class="img-fluid" src="http://placehold.it/300x150">
                             </div>
-                            <input type="file" class="form-control">
-                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit">
-                                <i class="fa fa-plus"></i> Add image
-                            </a>
+                            <div class="row">
+                                <div *ngFor="let file_src of file_srcs; let i = index" class="col-img-frame" [@flyInOut]>  
+                                    
+                                    <div class="col-md-11">
+                                        <img class="img-fluid" [attr.src]='file_src' alt=""/>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a class="btn btn-sm btn-block submit" (click)="removeImage(i)"><i class="fa fa-times remove-element"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="btn-sm btn-block btn-secondary-color center">
+                                <i class="fa fa-info"></i> Add multiple images at one time
+                            </p>
                             <hr>
                             <h3>Interested by</h3>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">Desire 1</label>
+                            <div class="form-group row" *ngFor="let desire of desires; let in = index" [@flyInOut]>
+                                <label class="col-sm-3 col-form-label">Desire {{ in + 1 }}</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control">
                                 </div>
+                                <div class="col-sm-1">
+                                    <a class="btn btn-sm btn-block" (click)="removeDesire(in)"><i class="fa fa-times remove-element"></i></a>
+                                </div>
                             </div>
-                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit">
+                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit" (click)="addDesire()">
                                 <i class="fa fa-plus"></i> Add desire
                             </a>
                             <hr>
@@ -55,14 +70,21 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Title</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="name">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Estimed price</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-2 col-form-label">Min price</label>
+                                <div class="col-sm-4">
                                     <div class="input-group">
-                                      <input type="text" class="form-control">
+                                      <input type="text" class="form-control" formControlName="min_price">
+                                      <span class="input-group-addon">$</span>
+                                    </div>
+                                </div>
+                                <label class="col-sm-2 col-form-label">Max price</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                      <input type="text" class="form-control" formControlName="max_price">
                                       <span class="input-group-addon">$</span>
                                     </div>
                                 </div>
@@ -70,7 +92,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Category</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control">
+                                    <select class="form-control" formControlName="category">
                                         <option>1</option>
                                         <option>2</option>
                                         <option>3</option>
@@ -82,29 +104,33 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Description</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" rows="10"></textarea>
+                                    <textarea class="form-control" rows="10" formControlName="description"></textarea>
                                 </div>
                             </div>
                             <hr>
                             <h3>Key informations</h3>
-                            <div class="form-group row">
+                            <span class="img-infos">For example "color": "green" or "condition": "new"</span>
+                            <div class="form-group row" *ngFor="let keyInfo of keyInfos; let i = index" [@flyInOut]>
                                 <div class="col-sm-4">
                                     <input type="text" class="form-control" placeholder="Key">
                                 </div>
-                                <div class="col-sm-8">
+                                <div class="col-sm-7">
                                     <input type="text" class="form-control" placeholder="Value">
                                 </div>
+                                <div class="col-sm-1">
+                                    <a class="btn btn-sm btn-block" (click)="removeKeyInfo(i)"><i class="fa fa-times remove-element"></i></a>
+                                </div>
                             </div>
-                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit">
+                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit" (click)="addKeyInfo()">
                                 <i class="fa fa-plus"></i> Add key information
                             </a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
-                            <a href="#" class="btn btn-lg btn-block btn-primary submit">
+                            <button href="#" class="btn btn-lg btn-block btn-primary submit" type="submit" [disabled]="!createItemForm.valid">
                                 Create item
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </form>

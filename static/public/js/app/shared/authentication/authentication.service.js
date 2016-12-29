@@ -63,13 +63,6 @@ var AuthService = (function () {
     AuthService.prototype.getUser = function () {
         return this.user;
     };
-    /*
-        private extractData(res: Response) {
-            console.log("Response: " + res);
-            let body = res.json();
-            return body || { };
-        }
-    */
     AuthService.prototype.handleError = function (error) {
         // TODO : In a real world app, we might use a remote logging infrastructure
         var errMsg;

@@ -87,15 +87,6 @@ export class AuthService {
         return this.user;
     }
 
-
-
-/*
-    private extractData(res: Response) {
-        console.log("Response: " + res);
-        let body = res.json();
-        return body || { };
-    }
-*/
     private handleError (error: Response | any) {
         // TODO : In a real world app, we might use a remote logging infrastructure
         let errMsg: string;
