@@ -12,6 +12,7 @@ var core_1 = require("@angular/core");
 var forms_1 = require("@angular/forms");
 var ng2_toastr_1 = require("ng2-toastr/ng2-toastr");
 var authentication_service_1 = require("../../shared/authentication/authentication.service");
+var user_1 = require("./user");
 var ProfileComponent = (function () {
     function ProfileComponent(authService, formBuilder, toastr) {
         this.authService = authService;
@@ -21,23 +22,21 @@ var ProfileComponent = (function () {
         this.loginPass = new forms_1.FormControl("", forms_1.Validators.required);
     }
     ProfileComponent.prototype.ngOnInit = function () {
+        this.user = new user_1.User("", "", "", "", "", "", "", "", "", "", new Array(), new Array(), new Array());
         this.loggedIn = this.authService.isLoggedIn();
         this.loginForm = this.formBuilder.group({
             loginName: this.loginName,
             loginPass: this.loginPass
         });
     };
+    // $event is an object corresponding to a UserLoginDTO
     ProfileComponent.prototype.login = function ($event) {
         var _this = this;
-        console.log($event);
-        console.log("login " + this.loginName.value + " " + this.loginPass.value);
-        //this.toastr.success("Welcome DamienRonchon !", "Login succeed");
-        // TODO : for preview only
-        //this.router.navigate(['./dashboard']);
         this.authService.login($event).then(function (res) {
             _this.loggedIn = true;
             _this.authService.selectLoggedIn(_this.loggedIn);
             _this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
+            _this.authService.getAccount().then(function (user) { return _this.user = user; }, function (error) { return _this.toastr.error(error, "Error"); });
             setTimeout(function () {
                 // home inventory ///////////////////////////
                 var inventory = $('.home-inventory').flickity({
@@ -102,8 +101,7 @@ var ProfileComponent = (function () {
                     });
                 });
             }, 100);
-        }, function (error) { return console.log("error caca: " + error); } // TODO : Toastr ? Message under form ?
-        );
+        }, function (error) { return _this.toastr.error(error, "Error"); });
     };
     return ProfileComponent;
 }());

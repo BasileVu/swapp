@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 var Subject_1 = require("rxjs/Subject");
+var user_1 = require("../../home/profile/user");
 var AuthService = (function () {
     function AuthService(http) {
         this.http = http;
@@ -47,6 +48,20 @@ var AuthService = (function () {
         return this.http.post('/api/users/', body, options)
             .toPromise()
             .catch(this.handleError);
+    };
+    AuthService.prototype.getAccount = function () {
+        return this.http.get('/api/account/')
+            .toPromise()
+            .then(this.extractUser)
+            .catch(this.handleError);
+    };
+    AuthService.prototype.extractUser = function (res) {
+        var body = res.json();
+        return new user_1.User(body.username, // TODO : change with body.profile_picture_url when available on endpoint
+        body.username, body.first_name, body.last_name, body.email, body.location.street, body.location.city, body.location.region, body.location.country, body.location.last_modification_date, body.notes, body.likes, body.items);
+    };
+    AuthService.prototype.getUser = function () {
+        return this.user;
     };
     /*
         private extractData(res: Response) {

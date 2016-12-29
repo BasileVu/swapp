@@ -58,6 +58,7 @@ export class ProfileComponent implements OnInit {
                 public toastr: ToastsManager) {}
 
     ngOnInit() {
+        this.user = new User("", "", "", "", "", "", "", "", "", "", new Array<number>(), new Array<number>(), new Array<number>());
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({
@@ -66,18 +67,18 @@ export class ProfileComponent implements OnInit {
         });
     }
 
+    // $event is an object corresponding to a UserLoginDTO
     login($event) {
-        console.log($event);
-        console.log("login " + this.loginName.value + " " + this.loginPass.value);
-        //this.toastr.success("Welcome DamienRonchon !", "Login succeed");
-        // TODO : for preview only
-        //this.router.navigate(['./dashboard']);
-
         this.authService.login($event).then(
             res => {
                 this.loggedIn = true;
                 this.authService.selectLoggedIn(this.loggedIn);
                 this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
+
+                this.authService.getAccount().then(
+                    user => this.user = user,
+                    error => this.toastr.error(error, "Error")
+                );
 
                 setTimeout(function(){
                     // home inventory ///////////////////////////
@@ -149,7 +150,7 @@ export class ProfileComponent implements OnInit {
                     });
                 }, 100);
             },
-            error => console.log("error caca: "+error) // TODO : Toastr ? Message under form ?
+            error => this.toastr.error(error, "Error")
         );
     }
 }

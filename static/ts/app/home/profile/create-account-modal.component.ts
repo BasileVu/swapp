@@ -43,7 +43,7 @@ declare let $:any;
 export class CreateAccountModalComponent implements OnInit {
 
     // EventEmitter to call login function of the ProfileComponent after registering
-    @Output() myEvent = new EventEmitter();
+    @Output() loginEvent = new EventEmitter();
 
     // Form fields
     private registerForm: FormGroup;
@@ -54,6 +54,7 @@ export class CreateAccountModalComponent implements OnInit {
     private firstName = new FormControl("", Validators.required);
     private lastName = new FormControl("", Validators.required);
     private address = new FormControl("", Validators.required);
+    private city = new FormControl("", Validators.required);
     private region = new FormControl("", Validators.required);
     private country = new FormControl("", Validators.required);
 
@@ -96,6 +97,7 @@ export class CreateAccountModalComponent implements OnInit {
             password: this.password,
             confirmPassword: this.confirmPassword,
             address: this.address,
+            city: this.city,
             region: this.region,
             country: this.country,
             firstName: this.firstName,
@@ -112,6 +114,7 @@ export class CreateAccountModalComponent implements OnInit {
             this.firstName.value,
             this.lastName.value,
             this.address.value,
+            this.city.value,
             this.region.value,
             this.country.value,
             this.data.image
@@ -130,7 +133,7 @@ export class CreateAccountModalComponent implements OnInit {
                         $('#create-user-modal').modal('hide');
                         let userLoginDTO = new UserLoginDTO(user.username, user.password);
                         console.log(userLoginDTO);
-                        this.myEvent.emit(userLoginDTO);
+                        this.loginEvent.emit(userLoginDTO);
                     }
                 },
                 error => this.toastr.error(error, 'Error')

@@ -6,6 +6,7 @@ export class UserCreationDTO {
     first_name: string;
     last_name: string;
     address: string;
+    city: string;
     region: string;
     country: string;
     picture: string;
@@ -17,6 +18,7 @@ export class UserCreationDTO {
                 firstname: string,
                 lastname: string,
                 address: string,
+                city: string,
                 region: string,
                 country: string,
                 picture: string) {
@@ -27,6 +29,7 @@ export class UserCreationDTO {
         this.first_name = firstname;
         this.last_name = lastname;
         this.address = address;
+        this.city = city;
         this.region = region;
         this.country = country;
         this.picture = picture;

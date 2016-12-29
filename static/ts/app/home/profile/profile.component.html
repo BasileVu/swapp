@@ -6,13 +6,13 @@
             </div>
             <div class="col-xs-10 col-sm-8">
                 <h6>Welcome,</h6>
-                <h3>Name</h3>
-                <h3>Lastname</h3>
+                <h3>{{ user.first_name }}</h3>
+                <h3>{{ user.last_name }}</h3>
             </div>
         </div>
         <div class="row location">
             <div class="col-xs-10">
-                <i class="fa fa-map-marker"></i> Full address, Country
+                <i class="fa fa-map-marker"></i> {{ user.location.street }}, {{ user.location.city }}, {{ user.location.region }}, {{ user.location.country }}
             </div>
             <div class="col-xs-2">
                 <a href="#" class="btn btn-block btn-primary btn-sm btn-reversed open-update-profile-modal"><i class="fa fa-pencil"></i></a>

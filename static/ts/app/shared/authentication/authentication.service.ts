@@ -58,6 +58,37 @@ export class AuthService {
             .catch(this.handleError);
     }
 
+    getAccount(): Promise<User> {
+        return this.http.get('/api/account/')
+            .toPromise()
+            .then(this.extractUser)
+            .catch(this.handleError);
+    }
+
+    extractUser(res: Response) {
+        let body = res.json();
+        return new User(
+                    body.username, // TODO : change with body.profile_picture_url when available on endpoint
+                    body.username,
+                    body.first_name,
+                    body.last_name,
+                    body.email,
+                    body.location.street,
+                    body.location.city,
+                    body.location.region,
+                    body.location.country,
+                    body.location.last_modification_date,
+                    body.notes,
+                    body.likes,
+                    body.items);
+    }
+
+    getUser() {
+        return this.user;
+    }
+
+
+
 /*
     private extractData(res: Response) {
         console.log("Response: " + res);
