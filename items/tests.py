@@ -630,19 +630,24 @@ class ItemSearchApiTests(TestCase):
         self.item2 = self.create_item(c2, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30)
         self.item3 = self.create_item(c3, u1, name="Ring", description="My precious", price_min=100, price_max=500)
         self.item4 = self.create_item(c1, u2, name="New mouse", description="Brand new", price_min=20, price_max=100)
-        self.item5 = self.create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000)
+        self.item5 = self.create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500,
+                                      price_max=1000)
+
+        self.client.login(username="user1", password="password")
 
     def test_list_item_no_filter(self):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 5)
 
+        # TODO
+
     def test_list_item_no_archived_items(self):
         i = Item.objects.get(id=1)
         i.archived = True
         i.save()
 
-        r = self.client.get(self.url)
+        r = self.client.get(self.url + "?q=")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
 

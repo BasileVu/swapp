@@ -1,4 +1,5 @@
-from django.db.models import F, FloatField
+from django.contrib.auth.models import User
+from django.db.models import F, FloatField, Avg, IntegerField
 from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
@@ -8,24 +9,72 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from comments.models import Comment
 from items.serializers import *
 from users.models import Consultation
+
+
+def check_prices(price_min, price_max):
+    if price_min is not None and price_min < 0:
+        raise ValidationError("Price min is negative")
+
+    if price_max is not None and price_max < 0:
+        raise ValidationError("Price max is negative")
+
+    if price_min is not None and price_max is not None and price_min > price_max:
+        raise ValidationError("Price min is higher than price max")
+
+
+def filter_items(data):
+    q = data["q"]
+    category = data["category"]
+    price_min = data["price_min"]
+    price_max = data["price_max"]
+    lat = data["lat"]
+    lon = data["lon"]
+    radius = data["radius"]
+    order_by = data["order_by"]
+
+    queryset = Item.objects.filter(
+        Q(name__icontains=q) | Q(description__icontains=q),
+        price_min__gte=price_min, archived=False
+    )
+
+    if category is not None:
+        queryset = queryset.filter(category__name=category)
+
+    if price_max is not None:
+        queryset = queryset.filter(price_max__lte=price_max)
+
+    if lat is not None and lon is not None:
+        # add "distance" field to each object
+        queryset = queryset.annotate(
+            distance=Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                          function="compute_distance", output_field=FloatField())
+        )
+
+        queryset = queryset.filter(distance__lte=radius)
+
+    if order_by is None:
+        queryset = queryset.order_by("creation_date")
+    else:
+        strings_order_by = {
+            "name": "name",
+            "category": "category__name",
+            "price_min": "price_min",
+            "price_max": "-price_max",
+            "range": "distance",
+            "date": "creation_date"
+        }
+        queryset = queryset.order_by(strings_order_by[order_by])
+
+    return queryset
 
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
-
-    def check_prices(self, price_min, price_max):
-        if price_min is not None and price_min < 0:
-            raise ValidationError("Price min is negative")
-
-        if price_max is not None and price_max < 0:
-            raise ValidationError("Price max is negative")
-
-        if price_min is not None and price_max is not None and price_min > price_max:
-            raise ValidationError("Price min is higher than price max")
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -49,47 +98,113 @@ class ItemViewSet(viewsets.ModelViewSet):
         serializer = SearchItemsSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        q = serializer.validated_data["q"]
-        category = serializer.validated_data["category"]
-        price_min = serializer.validated_data["price_min"]
-        price_max = serializer.validated_data["price_max"]
-        lat = serializer.validated_data["lat"]
-        lon = serializer.validated_data["lon"]
-        radius = serializer.validated_data["radius"]
-        order_by = serializer.validated_data["order_by"]
+        user = request.user
 
-        queryset = Item.objects.filter(
-            Q(name__icontains=q) | Q(description__icontains=q),
-            price_min__gte=price_min, archived=False
-        )
+        if len(request.query_params) == 0 and user.is_authenticated:
+            lon = user.coordinates.longitude
+            lat = user.coordinates.latitude
 
-        if category is not None:
-            queryset = queryset.filter(category__name=category)
+            def distance_points(distance):
+                if distance < 10:
+                    return 20
+                if distance < 20:
+                    return 15
+                if distance < 30:
+                    return 10
+                if distance < 40:
+                    return 5
+                if distance < 50:
+                    return 3
+                return 0
 
-        if price_max is not None:
-            queryset = queryset.filter(price_max__lte=price_max)
+            def category_points(user, item):
+                if item.category in user.userprofile.categories:
+                    return 15
+                else:
+                    return 0
 
-        if lat is not None and lon is not None:
-            # add "distance" field to each object
-            queryset = queryset.annotate(
-                distance=Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
-                              function="compute_distance", output_field=FloatField())
+            # can be used either for last visited or for last liked
+            def last_similar_points(item, items):
+                n_cat_similar = 0
+                for i in items:
+                    if item.category == i.category:
+                        n_cat_similar += 1
+                if n_cat_similar > 9:
+                    return 11
+                if n_cat_similar > 6:
+                    return 9
+                if n_cat_similar > 5:
+                    return 3
+                if n_cat_similar > 1:
+                    return 2
+                return 0
+
+            def num_likes_points(item):
+                return item.like_set.count()
+
+            def note_mean_points(user):
+                #mean = user.note_set.aggregate(Avg("note"))["note_avg"]
+                mean_user_notes = User.objects.aggregate(Avg("userprofile__mean_note"))
+
+                if user.mean_note > mean_user_notes:
+                    return 5
+                if user.mean_note == mean_user_notes:
+                    return 3
+                return 0
+
+            def num_comments(item):
+                n_comments = item.comment_set.count()
+                mean = Comment.objects.aggregate(Avg("comment_set__mean_note"))
+                return
+
+            def num_offers(item):
+                return item.offers_received.count()
+
+            def compute_tot_points(distance_points, category_points, last_liked_points, last_visited_points,
+                                   num_like_points, note_mean_points, num_comments_points, num_offers_points):
+                return 20 * distance_points + \
+                       15 * category_points + \
+                       11 * last_liked_points + \
+                       7 * last_visited_points + \
+                       6 * last_liked_points + \
+                       5 * note_mean_points + \
+                       2 * num_comments_points + \
+                       num_offers_points
+
+
+            recent_consultations = user.consultation_set.order_by("date")[:10]
+
+            """queryset = Item.objects.raw(
+                "SELECT *, "
+                "distance_points(compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude)) * 20 + "
+                "categories_points() + "
+                "AS points "
+                "FROM items_item "
+                "INNER JOIN auth_user ON owner_id = auth_user.id "
+                "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
+                "ORDER BY points DESC" % (lon, lat)
             )
 
-            queryset = queryset.filter(distance__lte=radius)
 
-        if order_by is None:
-            queryset = queryset.order_by("creation_date")
+            queryset = Item.objects.raw(
+                "SELECT *, "
+                "compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude) * 20 AS points "
+                "FROM items_item "
+                "INNER JOIN auth_user ON owner_id = auth_user.id "
+                "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
+                "ORDER BY points DESC" % (lon, lat)
+            )"""
+
+            queryset = Item.objects.annotate(
+                distance_points=Func(
+                    Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                              function="compute_distance", output_field=FloatField()),
+                    function="distance_points", output_field=IntegerField()
+                )
+            ).order_by("-distance_points")
+
         else:
-            strings_order_by = {
-                    "name": "name",
-                    "category": "category__name",
-                    "price_min": "price_min",
-                    "price_max": "-price_max",
-                    "range": "distance",
-                    "date": "creation_date"
-                }
-            queryset = queryset.order_by(strings_order_by[order_by])
+            queryset = filter_items(serializer.validated_data)
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 
@@ -97,14 +212,14 @@ class ItemViewSet(viewsets.ModelViewSet):
         price_min = serializer.validated_data.get("price_min", None)
         price_max = serializer.validated_data.get("price_max", None)
 
-        self.check_prices(price_min, price_max)
+        check_prices(price_min, price_max)
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
         price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)
         price_max = serializer.validated_data.get("price_max", serializer.instance.price_max)
 
-        self.check_prices(price_min, price_max)
+        check_prices(price_min, price_max)
         serializer.save()
 
 
@@ -129,106 +244,3 @@ class LikeViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
-
-'''
-@login_required(login_url="users:login", redirect_field_name="")
-def create_view(request):
-    try:
-        name = request.POST["name"]
-        description = request.POST["description"]
-        price_min = int(request.POST["price_min"])
-        price_max = int(request.POST["price_max"])
-        archived = 0
-        category = request.POST["category"]
-    except KeyError:
-        return render(request, "items/create.html", {'categories': Category.objects.all()})
-    if price_min > price_max:
-        return render(request, "users/create.html", {
-            'categories': Category.objects.all(),
-            "error_message": "Price min is higher than price max."
-        })
-    try:
-        item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
-                    archived=archived,
-                    category=Category.objects.get(id=category),
-                    owner=UserProfile.objects.get(user=request.user))
-        item.save()
-    except IntegrityError:
-        return render(request, "items/create.html", {
-            'categories': Category.objects.all(),
-            "error_message": "Item already exists."
-        })
-    return HttpResponseRedirect('/items/%s/' % item.id)
-
-
-def item_view(request, item_id):
-    return render(request, "items/item.html", {"item": Item.objects.get(id=item_id)})
-
-
-@api_view(["POST"])
-@permission_classes((IsAuthenticated,))
-def create_item(request):
-    try:
-        received_json_data = json.loads(request.body.decode("utf-8"))
-        name = received_json_data["name"]
-        description = received_json_data["description"]
-        price_min = int(received_json_data["price_min"])
-        price_max = int(received_json_data["price_max"])
-        archived = 0
-        category = int(received_json_data["category"])
-    except KeyError:
-        return JsonResponse({"error": "Error in the JSON data"}, status=400)
-    if price_min > price_max:
-        return JsonResponse({"error": "The minimum price is higher than the maximum price"}, status=400)
-
-    if request.user.userprofile.location == "":
-        return JsonResponse({"error": "Your location is not specified"}, status=400)
-
-    try:
-        item = Item(name=name, description=description, price_min=price_min, price_max=price_max,
-                    archived=archived,
-                    category=Category.objects.get(id=category),
-                    owner=UserProfile.objects.get(user=request.user))
-        item.save()
-    except IntegrityError:
-        return JsonResponse({"error": "Error creating the item"}, status=400)
-
-    response = HttpResponse()
-    response["Location"] = "/api/items/%d/" % item.id
-    response.status_code = 201
-    return response
-
-
-@api_view(["GET"])
-def get_item(request, item_id):
-    return JsonResponse(Item.objects.get(id=item_id), status=200)
-
-
-@api_view(["PATCH"])
-@login_required(login_url="users:login", redirect_field_name="")
-def archive_item(request, item_id):
-    try:
-        Item.objects.filter(id=item_id, owner=UserProfile.objects.get(user=request.user).id).update(archived=1)
-    except IntegrityError:
-        return JsonResponse({"error": "User not logged in or item not found"}, status=409)
-
-    response = HttpResponse()
-    response["Location"] = "/api/items/%d/" % int(item_id)
-    response.status_code = 200
-    return response
-
-
-@api_view(["PATCH"])
-@login_required(login_url="users:login", redirect_field_name="")
-def unarchive_item(request, item_id):
-    try:
-        Item.objects.filter(id=item_id, owner=UserProfile.objects.get(user=request.user).id).update(archived=0)
-    except IntegrityError:
-        return JsonResponse({"error": "User not logged in or item not found"}, status=409)
-
-    response = HttpResponse()
-    response["Location"] = "/api/items/%d/" % int(item_id)
-    response.status_code = 200
-
-    return response
-'''
