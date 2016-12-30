@@ -292,3 +292,4 @@ tests/report/
 !.vscode/launch.json
 
 static/public/js/app
+static/public/js/vendor
