@@ -25,7 +25,7 @@ def check_prices(price_min, price_max):
         raise ValidationError("Price min is higher than price max")
 
 
-def filter_items(data):
+def filter_items(data, user):
     q = data["q"]
     category = data["category"]
     price_min = data["price_min"]
@@ -40,11 +40,18 @@ def filter_items(data):
         price_min__gte=price_min, archived=False
     )
 
+    if user.is_authenticated:
+        queryset = queryset.filter(~Q(owner=user))
+
     if category is not None:
         queryset = queryset.filter(category__name=category)
 
     if price_max is not None:
         queryset = queryset.filter(price_max__lte=price_max)
+
+    if user.is_authenticated and (lat is None or lon is None):
+        lat = user.coordinates.latitude
+        lon = user.coordinates.longitude
 
     if lat is not None and lon is not None:
         # add "distance" field to each object
@@ -74,7 +81,7 @@ def filter_items(data):
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -100,29 +107,16 @@ class ItemViewSet(viewsets.ModelViewSet):
 
         user = request.user
 
-        if len(request.query_params) == 0 and user.is_authenticated:
-            lon = user.coordinates.longitude
-            lat = user.coordinates.latitude
+        if len(request.query_params) == 0:
+            if user.is_authenticated:
+                lon = user.coordinates.longitude
+                lat = user.coordinates.latitude
+            else:
+                # FIXME provide lon/lat if not connected or not ?
+                lon = 0
+                lat = 0
 
-            def distance_points(distance):
-                if distance < 10:
-                    return 20
-                if distance < 20:
-                    return 15
-                if distance < 30:
-                    return 10
-                if distance < 40:
-                    return 5
-                if distance < 50:
-                    return 3
-                return 0
-
-            def category_points(user, item):
-                if item.category in user.userprofile.categories:
-                    return 15
-                else:
-                    return 0
-
+            """
             # can be used either for last visited or for last liked
             def last_similar_points(item, items):
                 n_cat_similar = 0
@@ -143,7 +137,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                 return item.like_set.count()
 
             def note_mean_points(user):
-                #mean = user.note_set.aggregate(Avg("note"))["note_avg"]
+                # mean = user.note_set.aggregate(Avg("note"))["note_avg"]
                 mean_user_notes = User.objects.aggregate(Avg("userprofile__mean_note"))
 
                 if user.mean_note > mean_user_notes:
@@ -171,40 +165,54 @@ class ItemViewSet(viewsets.ModelViewSet):
                        2 * num_comments_points + \
                        num_offers_points
 
+            recent_consultations = user.consultation_set.order_by("date")[:10]"""
 
-            recent_consultations = user.consultation_set.order_by("date")[:10]
+            user_id = user.id if user.is_authenticated else 0
 
-            """queryset = Item.objects.raw(
+            # FIXME sqlite does not have boolean type, thus the 0 for archived
+            queryset = Item.objects.raw(
                 "SELECT *, "
-                "distance_points(compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude)) * 20 + "
-                "categories_points() + "
+                "   distance_points(compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude)) "
+                "   * 20 + "
+                "   (SELECT COUNT(*) "
+                "    FROM auth_user "
+                "    INNER JOIN users_userprofile "
+                "      ON auth_user.id = users_userprofile.user_id "
+                "    INNER JOIN users_userprofile_categories "
+                "      ON users_userprofile.user_id = users_userprofile_categories.userprofile_id "
+                "    WHERE items_item.category_id = users_userprofile_categories.category_id "
+                "   ) * 15 "
                 "AS points "
                 "FROM items_item "
                 "INNER JOIN auth_user ON owner_id = auth_user.id "
                 "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
-                "ORDER BY points DESC" % (lon, lat)
+                "WHERE archived = 0 AND auth_user.id != %d "
+                "ORDER BY points DESC" % (lon, lat, user_id)
             )
 
+            #"last_similar_points(liked) * 11 + "
+            #"last_similar_points(visited) * 7 + "
+            #"num_like_points() * 6 + "
+            #"note_mean_points() * 5 + "
+            #"num_comments_points() * 2 + "
+            #"num_offers_points()"
 
-            queryset = Item.objects.raw(
-                "SELECT *, "
-                "compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude) * 20 AS points "
-                "FROM items_item "
-                "INNER JOIN auth_user ON owner_id = auth_user.id "
-                "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
-                "ORDER BY points DESC" % (lon, lat)
-            )"""
-
-            queryset = Item.objects.annotate(
+            """queryset = Item.objects.annotate(
                 distance_points=Func(
-                    Func(lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
-                              function="compute_distance", output_field=FloatField()),
+                    Func(
+                        lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                        function="compute_distance", output_field=FloatField()
+                    ),
                     function="distance_points", output_field=IntegerField()
+                ),
+                category_points=Func(
+                    F("category"), user.id,
+                    function="category_points", output_field=IntegerField()
                 )
-            ).order_by("-distance_points")
+            ).order_by("-distance_points")"""
 
         else:
-            queryset = filter_items(serializer.validated_data)
+            queryset = filter_items(serializer.validated_data, user)
 
         return Response(AggregatedItemSerializer(queryset, many=True).data)
 

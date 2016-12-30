@@ -1,4 +1,8 @@
 def distance_points(distance):
+    if distance < 1:
+        return 50
+    if distance < 5:
+        return 30
     if distance < 10:
         return 20
     if distance < 20:

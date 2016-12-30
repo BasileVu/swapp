@@ -121,6 +121,7 @@ class ItemAPITests(TestCase):
         r = self.post_item()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
+        self.client.logout()
         r = self.get_items()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
@@ -249,8 +250,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_item = r.data['id']
-        r = self.get_items()
-        self.assertEqual(len(r.data), 1)
+        self.assertEqual(Item.objects.count(), 1)
 
         r = self.delete_item(id_item=id_item)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
@@ -272,6 +272,7 @@ class ItemAPITests(TestCase):
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
+        self.client.logout()
         r = self.get_items()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
@@ -607,6 +608,7 @@ class ItemSearchApiTests(TestCase):
     def setUp(self):
         u1 = User.objects.create_user(username="user1", email="test@test.com", password="password")
         u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
+        u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password")
 
         # Cheseaux
         u1.coordinates.latitude = 46.7793801
@@ -622,9 +624,15 @@ class ItemSearchApiTests(TestCase):
         self.latitude = 46.77866239999999
         self.longitude = 6.6419655
 
+        u3.coordinates.latitude = self.latitude
+        u3.coordinates.longitude = self.longitude
+        u3.coordinates.save()
+
         c1 = Category.objects.create(name="Test")
         c2 = Category.objects.create(name="Test2")
         c3 = Category.objects.create(name="Test3")
+
+        self.c = c1
 
         self.item1 = self.create_item(c1, u1, name="Shoes", description="My old shoes", price_min=10, price_max=30)
         self.item2 = self.create_item(c2, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30)
@@ -633,16 +641,36 @@ class ItemSearchApiTests(TestCase):
         self.item5 = self.create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500,
                                       price_max=1000)
 
-        self.client.login(username="user1", password="password")
+        self.client.login(username="user3", password="password")
 
-    def test_list_item_no_filter(self):
+    def test_suggestions_far_away_should_be_last(self):
+        u = User.objects.create_user(username="user4", email="test4@test.com", password="password")
+        u.coordinates.latitude = 0
+        u.coordinates.longitude = 0
+        u.coordinates.save()
+        item = self.create_item(self.c, u, name="Should be last", description="", price_min=10, price_max=30)
+
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 5)
+        self.assertEqual(len(r.data), 6)
 
-        # TODO
+        self.assertEquals(r.data[0]["name"], self.item4.name)
+        self.assertEquals(r.data[1]["name"], self.item5.name)
+        self.assertEquals(r.data[2]["name"], self.item1.name)
+        self.assertEquals(r.data[3]["name"], self.item2.name)
+        self.assertEquals(r.data[4]["name"], self.item3.name)
+        self.assertEquals(r.data[5]["name"], item.name)
 
-    def test_list_item_no_archived_items(self):
+    def test_suggestions_no_archived_items(self):
+        i = Item.objects.get(id=1)
+        i.archived = True
+        i.save()
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 4)
+
+    def test_list_item_no_archived_item(self):
         i = Item.objects.get(id=1)
         i.archived = True
         i.save()
@@ -650,6 +678,22 @@ class ItemSearchApiTests(TestCase):
         r = self.client.get(self.url + "?q=")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
+
+    def test_suggestions_no_own_item(self):
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 2)
+
+    def test_list_no_own_item(self):
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+
+        r = self.client.get(self.url + "?q=")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 2)
 
     def test_list_item_q(self):
         r = self.client.get(self.url + "?q=my")
