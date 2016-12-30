@@ -9,7 +9,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from comments.models import Comment
 from items.serializers import *
 from users.models import Consultation
 
@@ -115,6 +114,12 @@ def num_comments_points(n_comments, mean_comments_number):
     return 0
 
 
+def num_offers_points(n_offers, mean_offer_number):
+    if n_offers > mean_offer_number:
+        return 5
+    return 0
+
+
 def build_item_suggestions(user):
     if user.is_authenticated:
         lon = user.coordinates.longitude
@@ -149,8 +154,16 @@ def build_item_suggestions(user):
     if n_users > 0:
         mean_all_users = sum(mean_user_notes(user) for user in all_users) / n_users
 
+    sum_comments = 0
+    sum_offers = 0
+
+    for i in queryset:
+        sum_comments += i.comment_set.count()
+        sum_offers += i.offers_received.count()
+
     if n_items > 0:
-        mean_comments_number = sum(i.comment_set.count() for i in queryset) / n_items
+        mean_comments_number = sum_comments / n_items
+        mean_offers_number = sum_offers / n_items
 
     if user.is_authenticated:
         recent_likes = user.like_set.order_by("date")[:10]
@@ -169,7 +182,7 @@ def build_item_suggestions(user):
         item.points += item.like_set.count() * 6
         item.points += note_mean_points(mean_user_notes(item.owner), mean_all_users) * 5
         item.points += num_comments_points(item.comment_set.count(), mean_comments_number) * 2
-        item.points += item.offers_received.count()
+        item.points += num_offers_points(item.offers_received.count(), mean_offers_number)
 
         items.append(item)
 
