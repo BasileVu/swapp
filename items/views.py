@@ -107,6 +107,75 @@ def note_mean_points(mean_user, mean_all_users):
     return 0
 
 
+def num_comments_points(n_comments, mean_comments_number):
+    if n_comments > mean_comments_number:
+        return 6
+    elif n_comments == mean_comments_number:
+        return 3
+    return 0
+
+
+def build_item_suggestions(user):
+    if user.is_authenticated:
+        lon = user.coordinates.longitude
+        lat = user.coordinates.latitude
+    else:
+        # FIXME provide lon/lat if not connected or not ?
+        lon = 0
+        lat = 0
+
+    queryset = Item.objects.filter(archived=False)
+
+    if user.is_authenticated:
+        queryset = queryset.filter(~Q(owner=user))
+
+    queryset = queryset.annotate(
+        points=Func(
+            Func(
+                lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                function="compute_distance", output_field=FloatField()
+            ),
+            function="distance_points", output_field=IntegerField()
+        )
+    )
+
+    items = list()
+
+    all_users = User.objects.all()
+    n_users = len(all_users)
+    n_items = len(queryset)
+
+    if n_users > 0:
+        mean_all_users = sum(mean_user_notes(user) for user in all_users) / n_users
+
+    if n_items > 0:
+        mean_comments_number = sum(i.comment_set.count() for i in queryset) / n_items
+
+    if user.is_authenticated:
+        recent_likes = user.like_set.order_by("date")[:10]
+        recent_consultations = user.consultation_set.order_by("date")[:10]
+
+    for item in queryset:
+        item.points *= 20
+
+        if user.is_authenticated:
+            if item.category in user.userprofile.categories.all():
+                item.points += 15
+
+            item.points += last_similar_points(item, recent_likes) * 11
+            item.points += last_similar_points(item, recent_consultations) * 7
+
+        item.points += item.like_set.count() * 6
+        item.points += note_mean_points(mean_user_notes(item.owner), mean_all_users) * 5
+        item.points += num_comments_points(item.comment_set.count(), mean_comments_number) * 2
+        item.points += item.offers_received.count()
+
+        items.append(item)
+
+    items.sort(key=lambda i: i.points, reverse=True)
+    return items
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -137,100 +206,11 @@ class ItemViewSet(viewsets.ModelViewSet):
         user = request.user
 
         if len(request.query_params) == 0:
-            if user.is_authenticated:
-                lon = user.coordinates.longitude
-                lat = user.coordinates.latitude
-            else:
-                # FIXME provide lon/lat if not connected or not ?
-                lon = 0
-                lat = 0
-
-            """def num_comments(item):
-                n_comments = item.comment_set.count()
-                mean = Comment.objects.aggregate(Avg("comment_set__mean_note"))
-                return
-
-            def num_offers(item):
-                return item.offers_received.count()"""
-
-            queryset = Item.objects.filter(archived=False)
-
-            if user.is_authenticated:
-                queryset = queryset.filter(~Q(owner=user))
-
-            queryset = queryset.annotate(
-                points=Func(
-                    Func(
-                        lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
-                        function="compute_distance", output_field=FloatField()
-                    ),
-                    function="distance_points", output_field=IntegerField()
-                )
-            )
-
-            items = list()
-
-            all_users = User.objects.all()
-            n_users = len(all_users)
-
-            if n_users > 0:
-                mean_all_users = sum(mean_user_notes(user) for user in all_users) / n_users
-
-            if user.is_authenticated:
-                recent_likes = user.like_set.order_by("date")[:10]
-                recent_consultations = user.consultation_set.order_by("date")[:10]
-
-            for item in queryset:
-                item.points *= 20
-
-                if user.is_authenticated:
-                    if item.category in user.userprofile.categories.all():
-                        item.points += 15
-
-                    item.points += last_similar_points(item, recent_likes) * 11
-                    item.points += last_similar_points(item, recent_consultations) * 7
-
-                item.points += item.like_set.count() * 6
-                item.points += note_mean_points(mean_user_notes(item.owner), mean_all_users) * 5
-
-                items.append(item)
-
-
-            """"
-            #user_id = user.id if user.is_authenticated else 0
-
-            # FIXME sqlite does not have boolean type, thus the 0 for archived
-            queryset = Item.objects.raw(
-                "SELECT *, "
-                "   distance_points(compute_distance(%f, %f, users_coordinates.longitude, users_coordinates.latitude)) "
-                "   * 20 + "
-                "   (SELECT COUNT(*) "
-                "    FROM auth_user "
-                "    INNER JOIN users_userprofile "
-                "      ON auth_user.id = users_userprofile.user_id "
-                "    INNER JOIN users_userprofile_categories "
-                "      ON users_userprofile.user_id = users_userprofile_categories.userprofile_id "
-                "    WHERE items_item.category_id = users_userprofile_categories.category_id "
-                "   ) * 15 "
-                "AS points "
-                "FROM items_item "
-                "INNER JOIN auth_user ON owner_id = auth_user.id "
-                "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
-                "WHERE archived = 0 AND auth_user.id != %d "
-                "ORDER BY points DESC" % (lon, lat, user_id)
-            )"""
-
-            #"num_comments_points() * 2 + "
-            #"num_offers_points()"
-
-            items.sort(key=lambda i: i.points, reverse=True)
-
+            items = build_item_suggestions(user)
             return Response(AggregatedItemSerializer(items, many=True).data)
-
         else:
             queryset = filter_items(serializer.validated_data, user)
             return Response(AggregatedItemSerializer(queryset, many=True).data)
-
 
     def perform_create(self, serializer):
         price_min = serializer.validated_data.get("price_min", None)
