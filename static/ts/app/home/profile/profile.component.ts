@@ -9,6 +9,7 @@ import {
     animate
 } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
+import { Subscription }   from 'rxjs/Subscription';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
@@ -47,6 +48,7 @@ declare let google: any;
 export class ProfileComponent implements OnInit {
 
     loggedIn: boolean;
+    subscription: Subscription;
     user: User;
 
     private loginForm: FormGroup;
@@ -65,6 +67,11 @@ export class ProfileComponent implements OnInit {
             loginName: this.loginName,
             loginPass: this.loginPass
         });
+
+        // Listen for login changes
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => this.loggedIn = loggedIn
+        );
     }
 
     // $event is an object corresponding to a UserLoginDTO

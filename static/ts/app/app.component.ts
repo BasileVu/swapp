@@ -73,6 +73,22 @@ export class AppComponent implements OnInit, AfterViewInit {
             console.log("Geolocation not available");
         }
     }
+
+    logout() {
+        this.authService.logout()
+            .then(
+                res => {
+                    if (res.status === 200) {
+                        this.loggedIn = false;
+                        this.authService.selectLoggedIn(this.loggedIn);
+                        this.toastr.success("", "Logged out");
+                    }
+                },
+                error => {
+                    console.log(error);
+                }
+            );
+    }
     
     ngAfterViewInit() {
 

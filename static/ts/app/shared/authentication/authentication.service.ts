@@ -32,8 +32,11 @@ export class AuthService {
         return this.loggedIn;
     }
 
-    logout() {
+    logout(): Promise<any> {
         localStorage.removeItem("user");
+        return this.http.get('/api/logout/')
+        .toPromise()
+        .catch(this.handleError);
     }
     
     login(userLoginDTO): Promise<any> {
