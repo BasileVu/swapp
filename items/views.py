@@ -130,12 +130,13 @@ def build_item_suggestions(user):
         queryset = queryset.filter(~Q(owner=user))
 
     queryset = queryset.annotate(
+        distance=Func(
+            lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+            function="compute_distance", output_field=FloatField()
+        )
+    ).annotate(
         points=Func(
-            Func(
-                lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
-                function="compute_distance", output_field=FloatField()
-            ),
-            function="distance_points", output_field=IntegerField()
+            F("distance"), function="distance_points", output_field=IntegerField()
         )
     )
 
@@ -172,7 +173,7 @@ def build_item_suggestions(user):
 
         items.append(item)
 
-    items.sort(key=lambda i: i.points, reverse=True)
+    items.sort(key=lambda i: (-i.points, i.distance))
     return items
 
 

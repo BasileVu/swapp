@@ -5,68 +5,87 @@ from items.models import *
 from users.models import *
 
 
-class ItemListTests(TestCase):
+class BaseSetupMixin():
     url = "/api/items/"
 
     def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
         return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
                                    archived=archived, category=category, owner=owner)
 
-    def setUp(self):
-        u1 = User.objects.create_user(username="user1", email="test@test.com", password="password")
-        u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
-        u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password")
+    def setup(self):
+        self.u1 = User.objects.create_user(username="user1", email="test@test.com", password="password")
+        self.u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
+        self.u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password")
 
         # Cheseaux
-        u1.coordinates.latitude = 46.7793801
-        u1.coordinates.longitude = 6.659497600000001
-        u1.coordinates.save()
+        self.u1.coordinates.latitude = 46.7793801
+        self.u1.coordinates.longitude = 6.659497600000001
+        self.u1.coordinates.save()
 
         # St-Roch
-        u2.coordinates.latitude = 46.7812274
-        u2.coordinates.longitude = 6.6473097
-        u2.coordinates.save()
+        self.u2.coordinates.latitude = 46.7812274
+        self.u2.coordinates.longitude = 6.6473097
+        self.u2.coordinates.save()
 
         # Maison d'ailleurs
         self.latitude = 46.77866239999999
         self.longitude = 6.6419655
 
-        u3.coordinates.latitude = self.latitude
-        u3.coordinates.longitude = self.longitude
-        u3.coordinates.save()
+        self.u3.coordinates.latitude = self.latitude
+        self.u3.coordinates.longitude = self.longitude
+        self.u3.coordinates.save()
 
-        c1 = Category.objects.create(name="Test")
-        c2 = Category.objects.create(name="Test2")
-        c3 = Category.objects.create(name="Test3")
+        self.c1 = Category.objects.create(name="Test")
+        self.c2 = Category.objects.create(name="Test2")
+        self.c3 = Category.objects.create(name="Test3")
 
-        self.c = c1
+        self.item1 = self.create_item(self.c1, self.u1, name="Shoes", description="My old shoes",
+                                      price_min=10, price_max=30)
+        self.item2 = self.create_item(self.c2, self.u1, name="Shirt", description="My old shirt",
+                                      price_min=5, price_max=30)
+        self.item3 = self.create_item(self.c3, self.u1, name="Ring", description="My precious",
+                                      price_min=100, price_max=500)
+        self.item4 = self.create_item(self.c1, self.u2, name="New mouse", description="Brand new",
+                                      price_min=20, price_max=100)
+        self.item5 = self.create_item(self.c2, self.u2, name="Piano", description="Still nice to the ear",
+                                      price_min=500, price_max=1000)
 
-        self.item1 = self.create_item(c1, u1, name="Shoes", description="My old shoes", price_min=10, price_max=30)
-        self.item2 = self.create_item(c2, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30)
-        self.item3 = self.create_item(c3, u1, name="Ring", description="My precious", price_min=100, price_max=500)
-        self.item4 = self.create_item(c1, u2, name="New mouse", description="Brand new", price_min=20, price_max=100)
-        self.item5 = self.create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500,
-                                      price_max=1000)
 
-        self.client.login(username="user3", password="password")
+class SuggestionDistanceMixin(BaseSetupMixin):
+    def setup(self):
+        super().setup()
 
-    def test_suggestions_far_away_should_be_last(self):
-        u = User.objects.create_user(username="user4", email="test4@test.com", password="password")
-        u.coordinates.latitude = 0
-        u.coordinates.longitude = 0
-        u.coordinates.save()
-        item = self.create_item(self.c, u, name="Should be last", description="", price_min=10, price_max=30)
+        self.u4 = User.objects.create_user(username="user4", email="test4@test.com", password="password")
 
-        r = self.client.get(self.url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 6)
+        self.u4.coordinates.latitude = 0
+        self.u4.coordinates.longitude = 0
+        self.u4.coordinates.save()
 
-        self.assertEquals(r.data[0]["name"], self.item4.name)
-        self.assertEquals(r.data[1]["name"], self.item5.name)
-        self.assertEquals(r.data[2]["name"], self.item1.name)
-        self.assertEquals(r.data[3]["name"], self.item2.name)
-        self.assertEquals(r.data[4]["name"], self.item3.name)
-        self.assertEquals(r.data[5]["name"], item.name)
+        self.item6 = self.create_item(self.c1, self.u4, name="Item 6", description="", price_min=10, price_max=30)
+
+        self.u5 = User.objects.create_user(username="user5", email="test5@test.com", password="password")
+        self.u5.coordinates.latitude = self.u3.coordinates.latitude
+        self.u5.coordinates.longitude = self.u3.coordinates.longitude
+        self.u5.coordinates.save()
+        self.item7 = self.create_item(self.c1, self.u5, name="Item 7", description="", price_min=10, price_max=30)
+
+
+class SuggestionCategoryMixin(SuggestionDistanceMixin):
+    def setup(self):
+        super().setup()
+
+        self.c4 = Category.objects.create(name="Test4")
+
+        self.item8 = self.create_item(self.c1, self.u1, name="Item 8", description="", price_min=10, price_max=30)
+        self.item9 = self.create_item(self.c1, self.u1, name="Item 9", description="", price_min=10, price_max=30)
+        self.item10 = self.create_item(self.c1, self.u1, name="Item 10", description="", price_min=10, price_max=30)
+        self.item11 = self.create_item(self.c1, self.u1, name="Item 11", description="", price_min=10, price_max=30)
+        self.item12 = self.create_item(self.c1, self.u1, name="Item 12", description="", price_min=10, price_max=30)
+
+
+class ItemSuggestionTests(TestCase, BaseSetupMixin):
+    def setUp(self):
+        self.setup()
 
     def test_suggestions_no_archived_items(self):
         i = Item.objects.get(id=1)
@@ -77,6 +96,60 @@ class ItemListTests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
 
+    def test_suggestions_no_own_item(self):
+        self.client.login(username="user1", password="password")
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 2)
+
+
+class ItemSuggestionDistanceTests(TestCase, SuggestionDistanceMixin):
+    def setUp(self):
+        self.setup()
+
+    def test_suggestions_far_away_should_be_last(self):
+        self.client.login(username="user3", password="password")
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 7)
+
+        self.assertEquals(r.data[0]["name"], self.item7.name)
+        self.assertEquals(r.data[1]["name"], self.item4.name)
+        self.assertEquals(r.data[2]["name"], self.item5.name)
+        self.assertEquals(r.data[3]["name"], self.item1.name)
+        self.assertEquals(r.data[4]["name"], self.item2.name)
+        self.assertEquals(r.data[5]["name"], self.item3.name)
+        self.assertEquals(r.data[6]["name"], self.item6.name)
+
+
+class ItemSuggestionCategoryTests(TestCase, SuggestionCategoryMixin):
+    def setUp(self):
+        self.setup()
+
+    def test_suggestions_no_wanted_category(self):
+        self.client.login(username="user3", password="password")
+
+        r = self.client.get(self.url)
+        self.assertEquals(r.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(r.data), 12)
+
+        self.assertEquals(r.data[0]["name"], self.item7.name)
+        self.assertEquals(r.data[1]["name"], self.item4.name)
+        self.assertEquals(r.data[2]["name"], self.item5.name)
+        self.assertEquals(r.data[11]["name"], self.item6.name)
+
+    def test_suggestions_no_matching_category(self):
+        self.u3.userprofile.categories.add()
+        self.client.login(username="user3", password="password")
+
+
+class ItemListTests(TestCase, BaseSetupMixin):
+    def setUp(self):
+        self.setup()
+        self.client.login(username="user3", password="password")
+
     def test_list_item_no_archived_item(self):
         i = Item.objects.get(id=1)
         i.archived = True
@@ -85,14 +158,6 @@ class ItemListTests(TestCase):
         r = self.client.get(self.url + "?q=")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 4)
-
-    def test_suggestions_no_own_item(self):
-        self.client.logout()
-        self.client.login(username="user1", password="password")
-
-        r = self.client.get(self.url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 2)
 
     def test_list_no_own_item(self):
         self.client.logout()
