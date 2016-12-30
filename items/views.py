@@ -78,6 +78,35 @@ def filter_items(data, user):
     return queryset
 
 
+def last_similar_points(item, items):
+    n_cat_similar = 0
+    for i in items:
+        if item.category == i.category:
+            n_cat_similar += 1
+    if n_cat_similar > 9:
+        return 11
+    if n_cat_similar > 6:
+        return 9
+    if n_cat_similar > 5:
+        return 3
+    if n_cat_similar > 1:
+        return 2
+    return 0
+
+
+def mean_user_notes(user):
+    res = user.note_set.aggregate(Avg("note"))["note__avg"]
+    return 5 if res is None else res
+
+
+def note_mean_points(mean_user, mean_all_users):
+    if mean_user > mean_all_users:
+        return 5
+    if mean_user == mean_all_users:
+        return 3
+    return 0
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -92,7 +121,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         queryset = Item.objects.all()
         item = get_object_or_404(queryset, pk=pk)
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             Consultation.objects.create(user=self.request.user, item=item)
 
         item.views += 1
@@ -116,58 +145,59 @@ class ItemViewSet(viewsets.ModelViewSet):
                 lon = 0
                 lat = 0
 
-            """
-            # can be used either for last visited or for last liked
-            def last_similar_points(item, items):
-                n_cat_similar = 0
-                for i in items:
-                    if item.category == i.category:
-                        n_cat_similar += 1
-                if n_cat_similar > 9:
-                    return 11
-                if n_cat_similar > 6:
-                    return 9
-                if n_cat_similar > 5:
-                    return 3
-                if n_cat_similar > 1:
-                    return 2
-                return 0
-
-            def num_likes_points(item):
-                return item.like_set.count()
-
-            def note_mean_points(user):
-                # mean = user.note_set.aggregate(Avg("note"))["note_avg"]
-                mean_user_notes = User.objects.aggregate(Avg("userprofile__mean_note"))
-
-                if user.mean_note > mean_user_notes:
-                    return 5
-                if user.mean_note == mean_user_notes:
-                    return 3
-                return 0
-
-            def num_comments(item):
+            """def num_comments(item):
                 n_comments = item.comment_set.count()
                 mean = Comment.objects.aggregate(Avg("comment_set__mean_note"))
                 return
 
             def num_offers(item):
-                return item.offers_received.count()
+                return item.offers_received.count()"""
 
-            def compute_tot_points(distance_points, category_points, last_liked_points, last_visited_points,
-                                   num_like_points, note_mean_points, num_comments_points, num_offers_points):
-                return 20 * distance_points + \
-                       15 * category_points + \
-                       11 * last_liked_points + \
-                       7 * last_visited_points + \
-                       6 * last_liked_points + \
-                       5 * note_mean_points + \
-                       2 * num_comments_points + \
-                       num_offers_points
+            queryset = Item.objects.filter(archived=False)
 
-            recent_consultations = user.consultation_set.order_by("date")[:10]"""
+            if user.is_authenticated:
+                queryset = queryset.filter(~Q(owner=user))
 
-            user_id = user.id if user.is_authenticated else 0
+            queryset = queryset.annotate(
+                points=Func(
+                    Func(
+                        lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
+                        function="compute_distance", output_field=FloatField()
+                    ),
+                    function="distance_points", output_field=IntegerField()
+                )
+            )
+
+            items = list()
+
+            all_users = User.objects.all()
+            n_users = len(all_users)
+
+            if n_users > 0:
+                mean_all_users = sum(mean_user_notes(user) for user in all_users) / n_users
+
+            if user.is_authenticated:
+                recent_likes = user.like_set.order_by("date")[:10]
+                recent_consultations = user.consultation_set.order_by("date")[:10]
+
+            for item in queryset:
+                item.points *= 20
+
+                if user.is_authenticated:
+                    if item.category in user.userprofile.categories.all():
+                        item.points += 15
+
+                    item.points += last_similar_points(item, recent_likes) * 11
+                    item.points += last_similar_points(item, recent_consultations) * 7
+
+                item.points += item.like_set.count() * 6
+                item.points += note_mean_points(mean_user_notes(item.owner), mean_all_users) * 5
+
+                items.append(item)
+
+
+            """"
+            #user_id = user.id if user.is_authenticated else 0
 
             # FIXME sqlite does not have boolean type, thus the 0 for archived
             queryset = Item.objects.raw(
@@ -188,33 +218,19 @@ class ItemViewSet(viewsets.ModelViewSet):
                 "INNER JOIN users_coordinates ON auth_user.id = users_coordinates.user_id "
                 "WHERE archived = 0 AND auth_user.id != %d "
                 "ORDER BY points DESC" % (lon, lat, user_id)
-            )
+            )"""
 
-            #"last_similar_points(liked) * 11 + "
-            #"last_similar_points(visited) * 7 + "
-            #"num_like_points() * 6 + "
-            #"note_mean_points() * 5 + "
             #"num_comments_points() * 2 + "
             #"num_offers_points()"
 
-            """queryset = Item.objects.annotate(
-                distance_points=Func(
-                    Func(
-                        lat, lon, F("owner__coordinates__latitude"), F("owner__coordinates__longitude"),
-                        function="compute_distance", output_field=FloatField()
-                    ),
-                    function="distance_points", output_field=IntegerField()
-                ),
-                category_points=Func(
-                    F("category"), user.id,
-                    function="category_points", output_field=IntegerField()
-                )
-            ).order_by("-distance_points")"""
+            items.sort(key=lambda i: i.points, reverse=True)
+
+            return Response(AggregatedItemSerializer(items, many=True).data)
 
         else:
             queryset = filter_items(serializer.validated_data, user)
+            return Response(AggregatedItemSerializer(queryset, many=True).data)
 
-        return Response(AggregatedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         price_min = serializer.validated_data.get("price_min", None)
