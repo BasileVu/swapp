@@ -47,10 +47,6 @@ export class InventoryComponent implements OnInit, OnChanges {
 
     @Input() loggedIn: boolean;
 
-    selectedItem: Item;
-    selectedOwner: Owner;
-    selectedComments: Array<Comment>;
-
     private inventory: Array<InventoryItem> = new Array();
     
     constructor(private authService: AuthService, private itemsService: ItemsService) { }
@@ -123,24 +119,21 @@ export class InventoryComponent implements OnInit, OnChanges {
         service.getItem(item_id)
             .then(
                 item => {
-                    this.selectedItem = item;
-                    service.selectItem(this.selectedItem);
+                    service.selectItem(item);
                 },
                 error => console.log(error));
 
         service.getOwner(owner_id)
             .then(
                 owner => {
-                    this.selectedOwner = owner;
-                    service.selectOwner(this.selectedOwner);
+                    service.selectOwner(owner);
                 },
                 error => console.log(error));
 
         service.getComments(item_id)
             .then(
                 comments => {
-                    this.selectedComments = comments;
-                    service.selectComments(this.selectedComments);
+                    service.selectComments(comments);
                 },
                 error => console.log(error));
     }

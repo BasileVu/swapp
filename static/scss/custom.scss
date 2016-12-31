@@ -35,6 +35,13 @@ hr {
 }
 .carousel-cell {
   position: relative;
+  .inner-item {
+    position: relative;
+    border: 1px solid $brand-secondary;
+    @include border-radius(3px);
+    margin-bottom: $grid-gutter-width;
+    cursor: zoom-in;
+  }
   a {
     @include border-radius($border-radius);
     overflow: hidden;
