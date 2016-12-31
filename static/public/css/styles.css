@@ -5493,6 +5493,12 @@ hr {
 
 .carousel-cell {
   position: relative; }
+  .carousel-cell .inner-item {
+    position: relative;
+    border: 1px solid #eed5a9;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    cursor: zoom-in; }
   .carousel-cell a {
     border-radius: 0.25rem;
     overflow: hidden;
