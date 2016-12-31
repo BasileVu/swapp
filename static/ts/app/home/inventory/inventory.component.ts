@@ -13,6 +13,9 @@ import {
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { InventoryItem } from './inventory-item';
+import { ItemsService } from '../items/items.service';
+import {Item} from "../items/item";
+import {Owner} from "../items/owner";
 
 declare var $:any;
 
@@ -44,12 +47,30 @@ export class InventoryComponent implements OnInit, OnChanges {
 
     @Input() loggedIn: boolean;
 
+    selectedItem: Item;
+    selectedOwner: Owner;
+    selectedComments: Array<Comment>;
+
     private inventory: Array<InventoryItem> = new Array();
     
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService, private itemsService: ItemsService) { }
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
+
+        this.authService.getAccount().then(
+            user => {
+                for(let i in user.items){
+                    this.itemsService.getItem(user.items[i]).then(
+                        item => {
+                            this.inventory.push(item);
+                        },
+                        error => console.log(error)
+                    );
+                }
+            },
+            error => console.log(error)
+        );
     }
 
     ngOnChanges() {
@@ -93,5 +114,34 @@ export class InventoryComponent implements OnInit, OnChanges {
 
         console.log("inventory:");
         console.log(this.inventory);
+    }
+
+    gotoDetail(item_id: number, owner_id: number): void {
+        console.log("clicked. item_id: " + item_id + " owner_id: " + owner_id);
+
+        let service = this.itemsService;
+        service.getItem(item_id)
+            .then(
+                item => {
+                    this.selectedItem = item;
+                    service.selectItem(this.selectedItem);
+                },
+                error => console.log(error));
+
+        service.getOwner(owner_id)
+            .then(
+                owner => {
+                    this.selectedOwner = owner;
+                    service.selectOwner(this.selectedOwner);
+                },
+                error => console.log(error));
+
+        service.getComments(item_id)
+            .then(
+                comments => {
+                    this.selectedComments = comments;
+                    service.selectComments(this.selectedComments);
+                },
+                error => console.log(error));
     }
 }

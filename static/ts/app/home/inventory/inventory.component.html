@@ -2,59 +2,11 @@
     <div class="row personal-inventory">
             <h3>Inventory <a href="#" class="open-new-item-modal"><i class="fa fa-plus"></i></a></h3>
             <div class="row home-inventory">
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
-                    </a>
-                    <a href="#" class="delete"><i class="fa fa-trash"></i></a>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell">
-                    <a href="#">
-                        <img class="img-fluid" src="http://placehold.it/400x400"/>
-                        <span>title</span>
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell" *ngFor="let item of inventory">
+                    <a href="#" (click)="gotoDetail(item.id, item.owner)">
+                        <img *ngIf="item.image_set[0] === undefined" class="img-fluid" src="http://placehold.it/400x400"/>
+                        <img *ngIf="item.image_set[0] != undefined" class="img-fluid" src="{{ item.image_set[0].image }}"/>
+                        <span>{{ item.name }}</span>
                     </a>
                     <a href="#" class="delete"><i class="fa fa-trash"></i></a>
                 </div>

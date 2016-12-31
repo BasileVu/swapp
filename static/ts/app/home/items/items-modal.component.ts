@@ -29,7 +29,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         );
     }
 
-
     ngOnDestroy() {
         // prevent memory leak when component is destroyed
         this.subscription.unsubscribe();
