@@ -4,6 +4,7 @@ from PIL import Image as ImagePil
 from django.test import TestCase
 from rest_framework import status
 
+from comments.models import *
 from items.models import *
 from users.models import *
 
@@ -242,49 +243,44 @@ class ItemAPITests(TestCase):
         r = self.delete_item(id_item=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_items_should_return_like_set_category_name_and_image_set_with_name(self):
+    def create_item_values_for_list_and_get_testing(self):
         self.login()
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
         r = self.post_like(1, 1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
         r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
         self.client.logout()
+
+    def check_get_item_data_complete(self, data):
+        self.assertEqual(data["owner_username"], "username")
+        self.assertEqual(data["id"], 1)
+        self.assertEqual(data["name"], "test")
+        self.assertEqual(data["description"], "test")
+        self.assertEqual(data["price_min"], 1)
+        self.assertEqual(data["price_max"], 2)
+        self.assertIn("creation_date", data)
+        self.assertEqual(data["category"]['id'], 1)
+        self.assertEqual(data["category"]['name'], "test")
+        self.assertEqual(data["views"], 1)
+        self.assertEqual(data["comments"], 0)
+        self.assertEqual(data["likes"], 1)
+        self.assertIn("/media/test", data["image_urls"][0])
+
+    def test_get_items_result(self):
+        self.create_item_values_for_list_and_get_testing()
+        item = Item.objects.get(pk=1)
+        item.views = 1
+        item.save()
+
         r = self.get_items()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 1)
-        self.assertEqual(r.data[0]['name'], "test")
-        self.assertEqual(r.data[0]['description'], "test")
-        self.assertEqual(r.data[0]['price_min'], 1)
-        self.assertEqual(r.data[0]['price_max'], 2)
-        self.assertEqual(r.data[0]['category']['name'], "test")
-        self.assertIn("/media/test", r.data[0]['image_set'][0]["image"])
-        self.assertEqual(r.data[0]['like_set'][0]["user"], 1)
+        self.check_get_item_data_complete(r.data[0])
 
-    def test_get_item_should_return_like_set_category_name_and_image_set_with_name(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+    def test_get_item_result(self):
+        self.create_item_values_for_list_and_get_testing()
 
-        r = self.post_like(1, 1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        r = self.get_item(id_item=r.data['id'])
+        r = self.get_item(1)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data['name'], "test")
-        self.assertEqual(r.data['description'], "test")
-        self.assertEqual(r.data['price_min'], 1)
-        self.assertEqual(r.data['price_max'], 2)
-        self.assertEqual(r.data['category']['name'], "test")
-        self.assertIn("/media/test", r.data['image_set'][0]["image"])
-        self.assertEqual(r.data['like_set'][0]["user"], 1)
+        self.check_get_item_data_complete(r.data)
 
     def test_get_item_should_increment_views(self):
         self.login()
@@ -299,14 +295,23 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data['views'], 2)
 
-    # FIXME
-    '''
-    def test_post_item_user_location_not_specified(self):
-        self.current_user.userprofile.location = ""
-        self.current_user.userprofile.save()
-        r = self.post_item()
-        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-    '''
+    def test_get_item_comments(self):
+        self.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.client.logout()
+
+        u = User.objects.create_user(username="username2", password="password")
+        item = Item.objects.get(pk=r.data["id"])
+
+        Comment.objects.create(user=u, item=item, content="nice")
+        Comment.objects.create(user=u, item=item, content="cool")
+        Comment.objects.create(user=u, item=item, content="fun")
+
+        r = self.client.get("/api/items/%d/comments/" % r.data["id"])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 3)
+        self.assertEqual(r.data[0]["content"], "nice")
+
     '''
     def test_archive_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
