@@ -121,18 +121,16 @@ def num_offers_points(n_offers, mean_offer_number):
 
 
 def build_item_suggestions(user):
+    queryset = Item.objects.filter(archived=False)
+
     if user.is_authenticated:
         lon = user.coordinates.longitude
         lat = user.coordinates.latitude
+        queryset = queryset.filter(~Q(owner=user))
     else:
         # FIXME provide lon/lat if not connected or not ?
         lon = 0
         lat = 0
-
-    queryset = Item.objects.filter(archived=False)
-
-    if user.is_authenticated:
-        queryset = queryset.filter(~Q(owner=user))
 
     queryset = queryset.annotate(
         distance=Func(
