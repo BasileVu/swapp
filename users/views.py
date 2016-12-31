@@ -151,7 +151,6 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
         return super(UserAccount, self).update(request, *args, **kwargs)
 
 
-
 @api_view(['PUT'])
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
@@ -205,8 +204,7 @@ def get_public_account_info(request, username):
         "last_name": user.last_name,
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
         "items": [i.id for i in user.item_set.all()],
-        "notes": [n.id for n in user.note_set.all()],
-        "likes": [l.id for l in user.like_set.all()],
+        "notes": user.note_set.count(),
     })
 
 

@@ -550,7 +550,6 @@ class LocationCoordinatesTests(TestCase):
         self.assertNotEqual(l.region, "fnupinom")
         self.assertNotEqual(l.country, "fnupinom")
 
-
     def test_coordinates_change_after_valid_location_modification(self):
         r = self.put_location()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -579,8 +578,7 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["location"], "a, b, c")
         self.assertListEqual(r.data["items"], [])
-        self.assertListEqual(r.data["notes"], [])
-        self.assertListEqual(r.data["likes"], [])
+        self.assertEqual(r.data["notes"], 0)
 
 
 class NoteAPITests(TestCase):
