@@ -4,6 +4,7 @@ from PIL import Image as ImagePil
 from django.test import TestCase
 from rest_framework import status
 
+from comments.models import *
 from items.models import *
 from users.models import *
 
@@ -264,7 +265,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(data["likes"], 1)
         self.assertIn("/media/test", data["image_urls"][0])
 
-    def test_get_items_should_return_likes_category_name_and_image_set_with_name(self):
+    def test_get_items_result(self):
         self.create_item_values_for_list_and_get_testing()
         item = Item.objects.get(pk=1)
         item.views = 1
@@ -294,14 +295,23 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data['views'], 2)
 
-    # FIXME
-    '''
-    def test_post_item_user_location_not_specified(self):
-        self.current_user.userprofile.location = ""
-        self.current_user.userprofile.save()
-        r = self.post_item()
-        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-    '''
+    def test_get_item_comments(self):
+        self.login()
+        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.client.logout()
+
+        u = User.objects.create_user(username="username2", password="password")
+        item = Item.objects.get(pk=r.data["id"])
+
+        Comment.objects.create(user=u, item=item, content="nice")
+        Comment.objects.create(user=u, item=item, content="cool")
+        Comment.objects.create(user=u, item=item, content="fun")
+
+        r = self.client.get("/api/items/%d/comments/" % r.data["id"])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 3)
+        self.assertEqual(r.data[0]["content"], "nice")
+
     '''
     def test_archive_item(self):
         r = self.c.post("/api/items/", data=json.dumps({
