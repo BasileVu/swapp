@@ -267,7 +267,7 @@ paths:
           
   /items:
     get:
-      description: Gets unarchived `Item` objects.
+      description: Gets unarchived `Item` objects according to the specified filters. If no parameter are given, items that the current user could find interresting will be returned.
       parameters:
         - in: query
           name: q
