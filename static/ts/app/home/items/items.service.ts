@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 
 import {Item} from "./item";
 import {Owner} from "./owner";
 import {Comment} from "./comment";
+import { CommentCreationDTO } from './comment-creation-dto';
 import {Observable} from "rxjs";
 
 @Injectable()
@@ -70,6 +71,17 @@ export class ItemsService {
 
     getComments (item_id: number): Promise<Comment[]> {
         return this.http.get(this.itemsUrl + item_id + '/comments')
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    addComment (commentCreationDTO: CommentCreationDTO): Promise<any> {
+        let body = JSON.stringify(commentCreationDTO); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.post('/api/comments/', body, options)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);
