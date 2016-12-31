@@ -46,15 +46,31 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class AggregatedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
-    image_set = ImageItemSerializer(many=True)
-    like_set = LikeItemSerializer(many=True)
-    comment_set = CommentItemSerializer(many=True)
-    offers_received = OfferItemSerializer(many=True)
+    image_urls = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+    offers_received = serializers.SerializerMethodField()
+    owner_username = serializers.SerializerMethodField()
+
+    def get_image_urls(self, obj):
+        return [i.image.url for i in obj.image_set.all()]
+
+    def get_likes(self, obj):
+        return obj.like_set.count()
+
+    def get_comments(self, obj):
+        return obj.comment_set.count()
+
+    def get_offers_received(self, obj):
+        return obj.offers_received.count()
+
+    def get_owner_username(self, obj):
+        return obj.owner.username
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
-                  'category', 'views', 'image_set', 'like_set', 'comment_set', 'offers_received')
+        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner_username',
+                  'category', 'views', 'image_urls', 'likes', 'comments', 'offers_received')
         read_only_fields = ('owner',)
 
 
