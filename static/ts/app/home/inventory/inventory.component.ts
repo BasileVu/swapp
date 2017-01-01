@@ -49,53 +49,62 @@ export class InventoryComponent implements OnInit, OnChanges {
 
     private inventory: Array<InventoryItem> = new Array();
     
-    constructor(private authService: AuthService, private itemsService: ItemsService) { }
+    constructor(private authService: AuthService, private itemsService: ItemsService) {
+        console.log("constructor");
+     }
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
-
-        this.authService.getAccount().then(
-            user => {
-                for(let i in user.items){
-                    this.itemsService.getItem(user.items[i]).then(
-                        item => {
-                            this.inventory.push(item);
-                        },
-                        error => console.log(error)
-                    );
-                }
-            },
-            error => console.log(error)
-        );
     }
 
     ngOnChanges() {
 
-        // settimeout is an hack to have the inventory displayed nicely.
-        // It's probably due to the DOM elements which are not fully loaded
-        // on ngOnChanges so we wait a little time (100ms)
-        setTimeout(function() {
-            // home inventory ///////////////////////////
-            var inventory = $('.home-inventory').flickity({
-                // options
-                cellAlign: 'center',
-                contain: true,
-                imagesLoaded: true,
-                wrapAround: true,
-                groupCells: '100%',
-                prevNextButtons: false,
-                adaptiveHeight: true
-            });
+        console.log("loggedIn ngonchanges: " + this.loggedIn);
 
-            // open item creation modal /////////////////////
-            var addItemButtons = $('.open-new-item-modal');
-            var newItemModal = $('#add-item-modal');
-            addItemButtons.each(function () {
-                $(this).click(function () {
-                    newItemModal.modal('show');
-                });
-            });
-        }, 100);
+        if (this.loggedIn) {
+            this.authService.getAccount().then(
+                user => {
+                    for(let i in user.items){
+                        this.itemsService.getItem(user.items[i]).then(
+                            item => {
+                                this.inventory.push(item);
+
+                                // settimeout is an hack to have the inventory displayed nicely.
+                                // It's probably due to the DOM elements which are not fully loaded
+                                // on ngOnChanges so we wait a little time (100ms)
+                                setTimeout(function() {
+                                    // home inventory ///////////////////////////
+                                    var inventory = $('.home-inventory').flickity({
+                                        // options
+                                        cellAlign: 'center',
+                                        contain: true,
+                                        imagesLoaded: true,
+                                        wrapAround: true,
+                                        groupCells: '100%',
+                                        prevNextButtons: false,
+                                        adaptiveHeight: true
+                                    });
+
+                                    // open item creation modal /////////////////////
+                                    var addItemButtons = $('.open-new-item-modal');
+                                    var newItemModal = $('#add-item-modal');
+                                    addItemButtons.each(function () {
+                                        $(this).click(function () {
+                                            newItemModal.modal('show');
+                                        });
+                                    });
+                                }, 10);
+                            },
+                            error => console.log(error)
+                        );
+                    }
+                },
+                error => console.log(error)
+            );
+
+            
+        }
+        
     }
 
     // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
