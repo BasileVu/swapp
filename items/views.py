@@ -4,11 +4,13 @@ from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from comments.serializers import CommentSerializer
 from items.serializers import *
 from users.models import Consultation
 
@@ -94,8 +96,8 @@ def last_similar_points(item, items):
 
 
 def mean_user_notes(user):
-    res = user.note_set.aggregate(Avg("note"))["note__avg"]
-    return 5 if res is None else res
+    note_avg = user.userprofile.note_avg
+    return 5 if note_avg is None else note_avg
 
 
 def note_mean_points(mean_user, mean_all_users):
@@ -198,7 +200,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             return AggregatedItemSerializer
         return ItemSerializer
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, *args, **kwargs):
         queryset = Item.objects.all()
         item = get_object_or_404(queryset, pk=pk)
 
@@ -210,6 +212,10 @@ class ItemViewSet(viewsets.ModelViewSet):
 
         serializer = AggregatedItemSerializer(item)
         return Response(serializer.data)
+
+    @detail_route(methods=["GET"])
+    def comments(self, request, pk=None):
+        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.all(), many=True).data)
 
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)

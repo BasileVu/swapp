@@ -110,10 +110,7 @@ export class InventoryComponent implements OnInit, OnChanges {
             ).then(function() {
                 
             });
-
-            
         }
-        
     }
 
     // We receive an ItemCreationDTO object so we'll change it into an InventoryItem

@@ -14,6 +14,5 @@ urlpatterns = [
     url(r'api/', include('comments.urls')),
     url(r'api/', include('items.urls')),
     url(r'api/', include('offers.urls')),
-    url(r'^docs/', include('rest_framework_docs.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

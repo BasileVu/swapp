@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Avg
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -13,6 +14,8 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     last_modification_date = models.DateTimeField(auto_now=True)
+    image = models.ImageField('Uploaded image', null=True)
+    note_avg = models.DecimalField(max_digits=2, decimal_places=1, null=True)
 
     categories = models.ManyToManyField("items.Category")
 
@@ -60,7 +63,7 @@ def create_user_related(sender, instance, signal, created, **kwargs):
 
 class Note(models.Model):
     """
-    Defines the note that can be attributed to an user after a proposition was made.
+    Defines the note that can be attributed to an user after an offer was made.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
@@ -69,3 +72,10 @@ class Note(models.Model):
 
     def __str__(self):
         return self.text
+
+
+@receiver(post_save, sender=Note)
+def update_mean_notes(sender, instance, signal, created, **kwargs):
+    user = instance.user
+    user.userprofile.note_avg = user.note_set.aggregate(Avg("note"))["note__avg"]
+    user.userprofile.save()
