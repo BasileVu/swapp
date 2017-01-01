@@ -156,13 +156,11 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "likes": [l.id for l in user.like_set.all()],
         })
 
-    # FIXME two errors occur when we launch the tests (two users can't have the same username)
     def update(self, request, *args, **kwargs):
-        """Updates the account info of the current logged in user."""
-        try:
-            return super(UserAccount, self).update(request, *args, **kwargs)
-        except IntegrityError as e:
-            return Response(status=status.HTTP_409_CONFLICT, data={"error": str(e)})
+        new_username = request.data.get("username", None)
+        if new_username is not None and User.objects.filter(username=new_username).count() > 0:
+            return Response(status=status.HTTP_409_CONFLICT, data={"error": "An user with same name already exists"})
+        return super(UserAccount, self).update(request, *args, **kwargs)
 
 
 @api_view(['PUT'])

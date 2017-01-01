@@ -374,8 +374,7 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # FIXME atomic errors
-    """def test_two_users_cant_have_same_username_update_patch(self):
+    def test_two_users_cant_have_same_username_update_patch(self):
         self.post_user(username="user1", password="pass1")
         self.post_user(username="user2", password="pass2")
         self.login(username="user1", password="pass1")
@@ -420,7 +419,7 @@ class AccountAPITests(TestCase):
 
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "user2")"""
+        self.assertEqual(r.data["username"], "user2")
 
     def test_update_malformed_email_logged_in(self):
         self.post_user()
