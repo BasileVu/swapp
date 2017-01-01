@@ -35,6 +35,13 @@ hr {
 }
 .carousel-cell {
   position: relative;
+  .inner-item {
+    position: relative;
+    border: 1px solid $brand-secondary;
+    @include border-radius(3px);
+    margin-bottom: $grid-gutter-width;
+    cursor: zoom-in;
+  }
   a {
     @include border-radius($border-radius);
     overflow: hidden;
@@ -303,7 +310,7 @@ hr {
 }
 
 // Register and Update modal ////////////////////////////////////
-#register-user-modal, #update-user-modal {
+#register-user-modal, #update-user-modal, #create-user-modal {
   .modal-panel {
     padding: 2*$grid-gutter-width;
   }
@@ -321,6 +328,12 @@ hr {
     margin-top: 2*$grid-gutter-width;
   }
 }
+
+// input type file
+input[type=file] {
+  margin-bottom: 10px;
+}
+
 
 // Add and Update item modal ////////////////////////////////
 #add-item-modal {

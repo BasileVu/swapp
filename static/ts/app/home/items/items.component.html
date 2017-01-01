@@ -1,0 +1,48 @@
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngIf="items === undefined">
+    {{ errorMessage }}
+</div>
+
+
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items">
+    <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id, item.owner)">
+        <img *ngIf="item.image_set[0] === undefined" class="img-fluid" src="http://placehold.it/600x600"/>
+        <img *ngIf="item.image_set[0] != undefined" class="img-fluid" src="{{ item.image_set[0].image }}"/>
+        <div class="infos">
+            <a href="#"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
+            <a href="#"><i class="fa fa-map-marker"></i>{{ item.city }}, {{ item.country }}</a>
+        </div>
+        <div class="row user">
+            <div class="col-xs-3">
+                <img *ngIf="item.owner_image_url === undefined" class="avatar img-fluid" src="http://placehold.it/50x50"/>
+                <img *ngIf="item.owner_image_url != undefined" class="avatar img-fluid" src="{{ item.owner_image_url }}"/>
+            </div>
+            <div class="col-xs-9">
+                {{ item.name }}
+            </div>
+        </div>
+        <div class="row reactions">
+            <ul class="list-inline">
+                <li class="list-inline-item">
+                    <i class="fa fa-refresh"></i><br>
+                    {{ item.offer_received }}
+                </li>
+                <li class="list-inline-item">
+                    <i class="fa fa-comment"></i><br>
+                    {{ item.comments }}
+                </li>
+                <li class="list-inline-item">
+                    <i class="fa fa-eye"></i><br>
+                    {{ item.views }}
+                </li>
+                <li class="list-inline-item">
+                    <i class="fa fa-heart"></i><br>
+                    {{ item.likes }}
+                </li>
+            </ul>
+        </div>
+        <div class="swap btn btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
+        <div class="share btn btn-primary"><i class="fa fa-share"></i></div>
+    </div>
+</div>
+
+<items-modal></items-modal>

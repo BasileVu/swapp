@@ -9,10 +9,11 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('pages.home.urls')),
-    url(r'', include('users.urls')),
+    url(r'api/', include('users.urls')),
     url(r'api/', include('private_messages.urls')),
     url(r'api/', include('comments.urls')),
     url(r'api/', include('items.urls')),
     url(r'api/', include('offers.urls')),
+    url(r'^docs/', include('rest_framework_docs.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

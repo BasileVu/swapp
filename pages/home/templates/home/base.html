@@ -7,29 +7,26 @@
 
 <body id="swapp">
 
-{% include 'header_menu/menu.html' %}
-
-{% include 'home/content.html' %}
-
-{% include 'items/modals.html' %}
-{% include 'search/advanced_search_modal.html' %}
-{% include 'users/register_user_modal.html' %}
-{% include 'users/update_user_modal.html' %}
-{% include 'items/add_item_modal.html' %}
-{% include 'users/profile_modal.html' %}
-{% include 'users/notification_modal.html' %}
-{% include 'offers/send_proposition_modal.html' %}
-{% include 'offers/accept_proposition_modal.html' %}
+<my-app>Loading...</my-app>
 
 <script src="//localhost:8080/livereload.js"></script>
-<script src="{% static 'js/jquery.js' %}"></script>
-<script src="{% static 'js/tether.js' %}"></script>
-<script src="{% static 'js/imagesloaded.pkgd.js' %}"></script>
-<script src="{% static 'js/bootstrap.js' %}"></script>
-<script src="{% static 'js/isotope.pkgd.js' %}"></script>
-<script src="{% static 'js/flickity.pkgd.js' %}"></script>
-<script src="{% static 'js/jquery.matchHeight.js' %}"></script>
-<script src="{% static 'js/custom.js' %}"></script>
+<script src="{% static 'js/vendor/jquery.js' %}"></script>
+<script src="{% static 'js/vendor/tether.js' %}"></script>
+<script src="{% static 'js/vendor/imagesloaded.pkgd.js' %}"></script>
+<script src="{% static 'js/vendor/bootstrap.js' %}"></script>
+<script src="{% static 'js/vendor/isotope.pkgd.js' %}"></script>
+<script src="{% static 'js/vendor/flickity.pkgd.js' %}"></script>
+<script src="{% static 'js/vendor/jquery.matchHeight.js' %}"></script>
+<script src="{% static 'js/vendor/ng2-toastr/bundles/ng2-toastr.min.js' %}"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNi0DkJRcQiOhJzSitoV5GhlacK6fNtKs" async defer></script>
+
+<script src="{% static 'js/vendor/zone.js' %}"></script>
+<script src="{% static 'js/vendor/Reflect.js' %}"></script>
+<script src="{% static 'js/vendor/system.src.js' %}"></script>
+<script src="{% static 'js/systemjs.config.js' %}"></script>
+<script>
+    System.import('app').catch(function(err){ console.error(err); });
+</script>
+
 </body>
 </html>
