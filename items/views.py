@@ -164,8 +164,8 @@ def build_item_suggestions(user):
         mean_offers_number = sum_offers / n_items
 
     if user.is_authenticated:
-        recent_likes = user.like_set.order_by("date")[:10]
-        recent_consultations = user.consultation_set.order_by("date")[:10]
+        recent_items_liked = [like.item for like in user.like_set.order_by("date")[:10]]
+        recent_items_visited = [consultation.item for consultation in user.consultation_set.order_by("date")[:10]]
 
     for item in queryset:
         item.points *= 20
@@ -174,8 +174,8 @@ def build_item_suggestions(user):
             if item.category in user.userprofile.categories.all():
                 item.points += 15
 
-            item.points += last_similar_points(item, recent_likes) * 11
-            item.points += last_similar_points(item, recent_consultations) * 7
+            item.points += last_similar_points(item, recent_items_liked) * 11
+            item.points += last_similar_points(item, recent_items_visited) * 7
 
         item.points += item.like_set.count() * 6
         item.points += note_mean_points(mean_user_notes(item.owner), mean_all_users) * 5
