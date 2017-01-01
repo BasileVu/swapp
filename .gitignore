@@ -275,4 +275,21 @@ tests/report/
 *.sqlite2
 *.sqlite3
 .sass-cache/
-test.png
+
+## angular
+.baseDir.*
+*.tmp.*
+.tscache/
+
+# Created by https://www.gitignore.io/api/visu,visualstudiocode
+
+#!! ERROR: visu is undefined. Use list command to see defined gitignore types !!#
+
+### VisualStudioCode ###
+.vscode/*
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+
+static/public/js/app/
+static/public/js/vendor/

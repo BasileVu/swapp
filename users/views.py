@@ -1,78 +1,16 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.db.utils import IntegrityError
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse
+from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.csrf import ensure_csrf_cookie
-
-from rest_framework import generics, mixins
+from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError, APIException
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
-
-
-# TODO delete when not user anymore
-def register_view(request):
-    try:
-        username = request.POST["username"]
-        password = request.POST["password"]
-        password_confirmation = request.POST["password-confirmation"]
-        email = request.POST["email"]
-    except KeyError:
-        return render(request, "users/register.html")
-
-    if password != password_confirmation:
-        return render(request, "users/register.html", {
-            "error_message": "Passwords don't match."
-        })
-
-    try:
-        user = User.objects.create_user(username, email, password)
-    except IntegrityError:
-        return render(request, "users/register.html", {
-            "error_message": "User already exists."
-        })
-
-    login(request, user)
-    return HttpResponseRedirect(reverse("users:account"))
-
-
-# TODO delete when not used anymore
-def login_view(request):
-    try:
-        username = request.POST["username"]
-        password = request.POST["password"]
-    except KeyError:
-        return render(request, "users/login.html")
-
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return HttpResponseRedirect(reverse("users:account"))
-    else:
-        return render(request, "users/login.html", {
-            "error_message": "Incorrect username/password combination."
-        })
-
-
-# TODO delete when not used anymore
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("users:login"))
-
-
-# TODO delete when not used anymore
-@login_required(login_url="users:login", redirect_field_name="")
-def account_view(request):
-    return render(request, "users/account.html", {"username": request.user.username})
 
 
 class OwnUserAccountMixin:
@@ -83,6 +21,7 @@ class OwnUserAccountMixin:
 @api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
+    """Returns a CSRF token needed when querying the API."""
     return Response()
 
 
@@ -102,6 +41,7 @@ def login_user(request):
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
+    """Logs out an user."""
     logout(request)
     return Response(status=status.HTTP_200_OK)
 
@@ -153,11 +93,14 @@ def create_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
+    """Allows to get the current's account info and update them."""
+
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        """Returns the private info of an account."""
         user = request.user
         user_profile = request.user.userprofile
 
@@ -186,7 +129,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
-    An endpoint for changing password.
+    Changes the current user's password.
     """
     serializer = ChangePasswordSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -226,6 +169,7 @@ class LocationView(generics.UpdateAPIView):
 
 @api_view(["GET"])
 def get_public_account_info(request, username):
+    """Returns the user's public info."""
     user = get_object_or_404(User, username=username)
 
     return Response({
