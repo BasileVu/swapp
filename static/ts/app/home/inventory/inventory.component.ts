@@ -53,20 +53,6 @@ export class InventoryComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
-
-        this.authService.getAccount().then(
-            user => {
-                for(let i in user.items){
-                    this.itemsService.getItem(user.items[i]).then(
-                        item => {
-                            this.inventory.push(item);
-                        },
-                        error => console.log(error)
-                    );
-                }
-            },
-            error => console.log(error)
-        );
     }
 
     ngOnChanges() {
@@ -95,6 +81,22 @@ export class InventoryComponent implements OnInit, OnChanges {
                     newItemModal.modal('show');
                 });
             });
+
+            if(this.loggedIn) {
+                this.authService.getAccount().then(
+                    user => {
+                        for (let i in user.items) {
+                            this.itemsService.getItem(user.items[i]).then(
+                                item => {
+                                    this.inventory.push(item);
+                                },
+                                error => console.log(error)
+                            );
+                        }
+                    },
+                    error => console.log(error)
+                );
+            }
         }, 100);
     }
 
