@@ -27,13 +27,20 @@ class UserProfileTests(TestCase):
 
 class AccountAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
-                  password="password"):
+                  password="password", password_confirmation="password",
+                  street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
+
         return self.client.post("/api/users/", data=json.dumps({
             "username": username,
             "first_name": first_name,
             "last_name": last_name,
             "email": email,
-            "password": password
+            "password": password,
+            "password_confirmation": password_confirmation,
+            "street": street,
+            "city": city,
+            "region": region,
+            "country": country
         }), content_type="application/json")
 
     def login(self, username="username", password="password"):
@@ -45,7 +52,7 @@ class AccountAPITests(TestCase):
     def test_user_creation(self):
         r = self.post_user()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(r["Location"], "/api/users/1/")
+        self.assertEqual(r["Location"], "/api/users/username/")
 
     def test_user_creation_conflict(self):
         self.post_user()
@@ -61,6 +68,16 @@ class AccountAPITests(TestCase):
     def test_user_creation_empty_json(self):
         r = self.post_user(username="", first_name="", last_name="", email="", password="")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_user_creation_password_should_match(self):
+        r = self.post_user(password="password", password_confirmation="pass")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 0)
+
+    def test_user_creation_location_not_existing(self):
+        r = self.post_user(street="street", city="city", region="region", country="country")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 0)
 
     def test_login_incorrect(self):
         self.post_user()
@@ -190,7 +207,7 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["email"], "a@b.com")
 
     def test_cannot_connect_if_account_not_active(self):
-        self.post_user()
+        r = self.post_user()
 
         u = User.objects.get(pk=1)
         u.is_active = False
@@ -374,8 +391,8 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_two_users_cant_have_same_username_update_patch(self):
-        self.post_user(username="user1", password="pass1")
-        self.post_user(username="user2", password="pass2")
+        self.post_user(username="user1", password="pass1", password_confirmation="pass1")
+        self.post_user(username="user2", password="pass2", password_confirmation="pass2")
         self.login(username="user1", password="pass1")
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -395,8 +412,8 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["username"], "user2")
 
     def test_two_users_cant_have_same_username_update_put(self):
-        self.post_user(username="user1", password="pass1")
-        self.post_user(username="user2", password="pass2")
+        self.post_user(username="user1", password="pass1", password_confirmation="pass1")
+        self.post_user(username="user2", password="pass2", password_confirmation="pass2")
         self.login(username="user1", password="pass1")
 
         r = self.client.put("/api/account/", data=json.dumps({
@@ -747,7 +764,6 @@ class NoteAPITests(TestCase):
         self.login()
         self.post_note(1, "test", 1)
         r = self.client.get("/api/account/")
-        print(r.data)
         self.client.logout()
 
         self.client.login(username="user1", password="password")

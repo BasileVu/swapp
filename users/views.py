@@ -86,21 +86,6 @@ def get_csrf_token(request):
     return Response()
 
 
-@api_view(["POST"])
-def create_user(request):
-    serializer = UserCreateSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-
-    try:
-        user = User.objects.create_user(**serializer.validated_data)
-    except IntegrityError:
-        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
-
-    response = Response(status=status.HTTP_201_CREATED)
-    response["Location"] = "/api/users/%d/" % user.id
-    return response
-
-
 @api_view(['POST'])
 def login_user(request):
     serializer = LoginUserSerializer(data=request.data)
@@ -119,6 +104,52 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def create_user(request):
+    serializer = UserCreateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    data = serializer.validated_data
+
+    if User.objects.filter(username=data["username"]).count() > 0:
+        return Response(status=status.HTTP_409_CONFLICT, data="An user with the same username already exists")
+
+    if data["password"] != data["password_confirmation"]:
+        raise serializers.ValidationError("Passwords don't match")
+
+    location = {
+        "street": data["street"],
+        "city": data["city"],
+        "region": data["region"],
+        "country": data["country"]
+    }
+
+    location_result = get_coordinates(Location(**location))
+
+    if len(location_result) == 0:
+        raise ValidationError("Could not find any match for specified location.")
+
+    user = User.objects.create_user(
+        username=data["username"],
+        first_name=data["first_name"],
+        last_name=data["last_name"],
+        email=data["email"],
+        password=data["password"]
+    )
+
+    for k in location.keys():
+        setattr(user.location, k, location[k])
+
+    c = user.coordinates
+    c.latitude = location_result[0]["lat"]
+    c.longitude = location_result[0]["lng"]
+    c.save()
+
+    response = Response(status=status.HTTP_201_CREATED)
+    response["Location"] = "/api/users/%s/" % user.username
+    return response
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
@@ -218,8 +249,6 @@ class NoteViewSet(viewsets.ModelViewSet):
         return NoteSerializer
 
     def perform_create(self, serializer):
-        # Will be done on every save
-
         serializer.is_valid(raise_exception=True)
         offer = serializer.validated_data["offer"]
 
