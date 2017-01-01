@@ -30,8 +30,6 @@ export class ItemsComponent implements OnInit, OnChanges {
         this.getItems();
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
             this.items = items;
-            //grid.arrange();
-            // home grid ///////////////////////////
             var grid = $('.grid').isotope({
                 // options
                 itemSelector: '.grid-item',
