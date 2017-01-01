@@ -10,10 +10,16 @@ class UserCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(write_only=True, required=True)
     email = serializers.EmailField(write_only=True, required=True)
     password = serializers.CharField(write_only=True, required=True)
+    password_confirmation = serializers.CharField(write_only=True, required=True)
+    street = serializers.CharField(write_only=True, required=True)
+    city = serializers.CharField(write_only=True, required=True)
+    region = serializers.CharField(write_only=True, required=True)
+    country = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+        fields = ('username', 'first_name', 'last_name', 'email', 'password', 'password_confirmation',
+                  'street', 'city', 'region', 'country')
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

@@ -287,9 +287,9 @@ tests/report/
 
 ### VisualStudioCode ###
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
 
 static/public/js/app/
 static/public/js/vendor/
