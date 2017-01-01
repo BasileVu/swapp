@@ -132,10 +132,9 @@ class AccountAPITests(TestCase):
             "region": ""
         })
         self.assertNotEqual(r.data["last_modification_date"], "")
-        self.assertListEqual(r.data["categories"], [1])
+        self.assertListEqual(r.data["categories"], ["category"])
         self.assertListEqual(r.data["items"], [1])
-        self.assertListEqual(r.data["notes"], [1])
-        self.assertListEqual(r.data["likes"], [1])
+        self.assertEqual(r.data["notes"], 1)
 
     def test_update_account_not_logged_in(self):
         self.post_user()
@@ -675,17 +674,34 @@ class NoteAPITests(TestCase):
         r = self.post_note(1, "Test", -1)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 0)
+
     def test_post_note_over_5(self):
         self.login()
         r = self.post_note(1, "Test", 6)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 0)
+
     def test_post_two_times_the_same_note(self):
         self.login()
         r = self.post_note(1, "Test", 1)
+
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 1)
 
     def test_put_note(self):
         self.login()
@@ -693,6 +709,7 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.status_code, 404)
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+
         r = self.put_note(1, "Test2", 2)
         self.assertEqual(r.data["note"], 2)
         self.assertEqual(r.data["text"], "Test2")
@@ -704,6 +721,7 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.status_code, 404)
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+
         r = self.patch_note(1, "Test2", 2)
         self.assertEqual(r.data["note"], 2)
         self.assertEqual(r.data["text"], "Test2")
@@ -713,6 +731,43 @@ class NoteAPITests(TestCase):
         self.login()
         r = self.post_note(2, "test", 1)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.client.logout()
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 0)
+
+    def test_user_avg_note_no_note(self):
+        self.login()
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 0)
+        self.assertEqual(r.data["note_avg"], None)
+
+    def test_user_avg_note_one_note(self):
+        self.login()
+        self.post_note(1, "test", 1)
+        r = self.client.get("/api/account/")
+        print(r.data)
+        self.client.logout()
+
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 1)
+        self.assertEqual(r.data["note_avg"], 1)
+
+    def test_user_avg_note_two_notes(self):
+        Offer.objects.create(id=3, accepted=1, status=1, comment="test", item_given=self.myItem,
+                             item_received=self.hisItem)
+
+        self.login()
+        self.post_note(1, "test", 2)
+        self.post_note(3, "test", 3)
+        self.client.logout()
+
+        self.client.login(username="user1", password="password")
+        r = self.client.get("/api/account/")
+        self.assertEqual(r.data["notes"], 2)
+        self.assertEqual(r.data["note_avg"], 2.5)
 
 
 class ConsultationTests(TestCase):

@@ -138,10 +138,10 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "email": user.email,
             "location": LocationSerializer(user.location).data,
             "last_modification_date": user_profile.last_modification_date,
-            "categories": [c.id for c in user_profile.categories.all()],
+            "categories": [c.name for c in user_profile.categories.all()],
             "items": [i.id for i in user.item_set.all()],
-            "notes": [n.id for n in user.note_set.all()],
-            "likes": [l.id for l in user.like_set.all()],
+            "notes": user.note_set.count(),
+            "note_avg": user.userprofile.note_avg
         })
 
     def update(self, request, *args, **kwargs):
@@ -205,6 +205,7 @@ def get_public_account_info(request, username):
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
         "items": [i.id for i in user.item_set.all()],
         "notes": user.note_set.count(),
+        "note_avg": user.userprofile.note_avg
     })
 
 

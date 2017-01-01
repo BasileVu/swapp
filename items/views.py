@@ -96,8 +96,8 @@ def last_similar_points(item, items):
 
 
 def mean_user_notes(user):
-    res = user.note_set.aggregate(Avg("note"))["note__avg"]
-    return 5 if res is None else res
+    note_avg = user.userprofile.note_avg
+    return 5 if note_avg is None else note_avg
 
 
 def note_mean_points(mean_user, mean_all_users):
@@ -243,6 +243,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
         check_prices(price_min, price_max)
         serializer.save()
+
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
