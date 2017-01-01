@@ -1,11 +1,11 @@
 export class InventoryItem {
-    url: string;
+    id: number;
     name: string;
     image: string;
     creation_date: Date;
 
-    constructor(url: string, name: string, image: string, creation_date: Date) {
-        this.url = url;
+    constructor(id: number, name: string, image: string, creation_date: Date) {
+        this.id = id;
         this.name = name;
         this.image = image;
         this.creation_date = creation_date;

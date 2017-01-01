@@ -57,7 +57,29 @@ export class ItemsComponent implements OnInit, OnChanges {
     getItems() {
         this.itemsService.getItems()
             .then(
-                items => this.items = items,
+                items => {
+                    this.items = items
+
+                    // Display grid view nicely
+                    // home grid ///////////////////////////
+                    var grid = $('.grid').isotope({
+                        // options
+                        itemSelector: '.grid-item',
+                        layoutMode: 'masonry'
+                    });
+                    // layout only when images are loaded
+                    grid.imagesLoaded().progress( function() {
+                        grid.isotope('layout');
+                    });
+                    // display items details when hovered
+                    $('.grid-item').hover(function () {
+                        $(this).addClass('hovered');
+                        grid.isotope('layout');
+                    }, function () {
+                        $(this).removeClass('hovered');
+                        grid.isotope('layout');
+                    });
+                },
                 error =>  this.errorMessage = <any>error);
     }
 
