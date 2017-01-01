@@ -28,25 +28,30 @@ export class ItemsComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.getItems();
+        
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
             this.items = items;
-            var grid = $('.grid').isotope({
-                // options
-                itemSelector: '.grid-item',
-                layoutMode: 'masonry'
-            });
-            // layout only when images are loaded
-            grid.imagesLoaded().progress( function() {
-                grid.isotope('layout');
-            });
-            // display items details when hovered
-            $('.grid-item').hover(function () {
-                $(this).addClass('hovered');
-                grid.isotope('layout');
-            }, function () {
-                $(this).removeClass('hovered');
-                grid.isotope('layout');
-            });
+            console.log("hello");
+            setTimeout(function(){
+                $('.grid').isotope({
+                    // options
+                    itemSelector: '.grid-item',
+                    layoutMode: 'masonry'
+                });
+                // layout only when images are loaded
+                $('.grid').imagesLoaded().progress( function() {
+                    $('.grid').isotope('layout');
+                });
+                // display items details when hovered
+                $('.grid-item').hover(function () {
+                    $(this).addClass('hovered');
+                    $('.grid').isotope('layout');
+                }, function () {
+                    $(this).removeClass('hovered');
+                    $('.grid').isotope('layout');
+                });
+            }, 100);
+            
         });
     }
 
@@ -58,27 +63,7 @@ export class ItemsComponent implements OnInit, OnChanges {
         this.itemsService.getItems()
             .then(
                 items => {
-                    this.items = items
-
-                    // Display grid view nicely
-                    // home grid ///////////////////////////
-                    var grid = $('.grid').isotope({
-                        // options
-                        itemSelector: '.grid-item',
-                        layoutMode: 'masonry'
-                    });
-                    // layout only when images are loaded
-                    grid.imagesLoaded().progress( function() {
-                        grid.isotope('layout');
-                    });
-                    // display items details when hovered
-                    $('.grid-item').hover(function () {
-                        $(this).addClass('hovered');
-                        grid.isotope('layout');
-                    }, function () {
-                        $(this).removeClass('hovered');
-                        grid.isotope('layout');
-                    });
+                    this.items = items;
                 },
                 error =>  this.errorMessage = <any>error);
     }

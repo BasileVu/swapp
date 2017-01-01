@@ -41,6 +41,7 @@
         defaultExtension: 'js' 
       },
       'ng2-toastr' : {
+        main: 'index.js',
         defaultExtension: 'js'
       }
     }

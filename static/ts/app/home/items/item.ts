@@ -7,7 +7,6 @@ export class Item {
     id: number;
     name: string;
     description: string;
-    image_url: string; // main image
     image_set: Array<string>; // other images
     price_min: number;
     price_max: number;
@@ -39,7 +38,6 @@ export class Item {
         this.id = -1;
         this.name = "undef";
         this.description = "undef";
-        this.image_url = "undef";
         this.image_set = new Array();
         this.price_min = -1;
         this.price_max = -1;

@@ -54,7 +54,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         let csrf = this.http.get("/api/csrf/");
-        console.log(csrf);
 
         this.loggedIn = this.authService.isLoggedIn();
 
@@ -94,6 +93,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         setTimeout(function() {
             $('document').ready(function() {
+                
                 // home grid ///////////////////////////
                 var grid = $('.grid').isotope({
                     // options
@@ -111,6 +111,18 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }, function () {
                     $(this).removeClass('hovered');
                     grid.isotope('layout');
+                });
+
+                // home inventory ///////////////////////////
+                var inventory = $('.home-inventory').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true
                 });
 
                 // swapp inventories /////////////////////////

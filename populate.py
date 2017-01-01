@@ -30,8 +30,8 @@ if __name__ == '__main__':
     create_item(c1, u2, name="New mouse", description="Brand new", price_min=20, price_max=100)
     create_item(c2, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000)
 
-    image = ImagePil.new('RGBA', size=(640, 960), color=(155, 0, 0))
+    # image = ImagePil.new('RGBA', size=(640, 960), color=(155, 0, 0))
     # file = tempfile.NamedTemporaryFile(suffix='.png')
-    image.save('test.png')
-    Image.objects.create(item=i1, image='test.png')
+    # image.save('test.png')
+    # Image.objects.create(item=i1, image='test.png')
 
