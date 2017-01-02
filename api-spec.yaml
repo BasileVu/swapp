@@ -58,14 +58,14 @@ paths:
           description: The account info of the user.
           required: true
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserCreation"
       responses:
         201:
           description: Successful operation
         400:
-          description: Missing field or json malformed
+          description: Missing field, json malformed or location invalid
         409:
-          description: An user with the same susername already exists
+          description: An user with the same username already exists
           
   /users/{username}:
     get:
@@ -84,13 +84,13 @@ paths:
             properties:
               id:
                 type: number
+              profile_picture_url:
+                type: string
               username:
                 type: string
               first_name:
                 type: string
               last_name:
-                type: string
-              profile_picture_url:
                 type: string
               location:
                 type: string
@@ -131,19 +131,15 @@ paths:
               categories:
                 type: array
                 items:
-                  type: number
+                  type: string
               items:
                 type: array
                 items:
                   type: number
               notes:
-                type: array
-                items:
-                  type: number
-              likes:
-                type: array
-                items:
-                  type: number
+                type: number
+              note_avg:
+                type: number
         401:
           description: User is not logged in
     put:
@@ -320,7 +316,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/ItemPresentationDTO"
+              $ref: "#/definitions/DetailedItemInfo"
                   
     post:
       description: Creates a new `Item`.
@@ -330,7 +326,7 @@ paths:
           description: The content of the item.
           required: true
           schema:
-            $ref: "#/definitions/ItemCreationDTO"
+            $ref: "#/definitions/SetItemInfo"
             
       responses:
         201:
@@ -353,10 +349,12 @@ paths:
         200:
           description: Successful operation
           schema:
-            $ref: "#/definitions/DetailedItemPresentationDTO"
+            $ref: "#/definitions/DetailedItemInfo"
             
   /items/{id}/comments:
     get:
+      tags:
+        - Not implemented
       description: Gets all comments of an `Item` object.
       parameters:
         - in: path
@@ -382,11 +380,17 @@ paths:
                   type: string
                 content:
                   type: string
-                  
-  /items/comments:     
+          
     post:
-      description: Post a new `Comment` on a specific `Item`. The date of publication is defined on server side.
+      tags:
+        - Not implemented
+      description: Post a new `Comment` on a specific `Item`. The user posting the comment is identified with his token. The date of publication is defined on server side.
       parameters:
+        - in: path
+          name: id
+          description: The id of the commented item.
+          required: true
+          type: number
         - in: body
           name: body
           description: The comment
@@ -394,10 +398,6 @@ paths:
           schema:
             type: object
             properties:
-              user_id:
-                type: number
-              item_id:
-                type: number
               content:
                 type: string
         
@@ -411,6 +411,30 @@ paths:
     
                
 definitions:
+  UserCreation:
+    type: object
+    properties:
+      username:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      street:
+        type: string
+      city:
+        type: string
+      region:
+        type: string
+      country:
+        type: string
+        
   User:
     type: object
     properties:
@@ -436,6 +460,7 @@ definitions:
         type: string
       country:
         type: string
+        
   Note:
     type: object
     properties:
@@ -447,6 +472,8 @@ definitions:
         type: string
       note:
         type: number
+        
+        
   ItemCreationDTO:
     type: object
     properties:
@@ -485,54 +512,39 @@ definitions:
           type: number
       creation_date:
         type: string
-  DetailedItemPresentationDTO:
+        
+  
+  SetItemInfo:
     type: object
     properties:
-      owner_username:
+      name: 
         type: string
+      description:
+        type: string
+      price_min:
+        type: number
+      price_max:
+        type: number
+      category:
+        type: number
+        
+  DetailedItemInfo:
+    type: object
+    properties:
       id:
         type: number
       name:
         type: string
       description:
         type: string
-      image_urls:
-        type: array
-        items:
-          type: string
       price_min:
         type: number
       price_max:
         type: number
       creation_date:
         type: string
-      interested_by:
-        type: array
-        items:
-          type: string
-      key_informations:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-      delivery_from:
+      owner_username:
         type: string
-      delivery_methods:
-        type: array
-        items:
-          type: string
-      offers_received:
-        type: number
-      comments:
-        type: number
-      views:
-        type: number
-      likes:
-        type: number
       category:
         type: object
         properties:
@@ -540,11 +552,21 @@ definitions:
             type: number
           name:
             type: string
-      similars:
+      views:
+        type: number
+      image_urls:
         type: array
         items:
           type: string
-  ItemPresentationDTO:
+      likes:
+        type: number
+      comments:
+        type: number
+      offers_received:
+        type: number
+          
+          
+  ItemGeneralInfo:
     type: object
     properties:
       id:
