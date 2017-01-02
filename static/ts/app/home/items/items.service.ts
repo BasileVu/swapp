@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
+import { Observable } from 'rxjs';
 
-import {Item} from "./item";
-import {Owner} from "./owner";
-import {Comment} from "./comment";
+import { Item } from './item';
+import { DetailedItem } from './detailed-item';
+import { Owner } from './owner';
+import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
-import {Observable} from "rxjs";
 
 @Injectable()
 export class ItemsService {
 
     // Observable string sources
-    private itemSelectedSource = new Subject<Item>();
+    private itemSelectedSource = new Subject<DetailedItem>();
     private ownerSelectedSource = new Subject<Owner>();
     private commentsSelectedSource = new Subject<Comment[]>();
 
@@ -28,7 +29,7 @@ export class ItemsService {
     constructor (private http: Http) {}
 
     // Service message commands
-    selectItem(item: Item) {
+    selectItem(item: DetailedItem) {
         this.itemSelectedSource.next(item);
     }
 
@@ -55,7 +56,7 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
-    getItem (id: number): Promise<Item> {
+    getDetailedItem (id: number): Promise<DetailedItem> {
         return this.http.get(this.itemsUrl + id)
             .toPromise()
             .then(this.extractData)

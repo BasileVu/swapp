@@ -1,11 +1,12 @@
 import {Component, ViewEncapsulation, OnInit, OnChanges} from '@angular/core';
 
-import { ItemsService } from "./items.service";
+import { ItemsService } from './items.service';
 
-import { Item } from "./item";
-import { Owner } from "./owner";
-import { Comment } from "./comment";
-import {Subscription} from "rxjs";
+import { DetailedItem } from './detailed-item';
+import { Item } from './item';
+import { Owner } from './owner';
+import { Comment } from './comment';
+import {Subscription} from 'rxjs';
 
 declare var $:any;
 
@@ -20,7 +21,7 @@ export class ItemsComponent implements OnInit, OnChanges {
 
     errorMessage: string = "No items available for now";
     items: Array<Item>;
-    selectedItem: Item;
+    selectedItem: DetailedItem;
     selectedOwner: Owner;
     selectedComments: Array<Comment>;
 
@@ -31,7 +32,7 @@ export class ItemsComponent implements OnInit, OnChanges {
         
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
             this.items = items;
-            console.log("hello");
+            
             setTimeout(function(){
                 $('.grid').isotope({
                     // options
@@ -69,31 +70,20 @@ export class ItemsComponent implements OnInit, OnChanges {
     }
 
     gotoDetail(item_id: number, owner_id: number): void {
-        console.log("clicked. item_id: " + item_id + " owner_id: " + owner_id);
+        console.log("clicked. item_id: " + item_id);
 
         let service = this.itemsService;
-        service.getItem(item_id)
+        service.getDetailedItem(item_id)
             .then(
                 item => {
                     this.selectedItem = item;
                     service.selectItem(this.selectedItem);
                 },
                 error => this.errorMessage = <any>error);
-        
-        service.getOwner(owner_id)
-            .then(
-                owner => {
-                    this.selectedOwner = owner;
-                    service.selectOwner(this.selectedOwner);
-                },
-                error => this.errorMessage = <any>error);
+    }
 
-        service.getComments(item_id)
-            .then(
-                comments => {
-                    this.selectedComments = comments;
-                    service.selectComments(this.selectedComments);
-                },
-                error => this.errorMessage = <any>error);
+    searchCategory(category_id: number) {
+        console.log("category id: " + category_id);
+        // TODO
     }
 }

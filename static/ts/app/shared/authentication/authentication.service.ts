@@ -71,6 +71,7 @@ export class AuthService {
     extractUser(res: Response) {
         let body = res.json();
         return new User(
+                    body.id,
                     body.username, // TODO : change with body.profile_picture_url when available on endpoint
                     body.username,
                     body.first_name,

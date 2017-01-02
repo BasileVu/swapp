@@ -13,6 +13,7 @@ class Location {
 }
 
 export class User {
+    id: number
     profile_picture: string;
     username: string;
     first_name: string;
@@ -24,7 +25,8 @@ export class User {
     likes: Array<number>;
     items: Array<number>;
 
-    constructor(profile_picture: string,
+    constructor(id: number,
+                profile_picture: string,
                 username: string,
                 first_name: string,
                 last_name: string,
@@ -37,6 +39,7 @@ export class User {
                 notes: Array<number>,
                 likes: Array<number>,
                 items: Array<number>) {
+        this.id = id;
         this.profile_picture = profile_picture;
         this.username = username;
         this.first_name = first_name;
