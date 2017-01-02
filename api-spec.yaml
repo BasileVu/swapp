@@ -382,15 +382,11 @@ paths:
                   type: string
                 content:
                   type: string
-          
+                  
+  /items/comments:     
     post:
-      description: Post a new `Comment` on a specific `Item`. The user posting the comment is identified with his token. The date of publication is defined on server side.
+      description: Post a new `Comment` on a specific `Item`. The date of publication is defined on server side.
       parameters:
-        - in: path
-          name: id
-          description: The id of the commented item.
-          required: true
-          type: number
         - in: body
           name: body
           description: The comment
@@ -398,6 +394,10 @@ paths:
           schema:
             type: object
             properties:
+              user_id:
+                type: number
+              item_id:
+                type: number
               content:
                 type: string
         
