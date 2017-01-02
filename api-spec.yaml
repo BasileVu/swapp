@@ -338,11 +338,11 @@ paths:
           
   /items/{id}:
     get:
-      description: Gets a detailed unarchived `Item` object. The similars array contains the images urls of similar items.
+      description: Gets a detailed unarchived item.
       parameters:
         - in: path
           name: id
-          description: id of the item
+          description: The id of the item.
           required: true
           type: number
       responses:
@@ -350,6 +350,49 @@ paths:
           description: Successful operation
           schema:
             $ref: "#/definitions/DetailedItemInfo"
+            
+    put:
+      description: Updates the info of the given item.
+      parameters:
+        - in: path
+          name: id
+          description: The id of the item.
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: The content of the item.
+          required: true
+          schema:
+            $ref: "#/definitions/SetItemInfo"
+            
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: User not logged in
+              
+    patch:
+      description: Partially updates the info of the given item.
+      parameters:
+        - in: path
+          name: id
+          description: The id of the item.
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: The content of the item.
+          required: true
+          schema:
+            $ref: "#/definitions/SetItemInfo"
+            
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: User not logged in
+            
             
   /items/{id}/comments:
     get:
@@ -472,47 +515,6 @@ definitions:
         type: string
       note:
         type: number
-        
-        
-  ItemCreationDTO:
-    type: object
-    properties:
-      username:
-        type: string
-      name:
-        type: string
-      price_min:
-        type: number
-      price_max:
-        type: number
-      category:
-        type: string
-      description:
-        type: string
-      key_informations:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-      images:
-        type: array
-        items:
-          type: string
-      owner_interests:
-        type: array
-        items:
-          type: string
-      accepted_delivery_ids:
-        type: array
-        items:
-          type: number
-      creation_date:
-        type: string
-        
   
   SetItemInfo:
     type: object
@@ -564,36 +566,3 @@ definitions:
         type: number
       offers_received:
         type: number
-          
-          
-  ItemGeneralInfo:
-    type: object
-    properties:
-      id:
-        type: number
-      name:
-        type: string
-      creation_date:
-        type: string
-      image_url:
-        type: string
-      category:
-        type: object
-        properties:
-          id:
-            type: number
-          name:
-            type: string
-      location:
-        type: string
-      offers_received:
-        type: number
-      views:
-        type: number
-      comments:
-        type: number
-      likes:
-        type: number
-      owner_image_url:
-        type: string
-     
