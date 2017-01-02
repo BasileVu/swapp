@@ -117,6 +117,8 @@ paths:
             properties:
               id: 
                 type: number
+              profile_picture_url:
+                type: string
               username:
                 type: string
               first_name:
@@ -265,7 +267,7 @@ paths:
           
   /items:
     get:
-      description: Gets unarchived `Item` objects.
+      description: Gets unarchived `Item` objects according to the specified filters. If no parameter are given, items that the current user could find interresting will be returned.
       parameters:
         - in: query
           name: q
@@ -321,43 +323,17 @@ paths:
           schema:
             type: array
             items:
-              title: Item
-              type: object
-              properties:
-                id:
-                  type: number
-                name:
-                  type: string
-                creation_date:
-                  type: string
-                image_url:
-                  type: string
-                category:
-                  type: string
-                city:
-                  type: string
-                country:
-                  type: string
-                offer_received:
-                  type: number
-                views:
-                  type: number
-                comments:
-                  type: number
-                likes:
-                  type: number
-                owner_image_url:
-                  type: string
+              $ref: "#/definitions/LightItemPresentationDTO"
                   
     post:
       description: Creates a new `Item`.
       parameters:
         - in: body
           name: body
-          description: The content of the note.
-          required: false
+          description: The content of the item.
+          required: true
           schema:
-            $ref: "#/definitions/Note"
+            $ref: "#/definitions/ItemCreationDTO"
             
       responses:
         201:
@@ -369,7 +345,7 @@ paths:
           
   /items/{id}:
     get:
-      description: Gets a detailed unarchived `Item` object.
+      description: Gets a detailed unarchived `Item` object. The similars array contains the images urls of similar items.
       parameters:
         - in: path
           name: id
@@ -380,36 +356,8 @@ paths:
         200:
           description: Successful operation
           schema:
-            type: object
-            properties:
-              id:
-                type: number
-              name:
-                type: string
-              description:
-                type: string
-              price_min:
-                type: number
-              price_max:
-                type: number
-              creation_date:
-                type: string
-              condition:
-                type: string
-              brand:
-                type: string
-              color:
-                type: string
-              owner:
-                type: string
-              number_of_vote:
-                type: number
-              category:
-                type: string
-              comments:
-                type: array
-                items:
-                  type: number
+            $ref: "#/definitions/ItemPresentationDTO"
+            
                   
 definitions:
   User:
@@ -448,3 +396,118 @@ definitions:
         type: string
       note:
         type: number
+  ItemCreationDTO:
+    type: object
+    properties:
+      username:
+        type: string
+      name:
+        type: string
+      price_min:
+        type: number
+      price_max:
+        type: number
+      category:
+        type: string
+      description:
+        type: string
+      key_informations:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+      images:
+        type: array
+        items:
+          type: string
+      owner_interests:
+        type: array
+        items:
+          type: string
+      accepted_delivery_ids:
+        type: array
+        items:
+          type: number
+      creation_date:
+        type: string
+  ItemPresentationDTO:
+    type: object
+    properties:
+      owner_username:
+        type: string
+      id:
+        type: number
+      name:
+        type: string
+      description:
+        type: string
+      image_urls:
+        type: array
+        items:
+          type: string
+      price_min:
+        type: number
+      price_max:
+        type: number
+      creation_date:
+        type: string
+      key_informations:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+      offers_received:
+        type: number
+      comments:
+        type: number
+      views:
+        type: number
+      likes:
+        type: number
+      category:
+        type: object
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      similars:
+        type: array
+        items:
+          type: string
+  LightItemPresentationDTO:
+    type: object
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      creation_date:
+        type: string
+      image_url:
+        type: string
+      category:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      offers_received:
+        type: number
+      views:
+        type: number
+      comments:
+        type: number
+      likes:
+        type: number
+      owner_image_url:
+        type: string
+     
