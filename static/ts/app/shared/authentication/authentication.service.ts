@@ -16,8 +16,10 @@ export class AuthService {
 
     // Observable source
     private loggedInSelectedSource = new Subject<boolean>();
+    private userSelectedSource = new Subject<User>();
     // Observable boolean streams
     loggedInSelected$ = this.loggedInSelectedSource.asObservable();
+    userSelected$ = this.userSelectedSource.asObservable();
 
     constructor(private http: Http) {
         this.loggedIn = false;
@@ -26,6 +28,10 @@ export class AuthService {
     // Service message commands
     selectLoggedIn(loggedIn: boolean) {
         this.loggedInSelectedSource.next(loggedIn);
+    }
+
+    selectUser(user: User) {
+        this.userSelectedSource.next(user);
     }
     
     isLoggedIn():boolean {

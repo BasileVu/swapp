@@ -60,7 +60,7 @@ export class ProfileComponent implements OnInit {
                 public toastr: ToastsManager) {}
 
     ngOnInit() {
-        this.user = new User("", "", "", "", "", "", "", "", "", "", new Array<number>(), new Array<number>(), new Array<number>());
+        this.user = new User(-1, "", "", "", "", "", "", "", "", "", "", new Array<number>(), new Array<number>(), new Array<number>());
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({
@@ -83,7 +83,10 @@ export class ProfileComponent implements OnInit {
                 this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
 
                 this.authService.getAccount().then(
-                    user => this.user = user,
+                    user => {
+                        this.user = user;
+                        this.authService.selectUser(this.user);
+                    },
                     error => this.toastr.error(error, "Error")
                 );
 

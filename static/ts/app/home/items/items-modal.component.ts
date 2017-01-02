@@ -93,7 +93,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     addComment() {
         if (this.loggedIn) {
-            let commentCreationDTO = new CommentCreationDTO(this.user.id, this.item.id, this.commentContent.value);
+            let commentCreationDTO = new CommentCreationDTO(1, this.item.id, this.commentContent.value);
             console.log(commentCreationDTO);
 
             this.itemsService.addComment(commentCreationDTO).then(
@@ -102,8 +102,8 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     this.commentForm.reset();
                     let comment: Comment = new Comment;
                     comment.fromCreationDTO(commentCreationDTO);
-                    comment.setUsername(this.user.username); // TODO
-                    comment.setUserProfilePictureUrl(this.user.profile_picture); // TODO
+                    comment.setUsername(""); // TODO
+                    comment.setUserProfilePictureUrl(""); // TODO
                     this.comments.push(comment);
                     this.toastr.success("", "Comment submitted");
                 },

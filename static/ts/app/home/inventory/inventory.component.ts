@@ -46,12 +46,10 @@ declare var $:any;
 export class InventoryComponent implements OnInit, OnChanges {
 
     @Input() loggedIn: boolean;
-    private counter: number = 1;
 
     private inventory: Array<InventoryItem> = new Array();
     
     constructor(private authService: AuthService, private itemsService: ItemsService) {
-        console.log("constructor " + ++this.counter);
      }
 
     ngOnInit(): void {
@@ -63,11 +61,11 @@ export class InventoryComponent implements OnInit, OnChanges {
             this.authService.getAccount().then(
                 user => {
                     for(let i in user.items){
-                        this.itemsService.getItem(user.items[i]).then(
+                        this.itemsService.getDetailedItem(user.items[i]).then(
                             item => {
                                 let image: string = undefined;
-                                if (item.image_set != undefined)
-                                    image = item.image_set[0];
+                                if (item.image_urls != undefined)
+                                    image = item.image_urls[0];
 
                                 let inventoryItem = new InventoryItem(item.id, item.name, image, item.creation_date);
                                 this.inventory.push(inventoryItem);
@@ -131,7 +129,7 @@ export class InventoryComponent implements OnInit, OnChanges {
         console.log("clicked. item_id: " + item_id);
 
         let service = this.itemsService;
-        service.getItem(item_id)
+        service.getDetailedItem(item_id)
             .then(
                 item => {
                     service.selectItem(item);
