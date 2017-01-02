@@ -234,7 +234,7 @@ paths:
       - in: body
         name: body
         description: The content of the note.
-        required: false
+        required: true
         schema:
           $ref: "#/definitions/Note"
       responses:
@@ -330,11 +330,7 @@ paths:
             
       responses:
         201:
-          description: Successful operation
-          headers:
-            Location: 
-              description: Location of the created object
-              type: string
+          description: Successful operation.
           
   /items/{id}:
     get:
@@ -347,7 +343,7 @@ paths:
           type: number
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             $ref: "#/definitions/DetailedItemInfo"
             
@@ -368,9 +364,9 @@ paths:
             
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: User not logged in
+          description: User not logged in.
               
     patch:
       description: Partially updates the info of the given item.
@@ -383,15 +379,15 @@ paths:
         - in: body
           name: body
           description: The content of the item.
-          required: true
+          required: false
           schema:
             $ref: "#/definitions/SetItemInfo"
             
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: User not logged in
+          description: User not logged in.
             
   /items/{id}/comments:
     get:
@@ -441,12 +437,8 @@ paths:
         
       responses:
         201:
-          description: Successful operation
-          headers:
-            Location: 
-              description: Location of the created comment
-              type: string
-    
+          description: Successful operation.
+          
                
 definitions:
   UserCreation:
