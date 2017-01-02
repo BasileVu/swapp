@@ -165,6 +165,7 @@ class AccountAPITests(TestCase):
 
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["profile_picture_url"], None)
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
         self.assertEqual(r.data["username"], "username")
@@ -493,7 +494,9 @@ class AccountAPITests(TestCase):
 
         r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+        r = self.client.get("/api/account/")
+        self.assertNotEqual(r.data["profile_picture_url"], None)
 
     def test_post_account_image_already_existing_image(self):
         self.login()
