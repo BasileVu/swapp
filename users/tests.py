@@ -26,10 +26,6 @@ class UserProfileTests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 0)
 
 
-def get_coordinates_mock(**kwargs):
-    return [{"lat": 46.7793801, "lng": 6.659497600000001}]
-
-
 class AccountAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
