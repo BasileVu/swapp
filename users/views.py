@@ -106,6 +106,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 
         return Response({
             "id": user.id,
+            "profile_picture_url": None if user.userprofile.image.name == "" else user.userprofile.image.url,
             "username": user.username,
             "first_name": user.first_name,
             "last_name": user.last_name,
@@ -174,6 +175,7 @@ def get_public_account_info(request, username):
 
     return Response({
         "id": user.id,
+        "profile_picture_url": None if user.userprofile.image.name == "" else user.userprofile.image.url,
         "username": user.username,
         "first_name": user.first_name,
         "last_name": user.last_name,
