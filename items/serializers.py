@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
-from comments.serializers import CommentItemSerializer
 from items.models import Category, Item, Image, Like
-from offers.serializers import OfferItemSerializer
 from swapp.gmaps_api_utils import MAX_RADIUS
 
 
@@ -10,6 +8,15 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name')
+
+
+class CreateImageSerializer(serializers.Serializer):
+    image = serializers.ImageField()
+    item = serializers.IntegerField(required=False)
+    user = serializers.IntegerField(required=False)
+
+    class Meta:
+        field = ('image', 'item', 'user')
 
 
 class ImageSerializer(serializers.ModelSerializer):
