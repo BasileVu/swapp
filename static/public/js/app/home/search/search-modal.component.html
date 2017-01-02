@@ -1,0 +1,94 @@
+<div id="advanced-search-modal" class="modal fade">
+    <div class="container" role="document">
+        <div class="row content">
+            <div class="col-xs-12">
+                <div class="modal-panel">
+                    <form class="row">
+                        <div class="col-md-9 col-xs-10">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
+                                        <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-item" *ngFor="let orderBy of orderBys" (click)="selectOrderBy(orderBy)">{{ orderBy.name }}</div>
+                                    </div>
+                                </div>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
+                                        <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
+                                    </div>
+                                </div>
+                                <input [(ngModel)]="model.q" type="text" class="form-control" name="q">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-2 advanced open-modal-advanced-search">
+                            <button type="submit" class="btn btn-block btn-lg btn-primary" (click)="search()">
+                                <span class="hidden-sm-down"><i class="fa fa-search"></i> Search</span>
+                                <span class="hidden-md-up"><i class="fa fa-search"></i></span>
+                            </button>
+                        </div>
+                        <div class="col-xs-12 labels">
+                            <div class="form-group row min-price">
+                                <label for="example-text-input" class="col-lg-3 col-md-4 col-form-label">Minimum evaluated price</label>
+                                <div class="col-lg-9 col-md-8">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="model.price_min" class="form-control" type="text" placeholder="Choose a value" name="price_min">
+                                        <div class="input-group-addon">$</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row max-price">
+                                <label for="example-text-input" class="col-lg-3 col-md-4 col-form-label">Maximum evaluated price</label>
+                                <div class="col-lg-9 col-md-8">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="model.price_max" class="form-control" type="text" placeholder="Choose a value" name="price_max">
+                                        <div class="input-group-addon">$</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row map-position">
+                                <label for="example-text-input" class="col-lg-3 col-md-4 col-form-label">Your position</label>
+                                <div class="col-lg-9 col-md-8">
+                                    <input class="form-control" type="text" placeholder="Set your position address" name="position">
+                                </div>
+                            </div>
+                            <div class="form-group row map-range">
+                                <label for="example-text-input" class="col-lg-3 col-md-4 col-form-label">Range to search in</label>
+                                <div class="col-lg-9 col-md-8">
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="1" [checked]="search.range==1" type="radio" name="rangeOptions"> 1 km
+                                    </label>
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="10" [checked]="search.range==10" type="radio" name="rangeOptions"> 10 km
+                                    </label>
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="50" [checked]="search.range==50" type="radio" name="rangeOptions" checked> 50 km
+                                    </label>
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="100" [checked]="search.range==100" type="radio" name="rangeOptions"> 100 km
+                                    </label>
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="500" [checked]="search.range==500" type="radio" name="rangeOptions"> 500 km
+                                    </label>
+                                    <label class="form-check-inline">
+                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="" [checked]="search.range==100000" type="radio" name="rangeOptions"> Earth
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="search-modal-map"></div>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="close" data-dismiss="modal">
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+</div>

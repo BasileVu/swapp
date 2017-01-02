@@ -1,0 +1,39 @@
+<div id="content-search">
+    <div class="container">
+        <form class="row">
+            <div class="col-xs-10">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
+                            <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" *ngFor="let orderBy of orderBys" (click)="selectOrderBy(orderBy)">{{ orderBy.name }}</div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
+                            <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
+                        </div>
+                    </div>
+                    <input #q type="text" [(ngModel)]="model.q" class="form-control" name="q">
+                    <span class="input-group-btn">
+                        <button class="btn btn-secondary" type="submit" (click)="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-2 advanced open-modal-advanced-search">
+                <a href="#" class="btn btn-primary btn-reversed btn-block">
+                    <span class="hidden-sm-down">Advanced</span>
+                    <span class="hidden-md-up"><i class="fa fa-cog"></i></span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
