@@ -8,6 +8,7 @@ MAX_RADIUS = pi * EARTH_RADIUS
 
 
 def get_coordinates(location):
+    print("[INFO] call to google maps API")
     url = "%s?address=%s,%s,%s,%s" % (GEOCODE_PREFIX, location.street, location.city, location.region, location.country)
     url = url.replace(" ", "+")
     r = requests.get(url)
