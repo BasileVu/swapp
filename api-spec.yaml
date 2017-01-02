@@ -71,9 +71,8 @@ paths:
     get:
       description: Get the public account info of the given user.
       parameters:
-        -
+        - in: path
           name: username
-          in: path
           description: The username of the target user
           required: true
           type: string
@@ -91,6 +90,8 @@ paths:
                 type: string
               last_name:
                 type: string
+              profile_picture_url:
+                type: string
               location:
                 type: string
               items:
@@ -98,13 +99,9 @@ paths:
                 items:
                   type: number
               notes:
-                type: array
-                items:
-                  type: number
-              likes:
-                type: array
-                items:
-                  type: number
+                type: number
+              note_avg:
+                type: number
           
   /account:
     get:
@@ -323,7 +320,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/LightItemPresentationDTO"
+              $ref: "#/definitions/ItemPresentationDTO"
                   
     post:
       description: Creates a new `Item`.
@@ -356,9 +353,63 @@ paths:
         200:
           description: Successful operation
           schema:
-            $ref: "#/definitions/ItemPresentationDTO"
+            $ref: "#/definitions/DetailedItemPresentationDTO"
             
-                  
+  /items/{id}/comments:
+    get:
+      description: Gets all comments of an `Item` object.
+      parameters:
+        - in: path
+          name: id
+          description: id of the item
+          required: true
+          type: number
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                user_id:
+                  type: number
+                user_profile_picture_url:
+                  type: string
+                user_fullname:
+                  type: string
+                date:
+                  type: string
+                content:
+                  type: string
+          
+    post:
+      description: Post a new `Comment` on a specific `Item`. The user posting the comment is identified with his token. The date of publication is defined on server side.
+      parameters:
+        - in: path
+          name: id
+          description: The id of the commented item.
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: The comment
+          required: true
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+        
+      responses:
+        201:
+          description: Successful operation
+          headers:
+            Location: 
+              description: Location of the created comment
+              type: string
+    
+               
 definitions:
   User:
     type: object
@@ -434,7 +485,7 @@ definitions:
           type: number
       creation_date:
         type: string
-  ItemPresentationDTO:
+  DetailedItemPresentationDTO:
     type: object
     properties:
       owner_username:
@@ -455,6 +506,10 @@ definitions:
         type: number
       creation_date:
         type: string
+      interested_by:
+        type: array
+        items:
+          type: string
       key_informations:
         type: array
         items:
@@ -464,6 +519,12 @@ definitions:
               type: string
             value:
               type: string
+      delivery_from:
+        type: string
+      delivery_methods:
+        type: array
+        items:
+          type: string
       offers_received:
         type: number
       comments:
@@ -483,7 +544,7 @@ definitions:
         type: array
         items:
           type: string
-  LightItemPresentationDTO:
+  ItemPresentationDTO:
     type: object
     properties:
       id:
@@ -495,10 +556,13 @@ definitions:
       image_url:
         type: string
       category:
-        type: string
-      city:
-        type: string
-      country:
+        type: object
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      location:
         type: string
       offers_received:
         type: number

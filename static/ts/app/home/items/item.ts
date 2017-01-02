@@ -7,7 +7,7 @@ export class Item {
     id: number;
     name: string;
     description: string;
-    image_set: Array<string>; // other images
+    image_urls: Array<string>; // other images
     price_min: number;
     price_max: number;
     key_informations: Array<{
@@ -22,8 +22,7 @@ export class Item {
     likes: number;
     comments: number;
 
-    owner: number;
-    owner_image_url: string;
+    owner_username: string;
     category: {
         id: number;
         name: string;
@@ -38,7 +37,7 @@ export class Item {
         this.id = -1;
         this.name = "undef";
         this.description = "undef";
-        this.image_set = new Array();
+        this.image_urls = new Array();
         this.price_min = -1;
         this.price_max = -1;
         this.key_informations = new Array();
@@ -49,8 +48,7 @@ export class Item {
         this.views = 0;
         this.likes = 0;
         this.comments = 0;
-        this.owner = -1;
-        this.owner_image_url = "undef";
+        this.owner_username = "";
         this.category = {id:-1, name:"undef"};
         this.similars = new Array();
     }

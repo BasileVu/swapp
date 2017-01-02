@@ -62,8 +62,8 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
-    getOwner (owner_id: number): Promise<Owner> {
-        return this.http.get('/api/users/' + owner_id)
+    getOwner (owner_username: string): Promise<Owner> {
+        return this.http.get('/api/users/' + owner_username)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);
