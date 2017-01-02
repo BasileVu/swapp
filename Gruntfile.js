@@ -44,26 +44,8 @@ module.exports = function(grunt) {
                         cwd: 'node_modules/ng2-toastr/',
                         src: ['**'],
                         dest: 'static/public/js/vendor/ng2-toastr/'
-                    }, {
-                        expand: true,
-                        cwd: 'static/ts/',
-                        src: ['**', '!**/*.ts'],
-                        dest: 'static/public/js/'
                     }
                 ]
-            }
-        },
-        sync: {
-            main: {
-                files: [
-                    {
-                        cwd: 'static/ts/',
-                        src: ['**', '!**/*.ts'],
-                        dest: 'static/public/js/'
-                    }
-                ],
-                verbose: true,
-                failOnError: true
             }
         },
         sass: {
@@ -75,8 +57,7 @@ module.exports = function(grunt) {
         },
         ts: {
             default: {
-                src: ["static/ts/**/*.ts", "!node_modules/**"],
-                outDir: 'static/public/js/',
+                src: ["static/public/js/app/**/*.ts", "!node_modules/**"],
                 options: {
                     "target": "es5",
                     "module": "commonjs",
@@ -90,16 +71,12 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            copies: {
-                files: ['static/ts/**/*.html'],
-                tasks: ['sync']
-            },
             styles: {
                 files: ['static/scss/**/*.scss'],
                 tasks: ['sass']
             },
             typescripts: {
-                files: ['static/ts/**/*.ts'],
+                files: ['static/**/*.ts'],
                 tasks: ['ts']
             },
             livereload: {
@@ -122,8 +99,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
-    grunt.registerTask('default', ['copy', 'sass', 'watch']);
+    grunt.registerTask('default', ['copy', 'sass', 'ts', 'watch']);
 
     // Build without watch
-    grunt.registerTask('build', ['copy', 'sass']);
+    grunt.registerTask('build', ['copy', 'sass', 'ts']);
 };
