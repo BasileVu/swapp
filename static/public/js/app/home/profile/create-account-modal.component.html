@@ -1,0 +1,105 @@
+<div id="create-user-modal" class="modal fade">
+    <div class="container" role="document">
+        <div class="row content">
+            <div class="col-xs-12">
+                <form class="modal-panel" [formGroup]="registerForm" (ngSubmit)="register()">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h1>Create an account</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div #profilePicture class="col-md-4">
+                            <h3>Profile picture</h3>
+                            <div class="col-img-frame" *ngIf="data.image === undefined">
+                                <img class="avatar img-fluid" src="http://placehold.it/200x200">
+                            </div>
+                            <div class="col-img-frame result rounded" *ngIf="data.image">
+                                <img [src]="data.image" [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
+                            </div>
+
+                            <div class="pull-left">
+                                <img-cropper [image]="data" [settings]="cropperSettings" ></img-cropper>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 col-2">
+                            <h3>Login</h3>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Username</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="username">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Email</label>
+                                <div class="col-sm-9">
+                                    <input type="email" class="form-control" formControlName="email">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" formControlName="password">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-3 col-form-label">Confirm Password</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" formControlName="confirmPassword">
+                                </div>
+                            </div>
+                            <h3>Position</h3>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">First Name</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="firstName">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Last Name</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="lastName">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Address</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="address">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">City</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="city">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Region</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="region">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Country</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" formControlName="country">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button href="#" class="btn btn-lg btn-block btn-primary submit" type="submit" [disabled]="!registerForm.valid">
+                                Create account
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <a href="#" class="close" data-dismiss="modal">
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+</div>

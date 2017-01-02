@@ -291,5 +291,6 @@ tests/report/
 .vscode/tasks.json
 .vscode/launch.json
 
-static/public/js/app/
+static/public/js/app/**/*.js
+static/public/js/app/**/*.js.map
 static/public/js/vendor/
