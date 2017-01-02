@@ -12,11 +12,15 @@ export class Comment {
         this.content = commentCreationDTO.content;
     }
 
-    setUsername(user_fullname: string) {
+    setUserFullname(user_fullname: string) {
         this.user_fullname = user_fullname;
     }
 
     setUserProfilePictureUrl(picture: string) {
         this.user_profile_picture_url = picture;
+    }
+
+    setDate(date: Date) {
+        this.date = date;
     }
 }

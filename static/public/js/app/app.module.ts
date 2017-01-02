@@ -21,7 +21,7 @@ import { AppRoutingModule } from './app-routing.module';
     imports: [
         BrowserModule,
         HomeModule,
-        CoreModule.forRoot({userFirstName: 'John', userLastName: 'Smith'}),
+        CoreModule,
         AppRoutingModule,
         HttpModule,
         JsonpModule,
