@@ -15,4 +15,4 @@ class NotificationViewSet(mixins.ListModelMixin,
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        return Response(self.serializer_class(request.user.notification_set.order_by("date"), many=True).data)
+        return Response(self.serializer_class(request.user.notification_set.order_by("-date"), many=True).data)
