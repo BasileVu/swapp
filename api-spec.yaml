@@ -14,7 +14,7 @@ produces:
 paths:
   /csrf:
     get:
-      description: Gets a CSRF token required o use the api's route. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
+      description: Gets a CSRF token required to use the api's routes. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
       responses:
         200:
           description: Successful operation. **Sets a cookie at the key "csrftoken".**
@@ -36,18 +36,18 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: Invalid username/password combination or account not active
+          description: Invalid username/password combination or account not active.
           
   /logout:
     get:
       description: Logs an user out.
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: User is not logged in
+          description: User is not logged in.
 
   /users:
     post:
@@ -58,14 +58,14 @@ paths:
           description: The account info of the user.
           required: true
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserCreation"
       responses:
         201:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field or json malformed
+          description: Missing field, json malformed or location invalid.
         409:
-          description: An user with the same susername already exists
+          description: An user with the same username already exists.
           
   /users/{username}:
     get:
@@ -73,24 +73,24 @@ paths:
       parameters:
         - in: path
           name: username
-          description: The username of the target user
+          description: The username of the target user.
           required: true
           type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: object
             properties:
               id:
                 type: number
+              profile_picture_url:
+                type: string
               username:
                 type: string
               first_name:
                 type: string
               last_name:
-                type: string
-              profile_picture_url:
                 type: string
               location:
                 type: string
@@ -108,7 +108,7 @@ paths:
       description: Get the account info of the current user logged in.
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: object
             properties:
@@ -131,21 +131,17 @@ paths:
               categories:
                 type: array
                 items:
-                  type: number
+                  type: string
               items:
                 type: array
                 items:
                   type: number
               notes:
-                type: array
-                items:
-                  type: number
-              likes:
-                type: array
-                items:
-                  type: number
+                type: number
+              note_avg:
+                type: number
         401:
-          description: User is not logged in
+          description: User is not logged in.
     put:
       description: Updates all the current user's account info.
       parameters:
@@ -157,11 +153,11 @@ paths:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field or json malformed
+          description: Missing field or json malformed.
         401:
-          description: User is not logged in
+          description: User is not logged in.
     patch:
       description: Partially updates the current user's account info.
       parameters:
@@ -173,11 +169,11 @@ paths:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful response
+          description: Successful response.
         400:
-          description: Json malformed
+          description: Json malformed.
         401:
-          description: User is not logged in
+          description: User is not logged in.
           
   /account/password:
     put:
@@ -196,9 +192,9 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field, json malformed or passwords not matching
+          description: Missing field, json malformed or passwords not matching.
     
   /account/location:
     put:
@@ -212,9 +208,9 @@ paths:
             $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field, json malformed or location not existing
+          description: Missing field, json malformed or location not existing.
       
     patch:
       description: Partially updates the location of the current user logged in.
@@ -227,9 +223,9 @@ paths:
           $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Json malformed or location not existing
+          description: Json malformed or location not existing.
           
   /notes:
     post:
@@ -243,9 +239,9 @@ paths:
           $ref: "#/definitions/Note"
       responses:
         201:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field or json malformed
+          description: Missing field or json malformed.
           
   /notes/{id}:
     get:
@@ -253,12 +249,12 @@ paths:
       parameters:
       - in: path
         name: id
-        description: id of the note
+        description: The id of the note.
         required: true
         type: number
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             $ref: "#/definitions/Note"
           
@@ -268,59 +264,59 @@ paths:
       parameters:
         - in: query
           name: q
-          description: Query of user
+          description: Query of user.
           required: false
           type: string
           
         - in: query
           name: category
-          description: category of item wanted.
+          description: Category of item wanted.
           required: false
           type: string
         
         - in: query
           name: lat
-          description: latitude of current point from where to search.
+          description: Latitude of current point from where to search.
           required: false
           type: number
           
         - in: query
           name: lon
-          description: longitude of current point from where to search.
+          description: Longitude of current point from where to search.
           required: false
           type: number
           
         - in: query
           name: radius
-          description: radius (in kilometers) in which items must be to appear in the result.
+          description: Radius (in kilometers) in which items must be to appear in the result.
           required: false
           type: number
           
         - in: query
           name: price_min
-          description: lower bound of an item's price range taht must e respected in order for an item to appear in the result.
+          description: Lower bound of an item's price range that must be respected in order for an item to appear in the result.
           required: false
           type: number
           
         - in: query
           name: price_max
-          description: upper bound of an item's price range taht must e respected in order for an item to appear in the result.
+          description: Upper bound of an item's price range that must be respected in order for an item to appear in the result.
           required: false
           type: number
           
         - in: query
           name: order_by
-          description: define the sorting in the result.
+          description: Define the sorting in the result.
           required: false
           type: string
           
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: array
             items:
-              $ref: "#/definitions/ItemPresentationDTO"
+              $ref: "#/definitions/DetailedItemInfo"
                   
     post:
       description: Creates a new `Item`.
@@ -330,7 +326,7 @@ paths:
           description: The content of the item.
           required: true
           schema:
-            $ref: "#/definitions/ItemCreationDTO"
+            $ref: "#/definitions/SetItemInfo"
             
       responses:
         201:
@@ -342,18 +338,60 @@ paths:
           
   /items/{id}:
     get:
-      description: Gets a detailed unarchived `Item` object. The similars array contains the images urls of similar items.
+      description: Gets a detailed unarchived item.
       parameters:
         - in: path
           name: id
-          description: id of the item
+          description: The id of the item.
           required: true
           type: number
       responses:
         200:
           description: Successful operation
           schema:
-            $ref: "#/definitions/DetailedItemPresentationDTO"
+            $ref: "#/definitions/DetailedItemInfo"
+            
+    put:
+      description: Updates the info of the given item.
+      parameters:
+        - in: path
+          name: id
+          description: The id of the item.
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: The content of the item.
+          required: true
+          schema:
+            $ref: "#/definitions/SetItemInfo"
+            
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: User not logged in
+              
+    patch:
+      description: Partially updates the info of the given item.
+      parameters:
+        - in: path
+          name: id
+          description: The id of the item.
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: The content of the item.
+          required: true
+          schema:
+            $ref: "#/definitions/SetItemInfo"
+            
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: User not logged in
             
   /items/{id}/comments:
     get:
@@ -361,43 +399,43 @@ paths:
       parameters:
         - in: path
           name: id
-          description: id of the item
+          description: The id of the item.
           required: true
           type: number
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: array
             items:
               type: object
               properties:
-                user_id:
+                user:
                   type: number
-                user_profile_picture_url:
-                  type: string
-                user_fullname:
-                  type: string
                 date:
                   type: string
                 content:
                   type: string
-                  
-  /items/comments:     
+                item:
+                  type: number
+
     post:
-      description: Post a new `Comment` on a specific `Item`. The date of publication is defined on server side.
+      tags:
+        - Not implemented
+      description: Post a new `Comment` on a specific `Item`. The user posting the comment is identified with his token. The date of publication is defined on server side.
       parameters:
+        - in: path
+          name: id
+          description: The id of the commented item.
+          required: true
+          type: number
         - in: body
           name: body
-          description: The comment
+          description: The comment.
           required: true
           schema:
             type: object
             properties:
-              user_id:
-                type: number
-              item_id:
-                type: number
               content:
                 type: string
         
@@ -411,6 +449,30 @@ paths:
     
                
 definitions:
+  UserCreation:
+    type: object
+    properties:
+      username:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      street:
+        type: string
+      city:
+        type: string
+      region:
+        type: string
+      country:
+        type: string
+        
   User:
     type: object
     properties:
@@ -436,6 +498,7 @@ definitions:
         type: string
       country:
         type: string
+        
   Note:
     type: object
     properties:
@@ -447,131 +510,54 @@ definitions:
         type: string
       note:
         type: number
-  ItemCreationDTO:
+  
+  SetItemInfo:
     type: object
     properties:
-      username:
+      name: 
         type: string
-      name:
+      description:
         type: string
       price_min:
         type: number
       price_max:
         type: number
       category:
-        type: string
-      description:
-        type: string
-      key_informations:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-      images:
-        type: array
-        items:
-          type: string
-      owner_interests:
-        type: array
-        items:
-          type: string
-      accepted_delivery_ids:
-        type: array
-        items:
-          type: number
-      creation_date:
-        type: string
-  DetailedItemPresentationDTO:
+        type: number
+        
+  DetailedItemInfo:
     type: object
     properties:
-      owner_username:
-        type: string
       id:
         type: number
       name:
         type: string
       description:
         type: string
+      price_min:
+        type: number
+      price_max:
+        type: number
+      creation_date:
+        type: string
+      owner_username:
+        type: string
+      category:
+        type: object
+        properties:
+          id:
+            type: number
+          name:
+            type: string
+      views:
+        type: number
       image_urls:
         type: array
         items:
           type: string
-      price_min:
-        type: number
-      price_max:
-        type: number
-      creation_date:
-        type: string
-      interested_by:
-        type: array
-        items:
-          type: string
-      key_informations:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-      delivery_from:
-        type: string
-      delivery_methods:
-        type: array
-        items:
-          type: string
-      offers_received:
+      likes:
         type: number
       comments:
         type: number
-      views:
-        type: number
-      likes:
-        type: number
-      category:
-        type: object
-        properties:
-          id:
-            type: number
-          name:
-            type: string
-      similars:
-        type: array
-        items:
-          type: string
-  ItemPresentationDTO:
-    type: object
-    properties:
-      id:
-        type: number
-      name:
-        type: string
-      creation_date:
-        type: string
-      image_url:
-        type: string
-      category:
-        type: object
-        properties:
-          id:
-            type: number
-          name:
-            type: string
-      location:
-        type: string
       offers_received:
         type: number
-      views:
-        type: number
-      comments:
-        type: number
-      likes:
-        type: number
-      owner_image_url:
-        type: string
-     

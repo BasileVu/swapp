@@ -22,16 +22,13 @@ class ItemAPITests(TestCase):
     def login(self):
         self.client.login(username="username", password="password")
 
-    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1, image_set=list(),
-                  like_set=list()):
+    def post_item(self, name="name", description="description", price_min=1, price_max=2, category=1):
         return self.client.post(self.url, data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
-            "category": category,
-            "image_set": image_set,
-            "like_set": like_set
+            "category": category
         }), content_type="application/json")
 
     def post_like(self, user, item):
@@ -53,16 +50,13 @@ class ItemAPITests(TestCase):
     def get_item(self, id_item=1):
         return self.client.get(self.url + str(id_item) + "/", content_type="application/json")
 
-    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1,
-                 image_set=list(), like_set=list()):
+    def put_item(self, id_item=1, name="name", description="description", price_min=1, price_max=2, category=1):
         return self.client.put(self.url + str(id_item) + "/", data=json.dumps({
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "image_set": image_set,
-            "like_set": like_set
         }), content_type="application/json")
 
     def delete_item(self, id_item=1):
@@ -226,28 +220,11 @@ class ItemAPITests(TestCase):
         r = self.delete_item(id_item=id_item)
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_delete_item(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        id_item = r.data['id']
-        self.assertEqual(Item.objects.count(), 1)
-
-        r = self.delete_item(id_item=id_item)
-        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
-
-        r = self.get_items()
-        self.assertEqual(len(r.data), 0)
-
-        r = self.delete_item(id_item=10)
-        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
-
     def create_item_values_for_list_and_get_testing(self):
         self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        r = self.post_like(1, 1)
-        r = self.post_image(1)
+        self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
+        self.post_like(1, 1)
+        self.post_image(1)
         self.client.logout()
 
     def check_get_item_data_complete(self, data):

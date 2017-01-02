@@ -191,7 +191,10 @@ def build_item_suggestions(user):
     return items
 
 
-class ItemViewSet(viewsets.ModelViewSet):
+class ItemViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -251,9 +254,9 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
 
 
-class ImageViewSet(mixins.RetrieveModelMixin,
+class ImageViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
                    mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
     queryset = Image.objects.all()
 
