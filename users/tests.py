@@ -2,6 +2,7 @@ import json
 import time
 from unittest.mock import patch
 
+from PIL import Image as ImagePil
 from django.test import Client, TestCase
 from rest_framework import status
 
@@ -26,7 +27,7 @@ class UserProfileTests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 0)
 
 
-class AccountAPITests(TestCase):
+class AccountCreationAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
                   street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
@@ -42,12 +43,6 @@ class AccountAPITests(TestCase):
             "city": city,
             "region": region,
             "country": country
-        }), content_type="application/json")
-
-    def login(self, username="username", password="password"):
-        return self.client.post("/api/login/", data=json.dumps({
-            "username": username,
-            "password": password
         }), content_type="application/json")
 
     def setUp(self):
@@ -90,49 +85,70 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 0)
 
+
+class AccountConnectionAPITests(TestCase):
+    def login(self, username="username", password="password"):
+        return self.client.post("/api/login/", data=json.dumps({
+            "username": username,
+            "password": password
+        }), content_type="application/json")
+
+    def setUp(self):
+        User.objects.create_user(username="username", password="password")
+
     def test_login_incorrect(self):
-        self.post_user()
         r = self.login(username="username", password="passwor")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_login_incomplete_json(self):
-        self.post_user()
         r = self.client.post("/api/login/", data=json.dumps({
             "username": "username"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_login_emtpy_json(self):
-        self.post_user()
         r = self.login(username="", password="")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_login_success(self):
-        self.post_user()
         r = self.login()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertIn('_auth_user_id', self.client.session)
 
     def test_logout_not_logged_in(self):
-        self.post_user()
-
         r = self.client.get("/api/logout/")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_logout_logged_in(self):
-        self.post_user()
         self.login()
 
         r = self.client.get("/api/logout/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
+
+class AccountAPITests(TestCase):
+    def login(self, username="username", password="password"):
+        return self.client.post("/api/login/", data=json.dumps({
+            "username": username,
+            "password": password
+        }), content_type="application/json")
+
+    def post_image(self, user=1):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "user": user}, format='multipart')
+
+    def setUp(self):
+        User.objects.create_user(username="username", password="password", first_name="first_name",
+                                 last_name="last_name", email="test@test.com")
+
     def test_get_account_info_not_logged_in(self):
-        self.post_user()
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_account_info_logged_in(self):
-        self.post_user()
         self.login()
 
         # add some data related to user
@@ -165,8 +181,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["notes"], 1)
 
     def test_update_account_not_logged_in(self):
-        self.post_user()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "first_name": "f",
             "last_name": "l"
@@ -184,7 +198,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "last_name")
 
     def test_update_account_logged_in(self):
-        self.post_user()
         self.login()
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -201,8 +214,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "lastname")
 
     def test_cannot_update_account_not_logged_in(self):
-        self.post_user()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "email": "a@b.com",
         }), content_type="application/json")
@@ -218,8 +229,6 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["email"], "a@b.com")
 
     def test_cannot_connect_if_account_not_active(self):
-        r = self.post_user()
-
         u = User.objects.get(pk=1)
         u.is_active = False
         u.save()
@@ -232,7 +241,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_account_empty_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -247,7 +255,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["username"], "username")
 
     def test_update_one_not_considered_info(self):
-        self.post_user()
         self.login()
         datetime = str(timezone.now())
 
@@ -263,7 +270,6 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
     def test_update_account_malformed_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -278,7 +284,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_update_user_account_incomplete_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/", data=json.dumps({
@@ -293,7 +298,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_complete_update_account(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/", data=json.dumps({
@@ -315,7 +319,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["location"], {'country': '', 'city': '', 'region': '', 'street': ''})
 
     def test_complete_update_account_empty_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/", data=json.dumps({
@@ -338,8 +341,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["location"], {'city': '', 'region': '', 'street': '', 'country': ''})
 
     def test_change_password_not_logged_in(self):
-        self.post_user()
-
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "password",
             "new_password": "newpassword"
@@ -349,7 +350,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(len(r.data), 1)
 
     def test_change_password(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/password/", data=json.dumps({
@@ -365,7 +365,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_with_false_old_password(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/password/", data=json.dumps({
@@ -383,7 +382,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_empty_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/password/", data=json.dumps({
@@ -393,7 +391,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_change_password_partial_json(self):
-        self.post_user()
         self.login()
 
         r = self.client.put("/api/account/password/", data=json.dumps({
@@ -402,8 +399,9 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_two_users_cant_have_same_username_update_patch(self):
-        self.post_user(username="user1", password="pass1", password_confirmation="pass1")
-        self.post_user(username="user2", password="pass2", password_confirmation="pass2")
+        User.objects.create_user(username="user1", password="pass1")
+        User.objects.create_user(username="user2", password="pass2")
+
         self.login(username="user1", password="pass1")
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -423,8 +421,9 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["username"], "user2")
 
     def test_two_users_cant_have_same_username_update_put(self):
-        self.post_user(username="user1", password="pass1", password_confirmation="pass1")
-        self.post_user(username="user2", password="pass2", password_confirmation="pass2")
+        User.objects.create_user(username="user1", password="pass1")
+        User.objects.create_user(username="user2", password="pass2")
+
         self.login(username="user1", password="pass1")
 
         r = self.client.put("/api/account/", data=json.dumps({
@@ -449,7 +448,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["username"], "user2")
 
     def test_update_malformed_email_logged_in(self):
-        self.post_user()
         self.login()
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -464,7 +462,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_modification_date_user_logged_in(self):
-        self.post_user()
         self.login()
 
         r = self.client.get("/api/account/")
@@ -485,10 +482,29 @@ class AccountAPITests(TestCase):
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
     def test_405_when_get_on_password(self):
-        self.post_user()
         self.login()
         r = self.client.get("/api/account/password/")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_post_account_image(self):
+        self.login()
+
+        self.assertEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+    def test_post_account_image_already_existing_image(self):
+        self.login()
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
 
 
 class CSRFTests(TestCase):
@@ -836,4 +852,3 @@ class ConsultationTests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(Consultation.objects.all()), 1)
-        consultation = Consultation.objects.first()
