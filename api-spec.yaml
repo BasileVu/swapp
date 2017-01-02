@@ -14,7 +14,7 @@ produces:
 paths:
   /csrf:
     get:
-      description: Gets a CSRF token required o use the api's route. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
+      description: Gets a CSRF token required to use the api's routes. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
       responses:
         200:
           description: Successful operation. **Sets a cookie at the key "csrftoken".**
@@ -36,18 +36,18 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: Invalid username/password combination or account not active
+          description: Invalid username/password combination or account not active.
           
   /logout:
     get:
       description: Logs an user out.
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         401:
-          description: User is not logged in
+          description: User is not logged in.
 
   /users:
     post:
@@ -61,11 +61,11 @@ paths:
             $ref: "#/definitions/UserCreation"
       responses:
         201:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field, json malformed or location invalid
+          description: Missing field, json malformed or location invalid.
         409:
-          description: An user with the same username already exists
+          description: An user with the same username already exists.
           
   /users/{username}:
     get:
@@ -73,12 +73,12 @@ paths:
       parameters:
         - in: path
           name: username
-          description: The username of the target user
+          description: The username of the target user.
           required: true
           type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: object
             properties:
@@ -108,7 +108,7 @@ paths:
       description: Get the account info of the current user logged in.
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: object
             properties:
@@ -141,7 +141,7 @@ paths:
               note_avg:
                 type: number
         401:
-          description: User is not logged in
+          description: User is not logged in.
     put:
       description: Updates all the current user's account info.
       parameters:
@@ -153,11 +153,11 @@ paths:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field or json malformed
+          description: Missing field or json malformed.
         401:
-          description: User is not logged in
+          description: User is not logged in.
     patch:
       description: Partially updates the current user's account info.
       parameters:
@@ -169,11 +169,11 @@ paths:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful response
+          description: Successful response.
         400:
-          description: Json malformed
+          description: Json malformed.
         401:
-          description: User is not logged in
+          description: User is not logged in.
           
   /account/password:
     put:
@@ -192,9 +192,9 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field, json malformed or passwords not matching
+          description: Missing field, json malformed or passwords not matching.
     
   /account/location:
     put:
@@ -208,9 +208,9 @@ paths:
             $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field, json malformed or location not existing
+          description: Missing field, json malformed or location not existing.
       
     patch:
       description: Partially updates the location of the current user logged in.
@@ -223,9 +223,9 @@ paths:
           $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Json malformed or location not existing
+          description: Json malformed or location not existing.
           
   /notes:
     post:
@@ -239,9 +239,9 @@ paths:
           $ref: "#/definitions/Note"
       responses:
         201:
-          description: Successful operation
+          description: Successful operation.
         400:
-          description: Missing field or json malformed
+          description: Missing field or json malformed.
           
   /notes/{id}:
     get:
@@ -249,12 +249,12 @@ paths:
       parameters:
       - in: path
         name: id
-        description: id of the note
+        description: The id of the note.
         required: true
         type: number
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             $ref: "#/definitions/Note"
           
@@ -264,55 +264,55 @@ paths:
       parameters:
         - in: query
           name: q
-          description: Query of user
+          description: Query of user.
           required: false
           type: string
           
         - in: query
           name: category
-          description: category of item wanted.
+          description: Category of item wanted.
           required: false
           type: string
         
         - in: query
           name: lat
-          description: latitude of current point from where to search.
+          description: Latitude of current point from where to search.
           required: false
           type: number
           
         - in: query
           name: lon
-          description: longitude of current point from where to search.
+          description: Longitude of current point from where to search.
           required: false
           type: number
           
         - in: query
           name: radius
-          description: radius (in kilometers) in which items must be to appear in the result.
+          description: Radius (in kilometers) in which items must be to appear in the result.
           required: false
           type: number
           
         - in: query
           name: price_min
-          description: lower bound of an item's price range taht must e respected in order for an item to appear in the result.
+          description: Lower bound of an item's price range that must be respected in order for an item to appear in the result.
           required: false
           type: number
           
         - in: query
           name: price_max
-          description: upper bound of an item's price range taht must e respected in order for an item to appear in the result.
+          description: Upper bound of an item's price range that must be respected in order for an item to appear in the result.
           required: false
           type: number
           
         - in: query
           name: order_by
-          description: define the sorting in the result.
+          description: Define the sorting in the result.
           required: false
           type: string
           
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: array
             items:
@@ -393,37 +393,32 @@ paths:
         401:
           description: User not logged in
             
-            
   /items/{id}/comments:
     get:
-      tags:
-        - Not implemented
       description: Gets all comments of an `Item` object.
       parameters:
         - in: path
           name: id
-          description: id of the item
+          description: The id of the item.
           required: true
           type: number
       responses:
         200:
-          description: Successful operation
+          description: Successful operation.
           schema:
             type: array
             items:
               type: object
               properties:
-                user_id:
+                user:
                   type: number
-                user_profile_picture_url:
-                  type: string
-                user_fullname:
-                  type: string
                 date:
                   type: string
                 content:
                   type: string
-          
+                item:
+                  type: number
+
     post:
       tags:
         - Not implemented
@@ -436,7 +431,7 @@ paths:
           type: number
         - in: body
           name: body
-          description: The comment
+          description: The comment.
           required: true
           schema:
             type: object
