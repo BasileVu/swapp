@@ -14,7 +14,7 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     last_modification_date = models.DateTimeField(auto_now=True)
-    image = models.ImageField('Uploaded image', null=True)
+    image = models.ImageField('Uploaded image', default=None)
     note_avg = models.DecimalField(max_digits=2, decimal_places=1, null=True)
 
     categories = models.ManyToManyField("items.Category")

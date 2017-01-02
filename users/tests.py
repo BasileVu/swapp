@@ -2,6 +2,7 @@ import json
 import time
 from unittest.mock import patch
 
+from PIL import Image as ImagePil
 from django.test import Client, TestCase
 from rest_framework import status
 
@@ -49,6 +50,13 @@ class AccountAPITests(TestCase):
             "username": username,
             "password": password
         }), content_type="application/json")
+
+    def post_image(self, user=1):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "user": user}, format='multipart')
 
     def setUp(self):
         self.patcher = patch("users.views.get_coordinates")
@@ -488,7 +496,29 @@ class AccountAPITests(TestCase):
         self.post_user()
         self.login()
         r = self.client.get("/api/account/password/")
-        self.assertEqual(r.status_code, 405)
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_post_account_image(self):
+        self.post_user()
+        self.login()
+
+        self.assertEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+    def test_post_account_image_already_existing_image(self):
+        self.post_user()
+        self.login()
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+        r = self.post_image()
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
 
 
 class CSRFTests(TestCase):
@@ -836,4 +866,3 @@ class ConsultationTests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(Consultation.objects.all()), 1)
-        consultation = Consultation.objects.first()

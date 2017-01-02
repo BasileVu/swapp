@@ -3,6 +3,7 @@ from django.db.models import F, FloatField, Avg, IntegerField
 from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
+from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ValidationError
@@ -252,11 +253,35 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ImageViewSet(mixins.RetrieveModelMixin,
                    mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
     queryset = Image.objects.all()
-    serializer_class = ImageSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CreateImageSerializer
+
+        return ImageSerializer
+
+    def perform_create(self, serializer):
+        item_id = serializer.validated_data.get("item", None)
+        user_id = serializer.validated_data.get("user", None)
+        image = serializer.validated_data.get("image", None)
+
+        if item_id is not None:
+            item = get_object_or_404(Item, pk=item_id)
+            i = Image.objects.create(image=image, item=item)
+
+            return Response(status=status.HTTP_201_CREATED, headers={"Location": i.image.url})
+
+        if user_id is not None and self.request.user.is_authenticated:
+            userprofile = self.request.user.userprofile
+            userprofile.image = image
+            userprofile.save()
+
+            return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})
+
+        raise ValidationError("item or user is required")
 
 
 class LikeViewSet(mixins.RetrieveModelMixin,

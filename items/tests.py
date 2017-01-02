@@ -50,9 +50,6 @@ class ImageAPITests(TestCase):
         with open('test.png', 'rb') as data:
             return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
 
-    def get_images(self):
-        return self.client.get("/api/images/", content_type="application/json")
-
     def get_image(self, id_image=1):
         return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
 
@@ -82,7 +79,7 @@ class ImageAPITests(TestCase):
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
-        r = self.get_image(id_image=r.data['id'])
+        r = self.get_image(id_image=1)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_image(id_image=10)
@@ -106,15 +103,12 @@ class ImageAPITests(TestCase):
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
-        id_image = r.data['id']
-        r = self.get_images()
-        self.assertEqual(len(r.data), 1)
+        self.assertEqual(Image.objects.count(), 1)
 
-        r = self.delete_image(id_image=id_image)
+        r = self.delete_image(id_image=1)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
-        r = self.get_images()
-        self.assertEqual(len(r.data), 0)
+        self.assertEqual(Image.objects.count(), 0)
 
         r = self.delete_image(id_image=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
