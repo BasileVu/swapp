@@ -203,7 +203,7 @@ class LikeAPITests(TestCase):
         return self.client.get("/api/likes/" + str(id_like) + "/", content_type="application/json")
 
     def delete_like(self, id_like):
-        return self.client.delete("/api/items/" + str(id_like) + "/", content_type="application/json")
+        return self.client.delete("/api/likes/" + str(id_like) + "/", content_type="application/json")
 
     def test_post_like(self):
         self.login()
@@ -239,11 +239,11 @@ class LikeAPITests(TestCase):
         r = self.post_like(1, self.current_user.userprofile.id)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
-        id_item = r.data['id']
+        id_like = r.data['id']
         r = self.get_likes()
         self.assertEqual(len(r.data), 1)
 
-        r = self.delete_like(id_like=id_item)
+        r = self.delete_like(id_like=id_like)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         r = self.get_likes()

@@ -46,9 +46,7 @@ class LikeItemSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'views', 'price_min', 'price_max', 'creation_date', 'archived', 'owner',
-                  'category', 'image_set', 'like_set')
-        read_only_fields = ('owner',)
+        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category')
 
 
 class AggregatedItemSerializer(serializers.ModelSerializer):
@@ -76,8 +74,8 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'archived', 'owner_username',
-                  'category', 'views', 'image_urls', 'likes', 'comments', 'offers_received')
+        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'owner_username', 'category',
+                  'views', 'image_urls', 'likes', 'comments', 'offers_received')
         read_only_fields = ('owner',)
 
 
