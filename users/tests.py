@@ -27,7 +27,7 @@ class UserProfileTests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 0)
 
 
-class AccountAPITests(TestCase):
+class AccountCreationAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
                   street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
@@ -44,19 +44,6 @@ class AccountAPITests(TestCase):
             "region": region,
             "country": country
         }), content_type="application/json")
-
-    def login(self, username="username", password="password"):
-        return self.client.post("/api/login/", data=json.dumps({
-            "username": username,
-            "password": password
-        }), content_type="application/json")
-
-    def post_image(self, user=1):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
-
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "user": user}, format='multipart')
 
     def setUp(self):
         self.patcher = patch("users.views.get_coordinates")
@@ -98,6 +85,31 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 0)
 
+
+class AccountConnectionAPITests(TestCase):
+    def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
+                  password="password", password_confirmation="password",
+                  street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
+
+        return self.client.post("/api/users/", data=json.dumps({
+            "username": username,
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": password,
+            "password_confirmation": password_confirmation,
+            "street": street,
+            "city": city,
+            "region": region,
+            "country": country
+        }), content_type="application/json")
+
+    def login(self, username="username", password="password"):
+        return self.client.post("/api/login/", data=json.dumps({
+            "username": username,
+            "password": password
+        }), content_type="application/json")
+
     def test_login_incorrect(self):
         self.post_user()
         r = self.login(username="username", password="passwor")
@@ -133,6 +145,38 @@ class AccountAPITests(TestCase):
 
         r = self.client.get("/api/logout/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+
+class AccountAPITests(TestCase):
+    def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
+                  password="password", password_confirmation="password",
+                  street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
+
+        return self.client.post("/api/users/", data=json.dumps({
+            "username": username,
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": password,
+            "password_confirmation": password_confirmation,
+            "street": street,
+            "city": city,
+            "region": region,
+            "country": country
+        }), content_type="application/json")
+
+    def login(self, username="username", password="password"):
+        return self.client.post("/api/login/", data=json.dumps({
+            "username": username,
+            "password": password
+        }), content_type="application/json")
+
+    def post_image(self, user=1):
+        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save('test.png')
+
+        with open('test.png', 'rb') as data:
+            return self.client.post("/api/images/", {"image": data, "user": user}, format='multipart')
 
     def test_get_account_info_not_logged_in(self):
         self.post_user()
