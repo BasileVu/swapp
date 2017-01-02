@@ -100,6 +100,10 @@ class NotificationAPITest(TestCase):
         r = self.get_notifications()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
+        self.assertIn("id", r.data[0])
+        self.assertIn("content", r.data[0])
+        self.assertIn("read", r.data[0])
+        self.assertIn("date", r.data[0])
 
     def test_get_notification_order_by_date(self):
         self.client.login(username="user1", password="password")
