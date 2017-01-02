@@ -1,5 +1,6 @@
 import json
 import time
+from unittest.mock import patch
 
 from django.test import Client, TestCase
 from rest_framework import status
@@ -25,6 +26,10 @@ class UserProfileTests(TestCase):
         self.assertEqual(UserProfile.objects.count(), 0)
 
 
+def get_coordinates_mock(**kwargs):
+    return [{"lat": 46.7793801, "lng": 6.659497600000001}]
+
+
 class AccountAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
@@ -48,6 +53,14 @@ class AccountAPITests(TestCase):
             "username": username,
             "password": password
         }), content_type="application/json")
+
+    def setUp(self):
+        self.patcher = patch("users.views.get_coordinates")
+        self.get_coordinates_mock = self.patcher.start()
+        self.get_coordinates_mock.return_value = [{"lat": 46.7793801, "lng": 6.659497600000001}]
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_user_creation(self):
         r = self.post_user()
@@ -75,6 +88,8 @@ class AccountAPITests(TestCase):
         self.assertEqual(User.objects.count(), 0)
 
     def test_user_creation_location_not_existing(self):
+        self.get_coordinates_mock.return_value = []
+
         r = self.post_user(street="street", city="city", region="region", country="country")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 0)
@@ -512,6 +527,13 @@ class LocationCoordinatesTests(TestCase):
         self.user = User.objects.create_user(username="username", password="password")
         self.client.login(username="username", password="password")
 
+        self.patcher = patch("users.views.get_coordinates")
+        self.get_coordinates_mock = self.patcher.start()
+        self.get_coordinates_mock.return_value = [{"lat": 46.7793801, "lng": 6.659497600000001}]
+
+    def tearDown(self):
+        self.patcher.stop()
+
     def test_change_location_not_logged_in(self):
         self.client.logout()
         r = self.put_location()
@@ -548,6 +570,8 @@ class LocationCoordinatesTests(TestCase):
         self.assertEqual(c.longitude, 0)
 
     def test_coordinates_and_location_do_not_change_after_zero_results_location_modification(self):
+        self.get_coordinates_mock.return_value = []
+
         r = self.client.patch("/api/account/location/", data=json.dumps({
             "street": "fnupinom",
             "city": "fnupinom",
