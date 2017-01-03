@@ -491,33 +491,131 @@ paths:
                   type: string
                 item:
                   type: number
-
+                  
+  /comments/:
     post:
-      tags:
-        - Not implemented
-      description: "Creates a new comment on a specific item. The user posting the comment is identified with his token. The date of publication is defined on server side."
+      description: "Creates a new comment."
+      parameters:
+      - in: body
+        name: body
+        description: "The content of the comment."
+        required: true
+        schema:
+          $ref: "#/definitions/Comment"
+      responses:
+        201:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+    get:
+      description: "Gets all the comments for the current user, sorted by date (recent first)."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                content:
+                  type: string
+                date:
+                  type: string
+                user:
+                  type: number
+                item:
+                  type: number
+        401:
+          description: "User not authenticated."
+          
+  /comments/{id}/:
+    get:
+      description: "Gets the info of the specified comment."
+      parameters:
+      - in: path
+        name: id
+        description: "The id of the comment."
+        required: true
+        type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              content:
+                type: string
+              date:
+                type: string
+              user:
+                type: number
+              item:
+                type: number
+        401:
+          description: "User not authenticated."
+          
+    put:
+      description: "Updates the info of the given comment."
       parameters:
         - in: path
           name: id
-          description: "The id of the commented item."
+          description: "The id of the comment."
           required: true
           type: number
         - in: body
           name: body
-          description: "The comment."
+          description: "The content of the comment."
           required: true
           schema:
-            type: object
-            properties:
-              content:
-                type: string
+            $ref: "#/definitions/Comment"
       responses:
-        201:
+        200:
           description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+    patch:
+      description: "Partially updates the info of the given comment."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the comment."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the comment."
+          required: false
+          schema:
+            $ref: "#/definitions/Comment"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+    delete:
+      description: "Deletes the specified comment."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the comment."
+          required: true
+          type: number
+      responses:
+        204:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."      
           
   /notifications/:
     get:
-      description: "Gets all the notifications for the current user."
+      description: "Gets all the notifications for the current user, sorted by date (recent first)."
       responses:
         200:
           description: "Successful operation."
@@ -827,6 +925,16 @@ definitions:
       text:
         type: string
       note:
+        type: number
+        
+  Comment:
+    type: object
+    properties:
+      content:
+        type: string
+      user:
+        type: number
+      item:
         type: number
         
   Offer:
