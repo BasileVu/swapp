@@ -251,6 +251,100 @@ paths:
           description: "Successful operation."
           schema:
             $ref: "#/definitions/Note"
+            
+    put:
+      description: "Updates the info of the specified note."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the note."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the note."
+          required: true
+          schema:
+            $ref: "#/definitions/Note"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+              
+    patch:
+      description: "Partially updates the info of the given note."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the note."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the note."
+          required: false
+          schema:
+            $ref: "#/definitions/Note"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+    delete:
+      description: "Deletes the specified note."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the note."
+          required: true
+          type: number
+      responses:
+        204:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /categories:
+    get:
+      description: "Gets all the categories for the current user."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+        401:
+          description: "User not authenticated."
+          
+  /categories/{id}:
+    get:
+      description: "Gets a detailed category."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the category."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+        401:
+          description: "User not authenticated."
           
   /items:
     get:
