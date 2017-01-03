@@ -44,9 +44,6 @@ class OfferAPITests(TestCase):
             "item_received": id_item_received
         }), content_type="application/json")
 
-    def get_offers(self):
-        return self.client.get("/api/offers/", content_type="application/json")
-
     def get_offer(self, id_offer=1):
         return self.client.get("/api/offers/" + str(id_offer) + "/", content_type="application/json")
 
@@ -85,19 +82,6 @@ class OfferAPITests(TestCase):
         r = self.post_offer(self.item1.id, self.item3.id)
         self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(Offer.objects.count(), 0)
-
-    def test_get_offers(self):
-        r = self.get_offers()
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 0)
-
-        self.login()
-        r = self.post_offer(self.item2.id, self.item3.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        r = self.get_offers()
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 1)
 
     def test_get_offer(self):
         self.login()
@@ -178,15 +162,10 @@ class OfferAPITests(TestCase):
         self.login()
         r = self.post_offer(self.item2.id, self.item3.id)
         self.post_offer(self.item1.id, self.item3.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data['id']
-        r = self.get_offers()
-        self.assertEqual(len(r.data), 1)
         r = self.delete_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
-        r = self.get_offers()
-        self.assertEqual(len(r.data), 0)
-        r = self.delete_offer(id_offer=1)
+        r = self.delete_offer(id_offer=id_offer)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
