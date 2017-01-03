@@ -53,7 +53,7 @@ export class CreateAccountModalComponent implements OnInit {
     private confirmPassword = new FormControl("", Validators.required);
     private firstName = new FormControl("", Validators.required);
     private lastName = new FormControl("", Validators.required);
-    private address = new FormControl("", Validators.required);
+    private street = new FormControl("", Validators.required);
     private city = new FormControl("", Validators.required);
     private region = new FormControl("", Validators.required);
     private country = new FormControl("", Validators.required);
@@ -96,7 +96,7 @@ export class CreateAccountModalComponent implements OnInit {
             email: this.email,
             password: this.password,
             confirmPassword: this.confirmPassword,
-            address: this.address,
+            street: this.street,
             city: this.city,
             region: this.region,
             country: this.country,
@@ -118,7 +118,7 @@ export class CreateAccountModalComponent implements OnInit {
                             this.confirmPassword.value,
                             this.firstName.value,
                             this.lastName.value,
-                            this.address.value,
+                            this.street.value,
                             this.city.value,
                             this.region.value,
                             this.country.value,

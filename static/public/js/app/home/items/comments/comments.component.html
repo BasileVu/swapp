@@ -1,0 +1,39 @@
+<div class="comments">
+    <h3>Comments</h3>
+    <div class="row comment new">
+        <div class="col-xs-1">
+            <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
+        </div>
+        <div class="col-xs-11">
+            <textarea name="" placeholder="Write a comment..."></textarea>
+        </div>
+    </div>
+    <div class="row comment"
+        *ngFor="let comment of comments">
+        <div class="col-xs-1">
+            <img class="img-fluid avatar" src="{{ comment.user_profile_picture_url }}"/>
+        </div>
+        <div class="col-xs-11">
+            <p class="writer-infos"><a href="#">{{ comment.username }}</a> {{ comment.date }}</p>
+            <p>{{ comment.content }}</p>
+        </div>
+    </div>
+    <div class="row comment">
+        <div class="col-xs-1">
+            <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
+        </div>
+        <div class="col-xs-11">
+            <p class="writer-infos"><a href="#">Name</a> november 14</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, animi atque culpa dignissimos dolor explicabo magni maxime ratione tenetur veritatis. Ab aliquam blanditiis culpa dicta est porro quisquam similique tenetur!</p>
+        </div>
+    </div>
+    <div class="row comment">
+        <div class="col-xs-1">
+            <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
+        </div>
+        <div class="col-xs-11">
+            <p class="writer-infos"><a href="#">Name</a> november 14</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, animi atque culpa dignissimos dolor explicabo magni maxime ratione tenetur veritatis. Ab aliquam blanditiis culpa dicta est porro quisquam similique tenetur!</p>
+        </div>
+    </div>
+</div>
