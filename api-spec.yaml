@@ -156,6 +156,8 @@ paths:
           description: "Successful operation."
         401:
           description: "User is not authenticated."
+        409:
+          description: "An user with the same username already exists."
     patch:
       description: "Partially updates the current user's account info."
       parameters:
@@ -170,6 +172,8 @@ paths:
           description: "Successful response."
         401:
           description: "User is not authenticated."
+        409:
+          description: "An user with the same username already exists."
           
   /account/password/:
     put:
@@ -207,6 +211,8 @@ paths:
           description: "Successful operation."
         400:
           description: "Location not existing."
+        401:
+          description: "User not authenticated."
       
     patch:
       description: "Partially updates the location of the current user logged in."
@@ -222,6 +228,8 @@ paths:
           description: "Successful operation."
         400:
           description: "Location not existing."
+        401:
+          description: "User not authenticated."
           
   /notes/:
     post:
@@ -236,6 +244,10 @@ paths:
       responses:
         201:
           description: "Successful operation."
+        400:
+          description: "The related offer has not been accepted, the user is not linked to the related offer or the user has already noted the related offer."
+        401:
+          description: "User not authenticated."
           
   /notes/{id}/:
     get:
@@ -251,6 +263,8 @@ paths:
           description: "Successful operation."
           schema:
             $ref: "#/definitions/Note"
+        401:
+          description: "User not authenticated."
             
     put:
       description: "Updates the info of the specified note."
@@ -397,7 +411,7 @@ paths:
             type: array
             items:
               $ref: "#/definitions/DetailedItemInfo"
-                  
+              
     post:
       description: "Creates a new item."
       parameters:
@@ -410,6 +424,8 @@ paths:
       responses:
         201:
           description: "Successful operation."
+        401:
+          description: "User not authenticated."
           
   /items/{id}/:
     get:
@@ -682,6 +698,8 @@ paths:
       responses:
         201:
           description: "Successful operation."
+        400:
+          description: "The item field or the user field is missing."
         401:
           description: "User not authenticated."
           
@@ -713,6 +731,8 @@ paths:
       responses:
         201:
           description: "Successful operation."
+        400:
+          description: "The specified item given is not owned by the user, the specified item received is already owned by the user or the price max of the specified item given is smaller than the price min of the specified item received."
         401:
           description: "User not authenticated."
           
@@ -828,7 +848,7 @@ paths:
           schema:
             $ref: "#/definitions/Like"
         400:
-          description: "Specified item owned by the user or already liked."
+          description: "Specified item already owned by the user or already liked."
         401:
           description: "User not authenticated."
       

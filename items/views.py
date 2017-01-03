@@ -284,7 +284,7 @@ class ImageViewSet(mixins.CreateModelMixin,
 
             return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})
 
-        raise ValidationError("item or user is required")
+        raise ValidationError("Item or user is required")
 
 
 class LikeViewSet(mixins.ListModelMixin,
