@@ -300,4 +300,14 @@ class LikeViewSet(mixins.ListModelMixin,
         return Like.objects.filter(user=self.request.user).order_by("-date")
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        item = serializer.validated_data["item"]
+        user = self.request.user
+
+        if item in user.item_set.all():
+            raise ValidationError("You cannot like your own item.")
+
+        for like in self.request.user.like_set.all():
+            if like.item == item:
+                raise ValidationError("An item cannot be liked twice.")
+
+        serializer.save(user=user)
