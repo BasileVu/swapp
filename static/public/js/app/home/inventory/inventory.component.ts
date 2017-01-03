@@ -91,16 +91,15 @@ export class InventoryComponent implements OnInit, OnChanges {
                     console.log("for end");
 
                     setTimeout(function(){
-                        
-
                         // open item creation modal /////////////////////
                         $('.open-new-item-modal').each(function () {
                             $(this).click(function () {
                                 $('#add-item-modal').modal('show');
                             });
                         });
-                        console.log("finito");
-
+                        $('.open-modal-item-x').click(function () {
+                            $('#view-item-x').modal('show');
+                        });
                     },1000)
                     
                 },

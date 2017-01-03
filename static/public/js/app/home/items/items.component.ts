@@ -51,6 +51,9 @@ export class ItemsComponent implements OnInit, OnChanges {
                     $(this).removeClass('hovered');
                     $('.grid').isotope('layout');
                 });
+                $('.open-modal-item-x').click(function () {
+                    $('#view-item-x').modal('show');
+                });
             }, 100);
             
         });
