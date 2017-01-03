@@ -167,6 +167,7 @@ class LikeAPITests(TestCase):
         self.assertEqual(r.data["id"], 1)
         self.assertEqual(r.data["user"], "username")
         self.assertEqual(r.data["item"], 1)
+        self.assertIn("date", r.data)
 
     def test_cannot_like_own_item(self):
         r = self.post_like(2)

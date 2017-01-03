@@ -12,14 +12,14 @@ produces:
   - application/json
 
 paths:
-  /csrf:
+  /csrf/:
     get:
       description: "Gets a CSRF token required to use the api's routes. When this route is queried, a **cookie is set**. The token can be found at the key **csrftoken**."
       responses:
         200:
           description: "Successful operation. **Sets a cookie at the key csrftoken.**"
 
-  /login:
+  /login/:
     post:
       description: "Logs an user in."
       parameters:
@@ -40,7 +40,7 @@ paths:
         401:
           description: "Invalid username/password combination or account not active."
           
-  /logout:
+  /logout/:
     get:
       description: "Logs an user out."
       responses:
@@ -49,7 +49,7 @@ paths:
         401:
           description: "User is not authenticated."
 
-  /users:
+  /users/:
     post:
       description: "Creates an user."
       parameters:
@@ -67,7 +67,7 @@ paths:
         409:
           description: "An user with the same username already exists."
           
-  /users/{username}:
+  /users/{username}/:
     get:
       description: "Gets the public account info of the given user."
       parameters:
@@ -103,7 +103,7 @@ paths:
               note_avg:
                 type: number
           
-  /account:
+  /account/:
     get:
       description: "Gets the account info of the current user logged in."
       responses:
@@ -171,7 +171,7 @@ paths:
         401:
           description: "User is not authenticated."
           
-  /account/password:
+  /account/password/:
     put:
       description: "Updates the password of the current user logged in."
       parameters:
@@ -192,7 +192,7 @@ paths:
         400:
           description: "Passwords not matching."
     
-  /account/location:
+  /account/location/:
     put:
       description: "Updates the location of the current user logged in."
       parameters:
@@ -223,7 +223,7 @@ paths:
         400:
           description: "Location not existing."
           
-  /notes:
+  /notes/:
     post:
       description: "Creates a new note."
       parameters:
@@ -237,7 +237,7 @@ paths:
         201:
           description: "Successful operation."
           
-  /notes/{id}:
+  /notes/{id}/:
     get:
       description: "Gets the info of the specified note."
       parameters:
@@ -306,7 +306,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /categories:
+  /categories/:
     get:
       description: "Gets all the categories for the current user."
       responses:
@@ -324,7 +324,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /categories/{id}:
+  /categories/{id}/:
     get:
       description: "Gets a detailed category."
       parameters:
@@ -346,7 +346,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /items:
+  /items/:
     get:
       description: "Gets unarchived items according to the specified filters. If no parameter are given, items that the current user could find interresting will be returned."
       parameters:
@@ -411,7 +411,7 @@ paths:
         201:
           description: "Successful operation."
           
-  /items/{id}:
+  /items/{id}/:
     get:
       description: "Gets a detailed unarchived item."
       parameters:
@@ -466,7 +466,7 @@ paths:
         401:
           description: "User not authenticated."
             
-  /items/{id}/comments:
+  /items/{id}/comments/:
     get:
       description: "Gets all comments of an item."
       parameters:
@@ -515,7 +515,7 @@ paths:
         201:
           description: "Successful operation."
           
-  /notifications:
+  /notifications/:
     get:
       description: "Gets all the notifications for the current user."
       responses:
@@ -537,7 +537,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /notifications/{id}:
+  /notifications/{id}/:
     patch:
       description: "Sets a notification as read or not."
       parameters:
@@ -561,7 +561,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /images:
+  /images/:
     post:
       description: "Creates a new image, either for an item or for an user, according to the payload. The encoding must be **multipart/form-data**."
       parameters:
@@ -587,7 +587,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /images/{id}:
+  /images/{id}/:
     delete:
       description: "Deletes the specified image."
       parameters:
@@ -602,7 +602,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /offers:
+  /offers/:
     post:
       description: "Creates a new offer."
       parameters:
@@ -618,7 +618,7 @@ paths:
         401:
           description: "User not authenticated."
           
-  /offers/{id}:
+  /offers/{id}/:
     get:
       description: "Gets the info of the specified offer."
       parameters:
@@ -701,6 +701,70 @@ paths:
           description: "Successful operation."
         401:
           description: "User not authenticated."
+          
+  /likes/:
+    get:
+      description: "Gets all the likes of the current user, sorted by date (recent first)."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Like"
+        401:
+          description: "User not authenticated."
+    
+    post:
+      description: "Creates a new like on an item by the current user."
+      parameters:
+        - in: body
+          name: body
+          description: "The data required to create the like."
+          required: true
+          schema:
+            $ref: "#/definitions/LikeCreation"
+      responses:
+        201:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Like"
+        400:
+          description: "Specified item owned by the user or already liked."
+        401:
+          description: "User not authenticated."
+      
+  /likes/{id}/:
+    get:
+      description: "Get the info of the specified like."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the like."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            $ref: "#/definitions/Like"
+        401:
+          description: "User not authenticated."
+          
+    delete:
+      description: "Deletes the specified like."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the like."
+          required: true
+          type: number
+      responses:
+        204:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
                
 definitions:
   UserCreation:
@@ -829,3 +893,20 @@ definitions:
         type: number
       offers_received:
         type: number
+        
+  LikeCreation:
+    type: object
+    properties:
+      item:
+        type: number
+        
+  Like:
+    properties:
+      id:
+        type: number
+      user:
+        type: number
+      item:
+        type: number
+      date:
+        type: string
