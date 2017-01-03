@@ -287,10 +287,27 @@ class ImageViewSet(mixins.CreateModelMixin,
         raise ValidationError("item or user is required")
 
 
-class LikeViewSet(mixins.RetrieveModelMixin,
-                  mixins.DestroyModelMixin,
-                  mixins.ListModelMixin,
+class LikeViewSet(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
-    queryset = Like.objects.all()
+
     serializer_class = LikeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Like.objects.filter(user=self.request.user).order_by("-date")
+
+    def perform_create(self, serializer):
+        item = serializer.validated_data["item"]
+        user = self.request.user
+
+        if item in user.item_set.all():
+            raise ValidationError("You cannot like your own item.")
+
+        for like in self.request.user.like_set.all():
+            if like.item == item:
+                raise ValidationError("An item cannot be liked twice.")
+
+        serializer.save(user=user)

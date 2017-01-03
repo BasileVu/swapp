@@ -14,10 +14,9 @@ class ItemAPITests(TestCase):
 
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
-        self.current_user.userprofile.save()
 
-        Category.objects.create(name="test")
-        Category.objects.create(name="test2")
+        self.c1 = Category.objects.create(name="test")
+        self.c2 = Category.objects.create(name="test2")
 
     def login(self):
         self.client.login(username="username", password="password")
@@ -30,19 +29,6 @@ class ItemAPITests(TestCase):
             "price_max": price_max,
             "category": category
         }), content_type="application/json")
-
-    def post_like(self, user, item):
-        return self.client.post("/api/likes/", data=json.dumps({
-            "user": user,
-            "item": item
-        }), content_type="application/json")
-
-    def post_image(self, item):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
-
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
 
     def get_items(self):
         return self.client.get(self.url, content_type="application/json")
@@ -221,11 +207,10 @@ class ItemAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def create_item_values_for_list_and_get_testing(self):
-        self.login()
-        self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.post_like(1, 1)
-        self.post_image(1)
-        self.client.logout()
+        u = User.objects.create_user(username="username2", password="password")
+        i = Item.objects.create(owner=self.current_user, name="test", description="test", price_min=1, price_max=2,
+                                category=self.c1)
+        Like.objects.create(user=u, item=i)
 
     def check_get_item_data_complete(self, data):
         self.assertEqual(data["owner_username"], "username")
@@ -240,7 +225,7 @@ class ItemAPITests(TestCase):
         self.assertEqual(data["views"], 1)
         self.assertEqual(data["comments"], 0)
         self.assertEqual(data["likes"], 1)
-        self.assertIn("/media/test", data["image_urls"][0])
+        self.assertIn("image_urls", data)
 
     def test_get_items_result(self):
         self.create_item_values_for_list_and_get_testing()
