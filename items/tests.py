@@ -44,7 +44,6 @@ class ImageAPITests(TestCase):
 
     def post_image(self, item):
         image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        #file = tempfile.NamedTemporaryFile(suffix='.png')
         image.save('test.png')
 
         with open('test.png', 'rb') as data:
@@ -60,30 +59,6 @@ class ImageAPITests(TestCase):
         self.login()
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-    def test_get_image(self):
-        r = self.get_image()
-        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(len(r.data), 1)
-
-        self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        r = self.get_image()
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 3)
-
-    def test_post_get_image(self):
-        self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        r = self.get_image(id_image=1)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-        r = self.get_image(id_image=10)
-        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied_offer(self):
         self.login()

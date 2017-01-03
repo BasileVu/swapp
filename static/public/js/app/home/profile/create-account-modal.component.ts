@@ -1,10 +1,11 @@
-import {Component, OnInit, ViewEncapsulation, EventEmitter, Output} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation, EventEmitter, Output, ViewChild} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 
-import {CropperSettings} from 'ng2-img-cropper';
+import { ImageCropperComponent, CropperSettings} from 'ng2-img-cropper';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
+import { ProfileService } from './profile.service';
 import { UserCreationDTO } from './user-creation-dto';
 import { UserLoginDTO } from './user-login-dto';
 
@@ -44,6 +45,7 @@ export class CreateAccountModalComponent implements OnInit {
 
     // EventEmitter to call login function of the ProfileComponent after registering
     @Output() loginEvent = new EventEmitter();
+    @Output() updateAccountEvent = new EventEmitter();
 
     // Form fields
     private registerForm: FormGroup;
@@ -61,8 +63,12 @@ export class CreateAccountModalComponent implements OnInit {
     // profile picture
     data: any;
     cropperSettings: CropperSettings;
+    @ViewChild('cropper', undefined) 
+    cropper:ImageCropperComponent;
+    private file:File;
  
     constructor(private authService: AuthService,
+                private profileService: ProfileService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) {
  
@@ -85,6 +91,8 @@ export class CreateAccountModalComponent implements OnInit {
 
         this.cropperSettings.cropperDrawSettings.strokeColor = 'rgba(238, 213, 169, 1)';
         this.cropperSettings.cropperDrawSettings.strokeWidth = 2;
+        
+        this.cropperSettings.noFileInput = true;
 
         this.data = {};
  
@@ -105,6 +113,38 @@ export class CreateAccountModalComponent implements OnInit {
         });
     }
 
+    fileChangeListener($event) {
+        var image:any = new Image();
+        this.file = $event.target.files[0];
+        var myReader:FileReader = new FileReader();
+        var that = this;
+        myReader.onloadend = function (loadEvent:any) {
+            image.src = loadEvent.target.result;
+            that.cropper.setImage(image);
+
+        };
+
+        myReader.readAsDataURL(this.file);
+    }
+
+    // $event is the user id
+    addProfilePicture($event) {
+        if (this.data.image != undefined) {
+            console.log(this.file);
+            let formData:FormData = new FormData();
+            formData.append('image', this.file, this.file.name);
+            formData.append('user', $event);
+            this.profileService.uploadProfilePicture(formData)
+                .then(
+                    res => this.updateAccountEvent.emit(),
+                    error => this.updateAccountEvent.emit()
+                ); // now signal the ProfileComponent that we uploaded picture
+                
+            $('#create-user-modal').modal('hide');
+        }
+    }
+
+
     register() {
         if (this.password.value !== this.confirmPassword.value) {
             this.toastr.error('Password confirmation is different', 'Passwords don\'t match');
@@ -121,20 +161,14 @@ export class CreateAccountModalComponent implements OnInit {
                             this.street.value,
                             this.city.value,
                             this.region.value,
-                            this.country.value,
-                            this.data.image
+                            this.country.value
                         );
 
             this.authService.register(user).then(
                 res => {
-                    console.log(res);
-                    if(res.status == 201) {
-                        this.toastr.success('Account successfully created', 'Registration succeed!');
-                        $('#create-user-modal').modal('hide');
-                        let userLoginDTO = new UserLoginDTO(user.username, user.password);
-                        console.log(userLoginDTO);
-                        this.loginEvent.emit(userLoginDTO);
-                    }
+                    this.toastr.success('Account successfully created', 'Registration succeed!');
+                    let userLoginDTO = new UserLoginDTO(user.username, user.password);
+                    this.loginEvent.emit([userLoginDTO, true]);
                 },
                 error => this.toastr.error(error, 'Error')
             );
