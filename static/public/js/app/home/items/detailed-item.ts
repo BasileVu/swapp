@@ -29,8 +29,8 @@ export class DetailedItem {
 
     constructor() {
         this.id = -1;
-        this.name = "undef";
-        this.description = "undef";
+        this.name = undefined;
+        this.description = undefined;
         this.image_urls = new Array();
         this.price_min = -1;
         this.price_max = -1;
@@ -41,7 +41,7 @@ export class DetailedItem {
         this.likes = 0;
         this.comments = 0;
         this.owner_username = "";
-        this.category = {id:-1, name:"undef"};
+        this.category = {id:-1, name:undefined};
         this.similars = new Array();
     }
 
