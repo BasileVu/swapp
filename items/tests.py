@@ -165,9 +165,8 @@ class LikeAPITests(TestCase):
     def login(self):
         self.client.login(username="username", password="password")
 
-    def post_like(self, user, item):
+    def post_like(self, item):
         return self.client.post("/api/likes/", data=json.dumps({
-            "user": user,
             "item": item
         }), content_type="application/json")
 
@@ -182,25 +181,32 @@ class LikeAPITests(TestCase):
 
     def test_post_like(self):
         self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
+        r = self.post_like(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["user"], "username")
+        self.assertEqual(r.data["item"], 1)
 
-    def test_get_likes(self):
+    def test_get_likes_no_likes(self):
+        self.login()
         r = self.get_likes()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
+    def test_get_likes_1_like(self):
         self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.post_like(1)
 
         r = self.get_likes()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
+        self.assertEqual(r.data[0]["id"], 1)
+        self.assertEqual(r.data[0]["user"], "username")
+        self.assertEqual(r.data[0]["item"], 1)
 
     def test_get_like(self):
         self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
+        r = self.post_like(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_like(id_like=r.data['id'])
@@ -211,7 +217,7 @@ class LikeAPITests(TestCase):
 
     def test_delete_like(self):
         self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
+        r = self.post_like(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_like = r.data['id']

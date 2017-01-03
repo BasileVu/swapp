@@ -26,6 +26,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class LikeSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True)
+
     class Meta:
         model = Like
         fields = ('id', 'user', 'item')
@@ -38,12 +40,6 @@ class ImageItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = ('id', 'image')
-
-
-class LikeItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Like
-        fields = ('id', 'user')
 
 
 class ItemSerializer(serializers.ModelSerializer):
