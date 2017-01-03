@@ -8,7 +8,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
 from comments.serializers import CommentSerializer
@@ -255,10 +255,10 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ImageViewSet(mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     queryset = Image.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == 'create':

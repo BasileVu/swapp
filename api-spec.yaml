@@ -434,10 +434,50 @@ paths:
             properties:
               content:
                 type: string
-        
       responses:
         201:
           description: Successful operation.
+          
+  /images:
+    post:
+      description: "Creates a new image, either for an item or for an user, according to the payload. The encoding must be **multipart/form-data**."
+      parameters:
+        - in: formData
+          name: image
+          description: "The image to updload."
+          required: true
+          type: file
+        - in: formData
+          name: item
+          description: 
+            "The id of the item that will be linked to the image. If this parameter is specified, the image will be linked to the item."
+          required: true
+          type: number
+        - in: formData
+          name: user
+          description: "The id of the user having the account. If this parameter is specified, the image will be the user's picture."
+          required: true
+          type: number
+      responses:
+        201:
+          description: "Successful operation"
+        401:
+          description: "User not authenticated."
+          
+  /images/{id}:
+    delete:
+      description: "Deletes the specified image."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the image."
+          required: true
+          type: number
+      responses:
+        204:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
           
                
 definitions:
