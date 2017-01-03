@@ -47,7 +47,7 @@ paths:
         200:
           description: "Successful operation."
         401:
-          description: "User is not logged in."
+          description: "User is not authenticated."
 
   /users:
     post:
@@ -63,13 +63,13 @@ paths:
         201:
           description: "Successful operation."
         400:
-          description: "Missing field, json malformed or location invalid."
+          description: "Location not existing."
         409:
           description: "An user with the same username already exists."
           
   /users/{username}:
     get:
-      description: "Get the public account info of the given user."
+      description: "Gets the public account info of the given user."
       parameters:
         - in: path
           name: username
@@ -105,7 +105,7 @@ paths:
           
   /account:
     get:
-      description: "Get the account info of the current user logged in."
+      description: "Gets the account info of the current user logged in."
       responses:
         200:
           description: "Successful operation."
@@ -141,7 +141,7 @@ paths:
               note_avg:
                 type: number
         401:
-          description: "User is not logged in."
+          description: "User is not authenticated."
     put:
       description: "Updates all the current user's account info."
       parameters:
@@ -154,10 +154,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
-        400:
-          description: "Missing field or json malformed."
         401:
-          description: "User is not logged in."
+          description: "User is not authenticated."
     patch:
       description: "Partially updates the current user's account info."
       parameters:
@@ -170,10 +168,8 @@ paths:
       responses:
         200:
           description: "Successful response."
-        400:
-          description: "Json malformed."
         401:
-          description: "User is not logged in."
+          description: "User is not authenticated."
           
   /account/password:
     put:
@@ -194,7 +190,7 @@ paths:
         200:
           description: "Successful operation."
         400:
-          description: "Missing field, json malformed or passwords not matching."
+          description: "Passwords not matching."
     
   /account/location:
     put:
@@ -210,7 +206,7 @@ paths:
         200:
           description: "Successful operation."
         400:
-          description: "Missing field, json malformed or location not existing."
+          description: "Location not existing."
       
     patch:
       description: "Partially updates the location of the current user logged in."
@@ -225,11 +221,11 @@ paths:
         200:
           description: "Successful operation."
         400:
-          description: "Json malformed or location not existing."
+          description: "Location not existing."
           
   /notes:
     post:
-      description: "Create a new note."
+      description: "Creates a new note."
       parameters:
       - in: body
         name: body
@@ -240,12 +236,10 @@ paths:
       responses:
         201:
           description: "Successful operation."
-        400:
-          description: "Missing field or json malformed."
           
   /notes/{id}:
     get:
-      description: "Get the info of the specified note."
+      description: "Gets the info of the specified note."
       parameters:
       - in: path
         name: id
@@ -366,7 +360,7 @@ paths:
         200:
           description: "Successful operation."
         401:
-          description: "User not logged in."
+          description: "User not authenticated."
               
     patch:
       description: "Partially updates the info of the given item."
@@ -387,7 +381,7 @@ paths:
         200:
           description: "Successful operation."
         401:
-          description: "User not logged in."
+          description: "User not authenticated."
             
   /items/{id}/comments:
     get:
@@ -418,7 +412,7 @@ paths:
     post:
       tags:
         - Not implemented
-      description: "Post a new comment on a specific item. The user posting the comment is identified with his token. The date of publication is defined on server side."
+      description: "Creates a new comment on a specific item. The user posting the comment is identified with his token. The date of publication is defined on server side."
       parameters:
         - in: path
           name: id
@@ -440,7 +434,7 @@ paths:
           
   /notifications:
     get:
-      description: "Get all the notifications for the current user."
+      description: "Gets all the notifications for the current user."
     
       responses:
         200:
@@ -459,11 +453,11 @@ paths:
                 date:
                   type: string
         401:
-          description: "User not logged in."
+          description: "User not authenticated."
           
   /notifications/{id}:
     patch:
-      description: "Set a notification as read or not."
+      description: "Sets a notification as read or not."
       parameters:
       - in: path
         name: id
@@ -483,7 +477,7 @@ paths:
         200:
           description: "Successful operation."
         401:
-          description: "User not logged in."
+          description: "User not authenticated."
           
   /images:
     post:
@@ -498,16 +492,16 @@ paths:
           name: item
           description: 
             "The id of the item that will be linked to the image. If this parameter is specified, the image will be linked to the item."
-          required: true
+          required: false
           type: number
         - in: formData
           name: user
           description: "The id of the user having the account. If this parameter is specified, the image will be the user's picture."
-          required: true
+          required: false
           type: number
       responses:
         201:
-          description: "Successful operation"
+          description: "Successful operation."
         401:
           description: "User not authenticated."
           
