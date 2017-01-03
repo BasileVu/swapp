@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   title: Swapp API
   description:
-    The swapp API specification. All endpoints are implicitely prefixed by __/api__ for the sake of readability.
+    "The swapp API specification. All endpoints are implicitely prefixed by __/api__ for the sake of readability."
     
 consumes:
   - application/json
@@ -14,18 +14,18 @@ produces:
 paths:
   /csrf:
     get:
-      description: Gets a CSRF token required to use the api's routes. When this route is queried, a **cookie is set**. The token can be found at the key "**csrftoken**".
+      description: "Gets a CSRF token required to use the api's routes. When this route is queried, a **cookie is set**. The token can be found at the key **csrftoken**."
       responses:
         200:
-          description: Successful operation. **Sets a cookie at the key "csrftoken".**
+          description: "Successful operation. **Sets a cookie at the key csrftoken.**"
 
   /login:
     post:
-      description: Logs an user in.
+      description: "Logs an user in."
       parameters:
         - in: body
           name: body
-          description: The credentials of the user.
+          description: "The credentials of the user."
           required: true
           schema:
             type: object
@@ -36,49 +36,49 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         401:
-          description: Invalid username/password combination or account not active.
+          description: "Invalid username/password combination or account not active."
           
   /logout:
     get:
-      description: Logs an user out.
+      description: "Logs an user out."
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         401:
-          description: User is not logged in.
+          description: "User is not logged in."
 
   /users:
     post:
-      description: Creates an user.
+      description: "Creates an user."
       parameters:
         - in: body
           name: body
-          description: The account info of the user.
+          description: "The account info of the user."
           required: true
           schema:
             $ref: "#/definitions/UserCreation"
       responses:
         201:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Missing field, json malformed or location invalid.
+          description: "Missing field, json malformed or location invalid."
         409:
-          description: An user with the same username already exists.
+          description: "An user with the same username already exists."
           
   /users/{username}:
     get:
-      description: Get the public account info of the given user.
+      description: "Get the public account info of the given user."
       parameters:
         - in: path
           name: username
-          description: The username of the target user.
+          description: "The username of the target user."
           required: true
           type: string
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             type: object
             properties:
@@ -105,10 +105,10 @@ paths:
           
   /account:
     get:
-      description: Get the account info of the current user logged in.
+      description: "Get the account info of the current user logged in."
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             type: object
             properties:
@@ -141,47 +141,47 @@ paths:
               note_avg:
                 type: number
         401:
-          description: User is not logged in.
+          description: "User is not logged in."
     put:
-      description: Updates all the current user's account info.
+      description: "Updates all the current user's account info."
       parameters:
         - in: body
           name: body
-          description: The account info to update.
+          description: "The account info to update."
           required: true
           schema:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Missing field or json malformed.
+          description: "Missing field or json malformed."
         401:
-          description: User is not logged in.
+          description: "User is not logged in."
     patch:
-      description: Partially updates the current user's account info.
+      description: "Partially updates the current user's account info."
       parameters:
         - in: body
           name: body
-          description: The account info to update.
+          description: "The account info to update."
           required: false
           schema:
             $ref: "#/definitions/User"
       responses:
         200:
-          description: Successful response.
+          description: "Successful response."
         400:
-          description: Json malformed.
+          description: "Json malformed."
         401:
-          description: User is not logged in.
+          description: "User is not logged in."
           
   /account/password:
     put:
-      description: Updates the password of the current user logged in.
+      description: "Updates the password of the current user logged in."
       parameters:
         - in: body
           name: body
-          description: The account info to update.
+          description: "The account info to update."
           required: true
           schema:
             type: object
@@ -192,215 +192,215 @@ paths:
                 type: string
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Missing field, json malformed or passwords not matching.
+          description: "Missing field, json malformed or passwords not matching."
     
   /account/location:
     put:
-      description: Updates the location of the current user logged in.
+      description: "Updates the location of the current user logged in."
       parameters:
         - in: body
           name: body
-          description: The account info to update.
+          description: "The account info to update."
           required: true
           schema:
             $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Missing field, json malformed or location not existing.
+          description: "Missing field, json malformed or location not existing."
       
     patch:
-      description: Partially updates the location of the current user logged in.
+      description: "Partially updates the location of the current user logged in."
       parameters:
       - in: body
         name: body
-        description: The account info to update.
+        description: "The account info to update."
         required: false
         schema:
           $ref: "#/definitions/Location"
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Json malformed or location not existing.
+          description: "Json malformed or location not existing."
           
   /notes:
     post:
-      description: Create a new note.
+      description: "Create a new note."
       parameters:
       - in: body
         name: body
-        description: The content of the note.
+        description: "The content of the note."
         required: true
         schema:
           $ref: "#/definitions/Note"
       responses:
         201:
-          description: Successful operation.
+          description: "Successful operation."
         400:
-          description: Missing field or json malformed.
+          description: "Missing field or json malformed."
           
   /notes/{id}:
     get:
-      description: Get the info of the specify note.
+      description: "Get the info of the specified note."
       parameters:
       - in: path
         name: id
-        description: The id of the note.
+        description: "The id of the note."
         required: true
         type: number
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             $ref: "#/definitions/Note"
           
   /items:
     get:
-      description: Gets unarchived `Item` objects according to the specified filters. If no parameter are given, items that the current user could find interresting will be returned.
+      description: "Gets unarchived items according to the specified filters. If no parameter are given, items that the current user could find interresting will be returned."
       parameters:
         - in: query
           name: q
-          description: Query of user.
+          description: "Query of user."
           required: false
           type: string
           
         - in: query
           name: category
-          description: Category of item wanted.
+          description: "Category of item wanted."
           required: false
           type: string
         
         - in: query
           name: lat
-          description: Latitude of current point from where to search.
+          description: "Latitude of current point from where to search."
           required: false
           type: number
           
         - in: query
           name: lon
-          description: Longitude of current point from where to search.
+          description: "Longitude of current point from where to search."
           required: false
           type: number
           
         - in: query
           name: radius
-          description: Radius (in kilometers) in which items must be to appear in the result.
+          description: "Radius (in kilometers) in which items must be to appear in the result."
           required: false
           type: number
           
         - in: query
           name: price_min
-          description: Lower bound of an item's price range that must be respected in order for an item to appear in the result.
+          description: "Lower bound of an item's price range that must be respected in order for an item to appear in the result."
           required: false
           type: number
           
         - in: query
           name: price_max
-          description: Upper bound of an item's price range that must be respected in order for an item to appear in the result.
+          description: "Upper bound of an item's price range that must be respected in order for an item to appear in the result."
           required: false
           type: number
           
         - in: query
           name: order_by
-          description: Define the sorting in the result.
+          description: "Define the sorting in the result."
           required: false
           type: string
           
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             type: array
             items:
               $ref: "#/definitions/DetailedItemInfo"
                   
     post:
-      description: Creates a new `Item`.
+      description: "Creates a new item."
       parameters:
         - in: body
           name: body
-          description: The content of the item.
+          description: "The content of the item."
           required: true
           schema:
             $ref: "#/definitions/SetItemInfo"
             
       responses:
         201:
-          description: Successful operation.
+          description: "Successful operation."
           
   /items/{id}:
     get:
-      description: Gets a detailed unarchived item.
+      description: "Gets a detailed unarchived item."
       parameters:
         - in: path
           name: id
-          description: The id of the item.
+          description: "The id of the item."
           required: true
           type: number
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             $ref: "#/definitions/DetailedItemInfo"
             
     put:
-      description: Updates the info of the given item.
+      description: "Updates the info of the given item."
       parameters:
         - in: path
           name: id
-          description: The id of the item.
+          description: "The id of the item."
           required: true
           type: number
         - in: body
           name: body
-          description: The content of the item.
+          description: "The content of the item."
           required: true
           schema:
             $ref: "#/definitions/SetItemInfo"
             
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         401:
-          description: User not logged in.
+          description: "User not logged in."
               
     patch:
-      description: Partially updates the info of the given item.
+      description: "Partially updates the info of the given item."
       parameters:
         - in: path
           name: id
-          description: The id of the item.
+          description: "The id of the item."
           required: true
           type: number
         - in: body
           name: body
-          description: The content of the item.
+          description: "The content of the item."
           required: false
           schema:
             $ref: "#/definitions/SetItemInfo"
             
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
         401:
-          description: User not logged in.
+          description: "User not logged in."
             
   /items/{id}/comments:
     get:
-      description: Gets all comments of an `Item` object.
+      description: "Gets all comments of an item."
       parameters:
         - in: path
           name: id
-          description: The id of the item.
+          description: "The id of the item."
           required: true
           type: number
       responses:
         200:
-          description: Successful operation.
+          description: "Successful operation."
           schema:
             type: array
             items:
@@ -418,16 +418,16 @@ paths:
     post:
       tags:
         - Not implemented
-      description: Post a new `Comment` on a specific `Item`. The user posting the comment is identified with his token. The date of publication is defined on server side.
+      description: "Post a new comment on a specific item. The user posting the comment is identified with his token. The date of publication is defined on server side."
       parameters:
         - in: path
           name: id
-          description: The id of the commented item.
+          description: "The id of the commented item."
           required: true
           type: number
         - in: body
           name: body
-          description: The comment.
+          description: "The comment."
           required: true
           schema:
             type: object
@@ -436,7 +436,54 @@ paths:
                 type: string
       responses:
         201:
-          description: Successful operation.
+          description: "Successful operation."
+          
+  /notifications:
+    get:
+      description: "Get all the notifications for the current user."
+    
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                content:
+                  type: string
+                read:
+                  type: boolean
+                date:
+                  type: string
+        401:
+          description: "User not logged in."
+          
+  /notifications/{id}:
+    patch:
+      description: "Set a notification as read or not."
+      parameters:
+      - in: path
+        name: id
+        description: "The id of the notification."
+        required: true
+        type: number
+      - in: body
+        name: body
+        description: "The content of the notification."
+        required: false
+        schema:
+          type: object
+          properties:
+            read:
+              type: boolean
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not logged in."
           
   /images:
     post:
