@@ -261,49 +261,41 @@ paths:
           description: "Query of user."
           required: false
           type: string
-          
         - in: query
           name: category
           description: "Category of item wanted."
           required: false
           type: string
-        
         - in: query
           name: lat
           description: "Latitude of current point from where to search."
           required: false
           type: number
-          
         - in: query
           name: lon
           description: "Longitude of current point from where to search."
           required: false
           type: number
-          
         - in: query
           name: radius
           description: "Radius (in kilometers) in which items must be to appear in the result."
           required: false
           type: number
-          
         - in: query
           name: price_min
           description: "Lower bound of an item's price range that must be respected in order for an item to appear in the result."
           required: false
           type: number
-          
         - in: query
           name: price_max
           description: "Upper bound of an item's price range that must be respected in order for an item to appear in the result."
           required: false
           type: number
-          
         - in: query
           name: order_by
           description: "Define the sorting in the result."
           required: false
           type: string
-          
       responses:
         200:
           description: "Successful operation."
@@ -321,7 +313,6 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/SetItemInfo"
-            
       responses:
         201:
           description: "Successful operation."
@@ -355,7 +346,6 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/SetItemInfo"
-            
       responses:
         200:
           description: "Successful operation."
@@ -376,7 +366,6 @@ paths:
           required: false
           schema:
             $ref: "#/definitions/SetItemInfo"
-            
       responses:
         200:
           description: "Successful operation."
@@ -435,7 +424,6 @@ paths:
   /notifications:
     get:
       description: "Gets all the notifications for the current user."
-    
       responses:
         200:
           description: "Successful operation."
@@ -520,6 +508,105 @@ paths:
         401:
           description: "User not authenticated."
           
+  /offers:
+    post:
+      description: "Creates a new offer."
+      parameters:
+      - in: body
+        name: body
+        description: "The content of the offer."
+        required: true
+        schema:
+          $ref: "#/definitions/Offer"
+      responses:
+        201:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /offers/{id}:
+    get:
+      description: "Gets the info of the specified offer."
+      parameters:
+      - in: path
+        name: id
+        description: "The id of the offer."
+        required: true
+        type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              accepted:
+                type: boolean
+              status:
+                type: boolean
+              comment:
+                type: string
+              item_given:
+                type: number
+              item_received:
+                type: number
+        401:
+          description: "User not authenticated."
+          
+    put:
+      description: "Updates the info of the given offer."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the offer."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the offer."
+          required: true
+          schema:
+            $ref: "#/definitions/Offer"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+              
+    patch:
+      description: "Partially updates the info of the given offer."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the offer."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the offer."
+          required: false
+          schema:
+            $ref: "#/definitions/Offer"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+    delete:
+      description: "Deletes the specified offer."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the offer."
+          required: true
+          type: number
+      responses:
+        204:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
                
 definitions:
   UserCreation:
@@ -582,6 +669,20 @@ definitions:
       text:
         type: string
       note:
+        type: number
+        
+  Offer:
+    type: object
+    properties:
+      accepted:
+        type: boolean
+      status:
+        type: boolean
+      comment:
+        type: string
+      item_given:
+        type: number
+      item_received:
         type: number
   
   SetItemInfo:
