@@ -11,7 +11,7 @@ from items.models import Item, Category
 
 class CommentsTests(TestCase):
     url_comments = "/api/comments/"
-    url_comment1 = "%s/%d/" % (url_comments, 1)
+    url_comment1 = "%s%d/" % (url_comments, 1)
 
     def setUp(self):
         self.user = User.objects.create_user(username="user1", password="password")
@@ -22,12 +22,12 @@ class CommentsTests(TestCase):
                                          creation_date=timezone.now(), archived=False, owner=self.user,
                                          category=self.category)
 
-    def create_comment(self, user, item, content="test"):
-        Comment.objects.create(content=content, user=user, item=item)
+    def create_comment(self, user, item, content="test", date=timezone.now()):
+        Comment.objects.create(content=content, user=user, item=item, date=date)
 
-    def check_get_comment_data_complete(self, data):
-        self.assertEqual(data["id"], 1)
-        self.assertEqual(data["content"], "test")
+    def check_get_comment_data_complete(self, data, comment_id=1, content="test"):
+        self.assertEqual(data["id"], comment_id)
+        self.assertEqual(data["content"], content)
         self.assertIn("date", data)
         self.assertEqual(data["user"], self.user.id)
         self.assertEqual(data["item"], self.item1.id)
@@ -46,7 +46,7 @@ class CommentsTests(TestCase):
         r = self.client.get(self.url_comments)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.check_get_comment_data_complete(r.data[0])
-        self.check_get_comment_data_complete(r.data[1])
+        self.check_get_comment_data_complete(r.data[1], 2, "other test")
 
     def test_get_comment(self):
         self.create_comment(self.user, self.item1)
@@ -63,7 +63,19 @@ class CommentsTests(TestCase):
 
         r = self.client.get(self.url_comments)
         self.assertEqual(len(r.data), 1)
-        self.assertEqual(r.data["content"], "comment user1")
+        self.assertEqual(r.data[0]["content"], "comment user1")
+
+    def test_get_comments_order_by_date(self):
+        now = timezone.now()
+
+        self.create_comment(self.user, self.item1, "test1", now + timezone.timedelta(seconds=4))
+        self.create_comment(self.user, self.item1, "test2", now + timezone.timedelta(seconds=2))
+        self.create_comment(self.user, self.item1, "test3", now + timezone.timedelta(seconds=3))
+
+        r = self.client.get(self.url_comments)
+        self.assertEquals(r.data[0]["content"], "test1")
+        self.assertEquals(r.data[1]["content"], "test3")
+        self.assertEquals(r.data[2]["content"], "test2")
 
     def test_put_comment(self):
         self.item2 = Item.objects.create(name="test2", description="test", price_min=50, price_max=60,
@@ -79,7 +91,7 @@ class CommentsTests(TestCase):
 
         r = self.client.get(self.url_comment1)
         self.assertEqual(r.data["content"], "put test")
-        self.assertEqual(r.datat["item"], self.item2.id)
+        self.assertEqual(r.data["item"], self.item2.id)
 
     def test_patch_comment(self):
         self.create_comment(self.user, self.item1)
