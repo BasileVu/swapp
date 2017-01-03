@@ -7,9 +7,3 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = ('id', 'accepted', 'comment', 'status', 'item_given', 'item_received')
-
-
-class OfferItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Offer
-        fields = ('id', 'accepted', 'item_given')

@@ -31,6 +31,9 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'item')
 
 
+# FIXME : DELETE ImageItemSerializer and LikeItemSerializer
+
+
 class ImageItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image

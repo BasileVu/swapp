@@ -1,6 +1,7 @@
 from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
@@ -186,7 +187,11 @@ def get_public_account_info(request, username):
     })
 
 
-class NoteViewSet(viewsets.ModelViewSet):
+class NoteViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Note.objects.all()
 
     def get_serializer_class(self):

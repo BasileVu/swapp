@@ -10,6 +10,8 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('content', 'date', 'user', 'item')
 
+# FIXME : DELETE CommentItemSerializer
+
 
 class CommentItemSerializer(serializers.ModelSerializer):
     date = serializers.DateField(write_only=True, required=False)
