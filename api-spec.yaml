@@ -98,11 +98,11 @@ paths:
                 type: array
                 items:
                   properties:
-                    item_id:
+                    id:
                       type: number
-                    item_picture_url:
+                    image_url:
                       type: string
-                    item_name:
+                    name:
                       type: string
               notes:
                 type: number
