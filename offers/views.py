@@ -36,16 +36,3 @@ class OfferViewSet(mixins.CreateModelMixin,
         item_received = serializer.validated_data.get("item_received", None)
         self.check_items(item_given, item_received)
         serializer.save()
-
-        # if offer.accepted:
-        #     # create notification for accepted offer
-        #     notification = Notification.objects.create(content="Offer accepted for item: %s" % offer.item_received.name,
-        #                                                user=offer.item_received.owner)
-        #     offer_notification = OfferNotification.objects.create(notification=notification, offer=offer)
-        #     AcceptedOfferNotification.objects.create(offer_notification=offer_notification)
-        # else:
-        #     # create notification for refused offer
-        #     notification = Notification.objects.create(content="Offer refused for item: %s" % offer.item_received.name,
-        #                                                user=offer.item_received.owner)
-        #     offer_notification = OfferNotification.objects.create(notification=notification, offer=offer)
-        #     RefusedOfferNotification.objects.create(offer_notification=offer_notification)
