@@ -140,7 +140,6 @@ export class CreateAccountModalComponent implements OnInit {
         }
     }
 
-
     register() {
         if (this.password.value !== this.confirmPassword.value) {
             this.toastr.error('Password confirmation is different', 'Passwords don\'t match');
@@ -159,6 +158,9 @@ export class CreateAccountModalComponent implements OnInit {
                             this.region.value,
                             this.country.value
                         );
+
+            console.log("UserCreationDTO");
+            console.log(user);
 
             this.authService.register(user).then(
                 res => {
