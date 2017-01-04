@@ -12,7 +12,7 @@ from users.models import Note
 
 class Notification(models.Model):
     content = models.CharField(max_length=100)
-    read = models.BooleanField()
+    read = models.BooleanField(default=False)
     date = models.DateTimeField('date published', default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -31,8 +31,7 @@ def new_message_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when a message is created.
     """
     if created:
-        notification = Notification.objects.create(content="New private message",
-                                                   read=False, date=timezone.now(), user=instance.user_to)
+        notification = Notification.objects.create(content="New private message", user=instance.user_to)
         MessageNotification.objects.create(notification=notification, message=instance)
 
 
@@ -47,8 +46,7 @@ def new_note_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when a note is given (created).
     """
     if created:
-        notification = Notification.objects.create(content="New note " + str(instance.note) + " with text: "
-                                                           + instance.text, read=False, date=timezone.now(),
+        notification = Notification.objects.create(content="New note %d with text: %s" % (instance.note, instance.text),
                                                    user=instance.offer.item_received.owner)
         NoteNotification.objects.create(notification=notification, note=instance)
 
@@ -64,9 +62,9 @@ def new_comment_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when a comment is created.
     """
     if created:
-        notification = Notification.objects.create(content=instance.user.username + " has commented your item: "
-                                                   + instance.item.name,
-                                                   read=False, date=timezone.now(), user=instance.item.owner)
+        notification = Notification.objects.create(content="%s has commented your item: %s" %
+                                                           (instance.user.username, instance.item.name),
+                                                   user=instance.item.owner)
         CommentNotification.objects.create(notification=notification, comment=instance)
 
 
@@ -85,8 +83,8 @@ def new_offer_notification(sender, instance, signal, created, **kwargs):
     Handler to create a notification when an offer is created.
     """
     if created:
-        notification = Notification.objects.create(content="New offer for item: " + instance.item_received.name,
-                                                   read=False, date=timezone.now(), user=instance.item_received.owner)
+        notification = Notification.objects.create(content="New offer for item: %s" % instance.item_received.name,
+                                                   user=instance.item_received.owner)
         offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
         NewOfferNotification.objects.create(offer_notification=offer_notification)
 
