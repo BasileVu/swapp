@@ -97,7 +97,13 @@ paths:
               items:
                 type: array
                 items:
-                  type: number
+                  properties:
+                    id:
+                      type: number
+                    image_url:
+                      type: string
+                    name:
+                      type: string
               notes:
                 type: number
               note_avg:

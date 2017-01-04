@@ -39,6 +39,17 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category')
 
 
+class InventoryItemSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        return obj.image_set.first().image.url if obj.image_set.count() > 0 else "null"
+
+    class Meta:
+        model = Item
+        fields = ('id', 'name', 'image_url')
+
+
 class AggregatedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     image_urls = serializers.SerializerMethodField()
