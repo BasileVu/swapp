@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from items.models import Category, Item, Image, Like
+from items.models import Category, Item, Image, Like, KeyInfo
 from swapp.gmaps_api_utils import MAX_RADIUS
 
 
@@ -33,10 +33,38 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'item', 'date')
 
 
+class KeyInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KeyInfo
+        fields = ('key', 'info')
+
+
 class ItemSerializer(serializers.ModelSerializer):
+    keyinfo_set = KeyInfoSerializer(many=True)
+
+    def create(self, validated_data):
+        key_info_set = validated_data.pop("keyinfo_set")
+        item = Item.objects.create(**validated_data)
+
+        for key_info in key_info_set:
+            item.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"], item=item))
+
+        return item
+
+    def update(self, instance, validated_data):
+        if validated_data.get("keyinfo_set", None) is not None:
+            keyinfo_set = validated_data.pop("keyinfo_set")
+            instance.keyinfo_set.all().delete()
+
+            for key_info in keyinfo_set:
+                instance.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"],
+                                                                item=instance))
+
+        return super().update(instance, validated_data)
+
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category')
+        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category', 'keyinfo_set')
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
@@ -51,12 +79,13 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
 
 class AggregatedItemSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(many=False)
+    category = CategorySerializer()
     image_urls = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     offers_received = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
+    keyinfo_set = KeyInfoSerializer(many=True)
 
     def get_image_urls(self, obj):
         return [i.image.url for i in obj.image_set.all()]
@@ -76,7 +105,7 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'owner_username', 'category',
-                  'views', 'image_urls', 'likes', 'comments', 'offers_received')
+                  'views', 'image_urls', 'likes', 'comments', 'offers_received', 'keyinfo_set')
         read_only_fields = ('owner',)
 
 
