@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from PIL import Image as ImagePil
 from django.test import Client, TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 
 from items.models import *
@@ -621,25 +622,54 @@ class LocationCoordinatesTests(TestCase):
 
 
 class PublicAccountInfoTests(TestCase):
-    def test_get_user_info(self):
+    def post_image(self, item=1):
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
+
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+
+    def setUp(self):
         u = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
                                      email="test@test.com", password="password")
+        c = Category.objects.create(name="category")
+        i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
+                                creation_date=timezone.now(), archived=False, owner=u, category=c)
+
         u.location.city = "a"
         u.location.region = "b"
         u.location.country = "c"
         u.location.save()
 
-        r = self.client.get("/api/users/%s/" % (u.username + "42"))
+        self.user = u
+        self.item = i
+
+    def test_get_user_info_not_found(self):
+        r = self.client.get("/api/users/%s/" % (self.user.username + "42"))
         self.assertEquals(r.status_code, 404)
 
-        r = self.client.get("/api/users/%s/" % u.username)
+    def test_get_user_info(self):
+        r = self.client.get("/api/users/%s/" % self.user.username)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["location"], "a, b, c")
-        self.assertListEqual(r.data["items"], [])
         self.assertEqual(r.data["notes"], 0)
+        self.assertEqual(len(r.data["items"]), 1)
+
+        item_received = r.data["items"][0]
+        self.assertEqual(item_received["id"], 1)
+        self.assertEqual(item_received["image_url"], "null")
+        self.assertEqual(item_received["name"], "test")
+
+    def test_get_user_info_image(self):
+        self.client.login(username="username", password="password")
+        r = self.post_image()
+        self.client.logout()
+
+        r = self.client.get("/api/users/%s/" % self.user.username)
+        self.assertNotEqual(r.data["items"][0]["image_url"], "null")
 
 
 class NoteAPITests(TestCase):

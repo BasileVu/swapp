@@ -32,8 +32,8 @@ class ImageAPITests(TestCase):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
         c = Category.objects.create(name="Test")
-        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False, category=c,
-                            owner=self.current_user)
+        self.item = Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False,
+                                        category=c, owner=self.current_user)
 
         self.login()
 
@@ -41,11 +41,11 @@ class ImageAPITests(TestCase):
         self.client.login(username="username", password="password")
 
     def post_image(self, item):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
 
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
     def get_image(self, id_image=1):
         return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
@@ -54,16 +54,20 @@ class ImageAPITests(TestCase):
         return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
 
     def test_post_image(self):
-        self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Image.objects.count(), 0)
 
-    def test_delete_image(self):
         self.login()
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(self.item.image_set.count(), 1)
+        self.assertNotEqual(self.item.image_set.first().image.name, "")
+
+    def test_delete_image(self):
+        self.login()
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.delete_image(id_image=1)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)

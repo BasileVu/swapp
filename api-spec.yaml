@@ -97,7 +97,13 @@ paths:
               items:
                 type: array
                 items:
-                  type: number
+                  properties:
+                    id:
+                      type: number
+                    image_url:
+                      type: string
+                    name:
+                      type: string
               notes:
                 type: number
               note_avg:
@@ -499,14 +505,20 @@ paths:
             items:
               type: object
               properties:
-                user:
+                id:
                   type: number
-                date:
-                  type: string
                 content:
                   type: string
+                date:
+                  type: string
+                user:
+                  type: number
                 item:
                   type: number
+                user_fullname:
+                  type: string
+                user_profile_picture:
+                  type: string
                   
   /comments/:
     post:
@@ -938,6 +950,8 @@ definitions:
   Note:
     type: object
     properties:
+      id:
+        type: number
       user:
         type: number
       offer:
