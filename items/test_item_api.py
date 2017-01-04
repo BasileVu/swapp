@@ -50,101 +50,65 @@ class ItemTestMixin:
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
 
-    def put_item(self, item_id=1, **kwargs):
-        return self.client.put("%s%d/" % (self.url, item_id), data=json.dumps(self.build_update_info(**kwargs)),
-                               content_type="application/json")
 
-    def delete_item(self, item_id=1):
-        return self.client.delete("%s%d/" % (self.url, item_id), content_type="application/json")
-
-
-class ItemAPITests(TestCase, ItemTestMixin):
+class ItemPostTests(TestCase, ItemTestMixin):
     def setUp(self):
         self.setup()
+        self.login()
 
     def test_post_item_not_logged_in(self):
+        self.client.logout()
         r = self.post_item()
         self.assertEqual(r.status_code, 401)
 
     def test_post_item_logged_in(self):
-        self.login()
-
         r = self.post_item()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_post_item_price_min_bigger_than_price_max(self):
-        self.login()
-
         r = self.post_item(price_min=2, price_max=1)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(Item.objects.count(), 0)
 
     def test_post_item_json_data_invalid(self):
-        self.login()
-
         r = self.client.post(self.url, data=json.dumps({}), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_get_item(self):
-        self.login()
 
-        r = self.post_item()
-        r = self.get_item(item_id=r.data["id"])
+class ItemGetTests(TestCase, ItemTestMixin):
+    def setUp(self):
+        self.setup()
+        self.login()
+        self.post_item()
+
+        # another user likes the item of the user "username"
+        self.another_user = User.objects.create_user(username="username2", password="password")
+        self.item = Item.objects.get(pk=1)
+        Like.objects.create(user=self.another_user, item=self.item)
+
+    def test_get_item(self):
+        r = self.get_item()
 
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["owner_username"], "username")
+        self.assertEqual(r.data["id"], 1)
         self.assertEqual(r.data["name"], "name")
         self.assertEqual(r.data["description"], "description")
         self.assertEqual(r.data["price_min"], 1)
         self.assertEqual(r.data["price_max"], 2)
         self.assertEqual(r.data["category"]["id"], 1)
         self.assertEqual(r.data["category"]["name"], "test")
+        self.assertEqual(r.data["views"], 1)
+        self.assertEqual(r.data["comments"], 0)
+        self.assertEqual(r.data["likes"], 1)
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
+        self.assertIn("image_urls", r.data)
 
     def test_get_item_not_existing(self):
         r = self.get_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_item_not_logged_in(self):
-        self.login()
-        self.post_item(price_min=1, price_max=2)
-        self.client.logout()
-
-        r = self.delete_item()
-        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def create_item_values_for_list_and_get_testing(self):
-        u = User.objects.create_user(username="username2", password="password")
-        i = Item.objects.create(owner=self.current_user, name="test", description="test", price_min=1, price_max=2,
-                                category=self.c1)
-        Like.objects.create(user=u, item=i)
-
-    def check_get_item_data_complete(self, data):
-        self.assertEqual(data["owner_username"], "username")
-        self.assertEqual(data["id"], 1)
-        self.assertEqual(data["name"], "test")
-        self.assertEqual(data["description"], "test")
-        self.assertEqual(data["price_min"], 1)
-        self.assertEqual(data["price_max"], 2)
-        self.assertIn("creation_date", data)
-        self.assertEqual(data["category"]["id"], 1)
-        self.assertEqual(data["category"]["name"], "test")
-        self.assertEqual(data["views"], 1)
-        self.assertEqual(data["comments"], 0)
-        self.assertEqual(data["likes"], 1)
-        self.assertIn("image_urls", data)
-
-    def test_get_item_result(self):
-        self.create_item_values_for_list_and_get_testing()
-
-        r = self.get_item()
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.check_get_item_data_complete(r.data)
-
     def test_get_item_should_increment_views(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
         r = self.get_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["views"], 1)
@@ -154,47 +118,14 @@ class ItemAPITests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["views"], 2)
 
     def test_get_item_comments(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.client.logout()
+        Comment.objects.create(user=self.another_user, item=self.item, content="nice")
+        Comment.objects.create(user=self.another_user, item=self.item, content="cool")
+        Comment.objects.create(user=self.another_user, item=self.item, content="fun")
 
-        u = User.objects.create_user(username="username2", password="password")
-        item = Item.objects.get(pk=r.data["id"])
-
-        Comment.objects.create(user=u, item=item, content="nice")
-        Comment.objects.create(user=u, item=item, content="cool")
-        Comment.objects.create(user=u, item=item, content="fun")
-
-        r = self.client.get("/api/items/%d/comments/" % r.data["id"])
+        r = self.client.get("/api/items/%d/comments/" % 1)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
         self.assertEqual(r.data[0]["content"], "nice")
-
-    """
-    def test_archive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-    def test_unarchive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-    """
 
 
 class ItemPatchTests(TestCase, ItemTestMixin):
@@ -270,6 +201,10 @@ class ItemPatchTests(TestCase, ItemTestMixin):
 
 
 class ItemPutTests(TestCase, ItemTestMixin):
+    def put_item(self, item_id=1, **kwargs):
+        return self.client.put("%s%d/" % (self.url, item_id), data=json.dumps(self.build_update_info(**kwargs)),
+                               content_type="application/json")
+
     def setUp(self):
         self.setup()
         self.login()
@@ -300,3 +235,31 @@ class ItemPutTests(TestCase, ItemTestMixin):
     def test_put_item_not_existing(self):
         r = self.put_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# tests for archiving items
+"""
+    def test_archive_item(self):
+        r = self.c.post("/api/items/", data=json.dumps({
+            "name": "test",
+            "description": "test",
+            "price_min": 1,
+            "price_max": 2,
+            "category": 1
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+    def test_unarchive_item(self):
+        r = self.c.post("/api/items/", data=json.dumps({
+            "name": "test",
+            "description": "test",
+            "price_min": 1,
+            "price_max": 2,
+            "category": 1
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+    """
