@@ -74,8 +74,10 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                             this.owner = owner;
                             this.fillStars(owner.note_avg);
                             this.ownerItems = new Array();
-                            for (let itemId of owner.items) {
-                                this.itemsService.getDetailedItem(itemId).then(
+
+                            for (let i in owner.items) {
+                                let ownerItem: any = owner.items[i];
+                                this.itemsService.getDetailedItem(ownerItem.id).then(
                                     item => this.ownerItems.push(item),
                                     error => this.toastr.error("Can't get owner's items", "Error")
                                 )

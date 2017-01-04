@@ -14,8 +14,7 @@ declare var $:any;
     moduleId: module.id,
     selector: 'items',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './items.component.html',
-    providers: []
+    templateUrl: './items.component.html'
 })
 export class ItemsComponent implements OnInit, OnChanges {
 
