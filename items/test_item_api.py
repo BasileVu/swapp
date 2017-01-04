@@ -51,6 +51,13 @@ class ItemAPITests(TestCase):
     def patch_item(self, id_item=1, data=json.dumps({"name": "test"})):
         return self.client.patch(self.url + str(id_item) + "/", data=data, content_type="application/json")
 
+    def post_image(self, user_id):
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
+
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+
     def test_post_item_not_logged_in(self):
         r = self.post_item()
         self.assertEqual(r.status_code, 401)
@@ -262,17 +269,28 @@ class ItemAPITests(TestCase):
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
         self.client.logout()
 
-        u = User.objects.create_user(username="username2", password="password")
+        u = User.objects.create_user(first_name="firstName", last_name="lastName", username="username2",
+                                     password="password")
+        self.client.login(username="username2", password="password")
+        self.post_image(u.id)
+        self.client.logout()
+
         item = Item.objects.get(pk=r.data["id"])
 
-        Comment.objects.create(user=u, item=item, content="nice")
+        c1 = Comment.objects.create(user=u, item=item, content="nice")
         Comment.objects.create(user=u, item=item, content="cool")
         Comment.objects.create(user=u, item=item, content="fun")
 
         r = self.client.get("/api/items/%d/comments/" % r.data["id"])
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
-        self.assertEqual(r.data[0]["content"], "nice")
+        self.assertEqual(r.data[0]["id"], c1.id)
+        self.assertEqual(r.data[0]["content"], c1.content)
+        self.assertIn("date", r.data[0])
+        self.assertEqual(r.data[0]["user"], c1.user.id)
+        self.assertEqual(r.data[0]["item"], c1.item.id)
+        self.assertEqual(r.data[0]["user_fullname"], "firstName lastName")
+        self.assertNotEqual(r.data[0]["user_profile_picture"], None)
 
     '''
     def test_archive_item(self):
