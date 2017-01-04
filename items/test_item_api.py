@@ -234,6 +234,15 @@ class ItemAPITests(TestCase):
         self.assertEqual(data["likes"], 1)
         self.assertIn("image_urls", data)
 
+    def check_get_comment_data_complete(self, data, comment):
+        self.assertEqual(data["id"], comment.id)
+        self.assertEqual(data["content"], comment.content)
+        self.assertIn("date", data)
+        self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["item"], comment.item.id)
+        self.assertEqual(data["user_fullname"], "firstName lastName")
+        self.assertNotEqual(data["user_profile_picture"], None)
+
     def test_get_items_result(self):
         self.create_item_values_for_list_and_get_testing()
         item = Item.objects.get(pk=1)
@@ -278,19 +287,15 @@ class ItemAPITests(TestCase):
         item = Item.objects.get(pk=r.data["id"])
 
         c1 = Comment.objects.create(user=u, item=item, content="nice")
-        Comment.objects.create(user=u, item=item, content="cool")
-        Comment.objects.create(user=u, item=item, content="fun")
+        c2 = Comment.objects.create(user=u, item=item, content="cool")
+        c3 = Comment.objects.create(user=u, item=item, content="fun")
 
         r = self.client.get("/api/items/%d/comments/" % r.data["id"])
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
-        self.assertEqual(r.data[0]["id"], c1.id)
-        self.assertEqual(r.data[0]["content"], c1.content)
-        self.assertIn("date", r.data[0])
-        self.assertEqual(r.data[0]["user"], c1.user.id)
-        self.assertEqual(r.data[0]["item"], c1.item.id)
-        self.assertEqual(r.data[0]["user_fullname"], "firstName lastName")
-        self.assertNotEqual(r.data[0]["user_profile_picture"], None)
+        self.check_get_comment_data_complete(r.data[0], c1)
+        self.check_get_comment_data_complete(r.data[1], c2)
+        self.check_get_comment_data_complete(r.data[2], c3)
 
     '''
     def test_archive_item(self):
