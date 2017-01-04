@@ -6,14 +6,11 @@ import {
 import { CommonModule }      from '@angular/common';
 
 import { TitleComponent }    from './title.component';
-import { UserService }       from './user.service';
-import { UserServiceConfig } from './user.service';
 
 @NgModule({
   imports:      [ CommonModule ],
   declarations: [ TitleComponent ],
-  exports:      [ TitleComponent ],
-  providers:    [ UserService ]
+  exports:      [ TitleComponent ]
 })
 export class CoreModule {
 
@@ -23,20 +20,4 @@ export class CoreModule {
         'CoreModule is already loaded. Import it in the AppModule only');
     }
   }
-
-  static forRoot(config: UserServiceConfig): ModuleWithProviders {
-    return {
-      ngModule: CoreModule,
-      providers: [
-        {provide: UserServiceConfig, useValue: config }
-      ]
-    };
-  }
 }
-
-
-/*
-Copyright 2016 Google Inc. All Rights Reserved.
-Use of this source code is governed by an MIT-style license that
-can be found in the LICENSE file at http://angular.io/license
-*/

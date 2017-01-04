@@ -14,8 +14,8 @@ import {
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { InventoryItem } from './inventory-item';
 import { ItemsService } from '../items/items.service';
-import {Item} from "../items/item";
-import {Owner} from "../items/owner";
+import { Item } from "../items/item";
+import { Owner } from "../items/owner";
 
 declare var $:any;
 

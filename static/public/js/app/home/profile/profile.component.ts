@@ -74,7 +74,7 @@ export class ProfileComponent implements OnInit {
                 }
 
     ngOnInit() {
-        this.user = new User(-1, "", "", "", "", "", "", "", "", "", "", new Array<number>(), new Array<number>(), new Array<number>());
+        this.user = new User();
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({

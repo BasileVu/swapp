@@ -83,21 +83,22 @@ export class AuthService {
 
     extractUser(res: Response) {
         let body = res.json();
-        return new User(
-                    body.id,
-                    body.profile_picture_url,
-                    body.username,
-                    body.first_name,
-                    body.last_name,
-                    body.email,
-                    body.location.street,
-                    body.location.city,
-                    body.location.region,
-                    body.location.country,
-                    body.location.last_modification_date,
-                    body.notes,
-                    body.likes,
-                    body.items);
+        let user = new User();
+        user.id = body.id;
+        user.profile_picture = body.profile_picture_url;
+        user.username = body.username;
+        user.first_name = body.first_name;
+        user.last_name = body.last_name;
+        user.email = body.email;
+        user.location.street = body.location.street;
+        user.location.city = body.location.city;
+        user.location.region = body.location.region;
+        user.location.country = body.location.country;
+        user.last_modification_date = body.last_modification_date;
+        user.notes = body.notes;
+        user.likes = body.likes;
+        user.items = body.items;
+        return user;
     }
 
     getUser() {

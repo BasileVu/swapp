@@ -8,10 +8,11 @@
                             <div class="col-lg-6 my-inventory">
                                 <div class="row">
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}">
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>Mathieu Urstein</h3>
+                                        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
                                     </div>
                                     <div class="hidden-lg-down col-lg-3 actions">
                                         <div class="btn-group btn-group-justified">
@@ -21,31 +22,8 @@
                                     </div>
                                 </div>
                                 <div class="row inventory swapp-inventory-mine">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
+                                        *ngFor="let item of user.items">
                                         <a href="#">
                                             <img class="img-fluid" src="http://placehold.it/400x400"/>
                                             <span>title</span>
@@ -62,38 +40,16 @@
                                         </div>
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>George Loosdé</h3>
+                                        <h3>{{ owner.first_name }} {{ owner.last_name }}</h3>
                                     </div>
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="owner.profile_picture_url === null" class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="owner.profile_picture_url != null" class="img-fluid avatar" src="{{ owner.profile_picture_url }}">
                                     </div>
                                 </div>
                                 <div class="row inventory swapp-inventory-yours">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
+                                        *ngFor="let item of owner.items">
                                         <a href="#">
                                             <img class="img-fluid" src="http://placehold.it/400x400"/>
                                             <span>title</span>
@@ -105,7 +61,7 @@
                                 </a>
                             </div>
                             <div class="col-xs-12 swap-md hidden-lg-up">
-                                <a href="#" class="swap">
+                                <a href="#" class="swap" (click)="sendOffer()">
                                     <i class="fa fa-refresh"></i>
                                 </a>
                             </div>

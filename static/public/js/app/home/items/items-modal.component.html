@@ -71,7 +71,12 @@
                                 </div>
                             </div>
                             <div class="row evaluation">
-                                <i *ngFor="let star of stars"  class="star fa fa-star-half-o">{{ star }}</i>
+                                <span *ngFor="let star of stars" [ngSwitch]="star">
+                                    <i *ngSwitchCase="0" class="star fa fa-star-o">{{ star }}</i>
+                                    <i *ngSwitchCase="0.5" class="star fa fa-star-half-o">{{ star }}</i>
+                                    <i *ngSwitchCase="1" class="star fa fa-star">{{ star }}</i>
+                                </span>
+                                
                                 (<a href="#">{{ owner.votes }} votes</a>)
                             </div>
                             <div class="row category">
@@ -205,7 +210,7 @@
             </div>
             </div>
             <div class="col-xs-3 options">
-                <button (click)="swap(item.id, owner.id)" class="btn btn-primary btn-block btn-lg open-send-proposition-modal" [disabled]="!loggedIn">
+                <button (click)="swap()" class="btn btn-primary btn-block btn-lg open-send-proposition-modal" [disabled]="!loggedIn">
                     <i class="fa fa-refresh"></i> <span class="hidden-sm-down">Swap</span>
                 </button>
                 <div *ngIf="loggedIn" class="btn-group btn-group-justified more">

@@ -5,6 +5,8 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { ItemsService } from './items.service';
 import { AuthService } from '../../shared/authentication/authentication.service';
+import { OfferService } from '../offers/offers.service';
+
 import { DetailedItem } from './detailed-item';
 import { Owner } from './owner';
 import { User } from '../profile/user';
@@ -36,6 +38,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     constructor(private itemsService: ItemsService,
                 private authService: AuthService,
+                private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) { }
 
@@ -142,10 +145,10 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // TODO
     }
 
-    swap(item_id: number, owner_id: number) {
-        console.log("swap item " + item_id + " of owner id " + owner_id);
+    swap() {
         console.log("item " + this.item.id + ", owner " + this.owner.id + ", user " + this.user.id);
-        // TODO
+
+        this.offerService.openOfferModal([this.user, this.owner, this.item]);
     }
 
     ngOnDestroy() {

@@ -3,13 +3,13 @@ import { BrowserModule }  from '@angular/platform-browser';
 import { HttpModule, JsonpModule, XSRFStrategy, CookieXSRFStrategy } from '@angular/http';
 
 /* App Root */
-import { AppComponent }   from './app.component';
-import { HomeModule } from './home/home.module';
+import { AppComponent } from './app.component';
+import { HomeModule }   from './home/home.module';
 
 /* Feature Modules */
-import { CoreModule }           from './core/core.module';
-import { AuthService }          from './shared/authentication/authentication.service';
-import {ToastModule} from 'ng2-toastr/ng2-toastr';
+import { CoreModule }  from './core/core.module';
+import { AuthService } from './shared/authentication/authentication.service';
+import { ToastModule } from 'ng2-toastr/ng2-toastr';
 
 /* Routing Module */
 import { AppRoutingModule } from './app-routing.module';

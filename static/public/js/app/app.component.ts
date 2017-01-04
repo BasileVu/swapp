@@ -41,8 +41,6 @@ declare var google: any;
     ]
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    subtitle = '(v1)';
-
     loggedIn: boolean;
     subscription: Subscription;
 

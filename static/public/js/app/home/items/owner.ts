@@ -25,4 +25,6 @@ export class Owner {
         this.delivery_address = undefined;
         this.delivery_methods = new Array();
     }
+
+    
 }
