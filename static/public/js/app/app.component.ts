@@ -4,7 +4,6 @@ import {Component, OnInit, AfterViewInit, ViewContainerRef,
     style,
     transition,
     animate,
-    keyframes,
 } from '@angular/core';
 
 import './rxjs-operators';

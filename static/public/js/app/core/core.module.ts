@@ -1,17 +1,19 @@
 /* tslint:disable:member-ordering no-unused-variable */
 import {
-    NgModule,
-    Optional, SkipSelf, ModuleWithProviders
-}       from '@angular/core';
+    ModuleWithProviders, NgModule,
+    Optional, SkipSelf }       from '@angular/core';
 
 import { CommonModule }      from '@angular/common';
 
 import { TitleComponent }    from './title.component';
+import { UserService }       from './user.service';
+import { UserServiceConfig } from './user.service';
 
 @NgModule({
     imports:      [ CommonModule ],
     declarations: [ TitleComponent ],
-    exports:      [ TitleComponent ]
+    exports:      [ TitleComponent ],
+    providers:    [ UserService ]
 })
 export class CoreModule {
 
@@ -22,9 +24,19 @@ export class CoreModule {
         }
     }
 
-    static forRoot(): ModuleWithProviders {
+    static forRoot(config: UserServiceConfig): ModuleWithProviders {
         return {
-            ngModule: CoreModule
+            ngModule: CoreModule,
+            providers: [
+                {provide: UserServiceConfig, useValue: config }
+            ]
         };
     }
 }
+
+
+/*
+ Copyright 2016 Google Inc. All Rights Reserved.
+ Use of this source code is governed by an MIT-style license that
+ can be found in the LICENSE file at http://angular.io/license
+ */
