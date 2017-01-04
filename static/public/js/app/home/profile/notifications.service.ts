@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class NotificationsService {
 
-    private notificationsUrl = '/notifications/';
+    private notificationsUrl = 'api/notifications/';
 
     constructor (private http: Http) {}
 
