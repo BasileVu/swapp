@@ -28,6 +28,7 @@ import { ProfileService } from './profile/profile.service';
 import { ItemsService } from './items/items.service';
 import { SearchService } from './search/search.service';
 import { OfferService } from './offers/offers.service';
+import {NotificationsService} from "./profile/notifications.service";
 
 @NgModule({
     imports: [
@@ -59,7 +60,8 @@ import { OfferService } from './offers/offers.service';
         ProfileService,
         ItemsService,
         SearchService,
-        OfferService
+        OfferService,
+        NotificationsService
     ]
 })
 

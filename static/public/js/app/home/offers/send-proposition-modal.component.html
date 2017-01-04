@@ -8,7 +8,7 @@
                             <div class="col-lg-6 my-inventory">
                                 <div class="row">
                                     <div class="col-xs-3 col-lg-2">
-                                        <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
                                         <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}">
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
@@ -25,7 +25,7 @@
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
                                         *ngFor="let item of user.items">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
+                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
                                             <span>title</span>
                                         </a>
                                     </div>
@@ -43,7 +43,7 @@
                                         <h3>{{ owner.first_name }} {{ owner.last_name }}</h3>
                                     </div>
                                     <div class="col-xs-3 col-lg-2">
-                                        <img *ngIf="owner.profile_picture_url === null" class="img-fluid avatar" src="http://placehold.it/100x100">
+                                        <img *ngIf="owner.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
                                         <img *ngIf="owner.profile_picture_url != null" class="img-fluid avatar" src="{{ owner.profile_picture_url }}">
                                     </div>
                                 </div>
@@ -51,7 +51,7 @@
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
                                         *ngFor="let item of owner.items">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://placehold.it/400x400"/>
+                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
                                             <span>title</span>
                                         </a>
                                     </div>

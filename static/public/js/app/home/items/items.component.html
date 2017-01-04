@@ -5,7 +5,7 @@
 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items">
     <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id)">
-        <img *ngIf="item.image_url === undefined" class="img-fluid" src="http://placehold.it/600x600"/>
+        <img *ngIf="item.image_url === undefined" class="img-fluid" src="http://loremflickr.com/600/600"/>
         <img *ngIf="item.image_url != undefined" class="img-fluid" src="{{ item.image_url }}"/>
         <div class="infos">
             <a href="#" (click)="searchCategory(item.category.id)"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
@@ -13,7 +13,7 @@
         </div>
         <div class="row user">
             <div class="col-xs-3">
-                <img *ngIf="item.owner_image_url === undefined" class="avatar img-fluid" src="http://placehold.it/50x50"/>
+                <img *ngIf="item.owner_image_url === undefined" class="avatar img-fluid" src="http://loremflickr.com/50/50"/>
                 <img *ngIf="item.owner_image_url != undefined" class="avatar img-fluid" src="{{ item.owner_image_url }}"/>
             </div>
             <div class="col-xs-9">
