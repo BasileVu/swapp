@@ -94,12 +94,11 @@ export class ProfileComponent implements OnInit {
             res => {
                 this.loggedIn = true;
                 this.authService.selectLoggedIn(this.loggedIn);
-                this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
-
                 let accountOnCreation: boolean = $event[1];
                 if (accountOnCreation) {
-                    this.profilePictureEvent.emit(24); // TODO : id of newly created user, should be res.id
+                    this.profilePictureEvent.emit();
                 } else {
+                    this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
                     this.getAccount();
 
                     setTimeout(function(){
@@ -182,6 +181,7 @@ export class ProfileComponent implements OnInit {
         this.authService.getAccount().then(
             user => {
                 this.user = user;
+                console.log(this.user);
                 this.authService.selectUser(this.user);
             },
             error => this.toastr.error(error, "Error")

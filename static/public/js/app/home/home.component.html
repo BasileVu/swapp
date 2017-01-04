@@ -3,7 +3,7 @@
 <div id="content-main" class="container">
     <inventory #inventory [loggedIn]="loggedIn"></inventory>
     <div class="row grid" #classGrid>
-        <profile #profile (profilePictureEvent)="createAccount.addProfilePicture($event)"></profile>
+        <profile #profile (profilePictureEvent)="createAccount.addProfilePicture()"></profile>
         <items></items>
     </div>
 </div>

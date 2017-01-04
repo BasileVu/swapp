@@ -101,7 +101,8 @@ export class AuthService {
     }
 
     getUser() {
-        return this.user;
+        if (this.loggedIn)
+            return this.user;
     }
 
     private handleError (error: Response | any) {

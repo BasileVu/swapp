@@ -127,20 +127,16 @@ export class CreateAccountModalComponent implements OnInit {
         myReader.readAsDataURL(this.file);
     }
 
-    // $event is the user id
-    addProfilePicture($event) {
+    addProfilePicture() {
         if (this.data.image != undefined) {
-            console.log(this.file);
             let formData:FormData = new FormData();
             formData.append('image', this.file, this.file.name);
-            formData.append('user', $event);
+            formData.append('user', 10); // 10 is an arbitrary value, we just need to indicate that user has a value
             this.profileService.uploadProfilePicture(formData)
-                .then(
+                .then( // now signal the ProfileComponent that we uploaded picture
                     res => this.updateAccountEvent.emit(),
                     error => this.updateAccountEvent.emit()
-                ); // now signal the ProfileComponent that we uploaded picture
-                
-            $('#create-user-modal').modal('hide');
+                ); 
         }
     }
 
@@ -168,7 +164,8 @@ export class CreateAccountModalComponent implements OnInit {
                 res => {
                     this.toastr.success('Account successfully created', 'Registration succeed!');
                     let userLoginDTO = new UserLoginDTO(user.username, user.password);
-                    this.loginEvent.emit([userLoginDTO, true]);
+                    this.loginEvent.emit([userLoginDTO, this.data.image != undefined]);
+                    $('#create-user-modal').modal('hide');
                 },
                 error => this.toastr.error(error, 'Error')
             );
