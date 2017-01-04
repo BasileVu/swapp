@@ -83,6 +83,8 @@ def create_user(request):
     for k in location.keys():
         setattr(user.location, k, location[k])
 
+    user.location.save()
+
     c = user.coordinates
     c.latitude = location_result[0]["lat"]
     c.longitude = location_result[0]["lng"]
