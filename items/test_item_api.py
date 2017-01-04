@@ -24,7 +24,11 @@ class ItemTestMixin:
     ]
 
     def setup(self):
-        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password",
+                                                     first_name="first",
+                                                     last_name="last")
+        self.another_user = User.objects.create_user(username="username2", password="password", first_name="first2",
+                                                     last_name="last2")
 
         self.c1 = Category.objects.create(name="test")
         self.c2 = Category.objects.create(name="test2")
@@ -44,8 +48,8 @@ class ItemTestMixin:
         return self.client.post(self.url, data=json.dumps(self.build_update_info(**kwargs)),
                                 content_type="application/json")
 
-    def login(self):
-        self.client.login(username="username", password="password")
+    def login(self, username="username", password="password"):
+        self.client.login(username=username, password=password)
 
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
@@ -80,9 +84,9 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.setup()
         self.login()
         self.post_item()
+        self.client.logout()
 
         # another user likes the item of the user "username"
-        self.another_user = User.objects.create_user(username="username2", password="password")
         self.item = Item.objects.get(pk=1)
         Like.objects.create(user=self.another_user, item=self.item)
 
@@ -116,16 +120,6 @@ class ItemGetTests(TestCase, ItemTestMixin):
         r = self.get_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["views"], 2)
-
-    def test_get_item_comments(self):
-        Comment.objects.create(user=self.another_user, item=self.item, content="nice")
-        Comment.objects.create(user=self.another_user, item=self.item, content="cool")
-        Comment.objects.create(user=self.another_user, item=self.item, content="fun")
-
-        r = self.client.get("/api/items/%d/comments/" % 1)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(r.data), 3)
-        self.assertEqual(r.data[0]["content"], "nice")
 
 
 class ItemPatchTests(TestCase, ItemTestMixin):
@@ -196,9 +190,6 @@ class ItemPatchTests(TestCase, ItemTestMixin):
         r = self.patch_item(item_id=1, price_max=0)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
-        r = self.get_item()
-        self.assertEquals(r.data["price_max"], 2)
-
 
 class ItemPutTests(TestCase, ItemTestMixin):
     def put_item(self, item_id=1, **kwargs):
@@ -213,7 +204,7 @@ class ItemPutTests(TestCase, ItemTestMixin):
     def test_put_item_not_logged_in(self):
         self.client.logout()
         r = self.put_item()
-        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_put_item(self):
         keyinfo_set = [{"key": "test", "info": "test2"}, {"key": "test3", "info": "test4"}]
@@ -235,6 +226,44 @@ class ItemPutTests(TestCase, ItemTestMixin):
     def test_put_item_not_existing(self):
         r = self.put_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ItemCommentsTests(TestCase, ItemTestMixin):
+    def post_image(self, user_id=1):
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
+
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+
+    def setUp(self):
+        self.setup()
+        self.login(username="username2", password="password")
+        self.post_image()
+        self.client.logout()
+
+        self.item = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1)
+
+    def check_get_comment_data_complete(self, data, comment):
+        self.assertEqual(data["id"], comment.id)
+        self.assertEqual(data["content"], comment.content)
+        self.assertIn("date", data)
+        self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["item"], comment.item.id)
+        self.assertEqual(data["user_fullname"], "first2 last2")
+        self.assertNotEqual(data["user_profile_picture"], None)
+
+    def test_get_item_comments(self):
+        c1 = Comment.objects.create(user=self.another_user, item=self.item, content="nice")
+        c2 = Comment.objects.create(user=self.another_user, item=self.item, content="cool")
+        c3 = Comment.objects.create(user=self.another_user, item=self.item, content="fun")
+
+        r = self.client.get("%s%d/comments/" % (self.url, self.item.id))
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 3)
+        self.check_get_comment_data_complete(r.data[0], c1)
+        self.check_get_comment_data_complete(r.data[1], c2)
+        self.check_get_comment_data_complete(r.data[2], c3)
 
 
 # tests for archiving items
