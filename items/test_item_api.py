@@ -86,11 +86,15 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.post_item()
         self.client.logout()
 
+    def test_get_item(self):
         # another user likes the item of the user "username"
         self.item = Item.objects.get(pk=1)
         Like.objects.create(user=self.another_user, item=self.item)
 
-    def test_get_item(self):
+        # other items in the same category
+        id1 = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1).id
+        id2 = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1).id
+
         r = self.get_item()
 
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -106,6 +110,8 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["comments"], 0)
         self.assertEqual(r.data["likes"], 1)
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
+        self.assertEqual(r.data["similar"][0]["id"], id1)
+        self.assertEqual(r.data["similar"][1]["id"], id2)
         self.assertIn("image_urls", r.data)
 
     def test_get_item_not_existing(self):

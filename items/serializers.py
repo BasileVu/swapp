@@ -80,12 +80,13 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
 class AggregatedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
+    keyinfo_set = KeyInfoSerializer(many=True)
     image_urls = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     offers_received = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
-    keyinfo_set = KeyInfoSerializer(many=True)
+    similar = serializers.SerializerMethodField()
 
     def get_image_urls(self, obj):
         return [i.image.url for i in obj.image_set.all()]
@@ -102,11 +103,13 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
     def get_owner_username(self, obj):
         return obj.owner.username
 
+    def get_similar(self, obj):
+        return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
+
     class Meta:
         model = Item
         fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'owner_username', 'category',
-                  'views', 'image_urls', 'likes', 'comments', 'offers_received', 'keyinfo_set')
-        read_only_fields = ('owner',)
+                  'views', 'image_urls', 'likes', 'comments', 'offers_received', 'keyinfo_set', 'similar')
 
 
 class SearchItemsSerializer(serializers.Serializer):
