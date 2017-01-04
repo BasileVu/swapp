@@ -660,7 +660,7 @@ class PublicAccountInfoTests(TestCase):
 
         item_received = r.data["items"][0]
         self.assertEqual(item_received["id"], 1)
-        self.assertEqual(item_received["image_url"], "null")
+        self.assertEqual(item_received["image_url"], None)
         self.assertEqual(item_received["name"], "test")
 
     def test_get_user_info_image(self):
@@ -669,7 +669,7 @@ class PublicAccountInfoTests(TestCase):
         self.client.logout()
 
         r = self.client.get("/api/users/%s/" % self.user.username)
-        self.assertNotEqual(r.data["items"][0]["image_url"], "null")
+        self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
 
 class NoteAPITests(TestCase):
