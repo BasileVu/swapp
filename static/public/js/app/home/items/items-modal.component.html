@@ -86,7 +86,7 @@
                                         Estimed price
                                     </div>
                                     <div class="right col-xs-6">
-                                        {{ (item.price_min + item.price_max) / 2 | number:'.2' }} chf
+                                        {{ item.price_min | number:'.2' }} - {{ item.price_max | number:'.2' }} $
                                     </div>
                                 </div>
                                 <div class="row" 

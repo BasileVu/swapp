@@ -64,6 +64,13 @@ export class AuthService {
         // No content to return, we just catch errors
         return this.http.post('/api/users/', body, options)
             .toPromise()
+            .then(function(response){
+                if (response.status === 201) {
+                    return response;
+                } else {
+                    this.handleError(response);
+                }
+            })
             .catch(this.handleError);
     }
 
@@ -78,7 +85,7 @@ export class AuthService {
         let body = res.json();
         return new User(
                     body.id,
-                    body.username, // TODO : change with body.profile_picture_url when available on endpoint
+                    body.profile_picture_url,
                     body.username,
                     body.first_name,
                     body.last_name,
@@ -94,7 +101,8 @@ export class AuthService {
     }
 
     getUser() {
-        return this.user;
+        if (this.loggedIn)
+            return this.user;
     }
 
     private handleError (error: Response | any) {

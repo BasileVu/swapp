@@ -84,7 +84,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 // Get the comments
                 this.itemsService.getComments(item.id)
                     .then(
-                        comments => this.comments = comments,
+                        comments => {
+                            this.comments = comments
+                        },
                         error => this.toastr.error("Can't get the comments", "Error")
                     );
             },
@@ -112,6 +114,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     comment.fromCreationDTO(commentCreationDTO);
                     comment.setUserFullname(this.user.first_name + " " + this.user.last_name);
                     comment.setUserProfilePictureUrl(this.user.profile_picture);
+                    comment.setDate(new Date());
                     this.comments.push(comment);
                     this.toastr.success("", "Comment submitted");
                 },

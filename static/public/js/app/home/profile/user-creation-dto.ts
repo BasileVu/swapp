@@ -9,7 +9,6 @@ export class UserCreationDTO {
     city: string;
     region: string;
     country: string;
-    picture: string;
     
     constructor(username: string,
                 email: string,
@@ -20,8 +19,7 @@ export class UserCreationDTO {
                 street: string,
                 city: string,
                 region: string,
-                country: string,
-                picture: string) {
+                country: string) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -32,6 +30,5 @@ export class UserCreationDTO {
         this.city = city;
         this.region = region;
         this.country = country;
-        this.picture = picture;
     }
 }

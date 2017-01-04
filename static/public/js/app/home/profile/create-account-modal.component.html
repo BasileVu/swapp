@@ -17,9 +17,12 @@
                             <div class="col-img-frame result rounded" *ngIf="data.image">
                                 <img [src]="data.image" [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
                             </div>
-
+                            <div class="file-upload">
+                                <span class="text">upload</span>
+                                <input id="custom-input" type="file" (change)="fileChangeListener($event)">
+                            </div>
                             <div class="pull-left">
-                                <img-cropper [image]="data" [settings]="cropperSettings" ></img-cropper>
+                                <img-cropper #cropper [image]="data" [settings]="cropperSettings" ></img-cropper>
                             </div>
                         </div>
 
