@@ -7,3 +7,9 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = ('id', 'accepted', 'comment', 'status', 'item_given', 'item_received')
+
+
+class UpdateOfferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Offer
+        field = ('accepted', 'comment', 'status')
