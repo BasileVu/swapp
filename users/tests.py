@@ -669,9 +669,6 @@ class NoteAPITests(TestCase):
             "note": note
         }), content_type="application/json")
 
-    def get_notes(self):
-        return self.client.get("/api/notes/", content_type="application/json")
-
     def get_note(self, id_note):
         return self.client.get("/api/notes/" + str(id_note) + "/", content_type="application/json")
 
@@ -707,22 +704,6 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.data["offer"], 1)
         self.assertEqual(r.data["note"], 1)
         self.assertEqual(r.data["text"], "Test")
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-    def test_get_notes(self):
-        self.login()
-        r = self.get_notes()
-        self.assertEqual(len(r.data), 0)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        r = self.post_note(1, "Test", 1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.get_notes()
-        self.assertEqual(len(r.data), 1)
-        self.assertEqual(r.data[0]["id"], 1)
-        self.assertEqual(r.data[0]["user"], 2)
-        self.assertEqual(r.data[0]["offer"], 1)
-        self.assertEqual(r.data[0]["note"], 1)
-        self.assertEqual(r.data[0]["text"], "Test")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_post_note_under_0(self):
