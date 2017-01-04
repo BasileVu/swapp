@@ -97,13 +97,7 @@ paths:
               items:
                 type: array
                 items:
-                  properties:
-                    id:
-                      type: number
-                    image_url:
-                      type: string
-                    name:
-                      type: string
+                  $ref: "#/definitions/InventoryItem"
               notes:
                 type: number
               note_avg:
@@ -984,7 +978,31 @@ definitions:
         type: number
       item_received:
         type: number
-  
+        
+  LikeCreation:
+    type: object
+    properties:
+      item:
+        type: number
+        
+  Like:
+    properties:
+      id:
+        type: number
+      user:
+        type: number
+      item:
+        type: number
+      date:
+        type: string
+        
+  KeyInfo:
+    properties:
+      key:
+        type: string
+      info:
+        type: string
+
   SetItemInfo:
     type: object
     properties:
@@ -998,6 +1016,20 @@ definitions:
         type: number
       category:
         type: number
+      keyinfo_set:
+        type: array
+        items:
+          $ref: "#/definitions/KeyInfo"
+  
+  InventoryItem:    
+    type: object
+    properties:
+      id:
+        type: number
+      image_url:
+        type: string
+      name:
+        type: string
         
   DetailedItemInfo:
     type: object
@@ -1014,6 +1046,10 @@ definitions:
         type: number
       creation_date:
         type: string
+      keyinfo_set:
+        type: array
+        items:
+          $ref: "#/definitions/KeyInfo"
       owner_username:
         type: string
       category:
@@ -1035,20 +1071,7 @@ definitions:
         type: number
       offers_received:
         type: number
-        
-  LikeCreation:
-    type: object
-    properties:
-      item:
-        type: number
-        
-  Like:
-    properties:
-      id:
-        type: number
-      user:
-        type: number
-      item:
-        type: number
-      date:
-        type: string
+      similar:
+        type: array
+        items:
+          $ref: "#/definitions/InventoryItem"
