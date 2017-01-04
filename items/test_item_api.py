@@ -51,6 +51,13 @@ class ItemAPITests(TestCase):
     def patch_item(self, id_item=1, data=json.dumps({"name": "test"})):
         return self.client.patch(self.url + str(id_item) + "/", data=data, content_type="application/json")
 
+    def post_image(self, user_id):
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
+
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+
     def test_post_item_not_logged_in(self):
         r = self.post_item()
         self.assertEqual(r.status_code, 401)
@@ -227,6 +234,15 @@ class ItemAPITests(TestCase):
         self.assertEqual(data["likes"], 1)
         self.assertIn("image_urls", data)
 
+    def check_get_comment_data_complete(self, data, comment):
+        self.assertEqual(data["id"], comment.id)
+        self.assertEqual(data["content"], comment.content)
+        self.assertIn("date", data)
+        self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["item"], comment.item.id)
+        self.assertEqual(data["user_fullname"], "firstName lastName")
+        self.assertNotEqual(data["user_profile_picture"], None)
+
     def test_get_items_result(self):
         self.create_item_values_for_list_and_get_testing()
         item = Item.objects.get(pk=1)
@@ -262,17 +278,24 @@ class ItemAPITests(TestCase):
         r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
         self.client.logout()
 
-        u = User.objects.create_user(username="username2", password="password")
+        u = User.objects.create_user(first_name="firstName", last_name="lastName", username="username2",
+                                     password="password")
+        self.client.login(username="username2", password="password")
+        self.post_image(u.id)
+        self.client.logout()
+
         item = Item.objects.get(pk=r.data["id"])
 
-        Comment.objects.create(user=u, item=item, content="nice")
-        Comment.objects.create(user=u, item=item, content="cool")
-        Comment.objects.create(user=u, item=item, content="fun")
+        c1 = Comment.objects.create(user=u, item=item, content="nice")
+        c2 = Comment.objects.create(user=u, item=item, content="cool")
+        c3 = Comment.objects.create(user=u, item=item, content="fun")
 
         r = self.client.get("/api/items/%d/comments/" % r.data["id"])
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
-        self.assertEqual(r.data[0]["content"], "nice")
+        self.check_get_comment_data_complete(r.data[0], c1)
+        self.check_get_comment_data_complete(r.data[1], c2)
+        self.check_get_comment_data_complete(r.data[2], c3)
 
     '''
     def test_archive_item(self):

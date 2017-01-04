@@ -41,11 +41,11 @@ class ImageAPITests(TestCase):
         self.client.login(username="username", password="password")
 
     def post_image(self, item):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
 
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
     def get_image(self, id_image=1):
         return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
