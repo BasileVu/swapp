@@ -1,5 +1,7 @@
 import os
 
+from notifications.models import Notification
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swapp.settings")
 
 import django
@@ -66,3 +68,4 @@ if __name__ == '__main__':
     # image.save('test.png')
     # Image.objects.create(item=i1, image='test.png')
 
+    n1 = Notification.objects.create(content="First notification on a new offer", read=False)

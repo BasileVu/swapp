@@ -55,7 +55,7 @@ class NotificationAPITest(TestCase):
         }), content_type="application/json")
 
     def patch_offer(self, id_offer, accepted):
-        return self.client.patch(self.url_offers + str(id_offer) + "/", data=json.dumps({
+        return self.client.patch("%s%d/" % (self.url_offers, id_offer), data=json.dumps({
             "accepted": accepted
         }), content_type="application/json")
 
@@ -82,7 +82,7 @@ class NotificationAPITest(TestCase):
         }), content_type="application/json")
 
     def patch_notification(self, id_notification, read):
-        return self.client.patch(self.url_notifications + str(id_notification) + "/", data=json.dumps({
+        return self.client.patch("%s%d/" % (self.url_notifications, id_notification), data=json.dumps({
             "read": read
         }), content_type="application/json")
 
@@ -95,7 +95,7 @@ class NotificationAPITest(TestCase):
         r = self.get_notifications()
         self.assertEqual(len(r.data), 0)
 
-        Offer.objects.create(item_given=self.item1, item_received=self.item7, accepted=False, status=0, comment="test")
+        Offer.objects.create(item_given=self.item1, item_received=self.item7, status=0, comment="test")
 
         r = self.get_notifications()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -110,11 +110,11 @@ class NotificationAPITest(TestCase):
 
         now = timezone.now()
 
-        Notification.objects.create(content="test1", read=False, date=now + timezone.timedelta(seconds=4),
+        Notification.objects.create(content="test1", date=now + timezone.timedelta(seconds=4),
                                     user=self.current_user)
-        Notification.objects.create(content="test2", read=False, date=now + timezone.timedelta(seconds=2),
+        Notification.objects.create(content="test2", date=now + timezone.timedelta(seconds=2),
                                     user=self.current_user)
-        Notification.objects.create(content="test3", read=False, date=now + timezone.timedelta(seconds=3),
+        Notification.objects.create(content="test3", date=now + timezone.timedelta(seconds=3),
                                     user=self.current_user)
 
         r = self.get_notifications()
@@ -125,7 +125,7 @@ class NotificationAPITest(TestCase):
     def test_patch_notification(self):
         self.client.login(username="user1", password="password")
 
-        n = Notification.objects.create(content="test1", read=False, user=self.current_user)
+        n = Notification.objects.create(content="test1", user=self.current_user)
         r = self.patch_notification(n.id, True)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(Notification.objects.get(pk=n.id).read, True)
