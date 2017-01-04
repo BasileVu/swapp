@@ -30,7 +30,7 @@ class UserProfileTests(TestCase):
 class AccountCreationAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
-                  street="Avenue des Sports 20", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
+                  street="Route de Cheseaux 1", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
 
         return self.client.post("/api/users/", data=json.dumps({
             "username": username,
@@ -57,6 +57,12 @@ class AccountCreationAPITests(TestCase):
         r = self.post_user()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         self.assertEqual(r["Location"], "/api/users/username/")
+
+        u = User.objects.get(pk=1)
+        self.assertEqual(u.location.street, "Route de Cheseaux 1")
+        self.assertEqual(u.location.city, "Yverdon-les-Bains")
+        self.assertEqual(u.location.region, "VD")
+        self.assertEqual(u.location.country, "Switzerland")
 
     def test_user_creation_conflict(self):
         self.post_user()
