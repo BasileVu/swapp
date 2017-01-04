@@ -1,4 +1,6 @@
 import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import {NotificationsService} from "./notifications.service";
+import {Notification} from "./notification";
 
 @Component({
     moduleId: module.id,
@@ -6,11 +8,15 @@ import {Component, ViewEncapsulation, OnInit} from '@angular/core';
     encapsulation: ViewEncapsulation.None,
     templateUrl: './notification-modal.component.html'
 })
-
 export class NotificationModalComponent implements OnInit {
 
-    constructor() {}
+    notifications: Notification[];
+
+    constructor (private notificationsService: NotificationsService) {}
 
     ngOnInit() {
+        this.notificationsService.getNotification().then(res => {
+            console.log(res);
+        });
     }
 }

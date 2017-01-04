@@ -27,6 +27,7 @@ import { InventoryService } from './inventory/inventory.service';
 import { ProfileService } from './profile/profile.service';
 import { ItemsService } from './items/items.service';
 import { SearchService } from './search/search.service';
+import {NotificationsService} from "./profile/notifications.service";
 
 @NgModule({
     imports: [
@@ -57,7 +58,8 @@ import { SearchService } from './search/search.service';
         InventoryService,
         ProfileService,
         ItemsService,
-        SearchService
+        SearchService,
+        NotificationsService
     ]
 })
 
