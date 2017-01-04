@@ -49,9 +49,15 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         this.subscription = this.authService.loggedInSelected$.subscribe(
             loggedIn => {
                 this.loggedIn = loggedIn;
-                this.user = this.authService.getUser();
             }
         );
+
+        // Listen for user login
+        this.subscription = this.authService.userSelected$.subscribe(
+            user => {
+                this.user = user;
+            }
+        )
 
         // When receiving the detailed item
         this.subscription = this.itemsService.itemSelected$.subscribe(
@@ -64,7 +70,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                         owner => {
                             this.owner = owner;
                             this.fillStars(owner.note_avg);
-                            
+                            this.ownerItems = new Array();
                             for (let itemId of owner.items) {
                                 this.itemsService.getDetailedItem(itemId).then(
                                     item => this.ownerItems.push(item),
@@ -78,7 +84,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 // Get the comments
                 this.itemsService.getComments(item.id)
                     .then(
-                        comments => this.comments = comments,
+                        comments => {
+                            this.comments = comments
+                        },
                         error => this.toastr.error("Can't get the comments", "Error")
                     );
             },
@@ -93,7 +101,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     addComment() {
         if (this.loggedIn) {
-            let commentCreationDTO = new CommentCreationDTO(1, this.item.id, this.commentContent.value);
+            console.log("user");
+            console.log(this.user);
+            let commentCreationDTO = new CommentCreationDTO(this.user.id, this.item.id, this.commentContent.value);
             console.log(commentCreationDTO);
 
             this.itemsService.addComment(commentCreationDTO).then(
@@ -102,13 +112,15 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     this.commentForm.reset();
                     let comment: Comment = new Comment;
                     comment.fromCreationDTO(commentCreationDTO);
-                    comment.setUsername(""); // TODO
-                    comment.setUserProfilePictureUrl(""); // TODO
+                    comment.setUserFullname(this.user.first_name + " " + this.user.last_name);
+                    comment.setUserProfilePictureUrl(this.user.profile_picture);
+                    comment.setDate(new Date());
                     this.comments.push(comment);
                     this.toastr.success("", "Comment submitted");
                 },
                 error => {
                     console.log(error);
+                
                 }
             );
         } else {
@@ -127,6 +139,12 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     searchCategory(category_id: number) {
         console.log("searchCategory id " + category_id);
+        // TODO
+    }
+
+    swap(item_id: number, owner_id: number) {
+        console.log("swap item " + item_id + " of owner id " + owner_id);
+        console.log("item " + this.item.id + ", owner " + this.owner.id + ", user " + this.user.id);
         // TODO
     }
 

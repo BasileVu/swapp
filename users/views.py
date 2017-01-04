@@ -1,6 +1,7 @@
 from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
@@ -9,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from items.serializers import InventoryItemSerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -81,6 +83,8 @@ def create_user(request):
 
     for k in location.keys():
         setattr(user.location, k, location[k])
+
+    user.location.save()
 
     c = user.coordinates
     c.latitude = location_result[0]["lat"]
@@ -180,13 +184,17 @@ def get_public_account_info(request, username):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
-        "items": [i.id for i in user.item_set.all()],
+        "items": InventoryItemSerializer(user.item_set.all(), many=True).data,
         "notes": user.note_set.count(),
         "note_avg": user.userprofile.note_avg
     })
 
 
-class NoteViewSet(viewsets.ModelViewSet):
+class NoteViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Note.objects.all()
 
     def get_serializer_class(self):

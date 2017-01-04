@@ -14,15 +14,15 @@ export class Owner {
 
     constructor() {
         this.id = -1;
-        this.first_name = "undef";
-        this.last_name = "undef";
-        this.username = "undef";
-        this.profile_picture_url = "undef";
+        this.first_name = undefined;
+        this.last_name = undefined;
+        this.username = undefined;
+        this.profile_picture_url = undefined;
         this.items = new Array();
         this.votes = 0;
         this.note_avg = 0;
         this.interested_in = new Array();
-        this.delivery_address = "undef";
+        this.delivery_address = undefined;
         this.delivery_methods = new Array();
     }
 }

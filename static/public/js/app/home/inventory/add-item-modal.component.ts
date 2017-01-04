@@ -112,6 +112,8 @@ export class AddItemModalComponent implements OnInit {
         } else {
             let deliveryM = new Array<string>();
 
+            console.log(this.file_srcs);
+
             let newItem = new ItemCreationDTO(
                 "TODO", // TODO
                 this.name.value,

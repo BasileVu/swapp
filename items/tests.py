@@ -30,12 +30,10 @@ class ItemTests(TestCase):
 class ImageAPITests(TestCase):
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
-        self.current_user.userprofile.location = "location"
-        self.current_user.userprofile.save()
 
         c = Category.objects.create(name="Test")
-        Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False, category=c,
-                            owner=self.current_user)
+        self.item = Item.objects.create(name="Test", description="Test", price_min=1, price_max=2, archived=False,
+                                        category=c, owner=self.current_user)
 
         self.login()
 
@@ -43,11 +41,11 @@ class ImageAPITests(TestCase):
         self.client.login(username="username", password="password")
 
     def post_image(self, item):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
 
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
     def get_image(self, id_image=1):
         return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
@@ -56,29 +54,20 @@ class ImageAPITests(TestCase):
         return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
 
     def test_post_image(self):
-        self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Image.objects.count(), 0)
 
-    def test_put_patch_should_be_denied_offer(self):
-        self.login()
-
-        r = self.client.put("/api/likes/1/", data=json.dumps({
-            "name": "test"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-        r = self.client.patch("/api/likes/1/", data=json.dumps({
-            "name": "test"
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_delete_image(self):
         self.login()
         r = self.post_image(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(self.item.image_set.count(), 1)
+        self.assertNotEqual(self.item.image_set.first().image.name, "")
+
+    def test_delete_image(self):
+        self.login()
+        r = self.post_image(1)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.delete_image(id_image=1)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
@@ -145,8 +134,6 @@ class CategoryAPITests(TestCase):
 class LikeAPITests(TestCase):
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
-        self.current_user.userprofile.location = "location"
-        self.current_user.userprofile.save()
 
         c1 = Category.objects.create(name="Test")
         c2 = Category.objects.create(name="Test2")
@@ -158,16 +145,14 @@ class LikeAPITests(TestCase):
         self.create_item(c2, self.current_user, name="Shirt", description="My old shirt", price_min=5,
                          price_max=30)
 
+        self.client.login(username="username", password="password")
+
     def create_item(self, category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
         return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
                                    archived=archived, category=category, owner=owner)
 
-    def login(self):
-        self.client.login(username="username", password="password")
-
-    def post_like(self, user, item):
+    def post_like(self, item):
         return self.client.post("/api/likes/", data=json.dumps({
-            "user": user,
             "item": item
         }), content_type="application/json")
 
@@ -175,61 +160,67 @@ class LikeAPITests(TestCase):
         return self.client.get("/api/likes/", content_type="application/json")
 
     def get_like(self, id_like):
-        return self.client.get("/api/likes/" + str(id_like) + "/", content_type="application/json")
+        return self.client.get("/api/likes/%d/" % id_like, content_type="application/json")
 
     def delete_like(self, id_like):
-        return self.client.delete("/api/likes/" + str(id_like) + "/", content_type="application/json")
+        return self.client.delete("/api/likes/%d/" % id_like, content_type="application/json")
 
     def test_post_like(self):
-        self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
+        r = self.post_like(1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["user"], "username")
+        self.assertEqual(r.data["item"], 1)
+        self.assertIn("date", r.data)
 
-    def test_get_likes(self):
+    def test_cannot_like_own_item(self):
+        r = self.post_like(2)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_like_an_item_twice(self):
+        self.post_like(1)
+        r = self.post_like(1)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_likes_no_likes(self):
         r = self.get_likes()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 0)
 
-        self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+    def test_get_likes_1_like(self):
+        self.post_like(1)
 
         r = self.get_likes()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 1)
+        self.assertEqual(r.data[0]["id"], 1)
+        self.assertEqual(r.data[0]["user"], "username")
+        self.assertEqual(r.data[0]["item"], 1)
+        self.assertIn("date", r.data[0])
 
     def test_get_like(self):
-        self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        r = self.post_like(1)
+        r = self.get_like(id_like=r.data["id"])
 
-        r = self.get_like(id_like=r.data['id'])
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["user"], "username")
+        self.assertEqual(r.data["item"], 1)
+        self.assertIn("date", r.data)
 
-        r = self.get_like(id_like=10)
+    def test_get_like_404(self):
+        r = self.get_like(id_like=1)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_like(self):
-        self.login()
-        r = self.post_like(1, self.current_user.userprofile.id)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        id_like = r.data['id']
-        r = self.get_likes()
-        self.assertEqual(len(r.data), 1)
-
-        r = self.delete_like(id_like=id_like)
+        r = self.post_like(1)
+        r = self.delete_like(id_like=r.data["id"])
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
-        r = self.get_likes()
-        self.assertEqual(len(r.data), 0)
-
-        r = self.delete_like(id_like=10)
+        r = self.delete_like(id_like=1)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied(self):
-        self.login()
-
         r = self.client.put("/api/likes/1/", data=json.dumps({
             "name": "test"
         }), content_type="application/json")

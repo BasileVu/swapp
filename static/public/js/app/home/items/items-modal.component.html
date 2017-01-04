@@ -86,7 +86,7 @@
                                         Estimed price
                                     </div>
                                     <div class="right col-xs-6">
-                                        {{ (item.price_min + item.price_max) / 2 | number:'.2' }} chf
+                                        {{ item.price_min | number:'.2' }} - {{ item.price_max | number:'.2' }} $
                                     </div>
                                 </div>
                                 <div class="row" 
@@ -145,8 +145,11 @@
                                 </ul>
                             </div>
                             <div class="row first-move">
-                                <div class="contact btn btn-block btn-primary btn-reversed"><i class="fa fa-envelope"></i> Contact</div>
-                                <div class="swap btn btn-block btn-primary btn-reversed open-send-proposition-modal"><i class="fa fa-refresh"></i> Swap</div>
+                                <div class="title" *ngIf="!loggedIn">
+                                    <p>Please log in to access features</p>
+                                </div>
+                                <button class="contact btn btn-block btn-primary btn-reversed" [disabled]="!loggedIn"><i class="fa fa-envelope"></i> Contact</button>
+                                <button class="swap btn btn-block btn-primary btn-reversed open-send-proposition-modal" [disabled]="!loggedIn"><i class="fa fa-refresh"></i> Swap</button>
                             </div>
                             <div class="row fraud">
                                 <div class="col-xs-6">
@@ -161,7 +164,10 @@
                 </div>
                 <div class="comments">
                 <h3>Comments</h3>
-                <div class="row comment new">
+                <div class="row comment new" *ngIf="!loggedIn">
+                    <p>You must be logged in to post comments</p>
+                </div>
+                <div class="row comment new" *ngIf="loggedIn">
                     <form [formGroup]="commentForm" (ngSubmit)="addComment()">
                         <div class="col-xs-1">
                             <img class="img-fluid avatar" src="http://placehold.it/100x100"/>
@@ -199,14 +205,17 @@
             </div>
             </div>
             <div class="col-xs-3 options">
-                <a href="#" class="btn btn-primary btn-block btn-lg open-send-proposition-modal">
+                <button (click)="swap(item.id, owner.id)" class="btn btn-primary btn-block btn-lg open-send-proposition-modal" [disabled]="!loggedIn">
                     <i class="fa fa-refresh"></i> <span class="hidden-sm-down">Swap</span>
-                </a>
-                <div class="btn-group btn-group-justified more">
+                </button>
+                <div *ngIf="loggedIn" class="btn-group btn-group-justified more">
                     <a href="#" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
                     <a href="#" class="btn btn-primary"><i class="fa fa-comment"></i></a>
                     <a href="#" class="btn btn-primary"><i class="fa fa-heart"></i></a>
                     <a href="#" class="btn btn-primary"><i class="fa fa-share"></i></a>
+                </div>
+                <div *ngIf="!loggedIn" class="title">
+                    <p>Please log in to access features</p>
                 </div>
                 <div class="modal-panel inventory">
                     <div class="title">

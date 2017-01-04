@@ -1,0 +1,18 @@
+.result {
+    margin-top: 30px;
+    border: 1px solid rgba(125,125,125,0.6);
+    display: inline-block;
+    padding: 1px;
+}
+
+.result.rounded > img {
+    border-radius: 100px;
+}
+
+.pull-left {
+    min-width: 400px;
+    float: left;
+    margin-right: 10px;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.05);
+}

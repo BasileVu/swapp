@@ -32,7 +32,7 @@ export class ItemsComponent implements OnInit, OnChanges {
         
         this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
             this.items = items;
-            
+
             setTimeout(function(){
                 $('.grid').isotope({
                     // options
@@ -51,11 +51,11 @@ export class ItemsComponent implements OnInit, OnChanges {
                     $(this).removeClass('hovered');
                     $('.grid').isotope('layout');
                 });
+                
                 $('.open-modal-item-x').click(function () {
                     $('#view-item-x').modal('show');
                 });
             }, 100);
-            
         });
     }
 
@@ -81,6 +81,26 @@ export class ItemsComponent implements OnInit, OnChanges {
                 item => {
                     this.selectedItem = item;
                     service.selectItem(this.selectedItem);
+
+                    setTimeout(function(){
+                $('.grid').isotope({
+                    // options
+                    itemSelector: '.grid-item',
+                    layoutMode: 'masonry'
+                });
+                // layout only when images are loaded
+                $('.grid').imagesLoaded().progress( function() {
+                    $('.grid').isotope('layout');
+                });
+                // display items details when hovered
+                $('.grid-item').hover(function () {
+                    $(this).addClass('hovered');
+                    $('.grid').isotope('layout');
+                }, function () {
+                    $(this).removeClass('hovered');
+                    $('.grid').isotope('layout');
+                });
+            }, 200);
                 },
                 error => this.errorMessage = <any>error);
     }

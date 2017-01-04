@@ -2,7 +2,8 @@
     <div *ngIf="loggedIn" [@flyInOut]>
         <div class="row identity">
             <div class="col-xs-2 col-sm-4">
-                <img class="avatar img-fluid" src="http://placehold.it/200x200"/>
+                <img *ngIf="user.profile_picture === null" class="avatar img-fluid" src="http://placehold.it/200x200"/>
+                <img *ngIf="user.profile_picture != null" class="avatar img-fluid" src="{{ url }}{{ user.profile_picture }}"/>
             </div>
             <div class="col-xs-10 col-sm-8">
                 <h6>Welcome,</h6>
@@ -12,7 +13,7 @@
         </div>
         <div class="row location">
             <div class="col-xs-10">
-                <i class="fa fa-map-marker"></i> {{ user.location.street }}, {{ user.location.city }}, {{ user.location.region }}, {{ user.location.country }}
+                <i class="fa fa-map-marker"></i> {{ user.location.city }}, {{ user.location.country }}
             </div>
             <div class="col-xs-2">
                 <a href="#" class="btn btn-block btn-primary btn-sm btn-reversed open-update-profile-modal"><i class="fa fa-pencil"></i></a>
@@ -47,7 +48,7 @@
             </div>
         </div>
         <div class="row location">
-            <form [formGroup]="loginForm" (ngSubmit)="login({username:loginName.value, password:loginPass.value})">
+            <form [formGroup]="loginForm" (ngSubmit)="login([{username:loginName.value, password:loginPass.value}, false])">
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group row">
