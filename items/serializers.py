@@ -71,7 +71,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
     def get_image_url(self, obj):
-        return obj.image_set.first().image.url if obj.image_set.count() > 0 else "null"
+        return obj.image_set.first().image.url if obj.image_set.count() > 0 else None
 
     class Meta:
         model = Item

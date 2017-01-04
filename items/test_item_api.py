@@ -104,38 +104,6 @@ class ItemAPITests(TestCase, ItemTestMixin):
         r = self.get_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_put_item_not_logged_in(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        self.client.logout()
-
-        item_id = r.data["id"]
-        r = self.put_item(item_id=item_id, name="test2", description="test2", price_min=2, price_max=3, category=2)
-        self.assertEqual(r.status_code, 401)
-
-    def test_put_item(self):
-        self.login()
-        r = self.post_item(name="test", description="test", price_min=1, price_max=2, category=1)
-
-        item_id = r.data["id"]
-        r = self.put_item(item_id, name="test2", description="test2", price_min=2, price_max=3, category=2)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-        r = self.get_item(item_id=item_id)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["name"], "test2")
-        self.assertEqual(r.data["description"], "test2")
-        self.assertEqual(r.data["price_min"], 2)
-        self.assertEqual(r.data["price_max"], 3)
-        self.assertEqual(r.data["category"]["id"], 2)
-        self.assertEqual(r.data["category"]["name"], "test2")
-
-    def test_put_item_not_existing(self):
-        self.login()
-        r = self.put_item(item_id=10)
-        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_delete_item_not_logged_in(self):
         self.login()
         self.post_item(price_min=1, price_max=2)
@@ -299,3 +267,36 @@ class ItemPatchTests(TestCase, ItemTestMixin):
 
         r = self.get_item()
         self.assertEquals(r.data["price_max"], 2)
+
+
+class ItemPutTests(TestCase, ItemTestMixin):
+    def setUp(self):
+        self.setup()
+        self.login()
+        self.post_item()
+
+    def test_put_item_not_logged_in(self):
+        self.client.logout()
+        r = self.put_item()
+        self.assertEqual(r.status_code, 401)
+
+    def test_put_item(self):
+        keyinfo_set = [{"key": "test", "info": "test2"}, {"key": "test3", "info": "test4"}]
+
+        r = self.put_item(name="test2", description="test2", price_min=2, price_max=3, category=2,
+                          keyinfo_set=keyinfo_set)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+        r = self.get_item()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["name"], "test2")
+        self.assertEqual(r.data["description"], "test2")
+        self.assertEqual(r.data["price_min"], 2)
+        self.assertEqual(r.data["price_max"], 3)
+        self.assertEqual(r.data["category"]["id"], 2)
+        self.assertEqual(r.data["category"]["name"], "test2")
+        self.assertEqual(r.data["keyinfo_set"], keyinfo_set)
+
+    def test_put_item_not_existing(self):
+        r = self.put_item(item_id=10)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
