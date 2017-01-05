@@ -102,6 +102,15 @@ paths:
                 type: number
               note_avg:
                 type: number
+              interested_by:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
           
   /account/:
     get:
@@ -125,7 +134,7 @@ paths:
               email:
                 type: string
               location:
-                  $ref: "#/definitions/Location"
+                $ref: "#/definitions/Location"
               last_modification_date:
                 type: string
               categories:
@@ -140,6 +149,7 @@ paths:
                 type: number
               note_avg:
                 type: number
+                
         401:
           description: "User is not authenticated."
     put:
@@ -228,6 +238,37 @@ paths:
           description: "Successful operation."
         400:
           description: "Location not existing."
+        401:
+          description: "User not authenticated."
+          
+  /account/categories/:
+    put:
+      description: "Updates the interested by categories of the current user logged in."
+      parameters:
+        - in: body
+          name: body
+          description: "The interested by categories to update."
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateInterestedByCategories"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+      
+    patch:
+      description: "Updates the interested by categories of the current user logged in."
+      parameters:
+      - in: body
+        name: body
+        description: "The interested by categories to update."
+        required: false
+        schema:
+          $ref: "#/definitions/UpdateInterestedByCategories"
+      responses:
+        200:
+          description: "Successful operation."
         401:
           description: "User not authenticated."
           
@@ -654,6 +695,26 @@ paths:
           description: "User not authenticated."
           
   /notifications/{id}/:
+    put:
+      description: "Sets a notification as read or not."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the notification."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the notification."
+          required: true
+          schema:
+            $ref: "#/definitions/Notification"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+  
     patch:
       description: "Sets a notification as read or not."
       parameters:
@@ -667,10 +728,7 @@ paths:
         description: "The content of the notification."
         required: false
         schema:
-          type: object
-          properties:
-            read:
-              type: boolean
+          $ref: "#/definitions/Notification"
       responses:
         200:
           description: "Successful operation."
@@ -1002,12 +1060,26 @@ definitions:
       date:
         type: string
         
+  Notification:
+    type: object
+    properties:
+      read:
+        type: boolean
+        
   KeyInfo:
     properties:
       key:
         type: string
       info:
         type: string
+        
+  UpdateInterestedByCategories:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: number
 
   SetItemInfo:
     type: object
