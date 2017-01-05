@@ -277,9 +277,9 @@ class ItemCommentsTests(TestCase, ItemTestMixin):
         r = self.client.get("%s%d/comments/" % (self.url, self.item.id))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 3)
-        self.check_get_comment_data_complete(r.data[0], c1)
+        self.check_get_comment_data_complete(r.data[0], c3)
         self.check_get_comment_data_complete(r.data[1], c2)
-        self.check_get_comment_data_complete(r.data[2], c3)
+        self.check_get_comment_data_complete(r.data[2], c1)
 
 
 # tests for archiving items
