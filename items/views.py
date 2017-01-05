@@ -219,7 +219,7 @@ class ItemViewSet(mixins.CreateModelMixin,
 
     @detail_route(methods=["GET"])
     def comments(self, request, pk=None):
-        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.all(), many=True).data)
+        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.order_by("-date"), many=True).data)
 
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
