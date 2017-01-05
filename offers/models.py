@@ -7,7 +7,7 @@ class Offer(models.Model):
     item_received = models.ForeignKey("items.Item", related_name='offers_received', on_delete=models.CASCADE)
 
     accepted = models.BooleanField(default=False)
-    status = models.BooleanField(default=False)
+    answered = models.BooleanField(default=False)
     comment = models.CharField(max_length=1000)
     creation_date = models.DateTimeField("date published", default=timezone.now)
 

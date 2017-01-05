@@ -4,7 +4,6 @@ from unittest.mock import patch
 
 from PIL import Image as ImagePil
 from django.test import Client, TestCase
-from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 
 from items.models import *
@@ -164,7 +163,7 @@ class AccountAPITests(TestCase):
         u.userprofile.categories.add(c)
         i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
                                 creation_date=timezone.now(), archived=False, owner=u, category=c)
-        o = Offer.objects.create(accepted=True, status=True, item_given=i, item_received=i)
+        o = Offer.objects.create(accepted=True, answered=True, item_given=i, item_received=i)
         Note.objects.create(user=u, offer=o, text="test", note=4)
         Like.objects.create(user=u, item=i)
 
@@ -685,9 +684,9 @@ class NoteAPITests(TestCase):
         self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
         self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
                                         price_max=30)
-        Offer.objects.create(id=1, accepted=1, status=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=1, accepted=1, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
-        Offer.objects.create(id=2, accepted=0, status=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=2, accepted=0, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
     def login(self):
@@ -827,7 +826,7 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.data["note_avg"], 1)
 
     def test_user_avg_note_two_notes(self):
-        Offer.objects.create(id=3, accepted=1, status=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=3, accepted=1, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
         self.login()

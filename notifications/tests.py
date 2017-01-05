@@ -45,18 +45,18 @@ class NotificationAPITest(TestCase):
         self.item8 = Item.objects.create(name="Car", description="My new car", price_min=35, price_max=50,
                                          owner=self.other_user, category=c2)
 
-    def post_offer(self, id_item_given, id_item_received, accepted=False, status=False, comment="test"):
+    def post_offer(self, id_item_given, id_item_received, accepted=False, answered=False, comment="test"):
         return self.client.post(self.offers_url, data=json.dumps({
             "accepted": accepted,
-            "status": status,
+            "answered": answered,
             "comment": comment,
             "item_given": id_item_given,
             "item_received": id_item_received
         }), content_type="application/json")
 
-    def patch_offer(self, id_offer, accepted, status=True):
+    def patch_offer(self, id_offer, accepted, answered=True):
         return self.client.patch("%s%d/" % (self.offers_url, id_offer), data=json.dumps({
-            "status": status,
+            "answered": answered,
             "accepted": accepted
         }), content_type="application/json")
 
@@ -96,7 +96,7 @@ class NotificationAPITest(TestCase):
         r = self.get_notifications()
         self.assertEqual(len(r.data), 0)
 
-        Offer.objects.create(item_given=self.item1, item_received=self.item7, status=False, comment="test")
+        Offer.objects.create(item_given=self.item1, item_received=self.item7, answered=False, comment="test")
 
         r = self.get_notifications()
         self.assertEqual(r.status_code, status.HTTP_200_OK)

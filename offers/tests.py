@@ -37,10 +37,10 @@ class OfferAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_offer(self, id_item_given, id_item_received, accepted=False, status=False, comment="Test"):
+    def post_offer(self, id_item_given, id_item_received, accepted=False, answered=False, comment="Test"):
         return self.client.post(self.offers_url, data=json.dumps({
             "accepted": accepted,
-            "status": status,
+            "answered": answered,
             "comment":  comment,
             "item_given": id_item_given,
             "item_received": id_item_received
@@ -49,10 +49,10 @@ class OfferAPITests(TestCase):
     def get_offer(self, id_offer=1):
         return self.client.get("%s%d/" % (self.offers_url, id_offer), content_type="application/json")
 
-    def put_offer(self, id_offer, id_item_given, id_item_received, accepted=False, status=False, comment="Test"):
+    def put_offer(self, id_offer, id_item_given, id_item_received, accepted=False, answered=False, comment="Test"):
         return self.client.put("%s%d/" % (self.offers_url, id_offer), data=json.dumps({
             "accepted": accepted,
-            "status": status,
+            "answered": answered,
             "comment":  comment,
             "item_given": id_item_given,
             "item_received": id_item_received
@@ -102,7 +102,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data["id"]
-        r = self.put_offer(1, self.item2.id, self.item3.id, accepted=True, status=True, comment="Test2")
+        r = self.put_offer(1, self.item2.id, self.item3.id, accepted=True, answered=True, comment="Test2")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_offer(id_offer=id_offer)
@@ -112,7 +112,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.data["item_given"], 2)
         self.assertEqual(r.data["item_received"], 3)
         self.assertEqual(r.data["accepted"], True)
-        self.assertEqual(r.data["status"], 1)
+        self.assertEqual(r.data["answered"], 1)
         self.assertEqual(r.data["comment"], "Test2")
         r = self.put_offer(10, self.item2.id, self.item3.id)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
@@ -132,7 +132,7 @@ class OfferAPITests(TestCase):
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"status": True}))
+        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"answered": True}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"comment": "Test2"}))
@@ -144,7 +144,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.data["item_given"], self.item2.id)
         self.assertEqual(r.data["item_received"], self.item3.id)
         self.assertEqual(r.data["accepted"], True)
-        self.assertEqual(r.data["status"], True)
+        self.assertEqual(r.data["answered"], True)
         self.assertEqual(r.data["comment"], "Test2")
 
     def test_patch_offer_not_existing(self):

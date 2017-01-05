@@ -1,9 +1,7 @@
-from django.utils import timezone
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 
-from notifications.models import Notification, OfferNotification, AcceptedOfferNotification, RefusedOfferNotification
 from offers.models import Offer
 from offers.serializers import OfferSerializer, UpdateOfferSerializer
 

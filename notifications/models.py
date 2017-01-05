@@ -88,7 +88,7 @@ def new_offer_notification(sender, instance, signal, created, **kwargs):
         offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
         NewOfferNotification.objects.create(offer_notification=offer_notification)
     else:
-        if instance.status:
+        if instance.answered:
             if instance.accepted:
                 # create notification for accepted offer
                 notification = Notification.objects.create(content="Offer accepted for item: %s" %
