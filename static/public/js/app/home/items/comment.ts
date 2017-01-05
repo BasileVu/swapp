@@ -1,26 +1,26 @@
 import { CommentCreationDTO } from './comment-creation-dto';
 
 export class Comment {
-    user_id: number;
-    user_profile_picture_url: string;
-    user_fullname: string;
-    date: Date;
+    id: number;
     content: string;
+    date: Date;
+    user: number;
+    item: number;
+    user_fullname: string;
+    user_profile_picture: string;
+
+    constructor() {
+        this.id = null;
+        this.content = null;
+        this.date = null;
+        this.user = null;
+        this.item = null;
+        this.user_fullname = null;
+        this.user_profile_picture = null;
+    }
 
     fromCreationDTO(commentCreationDTO: CommentCreationDTO) {
-        this.user_id = commentCreationDTO.user;
+        this.user = commentCreationDTO.user;
         this.content = commentCreationDTO.content;
-    }
-
-    setUserFullname(user_fullname: string) {
-        this.user_fullname = user_fullname;
-    }
-
-    setUserProfilePictureUrl(picture: string) {
-        this.user_profile_picture_url = picture;
-    }
-
-    setDate(date: Date) {
-        this.date = date;
     }
 }

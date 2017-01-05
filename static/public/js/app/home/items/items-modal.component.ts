@@ -8,7 +8,6 @@ import { AuthService } from '../../shared/authentication/authentication.service'
 import { OfferService } from '../offers/offers.service';
 
 import { DetailedItem } from './detailed-item';
-import { Owner } from './owner';
 import { User } from '../profile/user';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
@@ -26,10 +25,10 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     user: User;
 
     item: DetailedItem;
-    owner: Owner;
+    owner: User;
     ownerItems: Array<DetailedItem>;
     stars: Array<number>;
-    comments: Array<Comment> = new Array();
+    comments: Array<Comment> = [];
     subscription: Subscription;
 
     // Form fields
@@ -44,7 +43,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors
-        this.owner = new Owner();
+        this.owner = new User();
         this.ownerItems = new Array();
         this.stars = new Array();
 
@@ -60,7 +59,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
             user => {
                 this.user = user;
             }
-        )
+        );
 
         // When receiving the detailed item
         this.subscription = this.itemsService.itemSelected$.subscribe(
@@ -68,19 +67,22 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 this.item = item;
 
                 // Get the owner
-                this.itemsService.getOwner(item.owner_username)
+                this.itemsService.getUser(item.owner_username)
                     .then(
                         owner => {
                             this.owner = owner;
                             this.fillStars(owner.note_avg);
-                            this.ownerItems = new Array();
+                            this.ownerItems = [];
 
                             for (let i in owner.items) {
                                 let ownerItem: any = owner.items[i];
                                 this.itemsService.getDetailedItem(ownerItem.id).then(
-                                    item => this.ownerItems.push(item),
+                                    item => {
+                                        if (ownerItem.id != item.id)
+                                            this.ownerItems.push(item);
+                                    },
                                     error => this.toastr.error("Can't get owner's items", "Error")
-                                )
+                                );
                             }
                         },
                         error => this.toastr.error("Can't get the owner", "Error")
@@ -117,9 +119,11 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     this.commentForm.reset();
                     let comment: Comment = new Comment;
                     comment.fromCreationDTO(commentCreationDTO);
-                    comment.setUserFullname(this.user.first_name + " " + this.user.last_name);
-                    comment.setUserProfilePictureUrl(this.user.profile_picture);
-                    comment.setDate(new Date());
+                    comment.user_fullname = this.user.first_name + " " + this.user.last_name;
+                    comment.user_profile_picture = this.user.profile_picture;
+                    comment.date = new Date();
+                    comment.id = -1; // TODO : get comment's id from response
+                    comment.item = this.item.id;
                     this.comments.push(comment);
                     this.toastr.success("", "Comment submitted");
                 },
@@ -134,9 +138,10 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     }
 
     fillStars(note_avg: number) {
+        console.log(note_avg);
         let fullStars = Math.floor(note_avg)
         this.stars = Array(fullStars).fill(1);
-        this.stars.push(Math.round( (note_avg % 1) * 2));
+        this.stars.push(Math.round( (note_avg % 1) * 2) / 2);
         let size = this.stars.length;
         while (5 - size++ > 0)
             this.stars.push(0);

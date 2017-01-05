@@ -3,26 +3,25 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 import { Observable } from 'rxjs';
 
-import { Item } from './item';
 import { DetailedItem } from './detailed-item';
-import { Owner } from './owner';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
+import {User} from "../profile/user";
 
 @Injectable()
 export class ItemsService {
 
     // Observable string sources
     private itemSelectedSource = new Subject<DetailedItem>();
-    private ownerSelectedSource = new Subject<Owner>();
+    private userSelectedSource = new Subject<User>();
     private commentsSelectedSource = new Subject<Comment[]>();
 
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
-    ownerSelected$ = this.ownerSelectedSource.asObservable();
+    ownerSelected$ = this.userSelectedSource.asObservable();
     commentsSelected$ = this.commentsSelectedSource.asObservable();
 
-    private itemsSubject: Subject<Item[]> = new Subject<Item[]>();
+    private itemsSubject: Subject<DetailedItem[]> = new Subject<DetailedItem[]>();
 
     private itemsUrl = '/api/items/';  // URL to web API
 
@@ -33,23 +32,23 @@ export class ItemsService {
         this.itemSelectedSource.next(item);
     }
 
-    selectOwner(owner: Owner) {
-        this.ownerSelectedSource.next(owner);
+    selectUser(user: User) {
+        this.userSelectedSource.next(user);
     }
 
     selectComments(comments: Comment[]) {
         this.commentsSelectedSource.next(comments);
     }
 
-    updateItems(items: Item[]){
+    updateItems(items: DetailedItem[]){
         this.itemsSubject.next(items);
     }
 
-    getItemsSubject(): Observable<Item[]> {
+    getItemsSubject(): Observable<DetailedItem[]> {
         return this.itemsSubject.asObservable();
     }
 
-    getItems (): Promise<Item[]> {
+    getItems (): Promise<DetailedItem[]> {
         return this.http.get(this.itemsUrl)
             .toPromise()
             .then(this.extractData)
@@ -63,7 +62,7 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
-    getOwner (owner_username: string): Promise<Owner> {
+    getUser (owner_username: string): Promise<User> {
         return this.http.get('/api/users/' + owner_username)
             .toPromise()
             .then(this.extractData)
