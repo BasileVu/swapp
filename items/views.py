@@ -200,7 +200,7 @@ class ItemViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action == "list" or self.action == "retrieve":
             return DetailedItemSerializer
         return ItemSerializer
 
@@ -262,7 +262,7 @@ class ImageViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return CreateImageSerializer
 
         return ImageSerializer

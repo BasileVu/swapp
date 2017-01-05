@@ -28,7 +28,7 @@ class BaseSetupMixin():
         self.u2.coordinates.longitude = 6.6473097
         self.u2.coordinates.save()
 
-        # Maison d'ailleurs
+        # Maison d"ailleurs
         self.latitude = 46.77866239999999
         self.longitude = 6.6419655
 
