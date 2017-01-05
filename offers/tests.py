@@ -152,15 +152,6 @@ class OfferAPITests(TestCase):
         r = self.patch_offer(id_offer=1)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
-    def patch_offer_price_range_not_matching(self):
-        self.login()
-        r = self.post_offer(self.item2.id, self.item3.id)
-        offer = Offer.objects.get(pk=r.data["id"])
-        r = self.patch_offer(id_offer=offer.id, data=json.dumps({"item_given": self.item1.id}))
-        
-        self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(offer.item_given.id, self.item2.id)
-
     def test_delete_offer(self):
         self.login()
         r = self.post_offer(self.item2.id, self.item3.id)

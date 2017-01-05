@@ -761,7 +761,7 @@ paths:
                 type: number
               accepted:
                 type: boolean
-              status:
+              answered:
                 type: boolean
               comment:
                 type: string
@@ -785,7 +785,7 @@ paths:
           description: "The content of the offer."
           required: true
           schema:
-            $ref: "#/definitions/Offer"
+            $ref: "#/definitions/OfferUpdate"
       responses:
         200:
           description: "Successful operation."
@@ -805,7 +805,7 @@ paths:
           description: "The content of the offer."
           required: false
           schema:
-            $ref: "#/definitions/Offer"
+            $ref: "#/definitions/OfferUpdate"
       responses:
         200:
           description: "Successful operation."
@@ -970,7 +970,7 @@ definitions:
     properties:
       accepted:
         type: boolean
-      status:
+      answered:
         type: boolean
       comment:
         type: string
@@ -978,6 +978,16 @@ definitions:
         type: number
       item_received:
         type: number
+        
+  OfferUpdate:
+    type: object
+    properties:
+      accepted:
+        type: boolean
+      answered:
+        type: boolean
+      comment:
+        type: string
         
   LikeCreation:
     type: object
