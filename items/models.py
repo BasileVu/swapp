@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Item(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
     description = models.CharField(max_length=2000)
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
@@ -17,6 +17,13 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class KeyInfo(models.Model):
+    key = models.CharField(max_length=30)
+    info = models.CharField(max_length=30)
+
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
 
 class Image(models.Model):
