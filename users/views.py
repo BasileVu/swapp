@@ -120,8 +120,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "categories": [c.name for c in user_profile.categories.all()],
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
-            "note_avg": user.userprofile.note_avg,
-            "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
+            "note_avg": user.userprofile.note_avg
         })
 
     def update(self, request, *args, **kwargs):
@@ -187,7 +186,8 @@ def get_public_account_info(request, username):
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
         "items": InventoryItemSerializer(user.item_set.all(), many=True).data,
         "notes": user.note_set.count(),
-        "note_avg": user.userprofile.note_avg
+        "note_avg": user.userprofile.note_avg,
+        "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
     })
 
 
