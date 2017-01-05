@@ -291,6 +291,10 @@ tests/report/
 .vscode/tasks.json
 .vscode/launch.json
 
+### JS ###
 static/public/js/app/**/*.js
 static/public/js/app/**/*.js.map
 static/public/js/vendor/
+
+### generated folders ###
+uploaded_media/
