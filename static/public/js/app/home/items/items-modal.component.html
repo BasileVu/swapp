@@ -229,7 +229,6 @@
                     </div>
                     <div class="row preview">
                         <div class="col-sm-12 col-md-6" *ngFor="let ownerItem of ownerItems">
-                            <p>{{ ownerItem.name }}</p>
                             <img class="img-fluid" *ngIf="ownerItem.image_url != null" src="{{ ownerItem.image_url }}"/>
                             <img class="img-fluid" *ngIf="ownerItem.image_url === null" src="http://loremflickr.com/100/100"/>
                         </div>
