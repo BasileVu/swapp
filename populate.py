@@ -1,5 +1,7 @@
 import os
 
+from django.core.files import File
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swapp.settings")
 
 import django
@@ -26,7 +28,18 @@ def create_comment(user, item, content="Comment test"):
     return Comment.objects.create(content=content, user=user, item=item)
 
 
-if __name__ == '__main__':
+def set_image_profile(user, image_name):
+    image = open("populate_images/profiles/profile_%s" % image_name, "rb")
+    user.userprofile.image = File(image)
+    user.userprofile.save()
+
+
+def set_image_item(item, image_name):
+    image = open("populate_images/items/item_%s" % image_name, "rb")
+    Image.objects.create(image=File(image), item=item)
+
+
+if __name__ == "__main__":
     # Users
     u1 = User.objects.create_user(username="user1", email="test1@test.com", password="password")
     u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
@@ -79,6 +92,14 @@ if __name__ == '__main__':
                      views=50)
     i9 = create_item(c22, u4, name="Trumpet", description="Good sound", price_min=300, price_max=350, views=60)
 
+    # Set userprofile image
+    set_image_profile(u1, "user1.jpg")
+    set_image_profile(u2, "user2.jpg")
+    set_image_profile(u3, "user3.jpg")
+    set_image_profile(u4, "user4.jpg")
+
+    # Set items image
+
     # Key info on items
     KeyInfo.objects.create(key="Brand", info="Adidum", item=i1)
     KeyInfo.objects.create(key="Size", info="40", item=i1)
@@ -127,11 +148,6 @@ if __name__ == '__main__':
     Like.objects.create(user=u2, item=i8)
     Like.objects.create(user=u3, item=i9)
     Like.objects.create(user=u1, item=i9)
-
-    # image = ImagePil.new('RGBA', size=(640, 960), color=(155, 0, 0))
-    # file = tempfile.NamedTemporaryFile(suffix='.png')
-    # image.save('test.png')
-    # Image.objects.create(item=i1, image='test.png')
 
     # Create new offers with corresponding notifications (made automatically)
     o1 = create_offer(i1, i4, "A good offer for my shoes")
