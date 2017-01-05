@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.serializers import InventoryItemSerializer
+from items.serializers import InventoryItemSerializer, CategorySerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -120,7 +120,8 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "categories": [c.name for c in user_profile.categories.all()],
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
-            "note_avg": user.userprofile.note_avg
+            "note_avg": user.userprofile.note_avg,
+            "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
         })
 
     def update(self, request, *args, **kwargs):
