@@ -13,9 +13,9 @@ from comments.models import Comment
 from notifications.models import Notification
 
 
-def create_item(category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0):
+def create_item(category, owner, name="Test", description="Test", price_min=1, price_max=2, archived=0, views=0):
     return Item.objects.create(name=name, description=description, price_min=price_min,
-                               price_max=price_max, archived=archived, category=category, owner=owner)
+                               price_max=price_max, archived=archived, category=category, owner=owner, views=views)
 
 
 def create_offer(item_given, item_received, comment="Offer test"):
@@ -67,15 +67,65 @@ if __name__ == '__main__':
     c31 = Category.objects.create(name="Everything else")
 
     # Items
-    i1 = create_item(c8, u1, name="Shoes", description="My collector shoes", price_min=10, price_max=50)
-    i2 = create_item(c8, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30)
-    i3 = create_item(c19, u1, name="Ring", description="My precious", price_min=100, price_max=500)
-    i4 = create_item(c12, u2, name="New mouse", description="Brand new", price_min=40, price_max=150)
-    i5 = create_item(c22, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000)
-    i6 = create_item(c22, u3, name="Violin", description="In good shape", price_min=1000, price_max=2000)
-    i7 = create_item(c22, u3, name="Flute", description="Very old", price_min=200, price_max=300)
-    i8 = create_item(c22, u3, name="Guitar", description="One cord is broken", price_min=150, price_max=250)
-    i9 = create_item(c22, u4, name="Trumpet", description="Good sound", price_min=300, price_max=350)
+    i1 = create_item(c8, u1, name="Shoes", description="My collector shoes", price_min=10, price_max=50, views=800)
+    i2 = create_item(c8, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30, views=100)
+    i3 = create_item(c19, u1, name="Ring", description="My precious", price_min=100, price_max=500, views=400)
+    i4 = create_item(c12, u2, name="New mouse", description="Brand new", price_min=40, price_max=150, views=200)
+    i5 = create_item(c22, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000,
+                     views=1000)
+    i6 = create_item(c22, u3, name="Violin", description="In good shape", price_min=1000, price_max=2000, views=30)
+    i7 = create_item(c22, u3, name="Flute", description="Very old", price_min=200, price_max=300, views=40)
+    i8 = create_item(c22, u3, name="Electric guitar", description="One cord is broken", price_min=150, price_max=250, views=50)
+    i9 = create_item(c22, u4, name="Trumpet", description="Good sound", price_min=300, price_max=350, views=60)
+
+    # Key info on items
+    i1.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="Adidum"))
+    i1.keyinfo_set.add(KeyInfo.objects.create(key="Size", info="40"))
+    i1.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="Purple"))
+    i2.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="Niko"))
+    i2.keyinfo_set.add(KeyInfo.objects.create(key="Size", info="L"))
+    i2.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="White"))
+    i3.keyinfo_set.add(KeyInfo.objects.create(key="Made in", info="Mordor"))
+    i3.keyinfo_set.add(KeyInfo.objects.create(key="Manufacturer", info="Sauron"))
+    i3.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="Golden"))
+    i4.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="LogicTe"))
+    i4.keyinfo_set.add(KeyInfo.objects.create(key="Hand", info="Left"))
+    i4.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="Black and white"))
+    i5.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="StenStay"))
+    i5.keyinfo_set.add(KeyInfo.objects.create(key="Hand", info="Left and right"))
+    i5.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="Black"))
+    i6.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="StradiWarior"))
+    i6.keyinfo_set.add(KeyInfo.objects.create(key="Mater", info="Wood"))
+    i6.keyinfo_set.add(KeyInfo.objects.create(key="Quality", info="Brand new"))
+    i7.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="Pan"))
+    i7.keyinfo_set.add(KeyInfo.objects.create(key="Quality", info="Bad shape"))
+    i7.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="White"))
+    i8.keyinfo_set.add(KeyInfo.objects.create(key="Brand", info="Power"))
+    i8.keyinfo_set.add(KeyInfo.objects.create(key="Manufacturer", info="Elvis"))
+    i8.keyinfo_set.add(KeyInfo.objects.create(key="Color", info="Blue ocean"))
+    i9.keyinfo_set.add(KeyInfo.objects.create(key="Sound", info="Pouette"))
+    i9.keyinfo_set.add(KeyInfo.objects.create(key="Quality", info="Good shape"))
+    i9.keyinfo_set.add(KeyInfo.objects.create(key="Made in", info="China"))
+
+    # Likes on items for users
+    Like.objects.create(user=u2, item=i1)
+    Like.objects.create(user=u3, item=i1)
+    Like.objects.create(user=u4, item=i1)
+    Like.objects.create(user=u2, item=i2)
+    Like.objects.create(user=u3, item=i2)
+    Like.objects.create(user=u3, item=i3)
+    Like.objects.create(user=u1, item=i4)
+    Like.objects.create(user=u3, item=i4)
+    Like.objects.create(user=u4, item=i4)
+    Like.objects.create(user=u4, item=i5)
+    Like.objects.create(user=u1, item=i5)
+    Like.objects.create(user=u4, item=i6)
+    Like.objects.create(user=u4, item=i7)
+    Like.objects.create(user=u1, item=i7)
+    Like.objects.create(user=u2, item=i7)
+    Like.objects.create(user=u2, item=i8)
+    Like.objects.create(user=u3, item=i9)
+    Like.objects.create(user=u1, item=i9)
 
     # image = ImagePil.new('RGBA', size=(640, 960), color=(155, 0, 0))
     # file = tempfile.NamedTemporaryFile(suffix='.png')
