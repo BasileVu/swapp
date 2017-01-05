@@ -12,12 +12,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
-class UpdateCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ("id",)
-
-
 class InterestedByCategorySerializer(serializers.Serializer):
     interested_by = serializers.ListField(
         child=serializers.IntegerField()

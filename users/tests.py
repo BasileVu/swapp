@@ -146,17 +146,22 @@ class AccountAPITests(TestCase):
         with open("test.png", "rb") as data:
             return self.client.post("/api/images/", {"image": data, "user": user}, format="multipart")
 
+    def patch_interested_by_categories(self, interested_by=[]):
+        return self.client.patch("/api/account/categories/", data=json.dumps({
+            "interested_by": interested_by
+        }), content_type="application/json")
+
     def setUp(self):
         User.objects.create_user(username="username", password="password", first_name="first_name",
                                  last_name="last_name", email="test@test.com")
+        self.login()
 
     def test_get_account_info_not_logged_in(self):
+        self.client.logout()
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_account_info_logged_in(self):
-        self.login()
-
         # add some data related to user
         u = User.objects.get(pk=1)
         c = Category.objects.create(name="category")
@@ -188,6 +193,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["notes"], 1)
 
     def test_update_account_not_logged_in(self):
+        self.client.logout()
         r = self.client.patch("/api/account/", data=json.dumps({
             "first_name": "f",
             "last_name": "l"
@@ -205,8 +211,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "last_name")
 
     def test_update_account_logged_in(self):
-        self.login()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "first_name": "firstname",
             "last_name": "lastname"
@@ -221,6 +225,8 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["last_name"], "lastname")
 
     def test_cannot_update_account_not_logged_in(self):
+        self.client.logout()
+
         r = self.client.patch("/api/account/", data=json.dumps({
             "email": "a@b.com",
         }), content_type="application/json")
@@ -236,6 +242,8 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["email"], "a@b.com")
 
     def test_cannot_connect_if_account_not_active(self):
+        self.client.logout()
+
         u = User.objects.get(pk=1)
         u.is_active = False
         u.save()
@@ -248,8 +256,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_account_empty_json(self):
-        self.login()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "username": "",
         }), content_type="application/json")
@@ -262,7 +268,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["username"], "username")
 
     def test_update_one_not_considered_info(self):
-        self.login()
         datetime = str(timezone.now())
 
         r = self.client.patch("/api/account/", data=json.dumps({
@@ -277,8 +282,6 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
     def test_update_account_malformed_json(self):
-        self.login()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "emaaiill": "newemail@newemail.com",
         }), content_type="application/json")
@@ -291,8 +294,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_update_user_account_incomplete_json(self):
-        self.login()
-
         r = self.client.put("/api/account/", data=json.dumps({
             "email": "newemail@newemail.com",
         }), content_type="application/json")
@@ -305,8 +306,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_complete_update_account(self):
-        self.login()
-
         r = self.client.put("/api/account/", data=json.dumps({
             "username": "newusername",
             "first_name": "firstname",
@@ -326,8 +325,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["location"], {"country": "", "city": "", "region": "", "street": ""})
 
     def test_complete_update_account_empty_json(self):
-        self.login()
-
         r = self.client.put("/api/account/", data=json.dumps({
             "username": "",
             "first_name": "",
@@ -348,6 +345,8 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["location"], {"city": "", "region": "", "street": "", "country": ""})
 
     def test_change_password_not_logged_in(self):
+        self.client.logout()
+
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "password",
             "new_password": "newpassword"
@@ -357,8 +356,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(len(r.data), 1)
 
     def test_change_password(self):
-        self.login()
-
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "password",
             "new_password": "newpassword"
@@ -372,8 +369,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_with_false_old_password(self):
-        self.login()
-
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "passwor",
             "new_password": "newpassword"
@@ -389,8 +384,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_empty_json(self):
-        self.login()
-
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "",
             "new_password": ""
@@ -398,43 +391,35 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_change_password_partial_json(self):
-        self.login()
-
         r = self.client.put("/api/account/password/", data=json.dumps({
             "old_password": "password"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_two_users_cant_have_same_username_update_patch(self):
-        User.objects.create_user(username="user1", password="pass1")
-        User.objects.create_user(username="user2", password="pass2")
-
-        self.login(username="user1", password="pass1")
+        User.objects.create_user(username="username2", password="pass2")
 
         r = self.client.patch("/api/account/", data=json.dumps({
-            "username": "user2",
+            "username": "username2",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "user1")
+        self.assertEqual(r.data["username"], "username")
 
         self.client.get("/api/logout/")
-        self.login(username="user2", password="pass2")
+        self.login(username="username2", password="pass2")
 
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "user2")
+        self.assertEqual(r.data["username"], "username2")
 
     def test_two_users_cant_have_same_username_update_put(self):
-        User.objects.create_user(username="user1", password="pass1")
-        User.objects.create_user(username="user2", password="pass2")
-
-        self.login(username="user1", password="pass1")
+        User.objects.create_user(username="username2", password="pass2")
 
         r = self.client.put("/api/account/", data=json.dumps({
-            "username": "user2",
+            "username": "username2",
             "first_name": "firstname",
             "last_name": "lastname",
             "email": "newemail@newemail.com",
@@ -445,18 +430,16 @@ class AccountAPITests(TestCase):
 
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "user1")
+        self.assertEqual(r.data["username"], "username")
 
         self.client.get("/api/logout/")
-        self.login(username="user2", password="pass2")
+        self.login(username="username2", password="pass2")
 
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "user2")
+        self.assertEqual(r.data["username"], "username2")
 
     def test_update_malformed_email_logged_in(self):
-        self.login()
-
         r = self.client.patch("/api/account/", data=json.dumps({
             "email": "test",
         }), content_type="application/json")
@@ -469,8 +452,6 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_modification_date_user_logged_in(self):
-        self.login()
-
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         datetime = r.data["last_modification_date"]
@@ -489,13 +470,10 @@ class AccountAPITests(TestCase):
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
     def test_405_when_get_on_password(self):
-        self.login()
         r = self.client.get("/api/account/password/")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_post_account_image(self):
-        self.login()
-
         self.assertEqual(User.objects.get(pk=1).userprofile.image.name, "")
 
         r = self.post_image()
@@ -505,8 +483,6 @@ class AccountAPITests(TestCase):
         self.assertNotEqual(r.data["profile_picture_url"], None)
 
     def test_post_account_image_already_existing_image(self):
-        self.login()
-
         r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
@@ -514,6 +490,30 @@ class AccountAPITests(TestCase):
         r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         self.assertNotEqual(User.objects.get(pk=1).userprofile.image.name, "")
+
+    def test_patch_interested_by_categories(self):
+        c1 = Category.objects.create(name="category1")
+        c2 = Category.objects.create(name="category2")
+        c3 = Category.objects.create(name="category3")
+
+        r = self.patch_interested_by_categories([c1.id, c2.id, c3.id])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data, [
+            {"id": c1.id, "name": c1.name},
+            {"id": c2.id, "name": c2.name},
+            {"id": c3.id, "name": c3.name}
+        ])
+
+        r = self.patch_interested_by_categories([c2.id, c3.id])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data, [
+            {"id": c2.id, "name": c2.name},
+            {"id": c3.id, "name": c3.name}
+        ])
+
+        r = self.patch_interested_by_categories([])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data, [])
 
 
 class CSRFTests(TestCase):
@@ -627,11 +627,6 @@ class PublicAccountInfoTests(TestCase):
         with open("test.png", "rb") as data:
             return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
-    def patch_interested_by_categories(self, interested_by=[]):
-        return self.client.patch("/api/account/categories/", data=json.dumps({
-            "interested_by": interested_by
-        }), content_type="application/json")
-
     def setUp(self):
         self.user = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
                                              email="test@test.com", password="password")
@@ -650,6 +645,11 @@ class PublicAccountInfoTests(TestCase):
         self.user.location.country = "c"
         self.user.location.save()
 
+        self.user.userprofile.categories.add(self.c1)
+        self.user.userprofile.categories.add(self.c2)
+        self.user.userprofile.categories.add(self.c3)
+        self.user.userprofile.save()
+
     def test_get_user_info_not_found(self):
         r = self.client.get("/api/users/%s/" % (self.user.username + "42"))
         self.assertEquals(r.status_code, status.HTTP_404_NOT_FOUND)
@@ -663,9 +663,13 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(r.data["location"], "a, b, c")
         self.assertEqual(r.data["notes"], 0)
         self.assertEqual(r.data["note_avg"], None)
-        self.assertEqual(r.data["interested_by"], [])
-        self.assertEqual(len(r.data["items"]), 1)
+        self.assertEqual(r.data["interested_by"], [
+            {"id": self.c1.id, "name": self.c1.name},
+            {"id": self.c2.id, "name": self.c2.name},
+            {"id": self.c3.id, "name": self.c3.name}
+        ])
 
+        self.assertEqual(len(r.data["items"]), 1)
         item_received = r.data["items"][0]
         self.assertEqual(item_received["id"], 1)
         self.assertEqual(item_received["image_url"], None)
@@ -679,16 +683,6 @@ class PublicAccountInfoTests(TestCase):
         r = self.client.get("/api/users/%s/" % self.user.username)
         self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
-    def test_patch_interested_by_categories(self):
-        self.client.login(username="username", password="password")
-
-        r = self.patch_interested_by_categories([self.c1.id, self.c2.id, self.c3.id])
-        self.client.logout()
-
-        r = self.client.get("/api/users/%s/" % self.user.username)
-        self.assertEqual(r.data["interested_by"], [{"id": self.c1.id, "name": self.c1.name},
-                                                   {"id": self.c2.id, "name": self.c2.name},
-                                                   {"id": self.c3.id, "name": self.c3.name}])
 
 class NoteAPITests(TestCase):
     def setUp(self):

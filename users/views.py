@@ -98,7 +98,7 @@ def create_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
-    """Allows to get the current"s account info and update them."""
+    """Allows to get the current user's account info and update them."""
 
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
@@ -135,7 +135,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
-    Changes the current user"s password.
+    Changes the current user's password.
     """
     serializer = ChangePasswordSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -192,7 +192,7 @@ class CategoriesView(generics.UpdateAPIView):
 
 @api_view(["GET"])
 def get_public_account_info(request, username):
-    """Returns the user"s public info."""
+    """Returns the user's public info."""
     user = get_object_or_404(User, username=username)
 
     return Response({
@@ -226,7 +226,7 @@ class NoteViewSet(mixins.CreateModelMixin,
         offer = serializer.validated_data["offer"]
 
         if offer.accepted is not True:
-            raise ValidationError("You cannot make a note if the offer has not been accepted")
+            raise ValidationError("You can't make a note if the offer has not been accepted")
         if offer.item_given.owner == self.request.user:
             serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:
