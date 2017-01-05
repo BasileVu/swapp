@@ -1056,8 +1056,6 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
-      owner_username:
-        type: string
       category:
         type: object
         properties:
@@ -1081,3 +1079,9 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/InventoryItem"
+      owner_username:
+        type: string
+      owner_picture_url:
+        type: string
+      owner_location:
+        type: string
