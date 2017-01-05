@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
+import {UserLoginDTO} from "../profile/user-login-dto";
+import {UserCreationDTO} from "../profile/user-creation-dto";
 
 @Injectable()
 export class OfferService {
 
     // Observable source
-    private openOfferModalSource = new Subject<boolean>();
+    private openOfferModalSource = new Subject<Array<any>>();
     // Observable boolean streams
     offerModalSelected$ = this.openOfferModalSource.asObservable();
 
@@ -14,7 +16,7 @@ export class OfferService {
 
     // Service message commands
     // offer is an array where [0]=user, [1]=owner, [2]=item wanted
-    openOfferModal(offer) {
+    openOfferModal(offer: Array<any>) {
         this.openOfferModalSource.next(offer);
     }
     
@@ -24,7 +26,7 @@ export class OfferService {
         .catch(this.handleError);
     }
     
-    login(userLoginDTO): Promise<any> {
+    login(userLoginDTO: UserLoginDTO): Promise<any> {
         let body = JSON.stringify(userLoginDTO); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option
@@ -35,7 +37,7 @@ export class OfferService {
             .catch(this.handleError);
     }
 
-    register(userCreationDTO): Promise<any> {
+    register(userCreationDTO: UserCreationDTO): Promise<any> {
         let body = JSON.stringify(userCreationDTO); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option

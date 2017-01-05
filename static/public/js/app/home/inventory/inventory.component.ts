@@ -15,6 +15,7 @@ import { InventoryItem } from './inventory-item';
 import { ItemsService } from '../items/items.service';
 import {Subscription} from "rxjs";
 import {User} from "../profile/user";
+import {ItemCreationDTO} from "./item-creation-dto";
 
 declare var $:any;
 
@@ -62,6 +63,7 @@ export class InventoryComponent implements OnInit {
         this.subscription = this.authService.userSelected$.subscribe(
             user => {
                 this.owner = user;
+                this.inventory = [];
                 for(let item of this.owner.items) {
                     let inventoryItem = new InventoryItem(item.id, item.name, item.image_url, null);
                     console.log(inventoryItem);
@@ -72,9 +74,9 @@ export class InventoryComponent implements OnInit {
     }
 
     // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
-    addItemEvent($event) {
+    addItemEvent($event: ItemCreationDTO) {
         let inventoryItem = new InventoryItem(
-            $event.url,
+            1, // TODO
             $event.name, 
             $event.images[0], 
             $event.creation_date);
