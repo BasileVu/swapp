@@ -8,8 +8,10 @@ import { HomeModule }   from './home/home.module';
 
 /* Feature Modules */
 import { CoreModule }  from './core/core.module';
-import { AuthService } from './shared/authentication/authentication.service';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
+
+/* My modules */
+import { AuthService } from './shared/authentication/authentication.service';
 
 /* Routing Module */
 import { AppRoutingModule } from './app-routing.module';

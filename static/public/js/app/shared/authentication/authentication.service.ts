@@ -3,6 +3,7 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 
 import { User } from '../../home/profile/user';
+import { Account } from "../../home/profile/account";
 
 @Injectable()
 export class AuthService {
@@ -39,7 +40,6 @@ export class AuthService {
     }
 
     logout(): Promise<any> {
-        localStorage.removeItem("user");
         return this.http.get('/api/logout/')
         .toPromise()
         .catch(this.handleError);
@@ -74,7 +74,7 @@ export class AuthService {
             .catch(this.handleError);
     }
 
-    getAccount(): Promise<User> {
+    getAccount(): Promise<Account> {
         return this.http.get('/api/account/')
             .toPromise()
             .then(this.extractUser)
@@ -83,9 +83,9 @@ export class AuthService {
 
     extractUser(res: Response) {
         let body = res.json();
-        let user = new User();
+        let user = new Account();
         user.id = body.id;
-        user.profile_picture = body.profile_picture_url;
+        user.profile_picture_url = body.profile_picture_url;
         user.username = body.username;
         user.first_name = body.first_name;
         user.last_name = body.last_name;
@@ -95,8 +95,9 @@ export class AuthService {
         user.location.region = body.location.region;
         user.location.country = body.location.country;
         user.last_modification_date = body.last_modification_date;
+        user.categories = body.categories;
         user.notes = body.notes;
-        user.likes = body.likes;
+        user.note_avg = body.note_avg;
         user.items = body.items;
         return user;
     }

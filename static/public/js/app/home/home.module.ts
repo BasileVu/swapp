@@ -28,7 +28,13 @@ import { ProfileService } from './profile/profile.service';
 import { ItemsService } from './items/items.service';
 import { SearchService } from './search/search.service';
 import { OfferService } from './offers/offers.service';
-import {NotificationsService} from "./profile/notifications.service";
+import { NotificationsService } from "./profile/notifications.service";
+
+import { MyInventoryDirective } from './offers/my-inventory.directive';
+import { YourInventoryDirective } from './offers/your-inventory.directive';
+import { UpdateGridDirective } from './items/update-grid.directive';
+import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
+
 
 @NgModule({
     imports: [
@@ -53,7 +59,11 @@ import {NotificationsService} from "./profile/notifications.service";
         NotificationModalComponent,
         SendPropositionModalComponent,
         AcceptPropositionModalComponent,
-        ImageCropperComponent
+        ImageCropperComponent,
+        MyInventoryDirective,
+        YourInventoryDirective,
+        UpdateGridDirective,
+        UpdateInventoryDirective
     ],
     providers: [
         InventoryService,
