@@ -19,21 +19,11 @@ class UpdateCategorySerializer(serializers.ModelSerializer):
 
 
 class InterestedByCategorySerializer(serializers.Serializer):
-    interested_by_categories = UpdateCategorySerializer(many=True)
-
-    def update(self, instance, validated_data):
-        if validated_data.get("interested_by", None) is not None:
-            interested_by_categories = validated_data.pop("interested_by")
-
-            instance.categories.clear()
-
-            for id in interested_by_categories:
-                instance.categories.add(Category.objects.get(pk=id))
-
-        return super().update(instance, validated_data)
+    interested_by = serializers.ListField(
+        child=serializers.IntegerField()
+    )
 
     class Meta:
-        model = UserProfile
         fields = ("interested_by",)
 
 

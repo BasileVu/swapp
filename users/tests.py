@@ -681,12 +681,8 @@ class PublicAccountInfoTests(TestCase):
 
     def test_patch_interested_by_categories(self):
         self.client.login(username="username", password="password")
-        r = self.client.get("/api/account/categories/")
-        print(r.status_code)
 
         r = self.patch_interested_by_categories([self.c1.id, self.c2.id, self.c3.id])
-        print(r.status_code)
-        print(r.data)
         self.client.logout()
 
         r = self.client.get("/api/users/%s/" % self.user.username)

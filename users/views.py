@@ -10,8 +10,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.serializers import InventoryItemSerializer, CategorySerializer, UpdateCategorySerializer, \
-    InterestedByCategorySerializer
+from items.models import Category
+from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -173,19 +173,21 @@ class LocationView(generics.UpdateAPIView):
         serializer.save()
 
 
-class CategoryViewSet(mixins.UpdateModelMixin,
-                      mixins.ListModelMixin,
-                      viewsets.GenericViewSet):
-    serializer_class = InterestedByCategorySerializer
+class CategoriesView(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
-    # def update(self, request, pk=None, *args, **kwargs):
-    #     print("UPDATE")
-    #     return Response()
+    def update(self, request, *args, **kwargs):
+        serializer = InterestedByCategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    # def list(self, request, *args, **kwargs):
-    #     print("GET LIST")
-    #     return Response()
+        userprofile = self.request.user.userprofile
+        userprofile.categories.clear()
+
+        for id in serializer.validated_data["interested_by"]:
+            userprofile.categories.add(Category.objects.get(pk=id))
+            userprofile.save()
+
+        return Response(CategorySerializer(userprofile.categories.all(), many=True).data)
 
 
 @api_view(["GET"])

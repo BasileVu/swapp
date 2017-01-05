@@ -7,7 +7,6 @@ app_name = "users"
 
 router = DefaultRouter()
 router.register(r"notes", views.NoteViewSet)
-router.register(r"account/categories", views.CategoryViewSet, base_name="interested_by_categories")
 
 urlpatterns = [
     url(r"csrf/$", views.get_csrf_token, name="get_csrf"),
@@ -18,4 +17,5 @@ urlpatterns = [
     url(r"account/$", views.UserAccount.as_view(), name="user_account"),
     url(r"account/password/", views.change_password, name="change_password"),
     url(r"account/location/", views.LocationView.as_view(), name="location"),
+    url(r"account/categories/", views.CategoriesView.as_view(), name="categories"),
 ] + router.urls
