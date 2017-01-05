@@ -466,7 +466,6 @@ class AccountAPITests(TestCase):
         r = self.client.get("/api/account/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "mail@mail.com")
-        time.sleep(0.2)
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
     def test_405_when_get_on_password(self):
