@@ -9,6 +9,8 @@ from offers.models import Offer
 
 
 class OfferAPITests(TestCase):
+    offers_url = "/api/offers/"
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -35,8 +37,8 @@ class OfferAPITests(TestCase):
             "password": "password"
         }), content_type="application/json")
 
-    def post_offer(self, id_item_given, id_item_received, accepted=False, status=0, comment="Test"):
-        return self.client.post("/api/offers/", data=json.dumps({
+    def post_offer(self, id_item_given, id_item_received, accepted=False, status=False, comment="Test"):
+        return self.client.post(self.offers_url, data=json.dumps({
             "accepted": accepted,
             "status": status,
             "comment":  comment,
@@ -45,10 +47,10 @@ class OfferAPITests(TestCase):
         }), content_type="application/json")
 
     def get_offer(self, id_offer=1):
-        return self.client.get("/api/offers/" + str(id_offer) + "/", content_type="application/json")
+        return self.client.get("%s%d/" % (self.offers_url, id_offer), content_type="application/json")
 
-    def put_offer(self, id_offer, id_item_given, id_item_received, accepted=False, status=0, comment="Test"):
-        return self.client.put("/api/offers/" + str(id_offer) + "/", data=json.dumps({
+    def put_offer(self, id_offer, id_item_given, id_item_received, accepted=False, status=False, comment="Test"):
+        return self.client.put("%s%d/" % (self.offers_url, id_offer), data=json.dumps({
             "accepted": accepted,
             "status": status,
             "comment":  comment,
@@ -57,10 +59,10 @@ class OfferAPITests(TestCase):
         }), content_type="application/json")
 
     def delete_offer(self, id_offer=1):
-        return self.client.delete("/api/offers/" + str(id_offer) + "/", content_type="application/json")
+        return self.client.delete("%s%d/" % (self.offers_url, id_offer), content_type="application/json")
 
     def patch_offer(self, id_offer=1, data=json.dumps({"accepted": False})):
-        return self.client.patch("/api/offers/" + str(id_offer) + "/", data=data, content_type="application/json")
+        return self.client.patch("%s%d/" % (self.offers_url, id_offer), data=data, content_type="application/json")
 
     def test_post_offer(self):
         self.login()
@@ -100,7 +102,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         id_offer = r.data["id"]
-        r = self.put_offer(1, self.item2.id, self.item3.id, accepted=True, status=1, comment="Test2")
+        r = self.put_offer(1, self.item2.id, self.item3.id, accepted=True, status=True, comment="Test2")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_offer(id_offer=id_offer)
@@ -130,7 +132,7 @@ class OfferAPITests(TestCase):
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"status": 1}))
+        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"status": True}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"comment": "Test2"}))
@@ -142,7 +144,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.data["item_given"], self.item2.id)
         self.assertEqual(r.data["item_received"], self.item3.id)
         self.assertEqual(r.data["accepted"], True)
-        self.assertEqual(r.data["status"], 1)
+        self.assertEqual(r.data["status"], True)
         self.assertEqual(r.data["comment"], "Test2")
 
     def test_patch_offer_not_existing(self):

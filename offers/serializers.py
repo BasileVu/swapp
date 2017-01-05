@@ -12,4 +12,4 @@ class OfferSerializer(serializers.ModelSerializer):
 class UpdateOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
-        field = ('accepted', 'comment', 'status')
+        fields = ('accepted', 'comment', 'status')

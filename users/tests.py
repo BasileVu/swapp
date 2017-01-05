@@ -526,7 +526,6 @@ class CSRFTests(TestCase):
 
 
 class LocationCoordinatesTests(TestCase):
-
     new_location = {
         "street": "Route de Cheseaux 1",
         "city": "Yverdon-les-Bains",
@@ -646,7 +645,7 @@ class PublicAccountInfoTests(TestCase):
 
     def test_get_user_info_not_found(self):
         r = self.client.get("/api/users/%s/" % (self.user.username + "42"))
-        self.assertEquals(r.status_code, 404)
+        self.assertEquals(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_user_info(self):
         r = self.client.get("/api/users/%s/" % self.user.username)
@@ -686,9 +685,9 @@ class NoteAPITests(TestCase):
         self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
         self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
                                         price_max=30)
-        Offer.objects.create(id=1, accepted=1, status=1, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=1, accepted=1, status=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
-        Offer.objects.create(id=2, accepted=0, status=1, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=2, accepted=0, status=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
     def login(self):
@@ -731,7 +730,7 @@ class NoteAPITests(TestCase):
     def test_get_note(self):
         self.login()
         r = self.get_note(1)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         r = self.get_note(1)
@@ -779,7 +778,7 @@ class NoteAPITests(TestCase):
     def test_put_note(self):
         self.login()
         r = self.put_note(1, "Test", 1)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
@@ -791,7 +790,7 @@ class NoteAPITests(TestCase):
     def test_patch_note(self):
         self.login()
         r = self.patch_note(1, "Test", 1)
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
         r = self.post_note(1, "Test", 1)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
@@ -828,7 +827,7 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.data["note_avg"], 1)
 
     def test_user_avg_note_two_notes(self):
-        Offer.objects.create(id=3, accepted=1, status=1, comment="test", item_given=self.myItem,
+        Offer.objects.create(id=3, accepted=1, status=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
         self.login()
