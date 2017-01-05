@@ -113,12 +113,12 @@ if __name__ == '__main__':
     o4.save()
 
     # Change read to True for new accepted offer notification 6 and for new refused offer notification 8
-    n5 = Notification.objects.get(pk=6)
-    n5.read = True
-    n5.save()
-    n7 = Notification.objects.get(pk=8)
-    n7.read = True
-    n7.save()
+    n6 = Notification.objects.get(pk=6)
+    n6.read = True
+    n6.save()
+    n8 = Notification.objects.get(pk=8)
+    n8.read = True
+    n8.save()
 
     # Create new comments with corresponding notifications (made automatically)
     co1 = create_comment(u1, i4, "I think this mouse is not a good deal.")
@@ -130,12 +130,12 @@ if __name__ == '__main__':
     co7 = create_comment(u4, i1, "I want to put those shoes on.")
 
     # Change read to True for new comments notifications 10 and 11
-    n9 = Notification.objects.get(pk=10)
-    n9.read = True
-    n9.save()
-    n10 = Notification.objects.get(pk=11)
+    n10 = Notification.objects.get(pk=10)
     n10.read = True
     n10.save()
+    n11 = Notification.objects.get(pk=11)
+    n11.read = True
+    n11.save()
 
     # Create new notes with corresponding notifications (made automatically)
     no1 = Note.objects.create(user=u2, offer=o1, text="Very good", note=5)
@@ -143,6 +143,6 @@ if __name__ == '__main__':
     no3 = Note.objects.create(user=u1, offer=o4, text="Not too bad", note=3)
 
     # Change read to True for new note notification 17
-    n13 = Notification.objects.get(pk=17)
-    n13.read = True
-    n13.save()
+    n17 = Notification.objects.get(pk=17)
+    n17.read = True
+    n17.save()
