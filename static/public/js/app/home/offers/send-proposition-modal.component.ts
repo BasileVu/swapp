@@ -1,10 +1,9 @@
-import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import {Component, ViewEncapsulation, OnInit, Input} from '@angular/core';
 
 import { OfferService } from './offers.service';
 import { ItemsService } from '../items/items.service';
 
 import { User } from '../profile/user';
-import { Owner } from '../items/owner';
 import { DetailedItem } from '../items/detailed-item';
 
 @Component({
@@ -16,7 +15,7 @@ import { DetailedItem } from '../items/detailed-item';
 export class SendPropositionModalComponent implements OnInit {
 
     user: User;
-    owner: Owner;
+    owner: User;
     item: DetailedItem;
 
     constructor(private offerService: OfferService,
@@ -27,13 +26,13 @@ export class SendPropositionModalComponent implements OnInit {
         });
 
         this.user = new User();
-        this.owner = new Owner();
+        this.owner = new User();
     }
 
     ngOnInit() {
     }
 
-    // offerArray contains the offer elements where [0]=user, [1]=owner, [2]=item wanted
+    // offerArray contains the offer elements where [0]=user (type User), [1]=owner (type User), [2]=item wanted (type DetailedItem)
     initOffer(offerArray) {
         this.user = offerArray[0];
         this.owner = offerArray[1];
@@ -43,12 +42,37 @@ export class SendPropositionModalComponent implements OnInit {
         console.log(this.owner);
         console.log(this.item);
 
-
-
-        // Get owner's inventory
-
         // Display first owner's inventory item as the item wanted
 
+        /*
+        setTimeout(function(){
+            // swapp inventories /////////////////////////
+            $('.swapp-inventory-mine').flickity({
+                // options
+                cellAlign: 'center',
+                contain: true,
+                imagesLoaded: true,
+                wrapAround: true,
+                groupCells: '100%',
+                prevNextButtons: false,
+                adaptiveHeight: true,
+                pageDots: true
+            });
+            $('.swapp-inventory-yours').flickity({
+                // options
+                cellAlign: 'center',
+                contain: true,
+                imagesLoaded: true,
+                wrapAround: true,
+                groupCells: '100%',
+                prevNextButtons: false,
+                adaptiveHeight: true,
+                pageDots: true
+            });
+
+            console.log("fully loaded after 600ms");
+        }, 600);
+        */
     }
 
     sendOffer() {

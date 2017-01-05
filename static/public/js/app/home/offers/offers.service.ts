@@ -19,7 +19,6 @@ export class OfferService {
     }
     
     logout(): Promise<any> {
-        localStorage.removeItem("user");
         return this.http.get('/api/logout/')
         .toPromise()
         .catch(this.handleError);

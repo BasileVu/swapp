@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="row inventory swapp-inventory-mine">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
-                                        *ngFor="let item of user.items">
+                                        *ngFor="let item of user.items; let last = last" [update-my-inventory]="last ? true : false">
                                         <a href="#">
                                             <img class="img-fluid" src="http://loremflickr.com/400/400"/>
                                             <span>title</span>
@@ -49,7 +49,7 @@
                                 </div>
                                 <div class="row inventory swapp-inventory-yours">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
-                                        *ngFor="let item of owner.items">
+                                        *ngFor="let item of owner.items; let last = last" [update-your-inventory]="last ? true : false">
                                         <a href="#">
                                             <img class="img-fluid" src="http://loremflickr.com/400/400"/>
                                             <span>title</span>
