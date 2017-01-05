@@ -2,7 +2,7 @@
     <div *ngIf="loggedIn" [@flyInOut]>
         <div class="row identity">
             <div class="col-xs-2 col-sm-4">
-                <img *ngIf="user.profile_picture === null" class="avatar img-fluid" src="http://placehold.it/200x200"/>
+                <img *ngIf="user.profile_picture === null" class="avatar img-fluid" src="http://loremflickr.com/200/200"/>
                 <img *ngIf="user.profile_picture != null" class="avatar img-fluid" src="{{ url }}{{ user.profile_picture }}"/>
             </div>
             <div class="col-xs-10 col-sm-8">

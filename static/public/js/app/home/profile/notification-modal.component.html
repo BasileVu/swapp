@@ -5,47 +5,17 @@
                 <div class="modal-panel">
                     <div class="row">
                         <div class="col-xs-12">
-                            <a href="#" class="row notification">
+                            <a *ngFor="let notification of notifications" href="#" class="row notification">
                                 <div class="col-xs-2 col-lg-1">
-                                    <img class="img-fluid avatar" src="http://placehold.it/200x200">
+                                    <img class="img-fluid avatar" src="http://loremflickr.com/200/200">
                                 </div>
                                 <div class="col-xs-10 col-lg-11">
                                     <div class="row">
                                         <div class="col-xs-12">
-                                            <p>You received an offer from <b>Sébastien Boson</b></p>
+                                            <p>{{ notification.content }}</p>
                                         </div>
                                         <div class="col-xs-12 date">
-                                            <i class="fa fa-refresh"></i> septbember 23 of 2016 at 23h30
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="row notification">
-                                <div class="col-xs-2 col-lg-1">
-                                    <img class="img-fluid avatar" src="http://placehold.it/200x200">
-                                </div>
-                                <div class="col-xs-10 col-lg-11">
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <p><b>Sébastien Boson</b> commented your <b>Addidas shoes</b></p>
-                                        </div>
-                                        <div class="col-xs-12 date">
-                                            <i class="fa fa-comment"></i> septbember 23 of 2016 at 23h30
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="row notification">
-                                <div class="col-xs-2 col-lg-1">
-                                    <img class="img-fluid avatar" src="http://placehold.it/200x200">
-                                </div>
-                                <div class="col-xs-10 col-lg-11">
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <p>Your received a <b>5</b> for your swap with <b>Sébastien Boson</b></p>
-                                        </div>
-                                        <div class="col-xs-12 date">
-                                            <i class="fa fa-star"></i> septbember 23 of 2016 at 23h30
+                                            <i class="fa fa-refresh"></i> {{ notification.date }}
                                         </div>
                                     </div>
                                 </div>
