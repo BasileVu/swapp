@@ -18,7 +18,8 @@ import { Subscription }   from 'rxjs/Subscription';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
-import { User } from './user';
+import { ItemsService } from '../items/items.service';
+import { Account } from "./account";
 
 declare let $:any;
 declare let google: any;
@@ -26,7 +27,6 @@ declare let google: any;
 @Component({
     moduleId: module.id,
     selector: 'profile',
-
     encapsulation: ViewEncapsulation.None,
     templateUrl: './profile.component.html',
     animations: [
@@ -56,7 +56,7 @@ export class ProfileComponent implements OnInit {
 
     loggedIn: boolean;
     subscription: Subscription;
-    user: User;
+    user: Account;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -65,6 +65,7 @@ export class ProfileComponent implements OnInit {
     private url: String;
 
     constructor(private authService: AuthService,
+                private itemService: ItemsService,
                 private formBuilder: FormBuilder,
                 @Inject(DOCUMENT) private document: any,
                 public toastr: ToastsManager) {
@@ -74,7 +75,7 @@ export class ProfileComponent implements OnInit {
                 }
 
     ngOnInit() {
-        this.user = new User(-1, "", "", "", "", "", "", "", "", "", "", new Array<number>(), new Array<number>(), new Array<number>());
+        this.user = new Account();
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({
@@ -98,21 +99,10 @@ export class ProfileComponent implements OnInit {
                 if (accountOnCreation) {
                     this.profilePictureEvent.emit();
                 } else {
-                    this.toastr.success("Welcome " + $event.username + " !", "Login succeed");
+                    this.toastr.success("Welcome " + $event[0].username + " !", "Login succeed");
                     this.getAccount();
 
                     setTimeout(function(){
-                        // home inventory ///////////////////////////
-                        var inventory = $('.home-inventory').flickity({
-                            // options
-                            cellAlign: 'center',
-                            contain: true,
-                            imagesLoaded: true,
-                            wrapAround: true,
-                            groupCells: '100%',
-                            prevNextButtons: false,
-                            adaptiveHeight: true
-                        });
 
                         // open user edition modal /////////////////////
                         var openUpdateProfileButtons = $('.open-update-profile-modal');
@@ -133,7 +123,7 @@ export class ProfileComponent implements OnInit {
                         });
                         profileModal.on('show.bs.modal', function (e) {
                             setTimeout(function () {
-                                inventory.flickity('resize');
+                                //inventory.flickity('resize');
 
                                 // profile map
                                 var map = new google.maps.Map(document.getElementById('profile-map'), {
@@ -177,12 +167,18 @@ export class ProfileComponent implements OnInit {
         );
     }
 
+    // Get the account of the current logged in user
     getAccount() {
         this.authService.getAccount().then(
-            user => {
-                this.user = user;
-                console.log(this.user);
-                this.authService.selectUser(this.user);
+            account => {
+                this.user = account;
+
+                // Get user public profile to inform subscribed components of it
+                this.itemService.getUser(this.user.username).then(
+                    user => this.authService.selectUser(user),
+                    error => this.toastr.error("Can't get User public profile", "Error")
+                );
+
             },
             error => this.toastr.error(error, "Error")
         );

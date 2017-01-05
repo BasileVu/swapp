@@ -28,10 +28,10 @@ def create_comment(user, item, content="Comment test"):
 
 if __name__ == '__main__':
     # Users
-    u1 = User.objects.create_user(username="user1", email="test1@test.com", password="password")
-    u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
-    u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password")
-    u4 = User.objects.create_user(username="user4", email="test4@test.com", password="password")
+    u1 = User.objects.create_user(username="user1", first_name="François", last_name="LePoulpe", email="test1@test.com", password="password")
+    u2 = User.objects.create_user(username="user2", first_name="Margerite", last_name="Ducosset", email="test2@test.com", password="password")
+    u3 = User.objects.create_user(username="user3", first_name="Jack", last_name="Ometti", email="test3@test.com", password="password")
+    u4 = User.objects.create_user(username="user4", first_name="Ania", last_name="Mongrito", email="test4@test.com", password="password")
 
     # Categories
     c1 = Category.objects.create(name="Antiques")

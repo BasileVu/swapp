@@ -4,7 +4,6 @@ import {Component, OnInit, AfterViewInit, ViewContainerRef,
     style,
     transition,
     animate,
-    keyframes,
 } from '@angular/core';
 
 import './rxjs-operators';
@@ -41,8 +40,6 @@ declare var google: any;
     ]
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    subtitle = '(v1)';
-
     loggedIn: boolean;
     subscription: Subscription;
 
@@ -93,7 +90,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         setTimeout(function() {
             $('document').ready(function() {
-                
+
+                /*
+                 TODO : remove because it's handled in items/*.directive.ts
                 // home grid ///////////////////////////
                 var grid = $('.grid').isotope({
                     // options
@@ -112,7 +111,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                     $(this).removeClass('hovered');
                     grid.isotope('layout');
                 });
+                */
 
+                /*
+                 TODO : remove because it's handled in update-inventory.directive.ts
                 // home inventory ///////////////////////////
                 var inventory = $('.home-inventory').flickity({
                     // options
@@ -124,7 +126,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                     prevNextButtons: false,
                     adaptiveHeight: true
                 });
+                */
 
+                /*
+                TODO : remove because it's handled in offer/*.directive.ts
                 // swapp inventories /////////////////////////
                 var swapp_inventory_mine = $('.swapp-inventory-mine').flickity({
                     // options
@@ -148,6 +153,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     adaptiveHeight: true,
                     pageDots: true
                 });
+                */
 
                 // modal slider ///////////////////////////
                 var modalCarousel = $('.modal-carousel').flickity({
@@ -210,12 +216,16 @@ export class AppComponent implements OnInit, AfterViewInit {
                         sendPropositionModal.modal('show');
                     });
                 });
+                /*
+                 TODO : remove because it's handled in send-offer-proposition.component.ts
                 sendPropositionModal.on('show.bs.modal', function (e) {
                     setTimeout(function () {
-                        swapp_inventory_mine.flickity('resize');
-                        swapp_inventory_yours.flickity('resize');
+                        console.log("loaded");
+                        //swapp_inventory_mine.flickity('resize');
+                        //swapp_inventory_yours.flickity('resize');
                     }, 300)
                 });
+                */
 
                 // display item modal ///////////////////////////
                 var theItemModal = $('#view-item-x');

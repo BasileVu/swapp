@@ -2,8 +2,7 @@ import {
     Component, 
     Input, 
     ViewEncapsulation, 
-    OnInit, 
-    OnChanges,
+    OnInit,
     trigger,
     state,
     style,
@@ -14,8 +13,9 @@ import {
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { InventoryItem } from './inventory-item';
 import { ItemsService } from '../items/items.service';
-import {Item} from "../items/item";
-import {Owner} from "../items/owner";
+import {Subscription} from "rxjs";
+import {User} from "../profile/user";
+import {ItemCreationDTO} from "./item-creation-dto";
 
 declare var $:any;
 
@@ -43,77 +43,40 @@ declare var $:any;
         ])
     ]
 })
-export class InventoryComponent implements OnInit, OnChanges {
+export class InventoryComponent implements OnInit {
 
     @Input() loggedIn: boolean;
 
-    private inventory: Array<InventoryItem> = new Array();
+    owner: User;
+    subscription: Subscription;
+
+    private inventory: Array<InventoryItem> = [];
     
-    constructor(private authService: AuthService, private itemsService: ItemsService) {
-     }
+    constructor(private authService: AuthService,
+                private itemsService: ItemsService) {}
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
-    }
 
-    ngOnChanges() {
-        if (this.loggedIn && this.inventory.length === 0) {
-            this.authService.getAccount().then(
-                user => {
-                    for(let i in user.items){
-                        this.itemsService.getDetailedItem(user.items[i]).then(
-                            item => {
-                                let image: string = undefined;
-                                if (item.image_urls != undefined)
-                                    image = item.image_urls[0];
-
-                                let inventoryItem = new InventoryItem(item.id, item.name, image, item.creation_date);
-                                this.inventory.push(inventoryItem);
-                                console.log("end get");
-
-                            },
-                            error => console.log(error)
-                        ).then(function() {
-                            // home inventory /////// ////////////////////
-                            $('.home-inventory').flickity({
-                                // options
-                                cellAlign: 'center',
-                                contain: true,
-                                imagesLoaded: true,
-                                wrapAround: true,
-                                groupCells: '100%',
-                                prevNextButtons: false,
-                                adaptiveHeight: true
-                            });
-                        });
-                    }
-
-                    console.log("for end");
-
-                    setTimeout(function(){
-                        // open item creation modal /////////////////////
-                        $('.open-new-item-modal').each(function () {
-                            $(this).click(function () {
-                                $('#add-item-modal').modal('show');
-                            });
-                        });
-                        $('.open-modal-item-x').click(function () {
-                            $('#view-item-x').modal('show');
-                        });
-                    },1000)
-                    
-                },
-                error => console.log(error)
-            ).then(function() {
-                
-            });
-        }
+        // Listen for user login. We know that when user is available it means
+        // that he successfully logged in
+        this.subscription = this.authService.userSelected$.subscribe(
+            user => {
+                this.owner = user;
+                this.inventory = [];
+                for(let item of this.owner.items) {
+                    let inventoryItem = new InventoryItem(item.id, item.name, item.image_url, null);
+                    console.log(inventoryItem);
+                    this.inventory.push(inventoryItem);
+                }
+            }
+        );
     }
 
     // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
-    addItemEvent($event) {
+    addItemEvent($event: ItemCreationDTO) {
         let inventoryItem = new InventoryItem(
-            $event.url,
+            1, // TODO
             $event.name, 
             $event.images[0], 
             $event.creation_date);
@@ -150,30 +113,5 @@ export class InventoryComponent implements OnInit, OnChanges {
                     service.selectComments(comments);
                 },
                 error => console.log(error));
-    }
-
-    updateInventoryDisplay(): void {
-        // home inventory /////// ////////////////////
-        var inventory = $('.home-inventory').flickity({
-            // options
-            cellAlign: 'center',
-            contain: true,
-            imagesLoaded: true,
-            wrapAround: true,
-            groupCells: '100%',
-            prevNextButtons: false,
-            adaptiveHeight: true
-        });
-
-        // open item creation modal /////////////////////
-        var addItemButtons = $('.open-new-item-modal');
-        var newItemModal = $('#add-item-modal');
-        addItemButtons.each(function () {
-            $(this).click(function () {
-                newItemModal.modal('show');
-            });
-        });
-
-        console.log("end js");
     }
 }
