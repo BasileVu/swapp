@@ -12,11 +12,11 @@ from offers.models import Offer
 
 
 class NotificationAPITest(TestCase):
-    url_offers = "/api/offers/"
-    url_comments = "/api/comments/"
-    url_messages = "/api/messages/"
-    url_notes = "/api/notes/"
-    url_notifications = "/api/notifications/"
+    offers_url = "/api/offers/"
+    comments_url = "/api/comments/"
+    messages_url = "/api/messages/"
+    notes_url = "/api/notes/"
+    notifications_url = "/api/notifications/"
 
     def setUp(self):
         self.current_user = User.objects.create_user(username="user1", email="test@test.com", password="password")
@@ -45,29 +45,30 @@ class NotificationAPITest(TestCase):
         self.item8 = Item.objects.create(name="Car", description="My new car", price_min=35, price_max=50,
                                          owner=self.other_user, category=c2)
 
-    def post_offer(self, id_item_given, id_item_received, accepted=False, status=0, comment="test"):
-        return self.client.post(self.url_offers, data=json.dumps({
+    def post_offer(self, id_item_given, id_item_received, accepted=False, answered=False, comment="test"):
+        return self.client.post(self.offers_url, data=json.dumps({
             "accepted": accepted,
-            "status": status,
+            "answered": answered,
             "comment": comment,
             "item_given": id_item_given,
             "item_received": id_item_received
         }), content_type="application/json")
 
-    def patch_offer(self, id_offer, accepted):
-        return self.client.patch("%s%d/" % (self.url_offers, id_offer), data=json.dumps({
+    def patch_offer(self, id_offer, accepted, answered=True):
+        return self.client.patch("%s%d/" % (self.offers_url, id_offer), data=json.dumps({
+            "answered": answered,
             "accepted": accepted
         }), content_type="application/json")
 
     def post_comment(self, id_user, id_item, content="comment test"):
-        return self.client.post(self.url_comments, data=json.dumps({
+        return self.client.post(self.comments_url, data=json.dumps({
             "content": content,
             "user": id_user,
             "item": id_item
         }), content_type="application/json")
 
     def post_note(self, id_user, id_offer, text="note test", note=0):
-        return self.client.post(self.url_notes, data=json.dumps({
+        return self.client.post(self.notes_url, data=json.dumps({
             "user": id_user,
             "offer": id_offer,
             "text": text,
@@ -75,19 +76,19 @@ class NotificationAPITest(TestCase):
         }), content_type="application/json")
 
     def post_message(self, id_user_from, id_user_to, message="message test"):
-        return self.client.post(self.url_messages, data=json.dumps({
+        return self.client.post(self.messages_url, data=json.dumps({
             "text": message,
             "user_from": id_user_from,
             "user_to": id_user_to
         }), content_type="application/json")
 
     def patch_notification(self, id_notification, read):
-        return self.client.patch("%s%d/" % (self.url_notifications, id_notification), data=json.dumps({
+        return self.client.patch("%s%d/" % (self.notifications_url, id_notification), data=json.dumps({
             "read": read
         }), content_type="application/json")
 
     def get_notifications(self):
-        return self.client.get(self.url_notifications)
+        return self.client.get(self.notifications_url)
 
     def test_get_notifications(self):
         self.client.login(username="user2", password="password")
@@ -95,7 +96,7 @@ class NotificationAPITest(TestCase):
         r = self.get_notifications()
         self.assertEqual(len(r.data), 0)
 
-        Offer.objects.create(item_given=self.item1, item_received=self.item7, status=0, comment="test")
+        Offer.objects.create(item_given=self.item1, item_received=self.item7, answered=False, comment="test")
 
         r = self.get_notifications()
         self.assertEqual(r.status_code, status.HTTP_200_OK)

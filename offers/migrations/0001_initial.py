@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('accepted', models.BooleanField(default=False)),
-                ('status', models.BooleanField(default=False)),
+                ('answered', models.BooleanField(default=False)),
                 ('comment', models.CharField(max_length=1000)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date published')),
                 ('item_given', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='offers_done', to='items.Item')),

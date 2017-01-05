@@ -87,6 +87,22 @@ def new_offer_notification(sender, instance, signal, created, **kwargs):
                                                    user=instance.item_received.owner)
         offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
         NewOfferNotification.objects.create(offer_notification=offer_notification)
+    else:
+        if instance.answered:
+            if instance.accepted:
+                # create notification for accepted offer
+                notification = Notification.objects.create(content="Offer accepted for item: %s" %
+                                                                   instance.item_received.name,
+                                                           user=instance.item_received.owner)
+                offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
+                AcceptedOfferNotification.objects.create(offer_notification=offer_notification)
+            else:
+                # create notification for refused offer
+                notification = Notification.objects.create(content="Offer refused for item: %s" %
+                                                                   instance.item_received.name,
+                                                           user=instance.item_received.owner)
+                offer_notification = OfferNotification.objects.create(notification=notification, offer=instance)
+                RefusedOfferNotification.objects.create(offer_notification=offer_notification)
 
 
 class AcceptedOfferNotification(models.Model):
