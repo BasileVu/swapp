@@ -1,15 +1,7 @@
-class Location {
-    street: string;
-    city: string;
-    region: string;
-    country: string;
-
-    constructor(street: string, city: string, region: string, country: string) {
-        this.street = street;
-        this.city = city;
-        this.region = region;
-        this.country = country;
-    }
+class UserInventoryItem {
+    id: number;
+    image_url: string;
+    name: string;
 }
 
 export class User {
@@ -18,13 +10,10 @@ export class User {
     username: string;
     first_name: string;
     last_name: string;
-    email: string;
-    location: Location;
-    last_modification_date: Date;
-    notes: Array<number>;
-    likes: Array<number>;
-    items: Array<number>;
-
+    location: string;
+    items: Array<UserInventoryItem>;
+    notes: number;
+    note_avg: number;
 
     constructor() {
         this.id = -1;
@@ -32,11 +21,9 @@ export class User {
         this.username = "";
         this.first_name = "";
         this.last_name = "";
-        this.email = "";
-        this.location = new Location("", "", "", "");
-        this.last_modification_date = new Date();
-        this.notes = [];
-        this.likes = [];
+        this.location = "";
         this.items = [];
+        this.notes = 0;
+        this.note_avg = 0;
     }
 }
