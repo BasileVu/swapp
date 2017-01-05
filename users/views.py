@@ -10,7 +10,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.serializers import InventoryItemSerializer, CategorySerializer
+from items.serializers import InventoryItemSerializer, CategorySerializer, UpdateCategorySerializer, \
+    InterestedByCategorySerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -170,6 +171,21 @@ class LocationView(generics.UpdateAPIView):
         c.save()
 
         serializer.save()
+
+
+class CategoryViewSet(mixins.UpdateModelMixin,
+                      mixins.ListModelMixin,
+                      viewsets.GenericViewSet):
+    serializer_class = InterestedByCategorySerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    # def update(self, request, pk=None, *args, **kwargs):
+    #     print("UPDATE")
+    #     return Response()
+
+    # def list(self, request, *args, **kwargs):
+    #     print("GET LIST")
+    #     return Response()
 
 
 @api_view(["GET"])

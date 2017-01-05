@@ -1,13 +1,40 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from items.models import Category, Item, Image, Like, KeyInfo
 from swapp.gmaps_api_utils import MAX_RADIUS
+from users.models import UserProfile
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name")
+
+
+class UpdateCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id",)
+
+
+class InterestedByCategorySerializer(serializers.Serializer):
+    interested_by_categories = UpdateCategorySerializer(many=True)
+
+    def update(self, instance, validated_data):
+        if validated_data.get("interested_by", None) is not None:
+            interested_by_categories = validated_data.pop("interested_by")
+
+            instance.categories.clear()
+
+            for id in interested_by_categories:
+                instance.categories.add(Category.objects.get(pk=id))
+
+        return super().update(instance, validated_data)
+
+    class Meta:
+        model = UserProfile
+        fields = ("interested_by",)
 
 
 class CreateImageSerializer(serializers.Serializer):

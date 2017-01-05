@@ -627,20 +627,28 @@ class PublicAccountInfoTests(TestCase):
         with open("test.png", "rb") as data:
             return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
+    def patch_interested_by_categories(self, interested_by=[]):
+        return self.client.patch("/api/account/categories/", data=json.dumps({
+            "interested_by": interested_by
+        }), content_type="application/json")
+
     def setUp(self):
-        u = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
-                                     email="test@test.com", password="password")
-        c = Category.objects.create(name="category")
-        i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
-                                creation_date=timezone.now(), archived=False, owner=u, category=c)
+        self.user = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
+                                             email="test@test.com", password="password")
 
-        u.location.city = "a"
-        u.location.region = "b"
-        u.location.country = "c"
-        u.location.save()
+        self.c1 = Category.objects.create(name="category1")
+        self.c2 = Category.objects.create(name="category2")
+        self.c3 = Category.objects.create(name="category3")
+        self.c4 = Category.objects.create(name="category4")
+        self.c5 = Category.objects.create(name="category5")
 
-        self.user = u
-        self.item = i
+        self.item = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
+                                        creation_date=timezone.now(), archived=False, owner=self.user, category=self.c1)
+
+        self.user.location.city = "a"
+        self.user.location.region = "b"
+        self.user.location.country = "c"
+        self.user.location.save()
 
     def test_get_user_info_not_found(self):
         r = self.client.get("/api/users/%s/" % (self.user.username + "42"))
@@ -654,6 +662,8 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["location"], "a, b, c")
         self.assertEqual(r.data["notes"], 0)
+        self.assertEqual(r.data["note_avg"], None)
+        self.assertEqual(r.data["interested_by"], [])
         self.assertEqual(len(r.data["items"]), 1)
 
         item_received = r.data["items"][0]
@@ -663,12 +673,26 @@ class PublicAccountInfoTests(TestCase):
 
     def test_get_user_info_image(self):
         self.client.login(username="username", password="password")
-        r = self.post_image()
+        self.post_image()
         self.client.logout()
 
         r = self.client.get("/api/users/%s/" % self.user.username)
         self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
+    def test_patch_interested_by_categories(self):
+        self.client.login(username="username", password="password")
+        r = self.client.get("/api/account/categories/")
+        print(r.status_code)
+
+        r = self.patch_interested_by_categories([self.c1.id, self.c2.id, self.c3.id])
+        print(r.status_code)
+        print(r.data)
+        self.client.logout()
+
+        r = self.client.get("/api/users/%s/" % self.user.username)
+        self.assertEqual(r.data["interested_by"], [{"id": self.c1.id, "name": self.c1.name},
+                                                   {"id": self.c2.id, "name": self.c2.name},
+                                                   {"id": self.c3.id, "name": self.c3.name}])
 
 class NoteAPITests(TestCase):
     def setUp(self):
