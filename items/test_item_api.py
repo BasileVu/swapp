@@ -54,6 +54,13 @@ class ItemTestMixin:
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
 
+    def post_image(self, user_id=1):
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
+
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+
 
 class ItemPostTests(TestCase, ItemTestMixin):
     def setUp(self):
@@ -80,20 +87,27 @@ class ItemPostTests(TestCase, ItemTestMixin):
 
 
 class ItemGetTests(TestCase, ItemTestMixin):
+
     def setUp(self):
         self.setup()
         self.login()
         self.post_item()
+        self.post_image()
         self.client.logout()
 
     def test_get_item(self):
-        # another user likes the item of the user "username"
+        # another user likes the item of the user "username" to check number of likes
         self.item = Item.objects.get(pk=1)
         Like.objects.create(user=self.another_user, item=self.item)
 
-        # other items in the same category
+        # other items in the same category to check similar
         id1 = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1).id
         id2 = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1).id
+
+        # change owner location to check owner_location
+        self.current_user.location.city = "city"
+        self.current_user.location.country = "country"
+        self.current_user.location.save()
 
         r = self.get_item()
 
@@ -112,6 +126,8 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
         self.assertEqual(r.data["similar"][0]["id"], id1)
         self.assertEqual(r.data["similar"][1]["id"], id2)
+        self.assertEqual(r.data["owner_location"], "city, country")
+        self.assertNotEqual(r.data["owner_picture_url"], None)
         self.assertIn("image_urls", r.data)
 
     def test_get_item_not_existing(self):
@@ -235,12 +251,6 @@ class ItemPutTests(TestCase, ItemTestMixin):
 
 
 class ItemCommentsTests(TestCase, ItemTestMixin):
-    def post_image(self, user_id=1):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
-
-        with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
 
     def setUp(self):
         self.setup()

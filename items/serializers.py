@@ -109,7 +109,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
     
     def get_owner_picture_url(self, obj):
-        return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" > 0 else None
+        return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" else None
 
     def get_owner_location(self, obj):
         location = obj.owner.location
