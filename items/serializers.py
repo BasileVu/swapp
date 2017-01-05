@@ -7,7 +7,7 @@ from swapp.gmaps_api_utils import MAX_RADIUS
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name')
+        fields = ("id", "name")
 
 
 class CreateImageSerializer(serializers.Serializer):
@@ -16,13 +16,13 @@ class CreateImageSerializer(serializers.Serializer):
     user = serializers.IntegerField(required=False)
 
     class Meta:
-        field = ('image', 'item', 'user')
+        field = ("image", "item", "user")
 
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('id', 'image', 'item')
+        fields = ("id", "image", "item")
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -30,13 +30,13 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = ('id', 'user', 'item', 'date')
+        fields = ("id", "user", "item", "date")
 
 
 class KeyInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyInfo
-        fields = ('key', 'info')
+        fields = ("key", "info")
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -64,7 +64,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category', 'keyinfo_set')
+        fields = ("id", "name", "description", "price_min", "price_max", "category", "keyinfo_set")
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
@@ -75,10 +75,10 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'image_url')
+        fields = ("id", "name", "image_url")
 
 
-class AggregatedItemSerializer(serializers.ModelSerializer):
+class DetailedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     keyinfo_set = KeyInfoSerializer(many=True)
     image_urls = serializers.SerializerMethodField()
@@ -87,6 +87,8 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
     offers_received = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
     similar = serializers.SerializerMethodField()
+    owner_picture_url = serializers.SerializerMethodField()
+    owner_location = serializers.SerializerMethodField()
 
     def get_image_urls(self, obj):
         return [i.image.url for i in obj.image_set.all()]
@@ -105,11 +107,19 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
 
     def get_similar(self, obj):
         return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
+    
+    def get_owner_picture_url(self, obj):
+        return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" > 0 else None
+
+    def get_owner_location(self, obj):
+        location = obj.owner.location
+        return "%s, %s" % (location.city, location.country)
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'owner_username', 'category',
-                  'views', 'image_urls', 'likes', 'comments', 'offers_received', 'keyinfo_set', 'similar')
+        fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
+                  "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "similar",
+                  "owner_picture_url", "owner_location")
 
 
 class SearchItemsSerializer(serializers.Serializer):
