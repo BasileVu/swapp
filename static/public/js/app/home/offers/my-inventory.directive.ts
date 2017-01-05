@@ -8,18 +8,20 @@ export class MyInventoryDirective {
     @Input('update-my-inventory')
     set updateMyInventory(update : boolean){
         if(update) {
-            // swapp inventories /////////////////////////
-            $('.swapp-inventory-mine').flickity({
-                // options
-                cellAlign: 'center',
-                contain: true,
-                imagesLoaded: true,
-                wrapAround: true,
-                groupCells: '100%',
-                prevNextButtons: false,
-                adaptiveHeight: true,
-                pageDots: true
-            });
+            setTimeout(function(){
+                // swapp inventories /////////////////////////
+                $('.swapp-inventory-mine').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true,
+                    pageDots: true
+                });
+            }, 300);
         }
     }
 }

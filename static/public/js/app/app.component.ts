@@ -190,6 +190,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     });
                 });
 
+
                 // open user creation profile modal /////////////////////
                 var openCreateProfileButtons = $('.open-create-profile-modal');
                 var createProfileModal = $('#create-user-modal');

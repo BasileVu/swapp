@@ -8,17 +8,20 @@ export class YourInventoryDirective {
     @Input('update-your-inventory')
     set updateYourInventory(update : boolean){
         if(update) {
-            $('.swapp-inventory-yours').flickity({
-                // options
-                cellAlign: 'center',
-                contain: true,
-                imagesLoaded: true,
-                wrapAround: true,
-                groupCells: '100%',
-                prevNextButtons: false,
-                adaptiveHeight: true,
-                pageDots: true
-            });
+            setTimeout(function(){
+                $('.swapp-inventory-yours').flickity({
+                    // options
+                    cellAlign: 'center',
+                    contain: true,
+                    imagesLoaded: true,
+                    wrapAround: true,
+                    groupCells: '100%',
+                    prevNextButtons: false,
+                    adaptiveHeight: true,
+                    pageDots: true
+                });
+            }, 300);
+
         }
     }
 }

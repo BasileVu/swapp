@@ -3,6 +3,7 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 import {UserLoginDTO} from "../profile/user-login-dto";
 import {UserCreationDTO} from "../profile/user-creation-dto";
+import {User, UserInventoryItem} from "../profile/user";
 
 @Injectable()
 export class OfferService {
@@ -72,5 +73,26 @@ export class OfferService {
     checkCredentials() {
         //return localStorage.getItem("user") !== null;
         return true;
+    }
+
+    cloneUser(user: User): User {
+        let u = new User();
+        u.id = user.id;
+        u.profile_picture = user.profile_picture;
+        u.username = user.username;
+        u.first_name = user.first_name;
+        u.last_name = user.last_name;
+        u.location = user.location;
+        for (let item of user.items) {
+            let it = new UserInventoryItem();
+            it.id = item.id;
+            it.image_url = item.image_url;
+            it.name = item.name;
+            u.items.push(it);
+        }
+        u.notes = user.notes;
+        u.note_avg = user.note_avg;
+
+        return u;
     }
 }

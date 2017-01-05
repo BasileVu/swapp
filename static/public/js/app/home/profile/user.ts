@@ -1,7 +1,13 @@
-class UserInventoryItem {
+export class UserInventoryItem {
     id: number;
     image_url: string;
     name: string;
+
+    constructor() {
+        this.id = null;
+        this.image_url = null;
+        this.name = null;
+    }
 }
 
 export class User {
