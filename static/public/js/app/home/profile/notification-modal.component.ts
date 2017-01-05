@@ -12,8 +12,9 @@ import {AuthService} from "../../shared/authentication/authentication.service";
 })
 export class NotificationModalComponent implements OnInit {
 
+    @Input() loggedIn: boolean;
+
     notifications: Notification[];
-    @Input() loggedIn: boolean ;
     subscription: Subscription;
 
     constructor (private notificationsService: NotificationsService, private authService: AuthService) {}
@@ -27,6 +28,7 @@ export class NotificationModalComponent implements OnInit {
         if (this.loggedIn) {
             this.notificationsService.getNotification().then(res => {
                 console.log(res);
+                this.notifications = res;
             });
         }
     }
