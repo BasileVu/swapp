@@ -92,13 +92,33 @@ if __name__ == "__main__":
                      views=50)
     i9 = create_item(c22, u4, name="Trumpet", description="Good sound", price_min=300, price_max=350, views=60)
 
-    # Set userprofile image
+    # Set userprofiles images
     set_image_profile(u1, "user1.jpg")
     set_image_profile(u2, "user2.jpg")
     set_image_profile(u3, "user3.jpg")
     set_image_profile(u4, "user4.jpg")
 
-    # Set items image
+    # Set items images
+    set_image_item(i1, "shoes_1.jpg")
+    set_image_item(i1, "shoes_2.jpg")
+    set_image_item(i1, "shoes_3.jpg")
+    set_image_item(i2, "shirt_1.jpg")
+    set_image_item(i2, "shirt_2.jpg")
+    set_image_item(i3, "ring_1.jpg")
+    set_image_item(i4, "newMouse_1.jpg")
+    set_image_item(i4, "newMouse_2.png")
+    set_image_item(i4, "newMouse_3.jpg")
+    set_image_item(i5, "piano_1.png")
+    set_image_item(i5, "piano_2.jpg")
+    set_image_item(i6, "violin_1.jpg")
+    set_image_item(i7, "flute_1.jpg")
+    set_image_item(i7, "flute_2.jpg")
+    set_image_item(i7, "flute_3.jpg")
+    set_image_item(i8, "electricGuitar_1.jpg")
+    set_image_item(i8, "electricGuitar_2.jpg")
+    set_image_item(i9, "trumpet_1.jpg")
+    set_image_item(i9, "trumpet_2.jpg")
+    set_image_item(i9, "trumpet_3.jpg")
 
     # Key info on items
     KeyInfo.objects.create(key="Brand", info="Adidum", item=i1)
