@@ -40,14 +40,10 @@ def set_image_item(item, image_name):
 
 if __name__ == "__main__":
     # Users
-    u1 = User.objects.create_user(username="user1", email="test1@test.com", password="password",
-                                  first_name="Paul", last_name="Bonvin")
-    u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password",
-                                  first_name="John", last_name="Doe")
-    u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password",
-                                  first_name="Bertrand", last_name="Bond")
-    u4 = User.objects.create_user(username="user4", email="test4@test.com", password="password",
-                                  first_name="Roger", last_name="Moore")
+    u1 = User.objects.create_user(username="user1", email="test1@test.com", password="password")
+    u2 = User.objects.create_user(username="user2", email="test2@test.com", password="password")
+    u3 = User.objects.create_user(username="user3", email="test3@test.com", password="password")
+    u4 = User.objects.create_user(username="user4", email="test4@test.com", password="password")
 
     # Add locations to users
     u1.location.street = "Route de Cheseaux 1"
