@@ -3,8 +3,8 @@ from django.utils import timezone
 
 
 class Offer(models.Model):
-    item_given = models.ForeignKey("items.Item", related_name='offers_done', on_delete=models.CASCADE)
-    item_received = models.ForeignKey("items.Item", related_name='offers_received', on_delete=models.CASCADE)
+    item_given = models.ForeignKey("items.Item", related_name="offers_done", on_delete=models.CASCADE)
+    item_received = models.ForeignKey("items.Item", related_name="offers_received", on_delete=models.CASCADE)
 
     accepted = models.BooleanField(default=False)
     answered = models.BooleanField(default=False)
