@@ -119,7 +119,7 @@ class AccountConnectionAPITests(TestCase):
     def test_login_success(self):
         r = self.login()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn("_auth_user_id", self.client.session)
 
     def test_logout_not_logged_in(self):
         r = self.client.get("/api/logout/")
@@ -140,11 +140,11 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
 
     def post_image(self, user=1):
-        image = ImagePil.new('RGBA', size=(50, 50), color=(155, 0, 0))
-        image.save('test.png')
+        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
+        image.save("test.png")
 
-        with open('test.png', 'rb') as data:
-            return self.client.post("/api/images/", {"image": data, "user": user}, format='multipart')
+        with open("test.png", "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user}, format="multipart")
 
     def setUp(self):
         User.objects.create_user(username="username", password="password", first_name="first_name",
@@ -323,7 +323,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "firstname")
         self.assertEqual(r.data["last_name"], "lastname")
         self.assertEqual(r.data["email"], "newemail@newemail.com")
-        self.assertEqual(r.data["location"], {'country': '', 'city': '', 'region': '', 'street': ''})
+        self.assertEqual(r.data["location"], {"country": "", "city": "", "region": "", "street": ""})
 
     def test_complete_update_account_empty_json(self):
         self.login()
@@ -345,7 +345,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
         self.assertEqual(r.data["email"], "test@test.com")
-        self.assertEqual(r.data["location"], {'city': '', 'region': '', 'street': '', 'country': ''})
+        self.assertEqual(r.data["location"], {"city": "", "region": "", "street": "", "country": ""})
 
     def test_change_password_not_logged_in(self):
         r = self.client.put("/api/account/password/", data=json.dumps({
@@ -625,7 +625,7 @@ class PublicAccountInfoTests(TestCase):
         image.save("test.png")
 
         with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format='multipart')
+            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
 
     def setUp(self):
         u = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",

@@ -6,7 +6,7 @@ from . import views
 app_name = "users"
 
 router = DefaultRouter()
-router.register(r'notes', views.NoteViewSet)
+router.register(r"notes", views.NoteViewSet)
 
 urlpatterns = [
     url(r"csrf/$", views.get_csrf_token, name="get_csrf"),

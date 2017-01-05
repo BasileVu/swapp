@@ -18,8 +18,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password', 'password_confirmation',
-                  'street', 'city', 'region', 'country')
+        fields = ("username", "first_name", "last_name", "email", "password", "password_confirmation",
+                  "street", "city", "region", "country")
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+        fields = ("username", "first_name", "last_name", "email")
 
 
 class LoginUserSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class LoginUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = ("username", "password")
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -55,7 +55,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ('street', 'city', 'region', 'country')
+        fields = ("street", "city", "region", "country")
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -63,8 +63,8 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('id', 'user', 'offer', 'text', 'note')
-        read_only_fields = ('user',)
+        fields = ("id", "user", "offer", "text", "note")
+        read_only_fields = ("user",)
 
 
 class NoteUpdateSerializer(serializers.ModelSerializer):
@@ -72,4 +72,4 @@ class NoteUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('text', 'note')
+        fields = ("text", "note")
