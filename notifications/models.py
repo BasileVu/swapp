@@ -13,7 +13,7 @@ from users.models import Note
 class Notification(models.Model):
     content = models.CharField(max_length=100)
     read = models.BooleanField(default=False)
-    date = models.DateTimeField('date published', default=timezone.now)
+    date = models.DateTimeField("date published", default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):

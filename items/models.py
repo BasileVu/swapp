@@ -27,7 +27,7 @@ class KeyInfo(models.Model):
 
 
 class Image(models.Model):
-    image = models.ImageField('Uploaded image', null=True)
+    image = models.ImageField("Uploaded image", null=True)
 
     item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
