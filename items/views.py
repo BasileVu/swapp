@@ -253,6 +253,11 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
 
 
+class DeliveryMethodViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DeliveryMethod.objects.all()
+    serializer_class = DeliveryMethodSerializer
+
+
 class ImageViewSet(mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
