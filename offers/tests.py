@@ -177,12 +177,16 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_offer(self):
-        r = self.post_offer(self.item2, self.item3)
-        self.post_offer(self.item1, self.item3)
-
-        id_offer = r.data["id"]
-        r = self.delete_offer(id_offer=id_offer)
+        self.post_offer(self.item2, self.item3)
+        r = self.delete_offer()
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_cannot_delete_offer_of_another_user(self):
+        self.post_offer(self.item2, self.item3)
+
+        self.login2()
+        r = self.delete_offer()
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_cannot_delete_accepted_offer(self):
         o = Offer.objects.create(item_given=self.item2, item_received=self.item3, accepted=True, answered=True)
