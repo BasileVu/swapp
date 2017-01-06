@@ -1,12 +1,10 @@
-from django.contrib.auth.models import User
-from django.db.models import F, FloatField, Avg, IntegerField
+from django.db.models import F, FloatField, IntegerField
 from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response

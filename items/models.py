@@ -23,7 +23,8 @@ class Item(models.Model):
 class DeliveryMethod(models.Model):
     name = models.CharField(max_length=30)
 
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
 
 
 class KeyInfo(models.Model):

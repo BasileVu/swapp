@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
@@ -9,6 +10,12 @@ from users.models import UserProfile
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = ("id", "name")
+
+
+class DeliveryMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryMethod
         fields = ("id", "name")
 
 
@@ -27,7 +34,7 @@ class CreateImageSerializer(serializers.Serializer):
     user = serializers.IntegerField(required=False)
 
     class Meta:
-        field = ("image", "item", "user")
+        fields = ("image", "item", "user")
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -59,6 +66,10 @@ class ItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         key_info_set = validated_data.pop("keyinfo_set")
         delivery_methods = validated_data.pop("delivery_methods")
+
+        if len(delivery_methods) == 0:
+            raise ValidationError("A least one delivery method should be specified")
+
         item = Item.objects.create(**validated_data)
 
         for key_info in key_info_set:
@@ -80,6 +91,10 @@ class ItemSerializer(serializers.ModelSerializer):
 
         if validated_data.get("delivery_methods", None) is not None:
             delivery_methods = validated_data.pop("delivery_methods")
+
+            if len(delivery_methods) == 0:
+                raise ValidationError("A least one delivery method should be specified")
+
             instance.delivery_methods.clear()
 
             for id in delivery_methods:
@@ -106,6 +121,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 class DetailedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     keyinfo_set = KeyInfoSerializer(many=True)
+    delivery_methods = DeliveryMethodSerializer(many=True)
     image_urls = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
@@ -143,8 +159,8 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
-                  "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "similar",
-                  "owner_picture_url", "owner_location")
+                  "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
+                  "similar", "owner_picture_url", "owner_location")
 
 
 class SearchItemsSerializer(serializers.Serializer):
