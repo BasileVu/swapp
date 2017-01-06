@@ -246,7 +246,10 @@ class ItemViewSet(mixins.CreateModelMixin,
         if item.traded:
             raise ValidationError("Can't update a traded item")
 
-        if item.offers_received.count() > 0 or item.offers_done.count() > 0:
+        offers_received_pending = item.offers_received.filter(answered=False)
+        offers_done_pending = item.offers_received.filter(answered=False)
+
+        if offers_done_pending.count() > 0 or offers_received_pending.count() > 0:
             raise ValidationError("Can't update an item with pending offers")
 
         price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)

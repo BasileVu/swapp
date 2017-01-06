@@ -129,13 +129,10 @@ class OfferAPITests(TestCase):
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"item_received": self.item3.id}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"answered": True}))
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
         r = self.patch_offer(id_offer=id_offer, data=json.dumps({"comment": "Test2"}))
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+        r = self.patch_offer(id_offer=id_offer, data=json.dumps({"accepted": True}))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_offer(id_offer=id_offer)
