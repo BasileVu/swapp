@@ -1,10 +1,8 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
-from users.models import UserProfile
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -59,9 +57,7 @@ class KeyInfoSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     keyinfo_set = KeyInfoSerializer(many=True)
-    delivery_methods = serializers.ListField(
-        child=serializers.IntegerField()
-    )
+    delivery_methods = serializers.PrimaryKeyRelatedField(many=True, queryset=DeliveryMethod.objects.all())
 
     def create(self, validated_data):
         key_info_set = validated_data.pop("keyinfo_set")
@@ -75,8 +71,8 @@ class ItemSerializer(serializers.ModelSerializer):
         for key_info in key_info_set:
             item.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"], item=item))
 
-        for id in delivery_methods:
-            item.delivery_methods.add(DeliveryMethod.objects.get(pk=id))
+        for delivery_method in delivery_methods:
+            item.delivery_methods.add(DeliveryMethod.objects.get(pk=delivery_method.id))
 
         return item
 
@@ -97,8 +93,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
             instance.delivery_methods.clear()
 
-            for id in delivery_methods:
-                instance.delivery_methods.add(DeliveryMethod.objects.get(pk=id))
+            for delivery_method in delivery_methods:
+                instance.delivery_methods.add(DeliveryMethod.objects.get(pk=delivery_method.id))
 
         return super().update(instance, validated_data)
 
@@ -148,7 +144,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
 
     def get_similar(self, obj):
         return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
-    
+
     def get_owner_picture_url(self, obj):
         return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" else None
 

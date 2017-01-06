@@ -9,7 +9,7 @@ from items.models import *
 from users.models import *
 
 
-class ItemTestBase(TestCase):
+class ItemBaseTest(TestCase):
     url = "/api/items/"
 
     default_keyinfo_set = [
@@ -47,7 +47,6 @@ class ItemTestBase(TestCase):
 
         self.c1 = Category.objects.create(name="test")
         self.c2 = Category.objects.create(name="test2")
-
         self.dm1 = DeliveryMethod.objects.create(name="At my place")
         self.dm2 = DeliveryMethod.objects.create(name="At any place")
         self.dm3 = DeliveryMethod.objects.create(name="By mail")
@@ -62,6 +61,7 @@ class ItemTestBase(TestCase):
             "category": category,
             "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set,
             "delivery_methods": delivery_methods if delivery_methods is not None else self.default_delivery_methods
+
         }
 
     def post_item(self, **kwargs):
@@ -82,7 +82,7 @@ class ItemTestBase(TestCase):
             return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
 
 
-class ItemPostTests(ItemTestBase):
+class ItemPostTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login()
@@ -106,7 +106,7 @@ class ItemPostTests(ItemTestBase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ItemGetTests(ItemTestBase):
+class ItemGetTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login()
@@ -164,7 +164,7 @@ class ItemGetTests(ItemTestBase):
         self.assertEqual(r.data["views"], 2)
 
 
-class ItemPatchTests(ItemTestBase):
+class ItemPatchTests(ItemBaseTest):
     def patch_item(self, item_id=1, **kwargs):
         return self.client.patch("%s%d/" % (self.url, item_id), data=json.dumps(kwargs),
                                  content_type="application/json")
@@ -246,7 +246,7 @@ class ItemPatchTests(ItemTestBase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ItemPutTests(ItemTestBase):
+class ItemPutTests(ItemBaseTest):
     def put_item(self, item_id=1, **kwargs):
         return self.client.put("%s%d/" % (self.url, item_id), data=json.dumps(self.build_update_info(**kwargs)),
                                content_type="application/json")
@@ -264,7 +264,16 @@ class ItemPutTests(ItemTestBase):
     def test_put_item(self):
         keyinfo_set = [{"key": "test", "info": "test2"}, {"key": "test3", "info": "test4"}]
         delivery_methods = [1, 3]
-
+        get_delivery_methods = [
+            {
+                "id": 1,
+                "name": "At my place"
+            },
+            {
+                "id": 3,
+                "name": "By mail"
+            }
+        ]
         r = self.put_item(name="test2", description="test2", price_min=2, price_max=3, category=2,
                           keyinfo_set=keyinfo_set, delivery_methods=delivery_methods)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -278,14 +287,14 @@ class ItemPutTests(ItemTestBase):
         self.assertEqual(r.data["category"]["id"], 2)
         self.assertEqual(r.data["category"]["name"], "test2")
         self.assertEqual(r.data["keyinfo_set"], keyinfo_set)
-        self.assertEqual(r.data["delivery_methods"], delivery_methods)
+        self.assertEqual(r.data["delivery_methods"], get_delivery_methods)
 
     def test_put_item_not_existing(self):
         r = self.put_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ItemCommentsTests(ItemTestBase):
+class ItemCommentsTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login(username="username2", password="password")
