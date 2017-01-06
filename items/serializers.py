@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -143,7 +144,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         return obj.owner.username
 
     def get_similar(self, obj):
-        return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
+        return InventoryItemSerializer(Item.objects.filter(~Q(pk=obj.id), category=obj.category), many=True).data
 
     def get_owner_picture_url(self, obj):
         return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" else None

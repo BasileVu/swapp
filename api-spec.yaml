@@ -1204,3 +1204,7 @@ definitions:
         type: string
       owner_location:
         type: string
+      traded:
+        type: boolean
+      archived:
+        type: boolean
