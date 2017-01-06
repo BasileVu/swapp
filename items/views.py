@@ -241,10 +241,18 @@ class ItemViewSet(mixins.CreateModelMixin,
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
+        item = serializer.instance
+
+        if item.traded:
+            raise ValidationError("Can't update a traded item")
+
+        if item.offers_received.count() > 0 or item.offers_done.count() > 0:
+            raise ValidationError("Can't update an item with pending offers")
+
         price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)
         price_max = serializer.validated_data.get("price_max", serializer.instance.price_max)
-
         check_prices(price_min, price_max)
+
         serializer.save()
 
 

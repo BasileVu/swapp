@@ -9,8 +9,9 @@ class Item(models.Model):
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
     creation_date = models.DateTimeField("date published", default=timezone.now)
-    archived = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
+    traded = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
