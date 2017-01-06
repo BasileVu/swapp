@@ -111,7 +111,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ("id", "name", "image_url")
+        fields = ("id", "name", "image_url", "archived")
 
 
 class DetailedItemSerializer(serializers.ModelSerializer):
