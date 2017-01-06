@@ -1094,6 +1094,10 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
+      delivery_methods:
+        type: array
+        items:
+          type: number
   
   InventoryItem:    
     type: object
@@ -1124,6 +1128,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
+      delivery_methods:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
       category:
         type: object
         properties:
