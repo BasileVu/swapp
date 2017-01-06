@@ -400,6 +400,42 @@ paths:
                   type: number
                 name:
                   type: string
+                  
+  /deliverymethods/:
+    get:
+      description: "Gets all the delivery methods."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+          
+  /deliverymethods/{id}/:
+    get:
+      description: "Gets a detailed delivery method."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the delivery method."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
           
   /items/:
     get:
