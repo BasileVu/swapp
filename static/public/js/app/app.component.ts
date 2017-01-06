@@ -231,7 +231,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 // display item modal ///////////////////////////
                 var theItemModal = $('#view-item-x');
                 // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
-                theItemModal.on('show.bs.modal', function (e) {
+                theItemModal.on('show.bs.modal', function (e: any) {
                     setTimeout(function () {
                         modalCarousel.flickity('resize');
                         $('.modal-carousel-height').matchHeight({

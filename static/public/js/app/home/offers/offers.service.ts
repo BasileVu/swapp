@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
-import {UserLoginDTO} from "../profile/user-login-dto";
-import {UserCreationDTO} from "../profile/user-creation-dto";
 import {User, UserInventoryItem} from "../profile/user";
+import {Offer} from "./offer";
 
 @Injectable()
 export class OfferService {
@@ -20,40 +19,21 @@ export class OfferService {
     openOfferModal(offer: Array<any>) {
         this.openOfferModalSource.next(offer);
     }
-    
-    logout(): Promise<any> {
-        return this.http.get('/api/logout/')
-        .toPromise()
-        .catch(this.handleError);
-    }
-    
-    login(userLoginDTO: UserLoginDTO): Promise<any> {
-        let body = JSON.stringify(userLoginDTO); // Stringify payload
+
+    sendOffer(offer: Offer): Promise<any> {
+        let body = JSON.stringify(offer); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option
 
-        // No content to return, we just catch errors
-        return this.http.post('/api/login/', body, options)
+        return this.http.post('/api/offers/', body, options)
             .toPromise()
+            .then(this.extractData)
             .catch(this.handleError);
     }
 
-    register(userCreationDTO: UserCreationDTO): Promise<any> {
-        let body = JSON.stringify(userCreationDTO); // Stringify payload
-        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
-        let options = new RequestOptions({ headers: headers }); // Create a request option
-
-        // No content to return, we just catch errors
-        return this.http.post('/api/users/', body, options)
-            .toPromise()
-            .then(function(response){
-                if (response.status === 201) {
-                    return response;
-                } else {
-                    this.handleError(response);
-                }
-            })
-            .catch(this.handleError);
+    private extractData(res: Response) {
+        let body = res.json();
+        return body || { };
     }
 
     private handleError (error: Response | any) {
