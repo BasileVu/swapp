@@ -38,7 +38,7 @@ def filter_items(data, user):
 
     queryset = Item.objects.filter(
         Q(name__icontains=q) | Q(description__icontains=q),
-        price_min__gte=price_min, archived=False
+        price_min__gte=price_min, traded=False, archived=False
     )
 
     if user.is_authenticated:
@@ -123,7 +123,7 @@ def num_offers_points(n_offers, mean_offer_number):
 
 
 def build_item_suggestions(user):
-    queryset = Item.objects.filter(archived=False)
+    queryset = Item.objects.filter(traded=False, archived=False)
 
     if user.is_authenticated:
         lon = user.coordinates.longitude
