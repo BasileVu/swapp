@@ -151,7 +151,7 @@ export class AddItemModalComponent implements OnInit {
         this.desires.push("");
     }
 
-    removeDesire(index) {
+    removeDesire(index: number) {
         this.desires.splice(index, 1);
     }
 
@@ -159,20 +159,20 @@ export class AddItemModalComponent implements OnInit {
         this.keyInfos.push(new KeyInfo("", ""));
     }
 
-    removeKeyInfo(index) {
+    removeKeyInfo(index: number) {
         this.keyInfos.splice(index, 1);
     }
 
-    removeImage(index) {
+    removeImage(index: number) {
         this.file_srcs.splice(index, 1);
     }
   
     // This is called when the user selects new files from the upload button
-    fileChange(input){
+    fileChange(input: any){
         this.readFiles(input.files);
     }
 
-    readFile(file, reader, callback){
+    readFile(file: File, reader: FileReader, callback: any){
         // Set a callback funtion to fire after the file is fully loaded
         reader.onload = () => {
             // callback with the results
@@ -183,20 +183,20 @@ export class AddItemModalComponent implements OnInit {
         reader.readAsDataURL(file);
     }
 
-    readFiles(files, index=0){
+    readFiles(files: Array<File>, index=0){
         // Create the file reader
         let reader = new FileReader();
 
         // If there is a file
         if (index in files) {
             // Start reading this file
-            this.readFile(files[index], reader, (result) => {
+            this.readFile(files[index], reader, (result: string) => {
                 // Create an img element and add the image file data to it
                 var img = document.createElement("img");
                 img.src = result;
                 
                 // Send this img to the resize function (and wait for callback)
-                this.resize(img, 400, 400, (resized_jpeg, before, after) => {
+                this.resize(img, 400, 400, (resized_jpeg: string, before: any, after: any) => {
 
                     // Add the resized jpeg img source to a list for preview
                     // This is also the file you want to upload. (either as a
@@ -214,7 +214,7 @@ export class AddItemModalComponent implements OnInit {
     }
 
 
-    resize(img, MAX_WIDTH:number, MAX_HEIGHT:number, callback) {
+    resize(img: any, MAX_WIDTH:number, MAX_HEIGHT:number, callback: any) {
         // This will wait until the img is loaded before calling this function
         return img.onload = () => {
             console.log("img loaded");

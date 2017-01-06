@@ -23,10 +23,11 @@
                                 </div>
                                 <div class="row inventory swapp-inventory-mine">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
-                                        *ngFor="let item of user.items; let last = last" [update-my-inventory]="last ? true : false">
+                                        *ngFor="let userItem of user.items; let last = last" [update-my-inventory]="last">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="userItem.image_url === null" class="img-fluid" src="http://loremflickr.com/400/400"/>
+                                            <img *ngIf="userItem.image_url != null" class="img-fluid" src="{{ userItem.image_url }}"/>
+                                            <span>{{ userItem.name }}</span>
                                         </a>
                                     </div>
                                 </div>
@@ -49,19 +50,20 @@
                                 </div>
                                 <div class="row inventory swapp-inventory-yours">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
-                                        *ngFor="let item of owner.items; let last = last" [update-your-inventory]="last ? true : false">
+                                        *ngFor="let ownerItem of ownerItems; let last = last" [update-your-inventory]="last">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="ownerItem.image_url === null" class="img-fluid" src="http://loremflickr.com/400/400"/>
+                                            <img *ngIf="ownerItem.image_url != null" class="img-fluid" src="{{ ownerItem.image_url }}"/>
+                                            <span>{{ ownerItem.name }}</span>
                                         </a>
                                     </div>
                                 </div>
-                                <a href="#" class="swap hidden-md-down">
+                                <a href="#" class="swap hidden-md-down" (click)="sendOffer()">
                                     <i class="fa fa-refresh"></i>
                                 </a>
                             </div>
                             <div class="col-xs-12 swap-md hidden-lg-up">
-                                <a href="#" class="swap" (click)="sendOffer()">
+                                <a href="#" class="swap">
                                     <i class="fa fa-refresh"></i>
                                 </a>
                             </div>
