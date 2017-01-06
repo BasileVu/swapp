@@ -52,25 +52,29 @@ class OfferViewSet(mixins.CreateModelMixin,
         if item_given.price_max < item_received.price_min:
                 raise ValidationError("Price max of item given is smaller than price min of item received")
 
-
         serializer.save()
 
     def perform_update(self, serializer):
         data = serializer.validated_data
         accepted = data.get("accepted", None)
 
-        if accepted is not None and serializer.instance.item_given.owner != self.request.user:
-            raise ValidationError("Can't accept or refuse offer if you are the creator of the offer")
+        if accepted is not None:
+            serializer.validated_data["answered"] = True
 
-        if accepted is not None and serializer.instance.accepted:
-            raise ValidationError("Can't update an accepted offer")
+            if serializer.instance.item_given.owner == self.request.user:
+                raise ValidationError("Can't accept or refuse own offer")
 
-        if accepted:
-            serializer.instance.item_given.traded = True
-            serializer.instance.item_received.traded = True
-            serializer.save(answered=True)
-        else:
-            serializer.save()
+            if serializer.instance.accepted:
+                raise ValidationError("Can't update an accepted offer")
+
+            if accepted:
+                serializer.instance.item_given.traded = True
+                serializer.instance.item_given.save()
+                serializer.instance.item_received.traded = True
+                serializer.instance.item_received.save()
+
+        print(serializer.validated_data)
+        serializer.save()
 
     def perform_destroy(self, instance):
         if self.request.user != instance.item_given.owner:

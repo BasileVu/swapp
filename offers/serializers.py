@@ -18,4 +18,4 @@ class RetrieveOfferSerializer(serializers.ModelSerializer):
 class UpdateOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
-        fields = ("accepted", "comment", "answered")
+        fields = ("accepted", "comment")
