@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
@@ -5,6 +6,27 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from offers.models import Offer
 from offers.serializers import CreateOfferSerializer, RetrieveOfferSerializer, UpdateOfferSerializer
+
+
+def delete_offer(offer):
+    offer.delete()
+
+
+def refuse_offer(offer):
+    offer.answered = True
+    offer.accepted = False
+    offer.save()
+
+
+def refuse_and_delete_pending_offers(item, offer_id):
+    """
+    Refuses received pending received offers and deletes done pending offers.
+
+    :param item: the item on which to refuse and delete offers.
+    :param offer_id: the id of the offer to exclude when refusing and deleting.
+    """
+    map(refuse_offer, item.offers_received.filter(~Q(pk=offer_id), answered=False))
+    map(delete_offer, item.offers_done.filter(~Q(pk=offer_id), answered=False))
 
 
 class OfferViewSet(mixins.CreateModelMixin,
@@ -67,10 +89,15 @@ class OfferViewSet(mixins.CreateModelMixin,
             serializer.validated_data["answered"] = True
 
             if accepted:
-                serializer.instance.item_given.traded = True
-                serializer.instance.item_given.save()
-                serializer.instance.item_received.traded = True
-                serializer.instance.item_received.save()
+                offer = serializer.instance
+
+                offer.item_given.traded = True
+                offer.item_given.save()
+                offer.item_received.traded = True
+                offer.item_received.save()
+
+                refuse_and_delete_pending_offers(offer.item_given, offer.id)
+                refuse_and_delete_pending_offers(offer.item_received, offer.id)
 
         serializer.save()
 

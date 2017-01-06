@@ -250,7 +250,7 @@ class ItemViewSet(mixins.CreateModelMixin,
             raise ValidationError("Can't update an archived item")
 
         offers_received_pending = item.offers_received.filter(answered=False)
-        offers_done_pending = item.offers_received.filter(answered=False)
+        offers_done_pending = item.offers_done.filter(answered=False)
 
         if offers_done_pending.count() > 0 or offers_received_pending.count() > 0:
             raise ValidationError("Can't update an item with pending offers")

@@ -271,7 +271,7 @@ class ItemPatchTests(ItemBaseTest):
 
     def test_cannot_edit_item_with_pending_offers(self):
         i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
-        Offer.objects.create(item_given=i2, item_received=self.item, answered=False)
+        Offer.objects.create(item_given=self.item, item_received=i2, answered=False)
 
         r = self.patch_item(self.item.id, description="test2")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
