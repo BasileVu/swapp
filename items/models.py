@@ -14,6 +14,14 @@ class Item(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
+    delivery_methods = models.ManyToManyField("items.DeliveryMethod")
+
+    def __str__(self):
+        return self.name
+
+
+class DeliveryMethod(models.Model):
+    name = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name

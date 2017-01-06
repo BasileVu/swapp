@@ -9,7 +9,7 @@ from items.models import *
 from users.models import *
 
 
-class ItemTestMixin:
+class ItemBaseTest(TestCase):
     url = "/api/items/"
 
     default_keyinfo_set = [
@@ -22,8 +22,23 @@ class ItemTestMixin:
             "info": "top notch"
         }
     ]
+    default_delivery_methods = [1, 2, 3]
+    get_default_delivery_methods = [
+        {
+            "id": 1,
+            "name": "At my place"
+        },
+        {
+            "id": 2,
+            "name": "At any place"
+        },
+        {
+            "id": 3,
+            "name": "By mail"
+        }
+    ]
 
-    def setup(self):
+    def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password",
                                                      first_name="first",
                                                      last_name="last")
@@ -32,16 +47,21 @@ class ItemTestMixin:
 
         self.c1 = Category.objects.create(name="test")
         self.c2 = Category.objects.create(name="test2")
+        self.dm1 = DeliveryMethod.objects.create(name="At my place")
+        self.dm2 = DeliveryMethod.objects.create(name="At any place")
+        self.dm3 = DeliveryMethod.objects.create(name="By mail")
 
     def build_update_info(self, name="name", description="description", price_min=1, price_max=2, category=1,
-                          keyinfo_set=None):
+                          keyinfo_set=None, delivery_methods=None):
         return {
             "name": name,
             "description": description,
             "price_min": price_min,
             "price_max": price_max,
             "category": category,
-            "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set
+            "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set,
+            "delivery_methods": delivery_methods if delivery_methods is not None else self.default_delivery_methods
+
         }
 
     def post_item(self, **kwargs):
@@ -62,9 +82,9 @@ class ItemTestMixin:
             return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
 
 
-class ItemPostTests(TestCase, ItemTestMixin):
+class ItemPostTests(ItemBaseTest):
     def setUp(self):
-        self.setup()
+        super().setUp()
         self.login()
 
     def test_post_item_not_logged_in(self):
@@ -86,10 +106,9 @@ class ItemPostTests(TestCase, ItemTestMixin):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ItemGetTests(TestCase, ItemTestMixin):
-
+class ItemGetTests(ItemBaseTest):
     def setUp(self):
-        self.setup()
+        super().setUp()
         self.login()
         self.post_item()
         self.post_image()
@@ -124,6 +143,7 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["comments"], 0)
         self.assertEqual(r.data["likes"], 1)
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
+        self.assertEqual(r.data["delivery_methods"], self.get_default_delivery_methods)
         self.assertEqual(r.data["similar"][0]["id"], id1)
         self.assertEqual(r.data["similar"][1]["id"], id2)
         self.assertEqual(r.data["owner_location"], "city, country")
@@ -144,13 +164,13 @@ class ItemGetTests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["views"], 2)
 
 
-class ItemPatchTests(TestCase, ItemTestMixin):
+class ItemPatchTests(ItemBaseTest):
     def patch_item(self, item_id=1, **kwargs):
         return self.client.patch("%s%d/" % (self.url, item_id), data=json.dumps(kwargs),
                                  content_type="application/json")
 
     def setUp(self):
-        self.setup()
+        super().setUp()
         self.login()
         self.post_item()
 
@@ -196,10 +216,23 @@ class ItemPatchTests(TestCase, ItemTestMixin):
 
     def test_patch_keyinfo_set_not_empty(self):
         data = [{"key": "key", "info": "info"}]
-        r = self.patch_item(keyinfo_set=data)
 
+        r = self.patch_item(keyinfo_set=data)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["keyinfo_set"], data)
+
+    def test_patch_delivery_methods_empty(self):
+        r = self.patch_item(delivery_methods=[])
+        # At least, one delivery method is required
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+        r = self.get_item()
+        self.assertEquals(r.data["delivery_methods"], self.get_default_delivery_methods)
+
+    def test_patch_delivery_methods_not_empty(self):
+        r = self.patch_item(delivery_methods=[2])
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["delivery_methods"], [2])
 
     def test_cannot_set_min_price_greater_than_max_price(self):
         r = self.patch_item(price_min=3)
@@ -213,13 +246,13 @@ class ItemPatchTests(TestCase, ItemTestMixin):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ItemPutTests(TestCase, ItemTestMixin):
+class ItemPutTests(ItemBaseTest):
     def put_item(self, item_id=1, **kwargs):
         return self.client.put("%s%d/" % (self.url, item_id), data=json.dumps(self.build_update_info(**kwargs)),
                                content_type="application/json")
 
     def setUp(self):
-        self.setup()
+        super().setUp()
         self.login()
         self.post_item()
 
@@ -230,9 +263,19 @@ class ItemPutTests(TestCase, ItemTestMixin):
 
     def test_put_item(self):
         keyinfo_set = [{"key": "test", "info": "test2"}, {"key": "test3", "info": "test4"}]
-
+        delivery_methods = [1, 3]
+        get_delivery_methods = [
+            {
+                "id": 1,
+                "name": "At my place"
+            },
+            {
+                "id": 3,
+                "name": "By mail"
+            }
+        ]
         r = self.put_item(name="test2", description="test2", price_min=2, price_max=3, category=2,
-                          keyinfo_set=keyinfo_set)
+                          keyinfo_set=keyinfo_set, delivery_methods=delivery_methods)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
         r = self.get_item()
@@ -244,16 +287,16 @@ class ItemPutTests(TestCase, ItemTestMixin):
         self.assertEqual(r.data["category"]["id"], 2)
         self.assertEqual(r.data["category"]["name"], "test2")
         self.assertEqual(r.data["keyinfo_set"], keyinfo_set)
+        self.assertEqual(r.data["delivery_methods"], get_delivery_methods)
 
     def test_put_item_not_existing(self):
         r = self.put_item(item_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ItemCommentsTests(TestCase, ItemTestMixin):
-
+class ItemCommentsTests(ItemBaseTest):
     def setUp(self):
-        self.setup()
+        super().setUp()
         self.login(username="username2", password="password")
         self.post_image()
         self.client.logout()

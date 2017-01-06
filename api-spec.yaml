@@ -250,7 +250,9 @@ paths:
           description: "The interested by categories to update."
           required: true
           schema:
-            $ref: "#/definitions/UpdateInterestedByCategories"
+            type: array
+            items:
+              type: number
       responses:
         200:
           description: "Successful operation."
@@ -265,7 +267,9 @@ paths:
         description: "The interested by categories to update."
         required: false
         schema:
-          $ref: "#/definitions/UpdateInterestedByCategories"
+          type: array
+          items:
+            type: number
       responses:
         200:
           description: "Successful operation."
@@ -1072,14 +1076,6 @@ definitions:
         type: string
       info:
         type: string
-        
-  UpdateInterestedByCategories:
-    type: array
-    items:
-      type: object
-      properties:
-        id:
-          type: number
 
   SetItemInfo:
     type: object
@@ -1098,6 +1094,10 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
+      delivery_methods:
+        type: array
+        items:
+          type: number
   
   InventoryItem:    
     type: object
@@ -1128,6 +1128,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
+      delivery_methods:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
       category:
         type: object
         properties:
