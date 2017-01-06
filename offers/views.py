@@ -62,7 +62,7 @@ class OfferViewSet(mixins.CreateModelMixin,
         if accepted is not None and serializer.instance.item_given.owner != self.request.user:
             raise ValidationError("Can't accept or refuse offer if you are the creator of the offer")
 
-        if serializer.instance.accepted:
+        if accepted is not None and serializer.instance.accepted:
             raise ValidationError("Can't update an accepted offer")
 
         if accepted:
