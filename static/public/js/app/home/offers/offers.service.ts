@@ -58,7 +58,7 @@ export class OfferService {
     cloneUser(user: User): User {
         let u = new User();
         u.id = user.id;
-        u.profile_picture = user.profile_picture;
+        u.profile_picture_url = user.profile_picture_url;
         u.username = user.username;
         u.first_name = user.first_name;
         u.last_name = user.last_name;

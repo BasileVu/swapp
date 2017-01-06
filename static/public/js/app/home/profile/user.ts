@@ -12,7 +12,7 @@ export class UserInventoryItem {
 
 export class User {
     id: number;
-    profile_picture: string;
+    profile_picture_url: string;
     username: string;
     first_name: string;
     last_name: string;
@@ -20,10 +20,11 @@ export class User {
     items: Array<UserInventoryItem>;
     notes: number;
     note_avg: number;
+    interested_by: Array<{id:number,name:string}>;
 
     constructor() {
         this.id = -1;
-        this.profile_picture = "";
+        this.profile_picture_url = null;
         this.username = "";
         this.first_name = "";
         this.last_name = "";
@@ -31,5 +32,6 @@ export class User {
         this.items = [];
         this.notes = 0;
         this.note_avg = 0;
+        this.interested_by = [];
     }
 }
