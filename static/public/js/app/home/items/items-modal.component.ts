@@ -195,7 +195,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     like() {
         let l = new Like();
-        l.date = new Date().toDateString();
+        l.date = new Date().toISOString();
         l.item = this.item.id;
         l.user = this.user.id;
 
