@@ -246,6 +246,9 @@ class ItemViewSet(mixins.CreateModelMixin,
         if item.traded:
             raise ValidationError("Can't update a traded item")
 
+        if item.archived:
+            raise ValidationError("Can't update an archived item")
+
         offers_received_pending = item.offers_received.filter(answered=False)
         offers_done_pending = item.offers_received.filter(answered=False)
 

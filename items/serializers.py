@@ -156,7 +156,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
                   "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
-                  "similar", "owner_picture_url", "owner_location")
+                  "similar", "owner_picture_url", "owner_location", "traded", "archived")
 
 
 class SearchItemsSerializer(serializers.Serializer):
