@@ -1,46 +1,27 @@
 import { KeyInfo } from './key-info';
 
 export class ItemCreationDTO {
-    url: string;
-    username: string;
     name: string;
+    description: string;
     price_min: number;
     price_max: number;
-    category: string;
-    description: string;
-    key_informations: Array<KeyInfo>;
-    images: Array<string>;
-    image_set: Array<number> = new Array(); // // TODO : still needed ? check with api
-    owner_interests: Array<string>;
-    accepted_delivery_ids: Array<string>;
-    creation_date: Date;
-    like_set: Array<string> = new Array(); // TODO : still needed ? check with api
+    category: number;
+    keyinfo_set: Array<KeyInfo>;
+    delivery_methods: Array<number>;
 
-    constructor(username: string,
-                name: string,
+    constructor(name: string,
                 price_min: number,
                 price_max: number,
-                category: string,
+                category: number,
                 description: string,
-                key_informations: Array<KeyInfo>,
-                images: Array<string>,
-                owner_interests: Array<string>,
-                accepted_delivery_ids: Array<string>,
-                creation_date: Date) {
-        this.username = username;
+                keyinfo_set: Array<KeyInfo>,
+                delivery_methods: Array<number>) {
         this.name = name;
+        this.description = description;
         this.price_min = price_min;
         this.price_max = price_max;
         this.category = category;
-        this.description = description;
-        this.key_informations = key_informations;
-        this.images = images;
-        this.owner_interests = owner_interests;
-        this.accepted_delivery_ids = accepted_delivery_ids;
-        this.creation_date = creation_date;  
-    }
-
-    setUrl(url: string) {
-        this.url = url;
+        this.keyinfo_set = keyinfo_set;
+        this.delivery_methods = delivery_methods
     }
 }

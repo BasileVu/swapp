@@ -128,6 +128,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
                 */
 
+                // open user creation modal /////////////////////
+                let openCreateProfileButtons = $('.open-create-profile-modal');
+                let createProfileModal = $('#create-user-modal');
+                openCreateProfileButtons.each(function () {
+                    $(this).click(function () {
+                        createProfileModal.modal('show');
+                    });
+                });
+
                 // open item creation modal /////////////////////
                 let addItemButtons = $('.open-new-item-modal');
                 let newItemModal = $('#add-item-modal');
@@ -177,7 +186,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 $('.open-modal-advanced-search').click(function () {
                     advancedSearchModal.modal('show');
                 });
-                advancedSearchModal.on('show.bs.modal', function (e) {
+                advancedSearchModal.on('show.bs.modal', function (e: any) {
                     setTimeout(function () {
                         let map = new google.maps.Map(document.getElementById('search-modal-map'), {
                             center: {lat: -34.397, lng: 150.644},

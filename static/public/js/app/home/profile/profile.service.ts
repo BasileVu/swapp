@@ -10,7 +10,7 @@ export class ProfileService {
 
     // We must add csrftoken in header manually when we user XMLHttpRequest.
     // Without XHR, images can't be upload with enctype multipart/form-data
-    uploadProfilePicture(formData: FormData): Promise<any> {
+    addImage(formData: FormData): Promise<any> {
         
         let csrftoken: string = this.getCookie("csrftoken");
 
@@ -32,7 +32,6 @@ export class ProfileService {
             }
         })
         .catch(this.handleError);
-        
     }
 
     // Get cookie value from its name

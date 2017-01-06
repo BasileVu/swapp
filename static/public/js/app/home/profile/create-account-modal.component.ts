@@ -113,7 +113,7 @@ export class CreateAccountModalComponent implements OnInit {
         });
     }
 
-    fileChangeListener($event) {
+    fileChangeListener($event: any) {
         var image:any = new Image();
         this.file = $event.target.files[0];
         var myReader:FileReader = new FileReader();
@@ -121,7 +121,6 @@ export class CreateAccountModalComponent implements OnInit {
         myReader.onloadend = function (loadEvent:any) {
             image.src = loadEvent.target.result;
             that.cropper.setImage(image);
-
         };
 
         myReader.readAsDataURL(this.file);
@@ -132,7 +131,7 @@ export class CreateAccountModalComponent implements OnInit {
             let formData:FormData = new FormData();
             formData.append('image', this.file, this.file.name);
             formData.append('user', 10); // 10 is an arbitrary value, we just need to indicate that user has a value
-            this.profileService.uploadProfilePicture(formData)
+            this.profileService.addImage(formData)
                 .then( // now signal the ProfileComponent that we uploaded picture
                     res => this.updateAccountEvent.emit(),
                     error => this.updateAccountEvent.emit()

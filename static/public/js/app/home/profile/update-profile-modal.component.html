@@ -15,6 +15,21 @@
                                 <img class="avatar img-fluid" src="http://loremflickr.com/200/200">
                             </div>
                             <input type="file" class="form-control">
+
+                            <h3>Interested by</h3>
+                            <div class="form-group row" *ngFor="let desire of desires; let ind = index" [@flyInOut]>
+                                <label class="col-sm-3 col-form-label">Desire {{ ind + 1 }}</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col-sm-1">
+                                    <a class="btn btn-sm btn-block" (click)="removeDesire(ind)"><i class="fa fa-times remove-element"></i></a>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-block btn-secondary-color submit" (click)="addDesire()">
+                                <i class="fa fa-plus"></i> Add desire
+                            </a>
+                            <hr>
                         </div>
                         <div class="col-md-8 col-2">
                             <h3>Login</h3>

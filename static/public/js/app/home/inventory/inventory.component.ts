@@ -77,9 +77,9 @@ export class InventoryComponent implements OnInit {
     addItemEvent($event: ItemCreationDTO) {
         let inventoryItem = new InventoryItem(
             1, // TODO
-            $event.name, 
-            $event.images[0], 
-            $event.creation_date);
+            $event.name,
+            "",
+            new Date());
         
         this.inventory.push(inventoryItem);
 

@@ -90,7 +90,7 @@ export class ProfileComponent implements OnInit {
     }
 
     // $event is an object corresponding to an array with [0]=UserLoginDTO, [1]=true on account creation, false otherwise
-    login($event) {
+    login($event: Array<any>) {
         this.authService.login($event[0]).then(
             res => {
                 this.loggedIn = true;

@@ -13,6 +13,9 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { InventoryService } from './inventory.service';
 import { ItemCreationDTO } from './item-creation-dto';
 import { KeyInfo } from './key-info';
+import {ProfileService} from "../profile/profile.service";
+import {SearchService} from "../search/search.service";
+import {Category} from "../search/category";
 
 declare let $:any;
 
@@ -63,13 +66,15 @@ class DeliveryMethod {
 })
 export class AddItemModalComponent implements OnInit {
 
-    desires: Array<string> = new Array(1);
-    keyInfos: Array<KeyInfo> = new Array(1);
-    categories: Array<string> = new Array();
-    deliveryMethods: Array<DeliveryMethod> = new Array();
+    keyInfos: Array<KeyInfo> = [];
+    categories: Array<Category> = [];
+    deliveryMethods: Array<DeliveryMethod> = [];
     
     // images
-    public file_srcs: Array<string> = new Array();
+    file_srcs: Array<string> = [];
+    files: Array<File> = [];
+    data: any;
+    private file:File;
 
     // EventEmitter to call login function of the ProfileComponent after registering
     @Output() newItemEvent = new EventEmitter();
@@ -84,6 +89,8 @@ export class AddItemModalComponent implements OnInit {
 
     constructor(private changeDetectorRef: ChangeDetectorRef,
                 private inventoryService: InventoryService,
+                private profileService: ProfileService,
+                private searchService: SearchService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) { }
 
@@ -96,6 +103,12 @@ export class AddItemModalComponent implements OnInit {
             description: this.description
         });
 
+        this.searchService.getCategories().then(
+            categories => this.categories = categories,
+            error => this.toastr.error("Can't get alla categories", "Error")
+        );
+
+        this.keyInfos.push(new KeyInfo("", ""));
         // TODO : get delivery methods
     }
 
@@ -110,49 +123,52 @@ export class AddItemModalComponent implements OnInit {
         if (errorMessage != undefined) {
             this.toastr.error(errorMessage, "Error");
         } else {
-            let deliveryM = new Array<string>();
+            let deliveryM = new Array<number>();
+            deliveryM.push(1);
+            let keyInfos = new Array<KeyInfo>();
+            for (let ki of this.keyInfos)
+                if (ki.key && ki.key.trim() && ki.value && ki.value.trim())
+                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.value.trim()));
 
-            console.log(this.file_srcs);
+            console.log(this.files);
+            console.log(this.category.value);
 
             let newItem = new ItemCreationDTO(
-                "TODO", // TODO
                 this.name.value,
                 this.min_price.value,
                 this.max_price.value,
                 this.category.value,
                 this.description.value,
-                this.keyInfos,
-                this.file_srcs,
-                this.desires,
-                deliveryM,
-                new Date()
+                keyInfos,
+                deliveryM
             );
 
-            console.log(newItem);
-
-            this.inventoryService.addItem(newItem).then(
-                res => {
-                    console.log(res);
-                    if(res.status == 201) {
-                        this.toastr.success('New item added to your inventory', 'Item created!');
-                        $('#add-item-modal').modal('hide');
-                        newItem.setUrl(res.body);
-                        this.newItemEvent.emit(newItem);
-                    }
-                },
-                error => this.toastr.error(error, 'Error')
-            );
+            this.inventoryService.addItem(newItem)
+                .then(
+                    res => {console.log(res); this.addImages(7);},
+                    error => this.toastr.error(error, 'Error'));
         }
         
         
     }
 
-    addDesire() {
-        this.desires.push("");
-    }
-
-    removeDesire(index: number) {
-        this.desires.splice(index, 1);
+    addImages(item_id: number) {
+        let filesUploaded: number = 0;
+        for (let f of this.files) {
+            let formData:FormData = new FormData();
+            formData.append('image', f, f.name);
+            formData.append('item', item_id);
+            this.profileService.addImage(formData)
+                .then( // now signal the ProfileComponent that we uploaded picture
+                    res => {
+                        if (++filesUploaded === this.files.length) {
+                            this.toastr.success('New item added to your inventory', 'Item created!');
+                            this.newItemEvent.emit({});
+                        }
+                    },
+                    error => this.toastr.error(error, "Error")
+                );
+        }
     }
 
     addKeyInfo() {
@@ -165,10 +181,16 @@ export class AddItemModalComponent implements OnInit {
 
     removeImage(index: number) {
         this.file_srcs.splice(index, 1);
+        this.files.splice(index, 1);
     }
   
     // This is called when the user selects new files from the upload button
     fileChange(input: any){
+        console.log(input.files);
+
+        for (let f of input.files)
+            this.files.push(f);
+
         this.readFiles(input.files);
     }
 
@@ -196,7 +218,7 @@ export class AddItemModalComponent implements OnInit {
                 img.src = result;
                 
                 // Send this img to the resize function (and wait for callback)
-                this.resize(img, 400, 400, (resized_jpeg: string, before: any, after: any) => {
+                this.resize(img, 800, 500, (resized_jpeg: string, before: any, after: any) => {
 
                     // Add the resized jpeg img source to a list for preview
                     // This is also the file you want to upload. (either as a
@@ -212,7 +234,6 @@ export class AddItemModalComponent implements OnInit {
             this.changeDetectorRef.detectChanges();
         }
     }
-
 
     resize(img: any, MAX_WIDTH:number, MAX_HEIGHT:number, callback: any) {
         // This will wait until the img is loaded before calling this function
@@ -248,7 +269,7 @@ export class AddItemModalComponent implements OnInit {
             
             // Get this encoded as a jpeg
             // IMPORTANT: 'jpeg' NOT 'jpg'
-            var dataUrl = canvas.toDataURL('image/jpeg');
+            var dataUrl = canvas.toDataURL('image/jpeg'); // TODO : png
             
             // callback with the results
             callback(dataUrl, img.src.length, dataUrl.length);
