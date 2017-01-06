@@ -42,8 +42,6 @@ export class ItemsComponent implements OnInit, OnChanges {
     }
 
     gotoDetail(item: DetailedItem): void {
-        console.log("clicked. item_id: " + item);
-
         // Inform the item modal about the item we just clicked.
         // (ItemComponent and ItemModalComponent communicate via ItemService)
         this.itemsService.selectItem(item);

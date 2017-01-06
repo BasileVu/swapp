@@ -9,7 +9,7 @@
                                 *ngFor="let smallPicture of item.image_urls; let first = first; let last = last"
                                 [ngClass]="{'is-nav-selected': first}"
                                 [update-carousel]="last">
-                                <img class="img-fluid" src="{{ smallPicture }}"/>
+                                <img class="img-fluid small-pic" src="{{ smallPicture }}"/>
                             </div>
                         </div>
                         <div class="col-xs-9 modal-carousel modal-carousel-height">
@@ -17,7 +17,7 @@
                                 *ngFor="let bigPicture of item.image_urls; let first = first; let last = last"
                                 [ngClass]="{'is-nav-selected': first}"
                                 [update-carousel]="last">
-                                <img class="img-fluid" src="{{ bigPicture }}"/>
+                                <img class="img-fluid big-pic" src="{{ bigPicture }}"/>
                             </div>
                         </div>
                     </div>

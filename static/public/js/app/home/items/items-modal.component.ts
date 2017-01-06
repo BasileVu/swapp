@@ -8,7 +8,7 @@ import { AuthService } from '../../shared/authentication/authentication.service'
 import { OfferService } from '../offers/offers.service';
 
 import { DetailedItem } from './detailed-item';
-import { User } from '../profile/user';
+import {User, UserInventoryItem} from '../profile/user';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import { Subscription }   from 'rxjs/Subscription';
@@ -20,7 +20,18 @@ declare let $: any;
     moduleId: module.id,
     selector: 'items-modal',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './items-modal.component.html'
+    templateUrl: './items-modal.component.html',
+    styles:[`
+        .big-pic {
+            max-width: 100%;
+            max-height: 500px;
+        }
+        
+        .small-pic {
+            max-width: 100%;
+            max-height: 250px;
+        }
+    `]
 })
 export class ItemsModalComponent implements OnInit, OnDestroy {
 
@@ -29,7 +40,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     item: DetailedItem;
     owner: User;
-    ownerItems: Array<DetailedItem>;
+    ownerItems: Array<UserInventoryItem>;
     stars: Array<number>;
     comments: Array<Comment> = [];
     subscription: Subscription;
@@ -77,15 +88,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                             this.fillStars(owner.note_avg);
                             this.ownerItems = [];
 
-                            for (let i in owner.items) {
-                                let ownerItem: any = owner.items[i];
-                                this.itemsService.getDetailedItem(ownerItem.id).then(
-                                    item => {
-                                        if (ownerItem.id != item.id)
-                                            this.ownerItems.push(item);
-                                    },
-                                    error => this.toastr.error("Can't get owner's items", "Error")
-                                );
+                            for (let inventoryItem of owner.items) {
+                                if (inventoryItem.id != item.id)
+                                    this.ownerItems.push(inventoryItem);
                             }
                         },
                         error => this.toastr.error("Can't get the owner", "Error")
