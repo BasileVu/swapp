@@ -10,7 +10,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.serializers import InventoryItemSerializer
+from items.models import Category
+from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -27,7 +28,7 @@ def get_csrf_token(request):
     return Response()
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def login_user(request):
     serializer = LoginUserSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -40,7 +41,7 @@ def login_user(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
     """Logs out an user."""
@@ -97,7 +98,7 @@ def create_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
-    """Allows to get the current's account info and update them."""
+    """Allows to get the current user's account info and update them."""
 
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
@@ -130,7 +131,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
         return super(UserAccount, self).update(request, *args, **kwargs)
 
 
-@api_view(['PUT'])
+@api_view(["PUT"])
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
@@ -172,6 +173,23 @@ class LocationView(generics.UpdateAPIView):
         serializer.save()
 
 
+class CategoriesView(generics.UpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        serializer = InterestedByCategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        userprofile = self.request.user.userprofile
+        userprofile.categories.clear()
+
+        for id in serializer.validated_data["interested_by"]:
+            userprofile.categories.add(Category.objects.get(pk=id))
+            userprofile.save()
+
+        return Response(CategorySerializer(userprofile.categories.all(), many=True).data)
+
+
 @api_view(["GET"])
 def get_public_account_info(request, username):
     """Returns the user's public info."""
@@ -186,7 +204,8 @@ def get_public_account_info(request, username):
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
         "items": InventoryItemSerializer(user.item_set.all(), many=True).data,
         "notes": user.note_set.count(),
-        "note_avg": user.userprofile.note_avg
+        "note_avg": user.userprofile.note_avg,
+        "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
     })
 
 
@@ -198,7 +217,7 @@ class NoteViewSet(mixins.CreateModelMixin,
     queryset = Note.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'update':
+        if self.action == "update":
             return NoteUpdateSerializer
         return NoteSerializer
 
@@ -207,7 +226,7 @@ class NoteViewSet(mixins.CreateModelMixin,
         offer = serializer.validated_data["offer"]
 
         if offer.accepted is not True:
-            raise ValidationError("You can't not make a note if the offer has not been accepted")
+            raise ValidationError("You can't make a note if the offer has not been accepted")
         if offer.item_given.owner == self.request.user:
             serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:

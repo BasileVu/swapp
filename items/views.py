@@ -200,8 +200,8 @@ class ItemViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return AggregatedItemSerializer
+        if self.action == "list" or self.action == "retrieve":
+            return DetailedItemSerializer
         return ItemSerializer
 
     def retrieve(self, request, pk=None, *args, **kwargs):
@@ -214,12 +214,12 @@ class ItemViewSet(mixins.CreateModelMixin,
         item.views += 1
         item.save()
 
-        serializer = AggregatedItemSerializer(item)
+        serializer = DetailedItemSerializer(item)
         return Response(serializer.data)
 
     @detail_route(methods=["GET"])
     def comments(self, request, pk=None):
-        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.all(), many=True).data)
+        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.order_by("-date"), many=True).data)
 
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
@@ -229,10 +229,10 @@ class ItemViewSet(mixins.CreateModelMixin,
 
         if len(request.query_params) == 0:
             items = build_item_suggestions(user)
-            return Response(AggregatedItemSerializer(items, many=True).data)
+            return Response(DetailedItemSerializer(items, many=True).data)
         else:
             queryset = filter_items(serializer.validated_data, user)
-            return Response(AggregatedItemSerializer(queryset, many=True).data)
+            return Response(DetailedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         price_min = serializer.validated_data.get("price_min", None)
@@ -262,7 +262,7 @@ class ImageViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return CreateImageSerializer
 
         return ImageSerializer
