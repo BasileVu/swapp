@@ -15,12 +15,12 @@ class OfferAPITests(TestCase):
         return Item.objects.create(name=name, description=description, price_min=price_min, price_max=price_max,
                                    archived=archived, category=category, owner=owner)
 
-    def post_offer(self, id_item_given, id_item_received, accepted=False, comment="Test"):
+    def post_offer(self, item_given, item_received, accepted=False, comment="Test"):
         return self.client.post(self.offers_url, data=json.dumps({
             "accepted": accepted,
             "comment":  comment,
-            "item_given": id_item_given,
-            "item_received": id_item_received
+            "item_given": item_given.id,
+            "item_received": item_received.id
         }), content_type="application/json")
 
     def get_offer(self, id_offer=1):
@@ -64,29 +64,29 @@ class OfferAPITests(TestCase):
         self.login1()
 
     def test_post_offer(self):
-        r = self.post_offer(self.item2.id, self.item3.id)
+        r = self.post_offer(self.item2, self.item3)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_post_offer_on_self_item(self):
-        r = self.post_offer(self.item2.id, self.item2.id)
+        r = self.post_offer(self.item2, self.item2)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_offer_on_object_not_owned(self):
-        r = self.post_offer(self.item3.id, self.item2.id)
+        r = self.post_offer(self.item3, self.item2)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_offer_on_invalid_price_range(self):
-        r = self.post_offer(self.item1.id, self.item3.id)
+        r = self.post_offer(self.item1, self.item3)
         self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(Offer.objects.count(), 0)
 
     def test_cannot_create_already_created_offer(self):
-        r = self.post_offer(self.item2.id, self.item3.id)
-        r = self.post_offer(self.item2.id, self.item3.id)
+        self.post_offer(self.item2, self.item3)
+        r = self.post_offer(self.item2, self.item3)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_offer(self):
-        r = self.post_offer(self.item2.id, self.item3.id)
+        r = self.post_offer(self.item2, self.item3)
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         r = self.get_offer()
@@ -103,7 +103,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_offer(self):
-        self.post_offer(self.item2.id, self.item3.id)
+        self.post_offer(self.item2, self.item3)
 
         self.login2()
         r = self.put_offer(1, accepted=True, comment="Test2")
@@ -119,7 +119,7 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_patch_offer(self):
-        self.post_offer(self.item2.id, self.item3.id)
+        self.post_offer(self.item2, self.item3)
 
         r = self.patch_offer(comment="Test2")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -137,17 +137,48 @@ class OfferAPITests(TestCase):
         self.assertEqual(r.data["comment"], "Test2")
 
     def test_patch_offer_not_existing(self):
-        r = self.patch_offer(id_offer=1)
+        r = self.patch_offer()
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_cannot_change_answered_status(self):
+        self.post_offer(self.item2, self.item3)
+        self.patch_offer(answered=True)
+
+        self.login2()
+        self.patch_offer(answered=True)
+
+        r = self.get_offer()
+        self.assertEqual(r.data["answered"], False)
+
     def test_cannot_accept_or_refuse_own_offer(self):
-        r = self.post_offer(self.item2.id, self.item3.id)
-        r = self.patch_offer(id_offer=r.data["id"], accepted=True)
+        self.post_offer(self.item2, self.item3)
+        r = self.patch_offer(accepted=True)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_change_accepted_status_after_accepted(self):
+        self.post_offer(self.item2, self.item3)
+
+        self.login2()
+        self.patch_offer(accepted=True)
+        r = self.patch_offer(accepted=False)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_accepted_offer(self):
+        self.post_offer(self.item2, self.item3)
+
+        self.login2()
+        self.patch_offer(accepted=True)
+
+        r = self.patch_offer(comment="Test")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.login1()
+        r = self.patch_offer(comment="Test")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_offer(self):
-        r = self.post_offer(self.item2.id, self.item3.id)
-        self.post_offer(self.item1.id, self.item3.id)
+        r = self.post_offer(self.item2, self.item3)
+        self.post_offer(self.item1, self.item3)
 
         id_offer = r.data["id"]
         r = self.delete_offer(id_offer=id_offer)

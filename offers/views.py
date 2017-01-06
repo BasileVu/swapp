@@ -19,7 +19,7 @@ class OfferViewSet(mixins.CreateModelMixin,
     def get_serializer_class(self):
         if self.action == "create":
             return CreateOfferSerializer
-        if self.action == "update":
+        if self.action in ["update", "partial_update"]:
             return UpdateOfferSerializer
         return RetrieveOfferSerializer
 
@@ -55,17 +55,16 @@ class OfferViewSet(mixins.CreateModelMixin,
         serializer.save()
 
     def perform_update(self, serializer):
-        data = serializer.validated_data
-        accepted = data.get("accepted", None)
+        if serializer.instance.accepted:
+            raise ValidationError("Can't update an accepted offer")
+
+        accepted = serializer.validated_data.get("accepted", None)
 
         if accepted is not None:
-            serializer.validated_data["answered"] = True
-
             if serializer.instance.item_given.owner == self.request.user:
                 raise ValidationError("Can't accept or refuse own offer")
 
-            if serializer.instance.accepted:
-                raise ValidationError("Can't update an accepted offer")
+            serializer.validated_data["answered"] = True
 
             if accepted:
                 serializer.instance.item_given.traded = True
@@ -73,7 +72,6 @@ class OfferViewSet(mixins.CreateModelMixin,
                 serializer.instance.item_received.traded = True
                 serializer.instance.item_received.save()
 
-        print(serializer.validated_data)
         serializer.save()
 
     def perform_destroy(self, instance):
