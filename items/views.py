@@ -239,7 +239,6 @@ class ItemViewSet(mixins.CreateModelMixin,
         price_max = serializer.validated_data.get("price_max", None)
 
         check_prices(price_min, price_max)
-
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):

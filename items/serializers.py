@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from items.models import Category, Item, Image, Like, KeyInfo
+from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
 from users.models import UserProfile
 
@@ -52,13 +52,20 @@ class KeyInfoSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     keyinfo_set = KeyInfoSerializer(many=True)
+    delivery_methods = serializers.ListField(
+        child=serializers.IntegerField()
+    )
 
     def create(self, validated_data):
         key_info_set = validated_data.pop("keyinfo_set")
+        delivery_methods = validated_data.pop("delivery_methods")
         item = Item.objects.create(**validated_data)
 
         for key_info in key_info_set:
             item.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"], item=item))
+
+        for id in delivery_methods:
+            item.delivery_methods.add(DeliveryMethod.objects.get(pk=id))
 
         return item
 
@@ -71,11 +78,18 @@ class ItemSerializer(serializers.ModelSerializer):
                 instance.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"],
                                                                 item=instance))
 
+        if validated_data.get("delivery_methods", None) is not None:
+            delivery_methods = validated_data.pop("delivery_methods")
+            instance.delivery_methods.clear()
+
+            for id in delivery_methods:
+                instance.delivery_methods.add(DeliveryMethod.objects.get(pk=id))
+
         return super().update(instance, validated_data)
 
     class Meta:
         model = Item
-        fields = ("id", "name", "description", "price_min", "price_max", "category", "keyinfo_set")
+        fields = ("id", "name", "description", "price_min", "price_max", "category", "keyinfo_set", "delivery_methods")
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
