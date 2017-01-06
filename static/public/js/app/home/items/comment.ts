@@ -11,11 +11,11 @@ export class Comment {
 
     constructor() {
         this.id = null;
-        this.content = null;
+        this.content = "";
         this.date = null;
         this.user = null;
         this.item = null;
-        this.user_fullname = null;
+        this.user_fullname = "";
         this.user_profile_picture = null;
     }
 

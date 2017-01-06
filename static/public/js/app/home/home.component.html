@@ -2,7 +2,7 @@
 
 <div id="content-main" class="container">
     <inventory #inventory [loggedIn]="loggedIn"></inventory>
-    <div class="row grid" #classGrid>
+    <div class="row grid" #classGrid style="margin-bottom: 60px">
         <profile #profile (profilePictureEvent)="createAccount.addProfilePicture()"></profile>
         <items></items>
     </div>

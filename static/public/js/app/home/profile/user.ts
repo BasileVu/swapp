@@ -6,7 +6,7 @@ export class UserInventoryItem {
     constructor() {
         this.id = null;
         this.image_url = null;
-        this.name = null;
+        this.name = "";
     }
 }
 

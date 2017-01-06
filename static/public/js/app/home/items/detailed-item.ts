@@ -1,6 +1,7 @@
+import {UserInventoryItem} from "../profile/user";
 class KeyInfo {
     key: string;
-    value: string;
+    info: string;
 }
 
 
@@ -12,27 +13,20 @@ export class DetailedItem {
     price_max: number;
     creation_date: Date;
     keyinfo_set: Array<KeyInfo>;
-    owner_username: string;
+    delivery_methods: Array<{id:number, name:string}>;
     category: {
         id: number;
         name: string;
     };
     views: number;
-
-    // TODO : missing in API endpoint GET /items/
-    delivery_methods: Array<string>;
-    owner_profile_picture_url: string;
-    //
-
     image_urls: Array<string>; // other images
     likes: number;
     comments: number;
     offers_received: number;
-    similar: Array<{
-        id: number;
-        name: string;
-        image_url: string;
-    }>;
+    similar: Array<UserInventoryItem>;
+    owner_username: string;
+    owner_picture_url: string;
+    owner_location: string;
 
     constructor() {
         this.id = -1;
@@ -50,10 +44,9 @@ export class DetailedItem {
         this.owner_username = "";
         this.category = {id:-1, name:undefined};
         this.similar = [];
-        this.owner_profile_picture_url = null;
-    }
-
-    getId(): number {
-        return this.id;
+        this.owner_username = "";
+        this.owner_picture_url = null;
+        this.owner_location = "";
+        this.delivery_methods = [];
     }
 }

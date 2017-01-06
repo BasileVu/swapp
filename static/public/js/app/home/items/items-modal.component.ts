@@ -12,6 +12,9 @@ import { User } from '../profile/user';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import { Subscription }   from 'rxjs/Subscription';
+import {Like} from "./like";
+
+declare let $: any;
 
 @Component({
     moduleId: module.id,
@@ -44,8 +47,8 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors
         this.owner = new User();
-        this.ownerItems = new Array();
-        this.stars = new Array();
+        this.ownerItems = [];
+        this.stars = [];
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
@@ -92,7 +95,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 this.itemsService.getComments(item.id)
                     .then(
                         comments => {
-                            this.comments = comments
+                            this.comments = comments;
                         },
                         error => this.toastr.error("Can't get the comments", "Error")
                     );
@@ -103,6 +106,11 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // Initiate the comment form
         this.commentForm = this.formBuilder.group({
             commentContent: this.commentContent
+        });
+
+        // on close, destroy flickity carousal
+        $('#view-item-x').on('hide.bs.modal', function (e: any) {
+            $('.modal-carousel').flickity('destroy');
         });
     }
 
@@ -120,7 +128,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     let comment: Comment = new Comment;
                     comment.fromCreationDTO(commentCreationDTO);
                     comment.user_fullname = this.user.first_name + " " + this.user.last_name;
-                    comment.user_profile_picture = this.user.profile_picture;
+                    comment.user_profile_picture = this.user.profile_picture_url;
                     comment.date = new Date();
                     comment.id = -1; // TODO : get comment's id from response
                     comment.item = this.item.id;
@@ -138,7 +146,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     }
 
     fillStars(note_avg: number) {
-        console.log(note_avg);
         let fullStars = Math.floor(note_avg)
         this.stars = Array(fullStars).fill(1);
         this.stars.push(Math.round( (note_avg % 1) * 2) / 2);
@@ -147,15 +154,59 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
             this.stars.push(0);
     }
 
-    searchCategory(category_id: number) {
-        console.log("searchCategory id " + category_id);
+    searchCategory(category: any) {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Search '" + category.name + "'");
         // TODO
     }
 
     swap() {
-        console.log("item " + this.item.id + ", owner " + this.owner.id + ", user " + this.user.id);
-
         this.offerService.openOfferModal([this.user, this.owner, this.item]);
+    }
+
+    signalFraud() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Fraud signaled");
+        // TODO
+    }
+
+    security() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Security");
+        // TODO
+    }
+
+    sendMessage() {
+        this.toastr.warning("to '" + this.owner.first_name + " " + this.owner.last_name + "' (TODO)", "Send message");
+        // TODO
+    }
+
+    writeComment() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Write a comment");
+        // TODO
+    }
+
+    openProfileModal() {
+        this.toastr.warning("TODO (profile modal subscribed and we signal the profile)", "Open profile");
+        // TODO : voir avec Mathieu
+    }
+
+    seeMore() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "See more");
+        // TODO
+    }
+
+    like() {
+        let l = new Like();
+        l.date = new Date().toDateString();
+        l.item = this.item.id;
+        l.user = this.user.id;
+
+        this.itemsService.like(l).then(
+            res => this.toastr.success("'" + this.item.name + "'", "Liked"),
+            error => this.toastr.error(error, "Error")
+        )
+    }
+
+    shareItem() {
+
     }
 
     ngOnDestroy() {

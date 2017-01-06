@@ -7,6 +7,7 @@ import { DetailedItem } from './detailed-item';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import {User} from "../profile/user";
+import {Like} from "./like";
 
 @Injectable()
 export class ItemsService {
@@ -82,6 +83,17 @@ export class ItemsService {
         let options = new RequestOptions({ headers: headers }); // Create a request option
 
         return this.http.post('/api/comments/', body, options)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    like(l: Like): Promise<any> {
+        let body = JSON.stringify(l); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.post('/api/likes/', body, options)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

@@ -5,49 +5,19 @@
                 <div class="modal-panel">
                     <div class="row showroom">
                         <div class="col-xs-3 modal-carousel-nav modal-carousel-height">
-                            <div class="carousel-cell is-nav-selected">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/400/250"/>
+                            <div class="carousel-cell"
+                                *ngFor="let smallPicture of item.image_urls; let first = first; let last = last"
+                                [ngClass]="{'is-nav-selected': first}"
+                                [update-carousel]="last">
+                                <img class="img-fluid" src="{{ smallPicture }}"/>
                             </div>
                         </div>
                         <div class="col-xs-9 modal-carousel modal-carousel-height">
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
-                            </div>
-                            <div class="carousel-cell">
-                                <img class="img-fluid" src="http://loremflickr.com/800/500"/>
+                            <div class="carousel-cell"
+                                *ngFor="let bigPicture of item.image_urls; let first = first; let last = last"
+                                [ngClass]="{'is-nav-selected': first}"
+                                [update-carousel]="last">
+                                <img class="img-fluid" src="{{ bigPicture }}"/>
                             </div>
                         </div>
                     </div>
@@ -80,7 +50,7 @@
                                 (<a href="#">{{ owner.notes }} votes</a>)
                             </div>
                             <div class="row category">
-                                <a href="#" (click)="searchCategory(item.category.id)">
+                                <a href="#" (click)="searchCategory(item.category)">
                                     <i class="fa fa-folder"></i>
                                     {{ item.category.name }}
                                 </a>
@@ -96,12 +66,12 @@
                                 </div>
                                 <div class="row" 
                                     *ngFor="let keyInfo of item.keyinfo_set; let last = last"
-                                    [ngClass]="{last: last}">
+                                    [ngClass]="{'last': last}">
                                     <div class="left col-xs-6">
                                         {{keyInfo.key}}
                                     </div>
                                     <div class="right col-xs-6">
-                                        {{keyInfo.value}}
+                                        {{keyInfo.info}}
                                     </div>
                                 </div>
                                 <div class="row interests last">
@@ -109,8 +79,11 @@
                                         Interested by
                                     </div>
                                     <div class="right col-xs-6">
-                                        <ul>
-                                            <li *ngFor="let interest of item.Interested_by">{{ interest }}</li>
+                                        <ul *ngIf="owner.interested_by.length === 0">
+                                            <li>No specific interest</li>
+                                        </ul>
+                                        <ul *ngIf="owner.interested_by.length > 0">
+                                            <li *ngFor="let interest of owner.interested_by">{{ interest }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -119,7 +92,7 @@
                                         Delivery from
                                     </div>
                                     <div class="right col-xs-6">
-                                        {{ item.delivery_from }}
+                                        {{ item.owner_location }}
                                     </div>
                                 </div>
                                 <div class="row last">
@@ -127,8 +100,11 @@
                                         Delivery methods
                                     </div>
                                     <div class="right col-xs-6">
+                                        <ul *ngIf="item.delivery_methods.length === 0">
+                                            <li>Not specified</li>
+                                        </ul>
                                         <ul>
-                                            <li *ngFor="let method of item.delivery_methods">{{ method }}</li>
+                                            <li *ngFor="let method of item.delivery_methods">{{ method.name }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -154,14 +130,14 @@
                                     <p>Please log in to access features</p>
                                 </div>
                                 <button class="contact btn btn-block btn-primary btn-reversed" [disabled]="!loggedIn"><i class="fa fa-envelope"></i> Contact</button>
-                                <button class="swap btn btn-block btn-primary btn-reversed open-send-proposition-modal" [disabled]="!loggedIn"><i class="fa fa-refresh"></i> Swap</button>
+                                <button class="swap btn btn-block btn-primary btn-reversed open-send-proposition-modal" [disabled]="!loggedIn" (click)="swap()"><i class="fa fa-refresh"></i> Swap</button>
                             </div>
                             <div class="row fraud">
                                 <div class="col-xs-6">
-                                    <a href="#">Signal fraud</a>
+                                    <a href="#" (click)="signalFraud()">Signal fraud</a>
                                 </div>
                                 <div class="col-xs-6">
-                                    <a href="#">Security</a>
+                                    <a href="#" (click)="security()">Security</a>
                                 </div>
                             </div>
                         </div>
@@ -199,15 +175,6 @@
                         <p>{{ comment.content }}</p>
                     </div>
                 </div>
-                <div class="row comment">
-                    <div class="col-xs-1">
-                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100"/>
-                    </div>
-                    <div class="col-xs-11">
-                        <p class="writer-infos"><a href="#">Name</a> november 14</p>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, animi atque culpa dignissimos dolor explicabo magni maxime ratione tenetur veritatis. Ab aliquam blanditiis culpa dicta est porro quisquam similique tenetur!</p>
-                    </div>
-                </div>
             </div>
             </div>
             <div class="col-xs-3 options">
@@ -215,10 +182,10 @@
                     <i class="fa fa-refresh"></i> <span class="hidden-sm-down">Swap</span>
                 </button>
                 <div *ngIf="loggedIn" class="btn-group btn-group-justified more">
-                    <a href="#" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
-                    <a href="#" class="btn btn-primary"><i class="fa fa-comment"></i></a>
-                    <a href="#" class="btn btn-primary"><i class="fa fa-heart"></i></a>
-                    <a href="#" class="btn btn-primary"><i class="fa fa-share"></i></a>
+                    <a (click)="sendMessage()" href="#" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
+                    <a (click)="writeComment()" href="#" class="btn btn-primary"><i class="fa fa-comment"></i></a>
+                    <a (click)="like()" href="#" class="btn btn-primary"><i class="fa fa-heart"></i></a>
+                    <a (click)="shareItem()" href="#" class="btn btn-primary"><i class="fa fa-share"></i></a>
                 </div>
                 <div *ngIf="!loggedIn" class="title">
                     <p>Please log in to access features</p>
@@ -236,7 +203,7 @@
                         </div>
                     </div>
                     <div class="bottom-link">
-                        <a href="#" class="btn btn-block btn-reversed">
+                        <a href="#" class="btn btn-block btn-reversed open-profile-modal" (click)="openProfileModal()">
                             <i class="fa fa-eye"></i> <span class="hidden-sm-down">See profile</span>
                         </a>
                     </div>
@@ -253,7 +220,7 @@
                         </div>
                     </div>
                     <div class="bottom-link">
-                        <a href="#" class="btn btn-block btn-reversed">
+                        <a href="#" class="btn btn-block btn-reversed" (click)="seeMore()">
                             <i class="fa fa-eye"></i> <span class="hidden-sm-down">See more</span>
                         </a>
                     </div>
