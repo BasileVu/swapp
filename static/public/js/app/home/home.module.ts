@@ -1,3 +1,4 @@
+//noinspection ES6UnusedImports
 import { NgModule, Component }      from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +34,7 @@ import { NotificationsService } from "./profile/notifications.service";
 import { MyInventoryDirective } from './offers/my-inventory.directive';
 import { YourInventoryDirective } from './offers/your-inventory.directive';
 import { UpdateGridDirective } from './items/update-grid.directive';
+import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
 
 
@@ -63,6 +65,7 @@ import { UpdateInventoryDirective } from './inventory/update-inventory.directive
         MyInventoryDirective,
         YourInventoryDirective,
         UpdateGridDirective,
+        UpdateCarouselDirective,
         UpdateInventoryDirective
     ],
     providers: [

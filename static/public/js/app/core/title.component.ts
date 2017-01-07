@@ -1,5 +1,5 @@
 // Exact copy of app/title.component.ts except import UserService from shared
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   moduleId: module.id,

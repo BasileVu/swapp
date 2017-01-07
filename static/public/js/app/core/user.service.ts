@@ -23,18 +23,6 @@ export class UserService {
     constructor(@Optional() config: UserServiceConfig) {
         if (config) { this._userFirstName = config.userFirstName; this._userLastName = config.userLastName }
     }
-
-    get userFirstName() {
-        // Demo: add a suffix if this service has been created more than once
-        const suffix = this.id > 1 ? ` times ${this.id}` : '';
-        return this._userFirstName + suffix;
-    }
-
-    get userLastName() {
-        // Demo: add a suffix if this service has been created more than once
-        const suffix = this.id > 1 ? ` times ${this.id}` : '';
-        return this._userLastName + suffix;
-    }
 }
 
 

@@ -7,6 +7,7 @@ import { DetailedItem } from './detailed-item';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import {User} from "../profile/user";
+import {Like} from "./like";
 
 @Injectable()
 export class ItemsService {
@@ -18,8 +19,6 @@ export class ItemsService {
 
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
-    ownerSelected$ = this.userSelectedSource.asObservable();
-    commentsSelected$ = this.commentsSelectedSource.asObservable();
 
     private itemsSubject: Subject<DetailedItem[]> = new Subject<DetailedItem[]>();
 
@@ -87,6 +86,17 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
+    like(l: Like): Promise<any> {
+        let body = JSON.stringify(l); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.post('/api/likes/', body, options)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
     private extractData(res: Response) {
         let body = res.json();
         return body || { };
@@ -97,8 +107,7 @@ export class ItemsService {
         let errMsg: string;
         if (error instanceof Response) {
             const body = error.json() || '';
-            const err = body.error || JSON.stringify(body);
-            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+            errMsg = body[0];
         } else {
             errMsg = error.message ? error.message : error.toString();
         }

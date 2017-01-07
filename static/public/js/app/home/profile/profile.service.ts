@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { Subject }    from 'rxjs/Subject';
+import { Response } from '@angular/http';
 
 @Injectable()
 export class ProfileService {
 
-    constructor(private http: Http) {
+    constructor() {
     }
 
     // We must add csrftoken in header manually when we user XMLHttpRequest.
     // Without XHR, images can't be upload with enctype multipart/form-data
-    uploadProfilePicture(formData: FormData): Promise<any> {
+    addImage(formData: FormData): Promise<any> {
         
         let csrftoken: string = this.getCookie("csrftoken");
 
@@ -32,11 +31,10 @@ export class ProfileService {
             }
         })
         .catch(this.handleError);
-        
     }
 
     // Get cookie value from its name
-    getCookie(name): string {
+    getCookie(name: string): string {
         let value = "; " + document.cookie;
         let parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
@@ -47,12 +45,11 @@ export class ProfileService {
         let errMsg: string;
         if (error instanceof Response) {
             const body = error.json() || '';
-            const err = body.error || JSON.stringify(body);
-            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+            errMsg = body[0];
         } else {
             errMsg = error.message ? error.message : error.toString();
         }
-        console.error("error: " + errMsg);
+        console.error(errMsg);
         return Promise.reject(errMsg);
     }
 }

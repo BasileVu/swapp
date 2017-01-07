@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     private loggedIn: boolean;
     subscription: Subscription;
  
-    constructor(private authService : AuthService, private itemsService: ItemsService) { }
+    constructor(private authService : AuthService) { }
 
     ngOnInit() {
         this.subscription = this.authService.loggedInSelected$.subscribe(

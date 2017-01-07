@@ -3,7 +3,7 @@
         <div class="row identity">
             <div class="col-xs-2 col-sm-4">
                 <img *ngIf="user.profile_picture_url === null" class="avatar img-fluid" src="http://loremflickr.com/200/200"/>
-                <img *ngIf="user.profile_picture_url != null" class="avatar img-fluid" src="{{ url }}{{ user.profile_picture_url }}"/>
+                <img *ngIf="user.profile_picture_url != null" style="width: 100%; max-height: 90px;" class="avatar img-fluid" src="{{ url }}{{ user.profile_picture_url }}"/>
             </div>
             <div class="col-xs-10 col-sm-8">
                 <h6>Welcome,</h6>

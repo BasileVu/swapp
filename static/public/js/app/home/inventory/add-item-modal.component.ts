@@ -13,6 +13,10 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { InventoryService } from './inventory.service';
 import { ItemCreationDTO } from './item-creation-dto';
 import { KeyInfo } from './key-info';
+import {ProfileService} from "../profile/profile.service";
+import {SearchService} from "../search/search.service";
+import {Category} from "../search/category";
+import {DetailedItem} from "../items/detailed-item";
 
 declare let $:any;
 
@@ -63,15 +67,18 @@ class DeliveryMethod {
 })
 export class AddItemModalComponent implements OnInit {
 
-    desires: Array<string> = new Array(1);
-    keyInfos: Array<KeyInfo> = new Array(1);
-    categories: Array<string> = new Array();
-    deliveryMethods: Array<DeliveryMethod> = new Array();
+    keyInfos: Array<KeyInfo> = [];
+    categories: Array<Category> = [];
+    deliveryMethods: Array<DeliveryMethod> = [];
+    userDeliveryMethods: Array<number> = [];
+    newItemId: number;
     
     // images
-    public file_srcs: Array<string> = new Array();
+    file_srcs: Array<string> = [];
+    files: Array<File> = [];
+    data: any;
 
-    // EventEmitter to call login function of the ProfileComponent after registering
+    // EventEmitter to inform subscribed components after an item creation
     @Output() newItemEvent = new EventEmitter();
 
     // Form fields
@@ -84,10 +91,13 @@ export class AddItemModalComponent implements OnInit {
 
     constructor(private changeDetectorRef: ChangeDetectorRef,
                 private inventoryService: InventoryService,
+                private profileService: ProfileService,
+                private searchService: SearchService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) { }
 
     ngOnInit(): void {
+        // Init item creation form
         this.createItemForm = this.formBuilder.group({
             name: this.name,
             min_price: this.min_price,
@@ -96,11 +106,40 @@ export class AddItemModalComponent implements OnInit {
             description: this.description
         });
 
-        // TODO : get delivery methods
+        // Get all categories
+        this.searchService.getCategories().then(
+            categories => this.categories = categories,
+            error => this.toastr.error("Can't get all categories", "Error")
+        );
+
+        // Get all delivery methods
+        this.inventoryService.getDeliveryMethods().then(
+            deliveryMethods => {
+                this.deliveryMethods = deliveryMethods;
+            },
+            error => this.toastr.error("Can't get all delivery methods")
+        );
+
+        // Add a blank key info
+        this.keyInfos.push(new KeyInfo("", ""));
     }
 
+    // Add or remove the delivery method if selected/unselected
+    updateCheckbox(deliverymethod_id: number, checked: boolean) {
+        if (checked) {
+            this.userDeliveryMethods.push(+deliverymethod_id);
+        } else {
+            let index = this.userDeliveryMethods.indexOf(+deliverymethod_id, 0);
+            if (index > -1) {
+                this.userDeliveryMethods.splice(index, 1);
+            }
+        }
+    }
+
+    // Create the item if valid
     createItem() {
         let errorMessage: string;
+
         // verifications
         if (this.file_srcs.length === 0)
             errorMessage = "At least one image must be provided";
@@ -109,50 +148,62 @@ export class AddItemModalComponent implements OnInit {
 
         if (errorMessage != undefined) {
             this.toastr.error(errorMessage, "Error");
-        } else {
-            let deliveryM = new Array<string>();
 
-            console.log(this.file_srcs);
+        } else {
+            // Create the item
+
+            // Build a proper keyInfos array with trimmed values
+            let keyInfos = new Array<KeyInfo>();
+            for (let ki of this.keyInfos)
+                if (ki.key && ki.key.trim() && ki.value && ki.value.trim())
+                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.value.trim()));
 
             let newItem = new ItemCreationDTO(
-                "TODO", // TODO
                 this.name.value,
                 this.min_price.value,
                 this.max_price.value,
                 this.category.value,
                 this.description.value,
-                this.keyInfos,
-                this.file_srcs,
-                this.desires,
-                deliveryM,
-                new Date()
+                keyInfos,
+                this.userDeliveryMethods
             );
 
-            console.log(newItem);
-
-            this.inventoryService.addItem(newItem).then(
-                res => {
-                    console.log(res);
-                    if(res.status == 201) {
-                        this.toastr.success('New item added to your inventory', 'Item created!');
-                        $('#add-item-modal').modal('hide');
-                        newItem.setUrl(res.body);
-                        this.newItemEvent.emit(newItem);
-                    }
-                },
-                error => this.toastr.error(error, 'Error')
-            );
+            this.inventoryService.addItem(newItem)
+                .then(
+                    res => {
+                        // images can be added only after item creation (api constraint)
+                        this.newItemId = AddItemModalComponent.getItemIdFromResponse(res);
+                        this.addImages(this.newItemId);
+                    },
+                    error => this.toastr.error(error, 'Error'));
         }
-        
-        
     }
 
-    addDesire() {
-        this.desires.push("");
+    // Get the id of newly created item
+    static getItemIdFromResponse(res: any) {
+        let obj: DetailedItem = JSON.parse(res._body);
+        return obj.id;
     }
 
-    removeDesire(index: number) {
-        this.desires.splice(index, 1);
+    // Add images to the newly created item
+    addImages(item_id: number) {
+        let filesUploaded: number = 0;
+        for (let f of this.files) {
+            let formData:FormData = new FormData();
+            formData.append('image', f, f.name);
+            formData.append('item', item_id);
+            this.profileService.addImage(formData)
+                .then( // now signal the ProfileComponent that we uploaded picture
+                    res => {
+                        if (++filesUploaded === this.files.length) {
+                            this.toastr.success('New item added to your inventory', 'Item created!');
+                            this.newItemEvent.emit(this.newItemId);
+                            $('#add-item-modal').modal('hide');
+                        }
+                    },
+                    error => this.toastr.error(error, "Error")
+                );
+        }
     }
 
     addKeyInfo() {
@@ -165,24 +216,30 @@ export class AddItemModalComponent implements OnInit {
 
     removeImage(index: number) {
         this.file_srcs.splice(index, 1);
+        this.files.splice(index, 1);
     }
   
-    // This is called when the user selects new files from the upload button
+    // Called when the user selects new files from the upload button
     fileChange(input: any){
+        for (let f of input.files)
+            this.files.push(f);
+
         this.readFiles(input.files);
     }
 
+    // Read one file
     readFile(file: File, reader: FileReader, callback: any){
         // Set a callback funtion to fire after the file is fully loaded
         reader.onload = () => {
             // callback with the results
             callback(reader.result);
-        }
+        };
 
         // Read the file
         reader.readAsDataURL(file);
     }
 
+    // Read many files
     readFiles(files: Array<File>, index=0){
         // Create the file reader
         let reader = new FileReader();
@@ -192,11 +249,11 @@ export class AddItemModalComponent implements OnInit {
             // Start reading this file
             this.readFile(files[index], reader, (result: string) => {
                 // Create an img element and add the image file data to it
-                var img = document.createElement("img");
+                const img = document.createElement("img");
                 img.src = result;
                 
                 // Send this img to the resize function (and wait for callback)
-                this.resize(img, 400, 400, (resized_jpeg: string, before: any, after: any) => {
+                this.resize(img, 800, 500, (resized_jpeg: string, before: any, after: any) => {
 
                     // Add the resized jpeg img source to a list for preview
                     // This is also the file you want to upload. (either as a
@@ -213,15 +270,13 @@ export class AddItemModalComponent implements OnInit {
         }
     }
 
-
+    // Resize image to display it correctly for the user
     resize(img: any, MAX_WIDTH:number, MAX_HEIGHT:number, callback: any) {
         // This will wait until the img is loaded before calling this function
         return img.onload = () => {
-            console.log("img loaded");
-            console.log(this.file_srcs);
             // Get the images current width and height
-            var width = img.width;
-            var height = img.height;
+            let width = img.width;
+            let height = img.height;
             
             // Set the WxH to fit the Max values (but maintain proportions)
             if (width > height) {
@@ -237,18 +292,18 @@ export class AddItemModalComponent implements OnInit {
             }
             
             // create a canvas object
-            var canvas = document.createElement("canvas");
+            const canvas = document.createElement("canvas");
 
             // Set the canvas to the new calculated dimensions
             canvas.width = width;
             canvas.height = height;
-            var ctx = canvas.getContext("2d");  
+            const ctx = canvas.getContext("2d");
 
             ctx.drawImage(img, 0, 0,  width, height); 
             
             // Get this encoded as a jpeg
             // IMPORTANT: 'jpeg' NOT 'jpg'
-            var dataUrl = canvas.toDataURL('image/jpeg');
+            const dataUrl = canvas.toDataURL('image/jpeg'); // TODO : png
             
             // callback with the results
             callback(dataUrl, img.src.length, dataUrl.length);
