@@ -140,11 +140,12 @@ paths:
               categories:
                 type: array
                 items:
-                  type: string
-              items:
-                type: array
-                items:
-                  type: number
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
               notes:
                 type: number
               note_avg:
