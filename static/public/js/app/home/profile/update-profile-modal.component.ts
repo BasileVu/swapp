@@ -17,6 +17,16 @@ import {
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {ProfileService} from "./profile.service";
 
+class CategoryDesired {
+    category: Category;
+    desired: boolean;
+
+    constructor(category: Category, desired: boolean) {
+        this.category = category;
+        this.desired = desired;
+    }
+}
+
 @Component({
     moduleId: module.id,
     selector: 'update-profile-modal',
@@ -77,7 +87,7 @@ import {ProfileService} from "./profile.service";
 export class UpdateProfileModalComponent implements OnInit {
 
     interests: Array<number> = []; // The category in which the user is interested in
-    categories: Array<Category> = [];
+    categories: Array<CategoryDesired> = [];
     subscription: Subscription;
     account: Account = new Account();
 
@@ -154,7 +164,10 @@ export class UpdateProfileModalComponent implements OnInit {
 
         // Get categories
         this.searchService.getCategories().then(
-            categories => this.categories = categories,
+            categories => {
+                for (let c of categories)
+                    this.categories.push(new CategoryDesired(c, false));
+            },
             error => this.toastr.error("Can't get categories", "Error")
         );
 
@@ -175,8 +188,11 @@ export class UpdateProfileModalComponent implements OnInit {
 
                 // Check categories already desired by user
                 for (let c of this.categories)
-                    if (this.account.categories.indexOf(c, 0) >= 0)
-                        this.interests.push(c.id);
+                    if (this.account.categories.indexOf(c.category, 0) >= 0) {
+                        c.desired = true;
+                        this.interests.push(c.category.id);
+                    }
+
             }
         );
     }

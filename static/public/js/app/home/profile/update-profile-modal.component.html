@@ -102,10 +102,10 @@
                         <h3>Interested by</h3>
                         <label class="col-sm-4 col-form-label">Choose the categories you're interested in</label>
                         <div class="col-sm-8">
-                            <div *ngFor="let category of categories" class="category-choice">
+                            <div *ngFor="let c of categories" class="category-choice">
                                 <label>
-                                    <input type="checkbox" class="form-check-input" value="{{ category.id }}" checked="checked" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
-                                    <span>{{ category.name }}</span>
+                                    <input type="checkbox" class="form-check-input" value="{{ c.category.id }}" [checked]="c.desired" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
+                                    <span>{{ c.category.name }}</span>
                                 </label>
                             </div>
                         </div>

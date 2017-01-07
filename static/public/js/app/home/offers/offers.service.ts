@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
-import {User, UserInventoryItem} from "../profile/user";
+import {User} from "../profile/user";
 import {Offer} from "./offer";
+import {InventoryItem} from "../inventory/inventory-item";
 
 @Injectable()
 export class OfferService {
@@ -57,13 +58,8 @@ export class OfferService {
         u.first_name = user.first_name;
         u.last_name = user.last_name;
         u.location = user.location;
-        for (let item of user.items) {
-            let it = new UserInventoryItem();
-            it.id = item.id;
-            it.image_url = item.image_url;
-            it.name = item.name;
-            u.items.push(it);
-        }
+        for (let item of user.items)
+            u.items.push(item);
         u.notes = user.notes;
         u.note_avg = user.note_avg;
 

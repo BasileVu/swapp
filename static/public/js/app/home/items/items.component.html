@@ -1,11 +1,11 @@
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngIf="items.length === 0">
-    {{ errorMessage }}
+    No items for now
 </div>
 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items; let last = last" [update-grid]="last">
     <div class="inner-item open-modal-item-x" (click)="gotoDetail(item)">
-        <img *ngIf="item.image_urls.length === 0" class="img-fluid" src="http://loremflickr.com/600/600"/>
-        <img *ngIf="item.image_urls.length != 0" class="img-fluid" src="{{ item.image_urls[0] }}"/>
+        <img *ngIf="item.images.length === 0" class="img-fluid" src="http://loremflickr.com/600/600"/>
+        <img *ngIf="item.images.length != 0" class="img-fluid" src="{{ item.images[0].url }}"/>
         <div class="infos">
             <a href="#" (click)="searchCategory(item.category)"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
             <a href="#"><i class="fa fa-map-marker"></i>{{ item.owner_location }}</a>

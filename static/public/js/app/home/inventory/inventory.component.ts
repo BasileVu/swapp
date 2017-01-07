@@ -71,7 +71,7 @@ export class InventoryComponent implements OnInit {
                 this.owner = user;
                 this.inventory = [];
                 for(let item of this.owner.items) {
-                    let inventoryItem = new InventoryItem(item.id, item.name, item.image_url, null);
+                    let inventoryItem = new InventoryItem(item.id, item.name, item.image_id, item.image_url, item.archived);
                     this.sanitizer.bypassSecurityTrustUrl(item.image_url);
                     this.inventory.push(inventoryItem);
                 }
@@ -83,8 +83,8 @@ export class InventoryComponent implements OnInit {
     addItemEvent($event: number) {
         this.itemsService.getDetailedItem(+$event).then(
             item => {
-                let inventoryItem = new InventoryItem(item.id, item.name, item.image_urls[0], item.creation_date);
-                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image);
+                let inventoryItem = new InventoryItem(item.id, item.name, item.images[0].id, item.images[0].url, item.archived);
+                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
                 this.inventory.push(inventoryItem);
             },
             error => this.toastr.error("Can't get item " + $event, "Error")
