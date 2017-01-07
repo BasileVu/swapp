@@ -61,7 +61,6 @@ class ItemBaseTest(TestCase):
             "category": category,
             "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set,
             "delivery_methods": delivery_methods if delivery_methods is not None else self.default_delivery_methods
-
         }
 
     def post_item(self, **kwargs):
@@ -182,12 +181,7 @@ class ItemPatchTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login()
-        self.item = Item.objects.create(owner=self.current_user, price_min=1, price_max=2, category=self.c1)
-
-    def create_test(self, key, value):
-        r = self.patch_item(name=value)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data[key], value)
+        self.item = Item.objects.get(pk=self.post_item().data["id"])
 
     def test_patch_item_not_logged_in(self):
         self.client.logout()
