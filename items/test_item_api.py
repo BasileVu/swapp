@@ -47,6 +47,7 @@ class ItemBaseTest(TestCase):
 
         self.c1 = Category.objects.create(name="test")
         self.c2 = Category.objects.create(name="test2")
+
         self.dm1 = DeliveryMethod.objects.create(name="At my place")
         self.dm2 = DeliveryMethod.objects.create(name="At any place")
         self.dm3 = DeliveryMethod.objects.create(name="By mail")
@@ -61,7 +62,6 @@ class ItemBaseTest(TestCase):
             "category": category,
             "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set,
             "delivery_methods": delivery_methods if delivery_methods is not None else self.default_delivery_methods
-
         }
 
     def post_item(self, **kwargs):
@@ -70,6 +70,14 @@ class ItemBaseTest(TestCase):
 
     def login(self, username="username", password="password"):
         self.client.login(username=username, password=password)
+
+    def login1(self):
+        self.client.logout()
+        self.client.login(username="username1", password="password")
+
+    def login2(self):
+        self.client.logout()
+        self.client.login(username="username2", password="password")
 
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
@@ -149,6 +157,8 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["owner_location"], "city, country")
         self.assertNotEqual(r.data["owner_picture_url"], None)
         self.assertIn("image_urls", r.data)
+        self.assertEqual(r.data["traded"], False)
+        self.assertEqual(r.data["archived"], False)
 
     def test_get_item_not_existing(self):
         r = self.get_item(item_id=10)
@@ -172,12 +182,7 @@ class ItemPatchTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login()
-        self.post_item()
-
-    def create_test(self, key, value):
-        r = self.patch_item(name=value)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data[key], value)
+        self.item = Item.objects.get(pk=self.post_item().data["id"])
 
     def test_patch_item_not_logged_in(self):
         self.client.logout()
@@ -242,7 +247,42 @@ class ItemPatchTests(ItemBaseTest):
         self.assertEquals(r.data["price_min"], 1)
 
     def test_cannot_set_max_price_smaller_than_min_price(self):
-        r = self.patch_item(item_id=1, price_max=0)
+        r = self.patch_item(price_max=0)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_can_edit_item_with_refused_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=i2, item_received=self.item, answered=True, accepted=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+    def test_cannot_edit_item_with_pending_initiated_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=i2, item_received=self.item, answered=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_with_pending_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=self.item, item_received=i2, answered=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_if_traded(self):
+        self.item.traded = True
+        self.item.save()
+
+        r = self.patch_item(description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_if_archived(self):
+        self.item.archived = True
+        self.item.save()
+
+        r = self.patch_item(description="test2")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -294,7 +334,7 @@ class ItemPutTests(ItemBaseTest):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ItemCommentsTests(ItemBaseTest):
+class ItemCommentTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login(username="username2", password="password")
@@ -325,29 +365,74 @@ class ItemCommentsTests(ItemBaseTest):
         self.check_get_comment_data_complete(r.data[2], c1)
 
 
-# tests for archiving items
-"""
+class ArchiveRestoreItemTests(ItemBaseTest):
+    archive_item_url = "/api/items/%d/archive/"
+    restore_item_url = "/api/items/%d/restore/"
+
+    def setUp(self):
+        super().setUp()
+        self.login()
+
+        self.item1 = Item.objects.create(name="Test1", description="Description1", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+        self.item2 = Item.objects.create(name="Test2", description="Description2", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+        self.item3 = Item.objects.create(name="Test3", description="Description3", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+
+    def archive_item(self, item_id=1):
+        return self.client.post(self.archive_item_url % item_id, data=json.dumps({}), content_type="application/json")
+
+    def restore_item(self, item_id=1):
+        return self.client.post(self.restore_item_url % item_id, data=json.dumps({}), content_type="application/json")
+
+    def test_archive_item_not_logged_in(self):
+        self.client.logout()
+
+        r = self.archive_item()
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_restore_item_not_logged_in(self):
+        self.client.logout()
+
+        r = self.restore_item()
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_archive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
+        r = self.archive_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-    def test_unarchive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+
+    def test_restore_item(self):
+        self.archive_item()
+        r = self.restore_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-    """
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+
+    def test_archive_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)
+
+    def test_restore_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+        self.restore_item()
+        self.restore_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)

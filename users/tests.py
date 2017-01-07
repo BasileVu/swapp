@@ -673,6 +673,7 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(item_received["id"], 1)
         self.assertEqual(item_received["image_url"], None)
         self.assertEqual(item_received["name"], "test")
+        self.assertEqual(item_received["archived"], False)
 
     def test_get_user_info_image(self):
         self.client.login(username="username", password="password")

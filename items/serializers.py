@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -111,7 +112,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ("id", "name", "image_url")
+        fields = ("id", "name", "image_url", "archived")
 
 
 class DetailedItemSerializer(serializers.ModelSerializer):
@@ -143,7 +144,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         return obj.owner.username
 
     def get_similar(self, obj):
-        return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
+        return InventoryItemSerializer(Item.objects.filter(~Q(pk=obj.id), category=obj.category), many=True).data
 
     def get_owner_picture_url(self, obj):
         return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" else None
@@ -156,7 +157,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
                   "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
-                  "similar", "owner_picture_url", "owner_location")
+                  "similar", "owner_picture_url", "owner_location", "traded", "archived")
 
 
 class SearchItemsSerializer(serializers.Serializer):

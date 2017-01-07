@@ -400,6 +400,42 @@ paths:
                   type: number
                 name:
                   type: string
+                  
+  /deliverymethods/:
+    get:
+      description: "Gets all the delivery methods."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+          
+  /deliverymethods/{id}/:
+    get:
+      description: "Gets a detailed delivery method."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the delivery method."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
           
   /items/:
     get:
@@ -470,7 +506,7 @@ paths:
           
   /items/{id}/:
     get:
-      description: "Gets a detailed unarchived item."
+      description: "Gets a detailed item."
       parameters:
         - in: path
           name: id
@@ -554,6 +590,36 @@ paths:
                   type: string
                 user_profile_picture:
                   type: string
+                  
+  /items/{id}/archive/:
+    post:
+      description: "Archives a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /items/{id}/restore/:
+    post:
+      description: "Restores a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
                   
   /comments/:
     post:
@@ -1108,6 +1174,8 @@ definitions:
         type: string
       name:
         type: string
+      archived:
+        type: boolean
         
   DetailedItemInfo:
     type: object
@@ -1166,3 +1234,7 @@ definitions:
         type: string
       owner_location:
         type: string
+      traded:
+        type: boolean
+      archived:
+        type: boolean

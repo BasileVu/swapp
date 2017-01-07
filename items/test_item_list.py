@@ -79,6 +79,15 @@ class ItemBasicSuggestionTests(TestCase, BaseSetupMixin):
     def setUp(self):
         self.setup()
 
+    def test_suggestions_no_traded_items(self):
+        i = Item.objects.get(id=1)
+        i.traded = True
+        i.save()
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 4)
+
     def test_suggestions_no_archived_items(self):
         i = Item.objects.get(id=1)
         i.archived = True
@@ -174,6 +183,15 @@ class ItemListTests(TestCase, BaseSetupMixin):
     def setUp(self):
         self.setup()
         self.client.login(username="user3", password="password")
+
+    def test_list_item_no_traded_item(self):
+        i = Item.objects.get(id=1)
+        i.traded = True
+        i.save()
+
+        r = self.client.get(self.url + "?q=")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 4)
 
     def test_list_item_no_archived_item(self):
         i = Item.objects.get(id=1)
