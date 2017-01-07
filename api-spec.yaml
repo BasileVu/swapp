@@ -140,12 +140,11 @@ paths:
               categories:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    name:
-                      type: string
+                  type: string
+              items:
+                type: array
+                items:
+                  type: number
               notes:
                 type: number
               note_avg:
@@ -251,9 +250,7 @@ paths:
           description: "The interested by categories to update."
           required: true
           schema:
-            type: array
-            items:
-              type: number
+            $ref: "#/definitions/InterestedBy"
       responses:
         200:
           description: "Successful operation."
@@ -268,9 +265,7 @@ paths:
         description: "The interested by categories to update."
         required: false
         schema:
-          type: array
-          items:
-            type: number
+          $ref: "#/definitions/InterestedBy"
       responses:
         200:
           description: "Successful operation."
@@ -1143,6 +1138,14 @@ definitions:
     properties:
       read:
         type: boolean
+        
+  InterestedBy:
+    type: object
+    properties:
+      interested_by:
+        type: array
+        items:
+          type: number
         
   KeyInfo:
     properties:
