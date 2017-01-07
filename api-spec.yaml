@@ -506,7 +506,7 @@ paths:
           
   /items/{id}/:
     get:
-      description: "Gets a detailed unarchived item."
+      description: "Gets a detailed item."
       parameters:
         - in: path
           name: id

@@ -47,6 +47,7 @@ class ItemBaseTest(TestCase):
 
         self.c1 = Category.objects.create(name="test")
         self.c2 = Category.objects.create(name="test2")
+
         self.dm1 = DeliveryMethod.objects.create(name="At my place")
         self.dm2 = DeliveryMethod.objects.create(name="At any place")
         self.dm3 = DeliveryMethod.objects.create(name="By mail")
@@ -333,7 +334,7 @@ class ItemPutTests(ItemBaseTest):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ItemCommentsTests(ItemBaseTest):
+class ItemCommentTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login(username="username2", password="password")
@@ -364,29 +365,75 @@ class ItemCommentsTests(ItemBaseTest):
         self.check_get_comment_data_complete(r.data[2], c1)
 
 
-# tests for archiving items
-"""
+class ArchiveRestoreItemTests(ItemBaseTest):
+    archive_item_url = "/api/items/%d/archive/"
+    restore_item_url = "/api/items/%d/restore/"
+
+    def setUp(self):
+        super().setUp()
+        self.login()
+
+        self.item1 = Item.objects.create(name="Test1", description="Description1", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+        self.item2 = Item.objects.create(name="Test2", description="Description2", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+        self.item3 = Item.objects.create(name="Test3", description="Description3", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+
+    def archive_item(self, item_id=1):
+        return self.client.post(self.archive_item_url % item_id, data=json.dumps({}), content_type="application/json")
+
+    def restore_item(self, item_id=1):
+        return self.client.post(self.restore_item_url % item_id, data=json.dumps({}), content_type="application/json")
+
+    def test_archive_item_not_logged_in(self):
+        self.client.logout()
+
+        r = self.archive_item()
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_restore_item_not_logged_in(self):
+        self.client.logout()
+
+        r = self.restore_item()
+        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_archive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/archive", data=json.dumps({}), content_type="application/json")
+        r = self.archive_item()
+        print(r.data)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-    def test_unarchive_item(self):
-        r = self.c.post("/api/items/", data=json.dumps({
-            "name": "test",
-            "description": "test",
-            "price_min": 1,
-            "price_max": 2,
-            "category": 1
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        r = self.c.patch("/api/items/1/unarchive", data=json.dumps({}), content_type="application/json")
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+
+    def test_restore_item(self):
+        self.archive_item()
+        r = self.restore_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-    """
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+
+    def test_archive_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)
+
+    def test_restore_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+        self.restore_item()
+        self.restore_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)
