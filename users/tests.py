@@ -1,12 +1,11 @@
 import json
-import time
 from unittest.mock import patch
 
-from PIL import Image as ImagePil
 from django.test import Client, TestCase
 from rest_framework import status
 
 from items.models import *
+from swapp import settings
 from users.models import *
 
 
@@ -139,12 +138,9 @@ class AccountAPITests(TestCase):
             "password": password
         }), content_type="application/json")
 
-    def post_image(self, user=1):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
-
-        with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "user": user}, format="multipart")
+    def post_image(self, image_name="test.png", user_id=1):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
 
     def patch_interested_by_categories(self, interested_by=[]):
         return self.client.patch("/api/account/categories/", data=json.dumps({
@@ -188,8 +184,8 @@ class AccountAPITests(TestCase):
             "region": ""
         })
         self.assertNotEqual(r.data["last_modification_date"], "")
-        self.assertListEqual(r.data["categories"], ["category"])
-        self.assertListEqual(r.data["items"], [1])
+        self.assertEqual(r.data["categories"], [{"id": 1, "name": "category"}])
+        self.assertEqual(r.data["items"], [1])
         self.assertEqual(r.data["notes"], 1)
 
     def test_update_account_not_logged_in(self):
@@ -619,12 +615,9 @@ class LocationCoordinatesTests(TestCase):
 
 
 class PublicAccountInfoTests(TestCase):
-    def post_image(self, item=1):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
-
-        with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
+    def post_image(self, image_name="test.png", item_id=1):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
+            return self.client.post("/api/images/", {"image": data, "item": item_id}, format="multipart")
 
     def setUp(self):
         self.user = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
@@ -671,6 +664,7 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(len(r.data["items"]), 1)
         item_received = r.data["items"][0]
         self.assertEqual(item_received["id"], 1)
+        self.assertEqual(item_received["image_id"], None)
         self.assertEqual(item_received["image_url"], None)
         self.assertEqual(item_received["name"], "test")
         self.assertEqual(item_received["archived"], False)
@@ -681,6 +675,7 @@ class PublicAccountInfoTests(TestCase):
         self.client.logout()
 
         r = self.client.get("/api/users/%s/" % self.user.username)
+        self.assertNotEqual(r.data["items"][0]["image_id"], None)
         self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
 

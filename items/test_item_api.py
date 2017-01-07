@@ -1,11 +1,11 @@
 import json
 
-from PIL import Image as ImagePil
 from django.test import TestCase
 from rest_framework import status
 
 from comments.models import *
 from items.models import *
+from swapp import settings
 from users.models import *
 
 
@@ -82,11 +82,8 @@ class ItemBaseTest(TestCase):
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
 
-    def post_image(self, user_id=1):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
-
-        with open("test.png", "rb") as data:
+    def post_image(self, image_name="test.png", user_id=1):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
             return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
 
 
@@ -156,7 +153,7 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["similar"][1]["id"], id2)
         self.assertEqual(r.data["owner_location"], "city, country")
         self.assertNotEqual(r.data["owner_picture_url"], None)
-        self.assertIn("image_urls", r.data)
+        self.assertIn("images", r.data)
         self.assertEqual(r.data["traded"], False)
         self.assertEqual(r.data["archived"], False)
 

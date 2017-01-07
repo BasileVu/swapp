@@ -140,11 +140,12 @@ paths:
               categories:
                 type: array
                 items:
-                  type: string
-              items:
-                type: array
-                items:
-                  type: number
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
               notes:
                 type: number
               note_avg:
@@ -1170,6 +1171,8 @@ definitions:
     properties:
       id:
         type: number
+      image_id:
+        type: number
       image_url:
         type: string
       name:
@@ -1214,10 +1217,15 @@ definitions:
             type: string
       views:
         type: number
-      image_urls:
+      images:
         type: array
         items:
-          type: string
+          type: object
+          properties:
+            id:
+              type: number
+            url:
+              type: string
       likes:
         type: number
       comments:

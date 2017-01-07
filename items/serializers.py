@@ -37,9 +37,14 @@ class CreateImageSerializer(serializers.Serializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return obj.image.url
+
     class Meta:
         model = Image
-        fields = ("id", "image", "item")
+        fields = ("id", "url")
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -105,21 +110,25 @@ class ItemSerializer(serializers.ModelSerializer):
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
+    image_id = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+
+    def get_image_id(self, obj):
+        return obj.image_set.first().id if obj.image_set.count() > 0 else None
 
     def get_image_url(self, obj):
         return obj.image_set.first().image.url if obj.image_set.count() > 0 else None
 
     class Meta:
         model = Item
-        fields = ("id", "name", "image_url", "archived")
+        fields = ("id", "name", "image_id", "image_url", "archived")
 
 
 class DetailedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     keyinfo_set = KeyInfoSerializer(many=True)
     delivery_methods = DeliveryMethodSerializer(many=True)
-    image_urls = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     offers_received = serializers.SerializerMethodField()
@@ -128,8 +137,8 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     owner_picture_url = serializers.SerializerMethodField()
     owner_location = serializers.SerializerMethodField()
 
-    def get_image_urls(self, obj):
-        return [i.image.url for i in obj.image_set.all()]
+    def get_images(self, obj):
+        return ImageSerializer(obj.image_set.all(), many=True).data
 
     def get_likes(self, obj):
         return obj.like_set.count()
@@ -156,7 +165,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
-                  "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
+                  "views", "images", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
                   "similar", "owner_picture_url", "owner_location", "traded", "archived")
 
 

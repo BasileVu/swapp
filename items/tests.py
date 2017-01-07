@@ -1,11 +1,11 @@
 import json
 
-from PIL import Image as ImagePil
-from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from rest_framework import status
 
 from items.models import *
+from swapp import settings
 from users.models import *
 
 
@@ -34,6 +34,10 @@ class ItemTests(TestCase):
 
 
 class ImageAPITests(TestCase):
+    images_url = "/api/images/"
+    items_url = "/api/items/"
+    image_file_delete_path = "%s/%s" % (settings.MEDIA_ROOT, "delete_image.png")
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -46,41 +50,58 @@ class ImageAPITests(TestCase):
     def login(self):
         self.client.login(username="username", password="password")
 
-    def post_image(self, item):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
+    def post_image(self, image_name="test.png", item_id=1):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
+            return self.client.post(self.images_url, {"image": data, "item": item_id}, format="multipart")
 
-        with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
-
-    def get_image(self, id_image=1):
-        return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
-
-    def delete_image(self, id_image=1):
-        return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
+    def delete_image(self, image_id=1):
+        return self.client.delete("%s%d/" % (self.images_url, image_id), content_type="application/json")
 
     def test_post_image(self):
         self.assertEqual(Image.objects.count(), 0)
 
         self.login()
-        r = self.post_image(1)
+        r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(self.item.image_set.count(), 1)
         self.assertNotEqual(self.item.image_set.first().image.name, "")
+        self.assertNotEqual(self.item.image_set.first().image.url, "")
+
+        r = self.client.get("%s%d/" % (self.items_url, self.item.id))
+        self.assertEqual(r.data["images"][0]["id"], 1)
+        self.assertNotEqual(r.data["images"][0]["url"], None)
+
+    def test_post_images(self):
+        self.assertEqual(Image.objects.count(), 0)
+
+        self.login()
+        self.post_image()
+        self.post_image()
+
+        self.assertEqual(Image.objects.count(), 2)
+        self.assertEqual(self.item.image_set.count(), 2)
+
+        r = self.client.get("%s%d/" % (self.items_url, self.item.id))
+        self.assertEqual(r.data["images"][0]["id"], 1)
+        self.assertNotEqual(r.data["images"][0]["url"], None)
+        self.assertEqual(r.data["images"][1]["id"], 2)
+        self.assertNotEqual(r.data["images"][1]["url"], None)
 
     def test_delete_image(self):
         self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.post_image(image_name="delete_image.png")
 
-        r = self.delete_image(id_image=1)
+        self.assertEqual(Image.objects.count(), 1)
+
+        r = self.delete_image()
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(Image.objects.count(), 0)
+        self.assertRaises(FileNotFoundError, open, self.image_file_delete_path, "rb")
 
-        r = self.delete_image(id_image=10)
+        r = self.delete_image(image_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -197,6 +218,8 @@ class CategoryAPITests(TestCase):
 
 
 class LikeAPITests(TestCase):
+    likes_url = "/api/likes/"
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -217,18 +240,18 @@ class LikeAPITests(TestCase):
                                    archived=archived, category=category, owner=owner)
 
     def post_like(self, item):
-        return self.client.post("/api/likes/", data=json.dumps({
+        return self.client.post(self.likes_url, data=json.dumps({
             "item": item
         }), content_type="application/json")
 
     def get_likes(self):
-        return self.client.get("/api/likes/", content_type="application/json")
+        return self.client.get(self.likes_url, content_type="application/json")
 
     def get_like(self, id_like):
-        return self.client.get("/api/likes/%d/" % id_like, content_type="application/json")
+        return self.client.get("%s%d/" % (self.likes_url, id_like), content_type="application/json")
 
     def delete_like(self, id_like):
-        return self.client.delete("/api/likes/%d/" % id_like, content_type="application/json")
+        return self.client.delete("%s%d/" % (self.likes_url, id_like), content_type="application/json")
 
     def test_post_like(self):
         r = self.post_like(1)
@@ -286,12 +309,12 @@ class LikeAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied(self):
-        r = self.client.put("/api/likes/1/", data=json.dumps({
+        r = self.client.put("%s%d/" % (self.likes_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        r = self.client.patch("/api/likes/1/", data=json.dumps({
+        r = self.client.patch("%s%d/" % (self.likes_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
