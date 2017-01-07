@@ -39,7 +39,7 @@ def login_user(request):
         login(request, user)
         return Response()
     else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "Invalid username/password combination"})
 
 
 @api_view(["GET"])
@@ -73,7 +73,7 @@ def create_user(request):
     location_result = get_coordinates(Location(**location))
 
     if len(location_result) == 0:
-        raise ValidationError("Could not find any match for specified location.")
+        raise ValidationError("Could not find any match for the specified location")
 
     user = User.objects.create_user(
         username=data["username"],
@@ -128,7 +128,8 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         new_username = request.data.get("username", None)
         if new_username is not None and User.objects.filter(username=new_username).count() > 0:
-            return Response(status=status.HTTP_409_CONFLICT, data={"error": "An user with same name already exists"})
+            return Response(status=status.HTTP_409_CONFLICT,
+                            data={"error": "An user with the same username already exists"})
         return super(UserAccount, self).update(request, *args, **kwargs)
 
 
@@ -145,7 +146,7 @@ def change_password(request):
     new_password = serializer.validated_data["new_password"]
 
     if not request.user.check_password(old_password):
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "Wrong password"})
 
     request.user.set_password(new_password)
     request.user.save()
@@ -163,7 +164,7 @@ class LocationView(generics.UpdateAPIView):
         data = get_coordinates(Location(**serializer.validated_data))
 
         if len(data) == 0:
-            raise ValidationError("Could not find any match for specified location.")
+            raise ValidationError("Could not find any match for the specified location")
 
         u = self.request.user
         c = u.coordinates
