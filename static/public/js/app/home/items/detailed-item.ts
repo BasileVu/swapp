@@ -1,9 +1,9 @@
 import {UserInventoryItem} from "../profile/user";
+
 class KeyInfo {
     key: string;
     info: string;
 }
-
 
 export class DetailedItem {
     id: number;

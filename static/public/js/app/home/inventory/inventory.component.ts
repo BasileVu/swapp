@@ -1,21 +1,25 @@
 import {
-    Component, 
-    Input, 
-    ViewEncapsulation, 
+    Component,
+    Input,
+    ViewEncapsulation,
     OnInit,
     trigger,
     state,
     style,
     transition,
-    animate,
+    animate, OnChanges,
 } from '@angular/core';
+import { __platform_browser_private__,
+    SafeResourceUrl,
+    DomSanitizer } from '@angular/platform-browser';
+
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { InventoryItem } from './inventory-item';
 import { ItemsService } from '../items/items.service';
 import {Subscription} from "rxjs";
 import {User} from "../profile/user";
-import {ItemCreationDTO} from "./item-creation-dto";
 
 declare var $:any;
 
@@ -41,7 +45,8 @@ declare var $:any;
                 }))
             ])
         ])
-    ]
+    ],
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
 export class InventoryComponent implements OnInit {
 
@@ -53,7 +58,9 @@ export class InventoryComponent implements OnInit {
     private inventory: Array<InventoryItem> = [];
     
     constructor(private authService: AuthService,
-                private itemsService: ItemsService) {}
+                private itemsService: ItemsService,
+                public toastr: ToastsManager,
+                private sanitizer: DomSanitizer) {}
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
@@ -66,25 +73,23 @@ export class InventoryComponent implements OnInit {
                 this.inventory = [];
                 for(let item of this.owner.items) {
                     let inventoryItem = new InventoryItem(item.id, item.name, item.image_url, null);
-                    console.log(inventoryItem);
+                    this.sanitizer.bypassSecurityTrustUrl(item.image_url);
                     this.inventory.push(inventoryItem);
                 }
             }
         );
     }
 
-    // We receive an ItemCreationDTO object so we'll change it into an InventoryItem
-    addItemEvent($event: ItemCreationDTO) {
-        let inventoryItem = new InventoryItem(
-            1, // TODO
-            $event.name,
-            "",
-            new Date());
-        
-        this.inventory.push(inventoryItem);
-
-        console.log("inventory:");
-        console.log(this.inventory);
+    // We receive the id of the item to add to the inventory
+    addItemEvent($event: number) {
+        this.itemsService.getDetailedItem(+$event).then(
+            item => {
+                let inventoryItem = new InventoryItem(item.id, item.name, item.image_urls[0], item.creation_date);
+                inventoryItem.safeImage = this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image);
+                this.inventory.push(inventoryItem);
+            },
+            error => this.toastr.error("Can't get item " + $event, "Error")
+        );
     }
 
     gotoDetail(item_id: number): void {
@@ -113,5 +118,9 @@ export class InventoryComponent implements OnInit {
                     service.selectComments(comments);
                 },
                 error => console.log(error));
+    }
+
+    ngOnDestroy() {
+        this.subscription.unsubscribe();
     }
 }

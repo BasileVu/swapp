@@ -16,6 +16,7 @@ import { KeyInfo } from './key-info';
 import {ProfileService} from "../profile/profile.service";
 import {SearchService} from "../search/search.service";
 import {Category} from "../search/category";
+import {DetailedItem} from "../items/detailed-item";
 
 declare let $:any;
 
@@ -69,14 +70,15 @@ export class AddItemModalComponent implements OnInit {
     keyInfos: Array<KeyInfo> = [];
     categories: Array<Category> = [];
     deliveryMethods: Array<DeliveryMethod> = [];
+    userDeliveryMethods: Array<number> = [];
+    newItemId: number;
     
     // images
     file_srcs: Array<string> = [];
     files: Array<File> = [];
     data: any;
-    private file:File;
 
-    // EventEmitter to call login function of the ProfileComponent after registering
+    // EventEmitter to inform subscribed components after an item creation
     @Output() newItemEvent = new EventEmitter();
 
     // Form fields
@@ -95,6 +97,7 @@ export class AddItemModalComponent implements OnInit {
                 public toastr: ToastsManager) { }
 
     ngOnInit(): void {
+        // Init item creation form
         this.createItemForm = this.formBuilder.group({
             name: this.name,
             min_price: this.min_price,
@@ -103,17 +106,40 @@ export class AddItemModalComponent implements OnInit {
             description: this.description
         });
 
+        // Get all categories
         this.searchService.getCategories().then(
             categories => this.categories = categories,
-            error => this.toastr.error("Can't get alla categories", "Error")
+            error => this.toastr.error("Can't get all categories", "Error")
         );
 
+        // Get all delivery methods
+        this.inventoryService.getDeliveryMethods().then(
+            deliveryMethods => {
+                this.deliveryMethods = deliveryMethods;
+            },
+            error => this.toastr.error("Can't get all delivery methods")
+        );
+
+        // Add a blank key info
         this.keyInfos.push(new KeyInfo("", ""));
-        // TODO : get delivery methods
     }
 
+    // Add or remove the delivery method if selected/unselected
+    updateCheckbox(deliverymethod_id: number, checked: boolean) {
+        if (checked) {
+            this.userDeliveryMethods.push(+deliverymethod_id);
+        } else {
+            let index = this.userDeliveryMethods.indexOf(+deliverymethod_id, 0);
+            if (index > -1) {
+                this.userDeliveryMethods.splice(index, 1);
+            }
+        }
+    }
+
+    // Create the item if valid
     createItem() {
         let errorMessage: string;
+
         // verifications
         if (this.file_srcs.length === 0)
             errorMessage = "At least one image must be provided";
@@ -122,16 +148,15 @@ export class AddItemModalComponent implements OnInit {
 
         if (errorMessage != undefined) {
             this.toastr.error(errorMessage, "Error");
+
         } else {
-            let deliveryM = new Array<number>();
-            deliveryM.push(1);
+            // Create the item
+
+            // Build a proper keyInfos array with trimmed values
             let keyInfos = new Array<KeyInfo>();
             for (let ki of this.keyInfos)
                 if (ki.key && ki.key.trim() && ki.value && ki.value.trim())
                     keyInfos.push(new KeyInfo(ki.key.trim(), ki.value.trim()));
-
-            console.log(this.files);
-            console.log(this.category.value);
 
             let newItem = new ItemCreationDTO(
                 this.name.value,
@@ -140,18 +165,27 @@ export class AddItemModalComponent implements OnInit {
                 this.category.value,
                 this.description.value,
                 keyInfos,
-                deliveryM
+                this.userDeliveryMethods
             );
 
             this.inventoryService.addItem(newItem)
                 .then(
-                    res => {console.log(res); this.addImages(7);},
+                    res => {
+                        // images can be added only after item creation (api constraint)
+                        this.newItemId = AddItemModalComponent.getItemIdFromResponse(res);
+                        this.addImages(this.newItemId);
+                    },
                     error => this.toastr.error(error, 'Error'));
         }
-        
-        
     }
 
+    // Get the id of newly created item
+    static getItemIdFromResponse(res: any) {
+        let obj: DetailedItem = JSON.parse(res._body);
+        return obj.id;
+    }
+
+    // Add images to the newly created item
     addImages(item_id: number) {
         let filesUploaded: number = 0;
         for (let f of this.files) {
@@ -163,7 +197,8 @@ export class AddItemModalComponent implements OnInit {
                     res => {
                         if (++filesUploaded === this.files.length) {
                             this.toastr.success('New item added to your inventory', 'Item created!');
-                            this.newItemEvent.emit({});
+                            this.newItemEvent.emit(this.newItemId);
+                            $('#add-item-modal').modal('hide');
                         }
                     },
                     error => this.toastr.error(error, "Error")
@@ -184,27 +219,27 @@ export class AddItemModalComponent implements OnInit {
         this.files.splice(index, 1);
     }
   
-    // This is called when the user selects new files from the upload button
+    // Called when the user selects new files from the upload button
     fileChange(input: any){
-        console.log(input.files);
-
         for (let f of input.files)
             this.files.push(f);
 
         this.readFiles(input.files);
     }
 
+    // Read one file
     readFile(file: File, reader: FileReader, callback: any){
         // Set a callback funtion to fire after the file is fully loaded
         reader.onload = () => {
             // callback with the results
             callback(reader.result);
-        }
+        };
 
         // Read the file
         reader.readAsDataURL(file);
     }
 
+    // Read many files
     readFiles(files: Array<File>, index=0){
         // Create the file reader
         let reader = new FileReader();
@@ -235,11 +270,10 @@ export class AddItemModalComponent implements OnInit {
         }
     }
 
+    // Resize image to display it correctly for the user
     resize(img: any, MAX_WIDTH:number, MAX_HEIGHT:number, callback: any) {
         // This will wait until the img is loaded before calling this function
         return img.onload = () => {
-            console.log("img loaded");
-            console.log(this.file_srcs);
             // Get the images current width and height
             var width = img.width;
             var height = img.height;

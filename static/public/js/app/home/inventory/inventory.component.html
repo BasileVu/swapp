@@ -4,7 +4,7 @@
             <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell" *ngFor="let item of inventory; let last = last" [update-inventory]="last">
                 <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id)">
                     <img *ngIf="item.image === null" class="img-fluid" src="http://loremflickr.com/400/400"/>
-                    <img *ngIf="item.image != null" class="img-fluid" src="{{ item.image }}"/>
+                    <div *ngIf="item.image != null" class="bg-img-fluid" [style.background-image]="'url(' + item.image + ')'"></div>
                     <span>{{ item.name }}</span>
                     <a href="#" class="delete"><i class="fa fa-trash"></i></a>
                 </div>

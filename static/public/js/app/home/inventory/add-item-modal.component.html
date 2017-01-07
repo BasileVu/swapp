@@ -13,10 +13,8 @@
                             <h3>Images</h3>
                             <span class="img-infos">At least one image must be provided</span>
                             <input type="file" class="form-control" multiple (change)="fileChange(input)" #input />
-                            <div *ngIf="file_srcs.length === 0" class="col-img-frame" [@flyInOut]>
-                                <img class="img-fluid" src="http://loremflickr.com/300/150">
-                            </div>
                             <div class="row">
+                                <p class="text-sm-center" *ngIf="file_srcs.length > 0">Preview</p>
                                 <div *ngFor="let file_src of file_srcs; let i = index" class="col-img-frame" [@flyInOut]>  
                                     
                                     <div class="col-md-11">
@@ -37,17 +35,9 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Methods</label>
                                 <div class="col-sm-8">
-                                    <div>
-                                        <input type="checkbox" class="form-check-input">
-                                        At my place
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" class="form-check-input">
-                                        At any place
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" class="form-check-input">
-                                        By mail
+                                    <div *ngFor="let dm of deliveryMethods">
+                                        <input type="checkbox" class="form-check-input" value="{{ dm.id }}" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
+                                        {{ dm.name }}
                                     </div>
                                 </div>
                             </div>

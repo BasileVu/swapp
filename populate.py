@@ -94,7 +94,7 @@ if __name__ == "__main__":
     c4 = Category.objects.create(name="Books")
     c5 = Category.objects.create(name="Business & Industrial")
     c6 = Category.objects.create(name="Cameras & Photos")
-    c7 = Category.objects.create(name="Celle Phones & Accessories")
+    c7 = Category.objects.create(name="Cell Phones & Accessories")
     c8 = Category.objects.create(name="Clothing, Shoes & Accessories")
     c9 = Category.objects.create(name="Coins & Paper Money")
     c10 = Category.objects.create(name="Collectibles")
@@ -119,6 +119,11 @@ if __name__ == "__main__":
     c29 = Category.objects.create(name="Vehicles, Auto, Moto")
     c30 = Category.objects.create(name="Video Games & Consoles")
     c31 = Category.objects.create(name="Everything else")
+
+    # Delivery methods
+    DeliveryMethod.objects.create(name="At my place")
+    DeliveryMethod.objects.create(name="At any place")
+    DeliveryMethod.objects.create(name="By mail")
 
     # Items
     i1 = create_item(c8, u1, name="Shoes", description="My collector shoes", price_min=10, price_max=50, views=800)

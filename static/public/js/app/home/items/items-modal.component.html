@@ -198,12 +198,13 @@
                     <div class="row preview">
                         <p *ngIf="ownerItems.length === 0">No other items</p>
                         <div class="col-sm-12 col-md-6" *ngFor="let ownerItem of ownerItems">
-                            <img class="img-fluid" *ngIf="ownerItem.image_url != null" src="{{ ownerItem.image_url }}"/>
+                            <div class="bg-similar-img-fluid" *ngIf="ownerItem.image_url != null" [style.background-image]="'url(' + ownerItem.image_url + ')'"></div>
                             <img class="img-fluid" *ngIf="ownerItem.image_url === null" src="http://loremflickr.com/100/100"/>
                         </div>
                     </div>
                     <div class="bottom-link">
-                        <a href="#" class="btn btn-block btn-reversed open-profile-modal" (click)="openProfileModal()">
+                        <a href="#" class="btn btn-block btn-reversed open-profile-modal" style="margin-top: 10px;"
+                           (click)="openProfileModal()">
                             <i class="fa fa-eye"></i> <span class="hidden-sm-down">See profile</span>
                         </a>
                     </div>
@@ -214,9 +215,9 @@
                     </div>
                     <div class="row preview">
                         <p *ngIf="item.similar.length === 0">No similar items found</p>
-                        <div class="col-sm-12 col-md-6" *ngFor="let similar of item.similar">
-                            <img class="img-fluid" *ngIf="similar.image_url != null" src="{{ similar.image_url }}"/>
-                            <img class="img-fluid" *ngIf="similar.image_url === null" src="http://loremflickr.com/100/100"/>
+                        <div class="col-sm-12 col-md-6" *ngFor="let simi of item.similar">
+                            <div class="bg-similar-img-fluid" *ngIf="simi.image_url != null" [style.background-image]="'url(' + simi.image_url + ')'"></div>
+                            <img class="img-fluid" *ngIf="simi.image_url === null" src="http://loremflickr.com/100/100"/>
                         </div>
                     </div>
                     <div class="bottom-link">

@@ -1,5 +1,7 @@
 import {Component, ViewEncapsulation, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
+import { __platform_browser_private__,
+    DomSanitizer } from '@angular/platform-browser';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
@@ -31,7 +33,8 @@ declare let $: any;
             max-width: 100%;
             max-height: 250px;
         }
-    `]
+    `],
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
 export class ItemsModalComponent implements OnInit, OnDestroy {
 
@@ -53,6 +56,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 private authService: AuthService,
                 private offerService: OfferService,
                 private formBuilder: FormBuilder,
+                private sanitizer: DomSanitizer,
                 public toastr: ToastsManager) { }
 
     ngOnInit() {
@@ -77,9 +81,12 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
         // When receiving the detailed item
         this.subscription = this.itemsService.itemSelected$.subscribe(
-            item => { 
+            item => {
                 this.item = item;
+                for (let userInventoryItem of this.item.similar)
+                    this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
 
+                console.log(this.item);
                 // Get the owner
                 this.itemsService.getUser(item.owner_username)
                     .then(
@@ -89,6 +96,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                             this.ownerItems = [];
 
                             for (let inventoryItem of owner.items) {
+                                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
                                 if (inventoryItem.id != item.id)
                                     this.ownerItems.push(inventoryItem);
                             }
