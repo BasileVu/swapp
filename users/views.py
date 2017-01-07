@@ -10,8 +10,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.models import Category
-from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer
+from items.models import Category, Item
+from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer, \
+    CreateImageSerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -237,3 +238,16 @@ class NoteViewSet(mixins.CreateModelMixin,
         if Note.objects.filter(offer=offer, user=serializer.validated_data["user"]).count() > 0:
             raise ValidationError("You have already noted this offer")
         serializer.save()
+
+
+@api_view(["POST"])
+@permission_classes((permissions.IsAuthenticated,))
+def set_profile_image(request):
+    serializer = CreateImageSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    userprofile = request.user.userprofile
+    userprofile.image = serializer.validated_data["image"]
+    userprofile.save()
+
+    return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})

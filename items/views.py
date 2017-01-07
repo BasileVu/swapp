@@ -236,6 +236,16 @@ class ItemViewSet(mixins.CreateModelMixin,
 
         return Response()
 
+    @detail_route(methods=["POST"])
+    def images(self, request, pk=None):
+        serializer = CreateImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        item = get_object_or_404(Item, pk=pk)
+        i = Image.objects.create(image=serializer.validated_data["image"], item=item)
+
+        return Response(status=status.HTTP_201_CREATED, data=ImageSerializer(i).data, headers={"Location": i.image.url})
+
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
@@ -288,37 +298,10 @@ class DeliveryMethodViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = DeliveryMethodSerializer
 
 
-class ImageViewSet(mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
+class ImageViewSet(mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     queryset = Image.objects.all()
     permission_classes = (IsAuthenticated,)
-
-    def get_serializer_class(self):
-        if self.action == "create":
-            return CreateImageSerializer
-
-        return ImageSerializer
-
-    def perform_create(self, serializer):
-        item_id = serializer.validated_data.get("item", None)
-        user_id = serializer.validated_data.get("user", None)
-        image = serializer.validated_data.get("image", None)
-
-        if item_id is not None:
-            item = get_object_or_404(Item, pk=item_id)
-            i = Image.objects.create(image=image, item=item)
-
-            return Response(status=status.HTTP_201_CREATED, headers={"Location": i.image.url})
-
-        if user_id is not None and self.request.user.is_authenticated:
-            userprofile = self.request.user.userprofile
-            userprofile.image = image
-            userprofile.save()
-
-            return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})
-
-        raise ValidationError("Item or user is required")
 
 
 class LikeViewSet(mixins.ListModelMixin,
