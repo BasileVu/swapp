@@ -82,9 +82,9 @@ class ItemBaseTest(TestCase):
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
 
-    def post_image(self, image_name="test.png", user_id=1):
+    def post_image(self, image_name="test.png"):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+            return self.client.post("/api/account/image/", {"image": data}, format="multipart")
 
 
 class ItemPostTests(ItemBaseTest):

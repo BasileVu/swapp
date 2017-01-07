@@ -29,11 +29,9 @@ class InterestedByCategorySerializer(serializers.Serializer):
 
 class CreateImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
-    item = serializers.IntegerField(required=False)
-    user = serializers.IntegerField(required=False)
 
     class Meta:
-        fields = ("image", "item", "user")
+        fields = ("image",)
 
 
 class ImageSerializer(serializers.ModelSerializer):
