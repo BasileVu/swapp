@@ -671,6 +671,7 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(len(r.data["items"]), 1)
         item_received = r.data["items"][0]
         self.assertEqual(item_received["id"], 1)
+        self.assertEqual(item_received["image_id"], None)
         self.assertEqual(item_received["image_url"], None)
         self.assertEqual(item_received["name"], "test")
         self.assertEqual(item_received["archived"], False)
@@ -681,6 +682,7 @@ class PublicAccountInfoTests(TestCase):
         self.client.logout()
 
         r = self.client.get("/api/users/%s/" % self.user.username)
+        self.assertNotEqual(r.data["items"][0]["image_id"], None)
         self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
 

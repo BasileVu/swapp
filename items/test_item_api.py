@@ -156,7 +156,7 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["similar"][1]["id"], id2)
         self.assertEqual(r.data["owner_location"], "city, country")
         self.assertNotEqual(r.data["owner_picture_url"], None)
-        self.assertIn("image_urls", r.data)
+        self.assertIn("images", r.data)
         self.assertEqual(r.data["traded"], False)
         self.assertEqual(r.data["archived"], False)
 

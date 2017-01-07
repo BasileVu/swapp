@@ -37,14 +37,14 @@ class CreateImageSerializer(serializers.Serializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
-    def get_image_url(self, obj):
+    def get_url(self, obj):
         return obj.image.url
 
     class Meta:
         model = Image
-        fields = ("id", "image_url")
+        fields = ("id", "url")
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -114,7 +114,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
     def get_image_id(self, obj):
-        return obj.image_set.first().image.id if obj.image_set.count() > 0 else None
+        return obj.image_set.first().id if obj.image_set.count() > 0 else None
 
     def get_image_url(self, obj):
         return obj.image_set.first().image.url if obj.image_set.count() > 0 else None
@@ -165,7 +165,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
-                  "views", "image_urls", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
+                  "views", "images", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
                   "similar", "owner_picture_url", "owner_location", "traded", "archived")
 
 
