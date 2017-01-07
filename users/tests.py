@@ -27,11 +27,13 @@ class UserProfileTests(TestCase):
 
 
 class AccountCreationAPITests(TestCase):
+    users_url = "/api/users/"
+
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
                   street="Route de Cheseaux 1", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
 
-        return self.client.post("/api/users/", data=json.dumps({
+        return self.client.post(self.users_url, data=json.dumps({
             "username": username,
             "first_name": first_name,
             "last_name": last_name,
@@ -55,7 +57,7 @@ class AccountCreationAPITests(TestCase):
     def test_user_creation(self):
         r = self.post_user()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(r["Location"], "/api/users/username/")
+        self.assertEqual(r["Location"], "%s%s/" % (self.users_url, "username"))
 
         u = User.objects.get(pk=1)
         self.assertEqual(u.location.street, "Route de Cheseaux 1")
@@ -69,7 +71,7 @@ class AccountCreationAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
     def test_user_creation_incomplete_json(self):
-        r = self.client.post("/api/users/", data=json.dumps({
+        r = self.client.post(self.users_url, data=json.dumps({
             "username": "username"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
@@ -92,8 +94,11 @@ class AccountCreationAPITests(TestCase):
 
 
 class AccountConnectionAPITests(TestCase):
+    login_url = "/api/login/"
+    logout_url = "/api/logout/"
+
     def login(self, username="username", password="password"):
-        return self.client.post("/api/login/", data=json.dumps({
+        return self.client.post(self.login_url, data=json.dumps({
             "username": username,
             "password": password
         }), content_type="application/json")
@@ -106,7 +111,7 @@ class AccountConnectionAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_login_incomplete_json(self):
-        r = self.client.post("/api/login/", data=json.dumps({
+        r = self.client.post(self.login_url, data=json.dumps({
             "username": "username"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
@@ -121,29 +126,33 @@ class AccountConnectionAPITests(TestCase):
         self.assertIn("_auth_user_id", self.client.session)
 
     def test_logout_not_logged_in(self):
-        r = self.client.get("/api/logout/")
+        r = self.client.get(self.logout_url)
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_logout_logged_in(self):
         self.login()
 
-        r = self.client.get("/api/logout/")
+        r = self.client.get(self.logout_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
 
 class AccountAPITests(TestCase):
+    login_url = "/api/login/"
+    logout_url = "/api/logout/"
+    account_url = "/api/account/"
+
     def login(self, username="username", password="password"):
-        return self.client.post("/api/login/", data=json.dumps({
+        return self.client.post(self.login_url, data=json.dumps({
             "username": username,
             "password": password
         }), content_type="application/json")
 
     def post_image(self, image_name="test.png"):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
-            return self.client.post("/api/account/image/", {"image": data}, format="multipart")
+            return self.client.post("%s%s/" % (self.account_url, "image"), {"image": data}, format="multipart")
 
     def patch_interested_by_categories(self, interested_by=[]):
-        return self.client.patch("/api/account/categories/", data=json.dumps({
+        return self.client.patch("%s%s/" % (self.account_url, "categories"), data=json.dumps({
             "interested_by": interested_by
         }), content_type="application/json")
 
@@ -154,7 +163,7 @@ class AccountAPITests(TestCase):
 
     def test_get_account_info_not_logged_in(self):
         self.client.logout()
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_account_info_logged_in(self):
@@ -168,7 +177,7 @@ class AccountAPITests(TestCase):
         Note.objects.create(user=u, offer=o, text="test", note=4)
         Like.objects.create(user=u, item=i)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
 
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["id"], 1)
@@ -190,7 +199,7 @@ class AccountAPITests(TestCase):
 
     def test_update_account_not_logged_in(self):
         self.client.logout()
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "first_name": "f",
             "last_name": "l"
         }), content_type="application/json")
@@ -201,13 +210,13 @@ class AccountAPITests(TestCase):
         self.login()
 
         # Test if no modification
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
 
     def test_update_account_logged_in(self):
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "first_name": "firstname",
             "last_name": "lastname"
         }), content_type="application/json")
@@ -215,7 +224,7 @@ class AccountAPITests(TestCase):
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["first_name"], "firstname")
         self.assertEqual(r.data["last_name"], "lastname")
@@ -223,7 +232,7 @@ class AccountAPITests(TestCase):
     def test_cannot_update_account_not_logged_in(self):
         self.client.logout()
 
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "email": "a@b.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -233,7 +242,7 @@ class AccountAPITests(TestCase):
         self.login()
 
         # Test if no modification
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertNotEqual(r.data["email"], "a@b.com")
 
@@ -244,7 +253,7 @@ class AccountAPITests(TestCase):
         u.is_active = False
         u.save()
 
-        r = self.client.post("/api/login/", data=json.dumps({
+        r = self.client.post(self.login_url, data=json.dumps({
             "username": "username",
             "password": "password"
         }), content_type="application/json")
@@ -252,57 +261,57 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_account_empty_json(self):
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "username": "",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 1)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username")
 
     def test_update_one_not_considered_info(self):
         datetime = str(timezone.now())
 
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "last_modification_date": datetime,
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
     def test_update_account_malformed_json(self):
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "emaaiill": "newemail@newemail.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_update_user_account_incomplete_json(self):
-        r = self.client.put("/api/account/", data=json.dumps({
+        r = self.client.put(self.account_url, data=json.dumps({
             "email": "newemail@newemail.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 3)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_complete_update_account(self):
-        r = self.client.put("/api/account/", data=json.dumps({
+        r = self.client.put(self.account_url, data=json.dumps({
             "username": "newusername",
             "first_name": "firstname",
             "last_name": "lastname",
@@ -312,7 +321,7 @@ class AccountAPITests(TestCase):
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "newusername")
         self.assertEqual(r.data["first_name"], "firstname")
@@ -321,7 +330,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["location"], {"country": "", "city": "", "region": "", "street": ""})
 
     def test_complete_update_account_empty_json(self):
-        r = self.client.put("/api/account/", data=json.dumps({
+        r = self.client.put(self.account_url, data=json.dumps({
             "username": "",
             "first_name": "",
             "last_name": "",
@@ -332,7 +341,7 @@ class AccountAPITests(TestCase):
         # Need five fields (mandatory)
         self.assertEqual(len(r.data), 4)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username")
         self.assertEqual(r.data["first_name"], "first_name")
@@ -343,7 +352,7 @@ class AccountAPITests(TestCase):
     def test_change_password_not_logged_in(self):
         self.client.logout()
 
-        r = self.client.put("/api/account/password/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "password"), data=json.dumps({
             "old_password": "password",
             "new_password": "newpassword"
         }), content_type="application/json")
@@ -352,7 +361,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(len(r.data), 1)
 
     def test_change_password(self):
-        r = self.client.put("/api/account/password/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "password"), data=json.dumps({
             "old_password": "password",
             "new_password": "newpassword"
         }), content_type="application/json")
@@ -365,13 +374,13 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_with_false_old_password(self):
-        r = self.client.put("/api/account/password/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "password"), data=json.dumps({
             "old_password": "passwor",
             "new_password": "newpassword"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
-        self.client.get("/api/account/logout/")
+        self.client.get(self.logout_url)
 
         r = self.login(password="newpassword")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -380,14 +389,14 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_change_password_empty_json(self):
-        r = self.client.put("/api/account/password/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "password"), data=json.dumps({
             "old_password": "",
             "new_password": ""
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_change_password_partial_json(self):
-        r = self.client.put("/api/account/password/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "password"), data=json.dumps({
             "old_password": "password"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
@@ -395,26 +404,26 @@ class AccountAPITests(TestCase):
     def test_two_users_cant_have_same_username_update_patch(self):
         User.objects.create_user(username="username2", password="pass2")
 
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "username": "username2",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username")
 
-        self.client.get("/api/logout/")
+        self.client.get(self.logout_url)
         self.login(username="username2", password="pass2")
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username2")
 
     def test_two_users_cant_have_same_username_update_put(self):
         User.objects.create_user(username="username2", password="pass2")
 
-        r = self.client.put("/api/account/", data=json.dumps({
+        r = self.client.put(self.account_url, data=json.dumps({
             "username": "username2",
             "first_name": "firstname",
             "last_name": "lastname",
@@ -424,48 +433,48 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username")
 
-        self.client.get("/api/logout/")
+        self.client.get(self.logout_url)
         self.login(username="username2", password="pass2")
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["username"], "username2")
 
     def test_update_malformed_email_logged_in(self):
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "email": "test",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 1)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_modification_date_user_logged_in(self):
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         datetime = r.data["last_modification_date"]
 
-        r = self.client.patch("/api/account/", data=json.dumps({
+        r = self.client.patch(self.account_url, data=json.dumps({
             "email": "mail@mail.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual("password" in r.data, False)
         self.assertEqual(len(r.data), 0)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "mail@mail.com")
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
     def test_405_when_get_on_password(self):
-        r = self.client.get("/api/account/password/")
+        r = self.client.get("%s%s/" % (self.account_url, "password"))
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_post_account_image(self):
@@ -474,7 +483,7 @@ class AccountAPITests(TestCase):
         r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertNotEqual(r.data["profile_picture_url"], None)
 
     def test_post_account_image_already_existing_image(self):
@@ -520,6 +529,8 @@ class CSRFTests(TestCase):
 
 
 class LocationCoordinatesTests(TestCase):
+    account_url = "/api/account/"
+
     new_location = {
         "street": "Route de Cheseaux 1",
         "city": "Yverdon-les-Bains",
@@ -528,7 +539,7 @@ class LocationCoordinatesTests(TestCase):
     }
 
     def put_location(self):
-        return self.client.patch("/api/account/location/",
+        return self.client.patch("%s%s/" % (self.account_url, "location"),
                                  data=json.dumps(self.new_location),
                                  content_type="application/json")
 
@@ -558,18 +569,18 @@ class LocationCoordinatesTests(TestCase):
         r = self.put_location()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["location"], self.new_location)
 
     def test_change_location_empty_json(self):
-        r = self.client.put("/api/account/location/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "location"), data=json.dumps({
             "location": {}
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_change_location_empty_json_fields(self):
-        r = self.client.put("/api/account/location/", data=json.dumps({
+        r = self.client.put("%s%s/" % (self.account_url, "location"), data=json.dumps({
             "location": {
                 "street": "",
                 "city": "",
@@ -587,7 +598,7 @@ class LocationCoordinatesTests(TestCase):
     def test_coordinates_and_location_do_not_change_after_zero_results_location_modification(self):
         self.get_coordinates_mock.return_value = []
 
-        r = self.client.patch("/api/account/location/", data=json.dumps({
+        r = self.client.patch("%s%s/" % (self.account_url, "location"), data=json.dumps({
             "street": "fnupinom",
             "city": "fnupinom",
             "region": "fnupinom",
@@ -615,6 +626,8 @@ class LocationCoordinatesTests(TestCase):
 
 
 class PublicAccountInfoTests(TestCase):
+    users_url = "/api/users/"
+
     def post_image(self, image_name="test.png", item_id=1):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
             return self.client.post("/api/items/%d/images/" % item_id, {"image": data}, format="multipart")
@@ -643,11 +656,11 @@ class PublicAccountInfoTests(TestCase):
         self.user.userprofile.save()
 
     def test_get_user_info_not_found(self):
-        r = self.client.get("/api/users/%s/" % (self.user.username + "42"))
+        r = self.client.get("%s%s%s/" % (self.users_url, self.user.username, "42"))
         self.assertEquals(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_user_info(self):
-        r = self.client.get("/api/users/%s/" % self.user.username)
+        r = self.client.get("%s%s/" % (self.users_url, self.user.username))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
@@ -674,12 +687,15 @@ class PublicAccountInfoTests(TestCase):
         self.post_image()
         self.client.logout()
 
-        r = self.client.get("/api/users/%s/" % self.user.username)
+        r = self.client.get("%s%s/" % (self.users_url, self.user.username))
         self.assertNotEqual(r.data["items"][0]["image_id"], None)
         self.assertNotEqual(r.data["items"][0]["image_url"], None)
 
 
 class NoteAPITests(TestCase):
+    notes_url = "/api/notes/"
+    account_url = "/api/account/"
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
         self.current_user.userprofile.location = "location"
@@ -706,26 +722,26 @@ class NoteAPITests(TestCase):
                                    archived=archived, category=category, owner=owner)
 
     def post_note(self, offer=1, text="Test", note=0):
-        return self.client.post("/api/notes/", data=json.dumps({
+        return self.client.post(self.notes_url, data=json.dumps({
             "offer": offer,
             "text": text,
             "note": note
         }), content_type="application/json")
 
     def get_note(self, id_note):
-        return self.client.get("/api/notes/" + str(id_note) + "/", content_type="application/json")
+        return self.client.get("%s%d/" % (self.notes_url, id_note), content_type="application/json")
 
     def delete_note(self, id_note):
-        return self.client.delete("/api/notes/" + str(id_note) + "/", content_type="application/json")
+        return self.client.delete("%s%d/" % (self.notes_url, id_note), content_type="application/json")
 
     def put_note(self, id_note, text="Test", note=0):
-        return self.client.put("/api/notes/" + str(id_note) + "/", data=json.dumps({
+        return self.client.put("%s%d/" % (self.notes_url, id_note), data=json.dumps({
             "text": text,
             "note": note
         }), content_type="application/json")
 
     def patch_note(self, id_note, text="Test", note=0):
-        return self.client.patch("/api/notes/" + str(id_note) + "/", data=json.dumps({
+        return self.client.patch("%s%d/" % (self.notes_url, id_note), data=json.dumps({
             "text": text,
             "note": note
         }), content_type="application/json")
@@ -756,7 +772,7 @@ class NoteAPITests(TestCase):
 
         self.client.logout()
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 0)
 
     def test_post_note_over_5(self):
@@ -766,7 +782,7 @@ class NoteAPITests(TestCase):
 
         self.client.logout()
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 0)
 
     def test_post_two_times_the_same_note(self):
@@ -780,7 +796,7 @@ class NoteAPITests(TestCase):
 
         self.client.logout()
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 1)
 
     def test_put_note(self):
@@ -814,23 +830,23 @@ class NoteAPITests(TestCase):
 
         self.client.logout()
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 0)
 
     def test_user_avg_note_no_note(self):
         self.login()
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 0)
         self.assertEqual(r.data["note_avg"], None)
 
     def test_user_avg_note_one_note(self):
         self.login()
         self.post_note(1, "test", 1)
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.client.logout()
 
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 1)
         self.assertEqual(r.data["note_avg"], 1)
 
@@ -844,13 +860,13 @@ class NoteAPITests(TestCase):
         self.client.logout()
 
         self.client.login(username="user1", password="password")
-        r = self.client.get("/api/account/")
+        r = self.client.get(self.account_url)
         self.assertEqual(r.data["notes"], 2)
         self.assertEqual(r.data["note_avg"], 2.5)
 
 
 class ConsultationTests(TestCase):
-    url = "/api/items/"
+    items_url = "/api/items/"
 
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
@@ -864,7 +880,7 @@ class ConsultationTests(TestCase):
         self.client.login(username="username", password="password")
 
     def get_item(self, id_item=1):
-        return self.client.get(self.url + str(id_item) + "/", content_type="application/json")
+        return self.client.get("%s%d/" % (self.items_url, id_item), content_type="application/json")
 
     def test_not_logged_user_consultation_should_do_nothing(self):
 
