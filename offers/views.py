@@ -54,40 +54,44 @@ class OfferViewSet(mixins.CreateModelMixin,
 
         for o in item_given.offers_done.filter(answered=False):
             if item_received == o.item_received:
-                raise ValidationError("There is already an offer with the same item given and received")
+                raise ValidationError("You have already created an offer with the same item for the wanted item")
+
+        for o in item_received.offers_done.filter(answered=False):
+            if item_given == o.item_received:
+                raise ValidationError("There is already an offer for your item with the wanted item. Please accept it.")
 
         if item_given.traded:
-            raise ValidationError("Item given has already been traded")
+            raise ValidationError("You can't create an offer with an item that has been traded")
 
         if item_received.traded:
-            raise ValidationError("Item received has already been traded")
+            raise ValidationError("You can't create an offer for an item that has been traded")
 
         if item_given.archived:
-            raise ValidationError("Item given does not exist")
+            raise ValidationError("The item traded does not exist")
 
         if item_received.archived:
-            raise ValidationError("Item received does not exist")
+            raise ValidationError("The item wanted does not exist")
 
         if self.request.user != item_given.owner:
-            raise ValidationError("Item given is not owned by the current user")
+            raise ValidationError("You can't trade another person's item")
 
         if self.request.user == item_received.owner:
-            raise ValidationError("Item received is owned by the current user")
+            raise ValidationError("You can't traded for your own item")
 
         if item_given.price_max < item_received.price_min:
-                raise ValidationError("Price max of item given is smaller than price min of item received")
+                raise ValidationError("Price max of your item is smaller than price min of the wanted item")
 
         serializer.save()
 
     def perform_update(self, serializer):
         if serializer.instance.accepted:
-            raise ValidationError("Can't update an accepted offer")
+            raise ValidationError("You can't update an accepted offer")
 
         accepted = serializer.validated_data.get("accepted", None)
 
         if accepted is not None:
             if serializer.instance.item_given.owner == self.request.user:
-                raise ValidationError("Can't accept or refuse own offer")
+                raise ValidationError("You can't accept or refuse own offer")
 
             serializer.validated_data["answered"] = True
 
@@ -106,8 +110,8 @@ class OfferViewSet(mixins.CreateModelMixin,
 
     def perform_destroy(self, instance):
         if self.request.user != instance.item_given.owner:
-            raise ValidationError("Can't delete offer of another user")
+            raise ValidationError("You can't delete offer of another user")
 
         if instance.accepted:
-            raise ValidationError("Can't delete an accepted offer")
+            raise ValidationError("You can't delete an accepted offer")
         super().perform_destroy(instance)
