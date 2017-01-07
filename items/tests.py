@@ -7,6 +7,7 @@ from rest_framework import status
 
 from items.models import *
 from users.models import *
+from swapp import settings
 
 
 class CategoryTests(TestCase):
@@ -34,6 +35,8 @@ class ItemTests(TestCase):
 
 
 class ImageAPITests(TestCase):
+    image_file_delete_path = "%s/%s" % (settings.MEDIA_ROOT, "delete_image.png")
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -46,11 +49,11 @@ class ImageAPITests(TestCase):
     def login(self):
         self.client.login(username="username", password="password")
 
-    def post_image(self, item_id=1):
+    def post_image(self, image_name="test.png", item_id=1):
         image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
+        image.save(image_name)
 
-        with open("test.png", "rb") as data:
+        with open(image_name, "rb") as data:
             return self.client.post("/api/images/", {"image": data, "item": item_id}, format="multipart")
 
     def delete_image(self, image_id=1):
@@ -90,13 +93,15 @@ class ImageAPITests(TestCase):
 
     def test_delete_image(self):
         self.login()
-        r = self.post_image()
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.post_image(image_name="delete_image.png")
+
+        self.assertEqual(Image.objects.count(), 1)
 
         r = self.delete_image()
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(Image.objects.count(), 0)
+        self.assertRaises(FileNotFoundError, open, self.image_file_delete_path, "rb")
 
         r = self.delete_image(image_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
