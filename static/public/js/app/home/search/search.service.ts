@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Headers, Http, Response, URLSearchParams} from '@angular/http';
+import { Http, Response, URLSearchParams} from '@angular/http';
 
 import { Category } from './category';
 import {Search} from "./search";

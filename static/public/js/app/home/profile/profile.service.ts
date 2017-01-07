@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { Subject }    from 'rxjs/Subject';
+import { Response } from '@angular/http';
 
 @Injectable()
 export class ProfileService {
 
-    constructor(private http: Http) {
+    constructor() {
     }
 
     // We must add csrftoken in header manually when we user XMLHttpRequest.
@@ -35,7 +34,7 @@ export class ProfileService {
     }
 
     // Get cookie value from its name
-    getCookie(name): string {
+    getCookie(name: string): string {
         let value = "; " + document.cookie;
         let parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();

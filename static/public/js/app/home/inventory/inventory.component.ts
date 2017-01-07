@@ -7,10 +7,9 @@ import {
     state,
     style,
     transition,
-    animate, OnChanges,
+    animate,
 } from '@angular/core';
 import { __platform_browser_private__,
-    SafeResourceUrl,
     DomSanitizer } from '@angular/platform-browser';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
@@ -21,7 +20,7 @@ import { ItemsService } from '../items/items.service';
 import {Subscription} from "rxjs";
 import {User} from "../profile/user";
 
-declare var $:any;
+export let $: any;
 
 @Component({
     moduleId: module.id,
@@ -85,7 +84,7 @@ export class InventoryComponent implements OnInit {
         this.itemsService.getDetailedItem(+$event).then(
             item => {
                 let inventoryItem = new InventoryItem(item.id, item.name, item.image_urls[0], item.creation_date);
-                inventoryItem.safeImage = this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image);
+                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image);
                 this.inventory.push(inventoryItem);
             },
             error => this.toastr.error("Can't get item " + $event, "Error")

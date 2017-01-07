@@ -249,7 +249,7 @@ export class AddItemModalComponent implements OnInit {
             // Start reading this file
             this.readFile(files[index], reader, (result: string) => {
                 // Create an img element and add the image file data to it
-                var img = document.createElement("img");
+                const img = document.createElement("img");
                 img.src = result;
                 
                 // Send this img to the resize function (and wait for callback)
@@ -275,8 +275,8 @@ export class AddItemModalComponent implements OnInit {
         // This will wait until the img is loaded before calling this function
         return img.onload = () => {
             // Get the images current width and height
-            var width = img.width;
-            var height = img.height;
+            let width = img.width;
+            let height = img.height;
             
             // Set the WxH to fit the Max values (but maintain proportions)
             if (width > height) {
@@ -292,18 +292,18 @@ export class AddItemModalComponent implements OnInit {
             }
             
             // create a canvas object
-            var canvas = document.createElement("canvas");
+            const canvas = document.createElement("canvas");
 
             // Set the canvas to the new calculated dimensions
             canvas.width = width;
             canvas.height = height;
-            var ctx = canvas.getContext("2d");  
+            const ctx = canvas.getContext("2d");
 
             ctx.drawImage(img, 0, 0,  width, height); 
             
             // Get this encoded as a jpeg
             // IMPORTANT: 'jpeg' NOT 'jpg'
-            var dataUrl = canvas.toDataURL('image/jpeg'); // TODO : png
+            const dataUrl = canvas.toDataURL('image/jpeg'); // TODO : png
             
             // callback with the results
             callback(dataUrl, img.src.length, dataUrl.length);

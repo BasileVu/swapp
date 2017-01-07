@@ -1,5 +1,3 @@
-import {SafeUrl} from "@angular/platform-browser";
-
 export class UserInventoryItem {
     id: number;
     image_url: string;

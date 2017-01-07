@@ -101,65 +101,6 @@ export class ProfileComponent implements OnInit {
                 } else {
                     this.toastr.success("Welcome " + $event[0].username + " !", "Login succeed");
                     this.getAccount();
-
-                    setTimeout(function(){
-
-                        // open user edition modal /////////////////////
-                        var openUpdateProfileButtons = $('.open-update-profile-modal');
-                        var updateProfileModal = $('#update-user-modal');
-                        openUpdateProfileButtons.each(function () {
-                            $(this).click(function () {
-                                updateProfileModal.modal('show');
-                            });
-                        });
-
-                        // open user profile modal /////////////////////
-                        var openProfileButtons = $('.open-profile-modal');
-                        var profileModal = $('#user-profile-modal');
-                        openProfileButtons.each(function () {
-                            $(this).click(function () {
-                                profileModal.modal('show');
-                            });
-                        });
-                        profileModal.on('show.bs.modal', function (e) {
-                            setTimeout(function () {
-                                //inventory.flickity('resize');
-
-                                // profile map
-                                var map = new google.maps.Map(document.getElementById('profile-map'), {
-                                    center: {lat: -34.197, lng: 150.844},
-                                    scrollwheel: false,
-                                    zoom: 8
-                                });
-                                var marker = new google.maps.Marker({
-                                    map: map,
-                                    position: {lat: -34.197, lng: 150.844}
-                                });
-                                var infowindow = new google.maps.InfoWindow({
-                                    content: '<h3 class="map-title">Adresse complète</h3>'
-                                });
-                                infowindow.open(map, marker);
-                            }, 300)
-                        });
-
-                        // open notif modal /////////////////////
-                        var openNotifButtons = $('.open-notif-modal');
-                        var notifModal = $('#notification-modal');
-                        openNotifButtons.each(function () {
-                            $(this).click(function () {
-                                notifModal.modal('show');
-                            });
-                        });
-
-                        // open accept proposition modal /////////////////////
-                        var openAcceptPropositionButtons = $('.open-accept-proposition-modal');
-                        var acceptPropositionModal = $('#accept-proposition-modal');
-                        openAcceptPropositionButtons.each(function () {
-                            $(this).click(function () {
-                                acceptPropositionModal.modal('show');
-                            });
-                        });
-                    }, 100);
                 }
 
             },
@@ -179,6 +120,67 @@ export class ProfileComponent implements OnInit {
                     error => this.toastr.error("Can't get User public profile", "Error")
                 );
 
+                // Inform subscribed components of the account
+                this.authService.selectAccount(this.user);
+
+                setTimeout(function(){
+
+                    // open user edition modal /////////////////////
+                    const openUpdateProfileButtons = $('.open-update-profile-modal');
+                    const updateProfileModal = $('#update-user-modal');
+                    openUpdateProfileButtons.each(function () {
+                        $(this).click(function () {
+                            updateProfileModal.modal('show');
+                        });
+                    });
+
+                    // open user profile modal /////////////////////
+                    const openProfileButtons = $('.open-profile-modal');
+                    const profileModal = $('#user-profile-modal');
+                    openProfileButtons.each(function () {
+                        $(this).click(function () {
+                            profileModal.modal('show');
+                        });
+                    });
+                    profileModal.on('show.bs.modal', function (e: any) {
+                        setTimeout(function () {
+                            //inventory.flickity('resize');
+
+                            // profile map
+                            const map = new google.maps.Map(document.getElementById('profile-map'), {
+                                center: {lat: -34.197, lng: 150.844},
+                                scrollwheel: false,
+                                zoom: 8
+                            });
+                            const marker = new google.maps.Marker({
+                                map: map,
+                                position: {lat: -34.197, lng: 150.844}
+                            });
+                            const infowindow = new google.maps.InfoWindow({
+                                content: '<h3 class="map-title">Adresse complète</h3>'
+                            });
+                            infowindow.open(map, marker);
+                        }, 300)
+                    });
+
+                    // open notif modal /////////////////////
+                    const openNotifButtons = $('.open-notif-modal');
+                    const notifModal = $('#notification-modal');
+                    openNotifButtons.each(function () {
+                        $(this).click(function () {
+                            notifModal.modal('show');
+                        });
+                    });
+
+                    // open accept proposition modal /////////////////////
+                    const openAcceptPropositionButtons = $('.open-accept-proposition-modal');
+                    const acceptPropositionModal = $('#accept-proposition-modal');
+                    openAcceptPropositionButtons.each(function () {
+                        $(this).click(function () {
+                            acceptPropositionModal.modal('show');
+                        });
+                    });
+                }, 100);
             },
             error => this.toastr.error(error, "Error")
         );

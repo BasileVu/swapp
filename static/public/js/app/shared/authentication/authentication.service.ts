@@ -4,6 +4,8 @@ import { Subject }    from 'rxjs/Subject';
 
 import { User } from '../../home/profile/user';
 import { Account } from "../../home/profile/account";
+import {UserCreationDTO} from "../../home/profile/user-creation-dto";
+import {UserLoginDTO} from "../../home/profile/user-login-dto";
 
 @Injectable()
 export class AuthService {
@@ -14,13 +16,16 @@ export class AuthService {
     // Sauver l'utilisateur lors du login et créer des méthodes à disposition des composants
     // pour récupérer cet utilisateur quand nécessaire
     private user: User;
+    private account: Account;
 
     // Observable source
     private loggedInSelectedSource = new Subject<boolean>();
     private userSelectedSource = new Subject<User>();
+    private accountSelectedSource = new Subject<Account>();
     // Observable boolean streams
     loggedInSelected$ = this.loggedInSelectedSource.asObservable();
     userSelected$ = this.userSelectedSource.asObservable();
+    accountSelected$ = this.accountSelectedSource.asObservable();
 
     constructor(private http: Http) {
         this.loggedIn = false;
@@ -34,6 +39,10 @@ export class AuthService {
     selectUser(user: User) {
         this.userSelectedSource.next(user);
     }
+
+    selectAccount(account: Account) {
+        this.accountSelectedSource.next(account);
+    }
     
     isLoggedIn():boolean {
         return this.loggedIn;
@@ -45,7 +54,7 @@ export class AuthService {
         .catch(this.handleError);
     }
     
-    login(userLoginDTO): Promise<any> {
+    login(userLoginDTO: UserLoginDTO): Promise<any> {
         let body = JSON.stringify(userLoginDTO); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option
@@ -56,7 +65,7 @@ export class AuthService {
             .catch(this.handleError);
     }
 
-    register(userCreationDTO): Promise<any> {
+    register(userCreationDTO: UserCreationDTO): Promise<any> {
         let body = JSON.stringify(userCreationDTO); // Stringify payload
         let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         let options = new RequestOptions({ headers: headers }); // Create a request option
@@ -102,11 +111,6 @@ export class AuthService {
         return user;
     }
 
-    getUser() {
-        if (this.loggedIn)
-            return this.user;
-    }
-
     private handleError (error: Response | any) {
         // TODO : In a real world app, we might use a remote logging infrastructure
         let errMsg: string;
@@ -118,10 +122,5 @@ export class AuthService {
         }
         console.error(errMsg);
         return Promise.reject(errMsg);
-    }
-
-    checkCredentials() {
-        //return localStorage.getItem("user") !== null;
-        return true;
     }
 }

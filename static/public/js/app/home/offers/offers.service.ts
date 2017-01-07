@@ -49,11 +49,6 @@ export class OfferService {
         return Promise.reject(errMsg);
     }
 
-    checkCredentials() {
-        //return localStorage.getItem("user") !== null;
-        return true;
-    }
-
     cloneUser(user: User): User {
         let u = new User();
         u.id = user.id;

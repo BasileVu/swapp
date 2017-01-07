@@ -114,10 +114,10 @@ export class CreateAccountModalComponent implements OnInit {
     }
 
     fileChangeListener($event: any) {
-        var image:any = new Image();
+        const image: any = new Image();
         this.file = $event.target.files[0];
-        var myReader:FileReader = new FileReader();
-        var that = this;
+        const myReader: FileReader = new FileReader();
+        const that = this;
         myReader.onloadend = function (loadEvent:any) {
             image.src = loadEvent.target.result;
             that.cropper.setImage(image);

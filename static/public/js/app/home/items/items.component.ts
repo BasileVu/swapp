@@ -7,7 +7,7 @@ import { DetailedItem } from './detailed-item';
 import {Subscription} from "rxjs";
 import {AuthService} from "../../shared/authentication/authentication.service";
 
-declare var $:any;
+export let $: any;
 
 @Component({
     moduleId: module.id,
@@ -17,9 +17,7 @@ declare var $:any;
 })
 export class ItemsComponent implements OnInit, OnChanges {
 
-    errorMessage: string = "No items available for now";
     items: Array<DetailedItem> = [];
-    selectedItem: DetailedItem;
     loggedIn: boolean;
     subscription: Subscription;
 

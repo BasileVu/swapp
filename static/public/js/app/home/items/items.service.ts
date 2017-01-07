@@ -19,8 +19,6 @@ export class ItemsService {
 
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
-    ownerSelected$ = this.userSelectedSource.asObservable();
-    commentsSelected$ = this.commentsSelectedSource.asObservable();
 
     private itemsSubject: Subject<DetailedItem[]> = new Subject<DetailedItem[]>();
 

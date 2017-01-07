@@ -124,7 +124,7 @@ export class SendPropositionModalComponent implements OnInit {
         this.offerService.sendOffer(offer).then(
             res => this.toastr.success("to " + ownerFullname, "Offer sent"),
             error => {
-                this.toastr.error(error, "Error")
+                this.toastr.error(error, "Error");
                 this.displayMessage = false;
             }
         );

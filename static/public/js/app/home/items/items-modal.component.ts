@@ -57,7 +57,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 private sanitizer: DomSanitizer,
-                public toastr: ToastsManager) { }
+                public toastr: ToastsManager) {console.log("construcot"); }
 
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors
@@ -159,7 +159,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     }
 
     fillStars(note_avg: number) {
-        let fullStars = Math.floor(note_avg)
+        let fullStars = Math.floor(note_avg);
         this.stars = Array(fullStars).fill(1);
         this.stars.push(Math.round( (note_avg % 1) * 2) / 2);
         let size = this.stars.length;
