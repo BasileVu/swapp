@@ -1,13 +1,12 @@
 import json
 
-from PIL import Image as ImagePil
-from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from rest_framework import status
 
 from items.models import *
-from users.models import *
 from swapp import settings
+from users.models import *
 
 
 class CategoryTests(TestCase):
@@ -50,10 +49,7 @@ class ImageAPITests(TestCase):
         self.client.login(username="username", password="password")
 
     def post_image(self, image_name="test.png", item_id=1):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save(image_name)
-
-        with open(image_name, "rb") as data:
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
             return self.client.post("/api/images/", {"image": data, "item": item_id}, format="multipart")
 
     def delete_image(self, image_id=1):
