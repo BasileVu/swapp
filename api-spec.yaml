@@ -506,7 +506,7 @@ paths:
           
   /items/{id}/:
     get:
-      description: "Gets a detailed unarchived item."
+      description: "Gets a detailed item."
       parameters:
         - in: path
           name: id
@@ -590,6 +590,36 @@ paths:
                   type: string
                 user_profile_picture:
                   type: string
+                  
+  /items/{id}/archive/:
+    post:
+      description: "Archives a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /items/{id}/restore/:
+    post:
+      description: "Restores a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
                   
   /comments/:
     post:

@@ -220,6 +220,22 @@ class ItemViewSet(mixins.CreateModelMixin,
     def comments(self, request, pk=None):
         return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.order_by("-date"), many=True).data)
 
+    @detail_route(methods=["POST"])
+    def archive(self, request, pk=None):
+        item = Item.objects.get(pk=pk)
+        item.archived = True
+        item.save()
+
+        return Response()
+
+    @detail_route(methods=["POST"])
+    def restore(self, request, pk=None):
+        item = Item.objects.get(pk=pk)
+        item.archived = False
+        item.save()
+
+        return Response()
+
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
