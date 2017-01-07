@@ -398,41 +398,41 @@ class ArchiveRestoreItemTests(ItemBaseTest):
         r = self.restore_item()
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # def test_archive_item(self):
-    #     r = self.archive_item()
-    #     self.assertEqual(r.status_code, status.HTTP_200_OK)
-    #
-    #     r = self.get_item()
-    #     self.assertEqual(r.data["archived"], True)
-    #
-    # def test_restore_item(self):
-    #     self.archive_item()
-    #     r = self.restore_item()
-    #     self.assertEqual(r.status_code, status.HTTP_200_OK)
-    #
-    #     r = self.get_item()
-    #     self.assertEqual(r.data["archived"], False)
-    #
-    # def test_archive_items(self):
-    #     self.archive_item()
-    #     self.archive_item(item_id=2)
-    #
-    #     r = self.get_item()
-    #     self.assertEqual(r.data["archived"], True)
-    #     r = self.get_item(item_id=2)
-    #     self.assertEqual(r.data["archived"], True)
-    #     r = self.get_item(item_id=3)
-    #     self.assertEqual(r.data["archived"], False)
-    #
-    # def test_restore_items(self):
-    #     self.archive_item()
-    #     self.archive_item(item_id=2)
-    #     self.restore_item()
-    #     self.restore_item(item_id=2)
-    #
-    #     r = self.get_item()
-    #     self.assertEqual(r.data["archived"], False)
-    #     r = self.get_item(item_id=2)
-    #     self.assertEqual(r.data["archived"], False)
-    #     r = self.get_item(item_id=3)
-    #     self.assertEqual(r.data["archived"], False)
+    def test_archive_item(self):
+        r = self.archive_item()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+
+    def test_restore_item(self):
+        self.archive_item()
+        r = self.restore_item()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+
+    def test_archive_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], True)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)
+
+    def test_restore_items(self):
+        self.archive_item()
+        self.archive_item(item_id=2)
+        self.restore_item()
+        self.restore_item(item_id=2)
+
+        r = self.get_item()
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=2)
+        self.assertEqual(r.data["archived"], False)
+        r = self.get_item(item_id=3)
+        self.assertEqual(r.data["archived"], False)
