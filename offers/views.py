@@ -25,8 +25,11 @@ def refuse_and_delete_pending_offers(item, offer_id):
     :param item: the item on which to refuse and delete offers.
     :param offer_id: the id of the offer to exclude when refusing and deleting.
     """
-    map(refuse_offer, item.offers_received.filter(~Q(pk=offer_id), answered=False))
-    map(delete_offer, item.offers_done.filter(~Q(pk=offer_id), answered=False))
+    for o in item.offers_received.filter(~Q(pk=offer_id), answered=False):
+        refuse_offer(o)
+
+    for o in item.offers_done.filter(~Q(pk=offer_id), answered=False):
+        delete_offer(o)
 
 
 class OfferViewSet(mixins.CreateModelMixin,
