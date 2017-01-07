@@ -138,9 +138,9 @@ class AccountAPITests(TestCase):
             "password": password
         }), content_type="application/json")
 
-    def post_image(self, image_name="test.png", user_id=1):
+    def post_image(self, image_name="test.png"):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "user": user_id}, format="multipart")
+            return self.client.post("/api/account/image/", {"image": data}, format="multipart")
 
     def patch_interested_by_categories(self, interested_by=[]):
         return self.client.patch("/api/account/categories/", data=json.dumps({
@@ -617,7 +617,7 @@ class LocationCoordinatesTests(TestCase):
 class PublicAccountInfoTests(TestCase):
     def post_image(self, image_name="test.png", item_id=1):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "item": item_id}, format="multipart")
+            return self.client.post("/api/items/%d/images/" % item_id, {"image": data}, format="multipart")
 
     def setUp(self):
         self.user = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",

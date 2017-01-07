@@ -52,7 +52,8 @@ class ImageAPITests(TestCase):
 
     def post_image(self, image_name="test.png", item_id=1):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
-            return self.client.post(self.images_url, {"image": data, "item": item_id}, format="multipart")
+            return self.client.post("%s%d/%s/" % (self.items_url, item_id, "images"), {"image": data},
+                                    format="multipart")
 
     def delete_image(self, image_id=1):
         return self.client.delete("%s%d/" % (self.images_url, image_id), content_type="application/json")
