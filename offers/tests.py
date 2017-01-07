@@ -78,6 +78,13 @@ class OfferAPITests(TestCase):
         r = self.post_offer(self.item1, self.item2)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_cannot_create_offer_if_already_offer_created_with_wanted_item_for_this_item(self):
+        self.post_offer(self.item1, self.item2)
+
+        self.login2()
+        r = self.post_offer(self.item2, self.item1)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_cannot_create_offer_for_traded_item(self):
         self.item2.traded = True
         self.item2.save()

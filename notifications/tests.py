@@ -147,14 +147,12 @@ class NotificationAPITest(TestCase):
 
         self.login2()
         self.post_offer(self.item5, self.item3)
-        self.post_offer(self.item7, self.item1)
 
-        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.count(), 3)
         self.assertEqual(Notification.objects.get(pk=3).user.username, "user1")
-        self.assertEqual(OfferNotification.objects.count(), 4)
+        self.assertEqual(OfferNotification.objects.count(), 3)
         self.assertEqual(OfferNotification.objects.get(pk=3).offer.id, 3)
-        self.assertEqual(OfferNotification.objects.get(pk=4).offer.id, 4)
-        self.assertEqual(NewOfferNotification.objects.count(), 4)
+        self.assertEqual(NewOfferNotification.objects.count(), 3)
 
     def test_offer_accepted_notification(self):
         self.login1()
