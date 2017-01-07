@@ -61,7 +61,6 @@ class ItemBaseTest(TestCase):
             "category": category,
             "keyinfo_set": keyinfo_set if keyinfo_set is not None else self.default_keyinfo_set,
             "delivery_methods": delivery_methods if delivery_methods is not None else self.default_delivery_methods
-
         }
 
     def post_item(self, **kwargs):
@@ -70,6 +69,14 @@ class ItemBaseTest(TestCase):
 
     def login(self, username="username", password="password"):
         self.client.login(username=username, password=password)
+
+    def login1(self):
+        self.client.logout()
+        self.client.login(username="username1", password="password")
+
+    def login2(self):
+        self.client.logout()
+        self.client.login(username="username2", password="password")
 
     def get_item(self, item_id=1):
         return self.client.get("%s%d/" % (self.url, item_id), content_type="application/json")
@@ -149,6 +156,8 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["owner_location"], "city, country")
         self.assertNotEqual(r.data["owner_picture_url"], None)
         self.assertIn("image_urls", r.data)
+        self.assertEqual(r.data["traded"], False)
+        self.assertEqual(r.data["archived"], False)
 
     def test_get_item_not_existing(self):
         r = self.get_item(item_id=10)
@@ -172,12 +181,7 @@ class ItemPatchTests(ItemBaseTest):
     def setUp(self):
         super().setUp()
         self.login()
-        self.post_item()
-
-    def create_test(self, key, value):
-        r = self.patch_item(name=value)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data[key], value)
+        self.item = Item.objects.get(pk=self.post_item().data["id"])
 
     def test_patch_item_not_logged_in(self):
         self.client.logout()
@@ -242,7 +246,42 @@ class ItemPatchTests(ItemBaseTest):
         self.assertEquals(r.data["price_min"], 1)
 
     def test_cannot_set_max_price_smaller_than_min_price(self):
-        r = self.patch_item(item_id=1, price_max=0)
+        r = self.patch_item(price_max=0)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_can_edit_item_with_refused_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=i2, item_received=self.item, answered=True, accepted=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+    def test_cannot_edit_item_with_pending_initiated_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=i2, item_received=self.item, answered=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_with_pending_offers(self):
+        i2 = Item.objects.create(owner=self.another_user, price_min=1, price_max=2, category=self.c1)
+        Offer.objects.create(item_given=self.item, item_received=i2, answered=False)
+
+        r = self.patch_item(self.item.id, description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_if_traded(self):
+        self.item.traded = True
+        self.item.save()
+
+        r = self.patch_item(description="test2")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_edit_item_if_archived(self):
+        self.item.archived = True
+        self.item.save()
+
+        r = self.patch_item(description="test2")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 

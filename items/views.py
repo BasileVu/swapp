@@ -38,7 +38,7 @@ def filter_items(data, user):
 
     queryset = Item.objects.filter(
         Q(name__icontains=q) | Q(description__icontains=q),
-        price_min__gte=price_min, archived=False
+        price_min__gte=price_min, traded=False, archived=False
     )
 
     if user.is_authenticated:
@@ -123,7 +123,7 @@ def num_offers_points(n_offers, mean_offer_number):
 
 
 def build_item_suggestions(user):
-    queryset = Item.objects.filter(archived=False)
+    queryset = Item.objects.filter(traded=False, archived=False)
 
     if user.is_authenticated:
         lon = user.coordinates.longitude
@@ -241,10 +241,24 @@ class ItemViewSet(mixins.CreateModelMixin,
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
+        item = serializer.instance
+
+        if item.traded:
+            raise ValidationError("Can't update a traded item")
+
+        if item.archived:
+            raise ValidationError("Can't update an archived item")
+
+        offers_received_pending = item.offers_received.filter(answered=False)
+        offers_done_pending = item.offers_done.filter(answered=False)
+
+        if offers_done_pending.count() > 0 or offers_received_pending.count() > 0:
+            raise ValidationError("Can't update an item with pending offers")
+
         price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)
         price_max = serializer.validated_data.get("price_max", serializer.instance.price_max)
-
         check_prices(price_min, price_max)
+
         serializer.save()
 
 
