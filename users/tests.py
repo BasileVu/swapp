@@ -184,8 +184,8 @@ class AccountAPITests(TestCase):
             "region": ""
         })
         self.assertNotEqual(r.data["last_modification_date"], "")
-        self.assertListEqual(r.data["categories"], ["category"])
-        self.assertListEqual(r.data["items"], [1])
+        self.assertEqual(r.data["categories"], [{"id": 1, "name": "category"}])
+        self.assertEqual(r.data["items"], [1])
         self.assertEqual(r.data["notes"], 1)
 
     def test_update_account_not_logged_in(self):

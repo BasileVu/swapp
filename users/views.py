@@ -118,7 +118,7 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "email": user.email,
             "location": LocationSerializer(user.location).data,
             "last_modification_date": user_profile.last_modification_date,
-            "categories": [c.name for c in user_profile.categories.all()],
+            "categories": CategorySerializer(user_profile.categories.all(), many=True).data,
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
             "note_avg": user.userprofile.note_avg
