@@ -276,6 +276,21 @@ paths:
         401:
           description: "User not authenticated."
           
+  /account/image/:
+    post:
+      description: "Creates a new image for the user profile. The encoding must be **multipart/form-data**."
+      parameters:
+      - in: formData
+        name: image
+        description: "The image to upload."
+        required: true
+        type: file
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
   /notes/:
     post:
       description: "Creates a new note."
@@ -620,6 +635,26 @@ paths:
           description: "Successful operation."
         401:
           description: "User not authenticated."
+          
+  /items/{id}/images/:
+    post:
+      description: "Creates a new image for an item. The encoding must be **multipart/form-data**."
+      parameters:
+      - in: path
+        name: id
+        description: "The id of the item."
+        required: true
+        type: number
+      - in: formData
+        name: image
+        description: "The image to upload."
+        required: true
+        type: file
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
                   
   /comments/:
     post:
@@ -805,37 +840,9 @@ paths:
         401:
           description: "User not authenticated."
           
-  /images/:
-    post:
-      description: "Creates a new image, either for an item or for an user, according to the payload. The encoding must be **multipart/form-data**."
-      parameters:
-        - in: formData
-          name: image
-          description: "The image to updload."
-          required: true
-          type: file
-        - in: formData
-          name: item
-          description: 
-            "The id of the item that will be linked to the image. If this parameter is specified, the image will be linked to the item."
-          required: false
-          type: number
-        - in: formData
-          name: user
-          description: "The id of the user having the account. If this parameter is specified, the image will be the user's picture."
-          required: false
-          type: number
-      responses:
-        201:
-          description: "Successful operation."
-        400:
-          description: "The item field or the user field is missing."
-        401:
-          description: "User not authenticated."
-          
   /images/{id}/:
     delete:
-      description: "Deletes the specified image."
+      description: "Deletes the specified image (associated with an item)."
       parameters:
         - in: path
           name: id
