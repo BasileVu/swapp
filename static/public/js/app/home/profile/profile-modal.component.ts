@@ -1,4 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {AuthService} from "../../shared/authentication/authentication.service";
+import {Subscription} from "rxjs";
 
 @Component({
     moduleId: module.id,
@@ -9,8 +11,14 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 
 export class ProfileModalComponent implements OnInit {
 
-    constructor() {}
+    private loggedIn: boolean;
+    subscription: Subscription;
+
+    constructor(private authService : AuthService) {}
 
     ngOnInit() {
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => this.loggedIn = loggedIn
+        );
     }
 }
