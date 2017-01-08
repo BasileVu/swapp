@@ -91,6 +91,21 @@ export class InventoryComponent implements OnInit {
         );
     }
 
+    // We receive the id of the item to edit in the inventory
+    editItemEvent($event: number) {
+        this.itemsService.getDetailedItem(+$event).then(
+            item => {
+                console.log(item);
+                let inventoryItem = this.inventory.find(i => i.id === item.id);
+                inventoryItem.archived = item.archived;
+                inventoryItem.name = item.name;
+                inventoryItem.image_id = item.images[0].id;
+                inventoryItem.image_url = item.images[0].url;
+                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
+            },
+            error => this.toastr.error("Can't get item " + $event, "Error")
+        );
+    }
     // We receive the id of the item to add to the inventory
     archive(item: InventoryItem) {
         this.itemsService.archiveItem(item.id).then(

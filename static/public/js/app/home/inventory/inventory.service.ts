@@ -65,6 +65,29 @@ export class InventoryService {
             .catch(this.handleError);
     }
 
+    deleteImage(imageId: number) {
+        let csrftoken: string = this.profileService.getCookie("csrftoken");
+
+        return new Promise(function (resolve, reject) {
+            let req = new XMLHttpRequest();
+            req.open("DELETE", "/api/images/" + imageId + "/");
+            req.setRequestHeader("enctype", "multipart/form-data");
+            req.setRequestHeader("X-CSRFToken", csrftoken);
+            req.send();
+
+            req.onreadystatechange = () => {
+                if(req.readyState === 4) {
+                    if(req.status === 204 || req.status === 200) {
+                        resolve(req.response);
+                    } else {
+                        reject(req.response);
+                    }
+                }
+            }
+        })
+            .catch(this.handleError);
+    }
+
     private extractData(res: Response) {
         let body = res.json();
         return body || { };
