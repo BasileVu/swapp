@@ -36,9 +36,6 @@ export class ProfileModalComponent implements OnInit {
                             this.user = account;
                             this.fillStars(account.note_avg);
 
-                            console.log(account);
-                            console.log(this.user);
-
                             const profileModal = $('#user-profile-modal');
                             profileModal.on('show.bs.modal', function (e: any) {
                                 setTimeout(function () {

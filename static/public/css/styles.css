@@ -5742,11 +5742,11 @@ input[type=file] {
   #user-profile-modal .infos img {
     margin: 20px 0; }
 #user-profile-modal .personal-inventory {
-  margin: 30px 5px; }
+  margin: 30px 5px 0; }
 #user-profile-modal ol {
   margin-top: 30px; }
 #user-profile-modal .inventory-separation {
-  margin: -27px -5px 0;
+  margin: 30px -5px 0;
   border-top: 1px solid #eed5a9; }
 #user-profile-modal #profile-map {
   height: 400px; }
