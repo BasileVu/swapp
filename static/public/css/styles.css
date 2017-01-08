@@ -5519,7 +5519,14 @@ hr {
     color: #d9534f;
     position: absolute;
     top: 3px;
-    right: 13px; }
+    right: 15px; }
+  .carousel-cell a.edit {
+    border: none;
+    text-align: center;
+    color: #d9534f;
+    position: absolute;
+    top: 3px;
+    left: 3px; }
 
 .modal {
   cursor: zoom-out;
