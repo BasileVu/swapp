@@ -154,6 +154,8 @@ paths:
                 type: number
               note_avg:
                 type: number
+              coordinates:
+                $ref: "#/definitions/Coordinates"
                 
         401:
           description: "User is not authenticated."
@@ -1076,6 +1078,14 @@ paths:
           
                
 definitions:
+  Coordinates:
+    type: object
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+
   UserCreation:
     type: object
     properties:
@@ -1318,6 +1328,8 @@ definitions:
         type: string
       owner_location:
         type: string
+      owner_coordinates:
+        $ref: "#/definitions/Coordinates"
       traded:
         type: boolean
       archived:
