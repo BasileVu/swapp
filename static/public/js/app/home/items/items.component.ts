@@ -54,7 +54,8 @@ export class ItemsComponent implements OnInit, OnChanges {
         this.itemsService.getItems()
             .then(
                 items => {
-                    this.items = items;
+                    this.items = [];
+                    this.items = items
                 },
                 error => this.toastr.error(error, "Error")
             );

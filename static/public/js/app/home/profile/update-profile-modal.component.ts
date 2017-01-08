@@ -362,5 +362,4 @@ export class UpdateProfileModalComponent implements OnInit {
 
         myReader.readAsDataURL(this.file);
     }
-
 }

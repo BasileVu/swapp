@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     "offers",
     "search",
     "users",
-    "menus.header_menu",
 ]
 
 MIDDLEWARE = [

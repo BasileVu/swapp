@@ -409,17 +409,6 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "username")
-
-        self.client.get(self.logout_url)
-        self.login(username="username2", password="pass2")
-
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "username2")
-
     def test_two_users_cant_have_same_username_update_put(self):
         User.objects.create_user(username="username2", password="pass2")
 
@@ -433,44 +422,39 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_409_CONFLICT)
 
-        r = self.client.get(self.account_url)
+    def test_can_put_account_with_same_username_without_conflict(self):
+        r = self.client.put(self.account_url, data=json.dumps({
+            "username": "username",
+            "first_name": "firstname",
+            "last_name": "lastname",
+            "email": "newemail@newemail.com",
+            "is_active": True,
+            "location": "test"
+        }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "username")
 
-        self.client.get(self.logout_url)
-        self.login(username="username2", password="pass2")
-
-        r = self.client.get(self.account_url)
+    def test_can_patch_same_username_without_conflict(self):
+        r = self.client.patch(self.account_url, data=json.dumps({
+            "username": "username"
+        }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "username2")
 
     def test_update_malformed_email_logged_in(self):
         r = self.client.patch(self.account_url, data=json.dumps({
             "email": "test",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 1)
 
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["email"], "test@test.com")
-
-    def test_modification_date_user_logged_in(self):
+    def test_last_modification_date_on_update(self):
         r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         datetime = r.data["last_modification_date"]
 
-        r = self.client.patch(self.account_url, data=json.dumps({
+        self.client.patch(self.account_url, data=json.dumps({
             "email": "mail@mail.com",
         }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["email"], "mail@mail.com")
         self.assertGreaterEqual(r.data["last_modification_date"], datetime)
 
     def test_405_when_get_on_password(self):
