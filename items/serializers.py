@@ -47,6 +47,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class LikeSerializer(serializers.ModelSerializer):
     user = serializers.CharField(read_only=True)
+    date = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Like
