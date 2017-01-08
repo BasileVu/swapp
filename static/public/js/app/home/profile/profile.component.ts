@@ -151,26 +151,6 @@ export class ProfileComponent implements OnInit {
                             profileModal.modal('show');
                         });
                     });
-                    profileModal.on('show.bs.modal', function (e: any) {
-                        setTimeout(function () {
-                            //inventory.flickity('resize');
-
-                            // profile map
-                            const map = new google.maps.Map(document.getElementById('profile-map'), {
-                                center: {lat: -34.197, lng: 150.844},
-                                scrollwheel: false,
-                                zoom: 8
-                            });
-                            const marker = new google.maps.Marker({
-                                map: map,
-                                position: {lat: -34.197, lng: 150.844}
-                            });
-                            const infowindow = new google.maps.InfoWindow({
-                                content: '<h3 class="map-title">Adresse complète</h3>'
-                            });
-                            infowindow.open(map, marker);
-                        }, 300)
-                    });
 
                     // open notif modal /////////////////////
                     const openNotifButtons = $('.open-notif-modal');

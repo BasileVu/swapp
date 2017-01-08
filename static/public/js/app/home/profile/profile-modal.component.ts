@@ -3,6 +3,9 @@ import {AuthService} from "../../shared/authentication/authentication.service";
 import {Subscription} from "rxjs";
 import {Account} from "./account";
 
+declare let $: any;
+declare let google: any;
+
 @Component({
     moduleId: module.id,
     selector: 'profile-modal',
@@ -34,6 +37,28 @@ export class ProfileModalComponent implements OnInit {
                             this.fillStars(account.note_avg);
                         }
                     );
+
+                    const profileModal = $('#user-profile-modal');
+                    profileModal.on('show.bs.modal', function (e: any) {
+                        setTimeout(function () {
+                            //inventory.flickity('resize');
+
+                            // profile map
+                            const map = new google.maps.Map(document.getElementById('profile-map'), {
+                                center: {lat: -34.197, lng: 150.844},
+                                scrollwheel: false,
+                                zoom: 8
+                            });
+                            const marker = new google.maps.Marker({
+                                map: map,
+                                position: {lat: -34.197, lng: 150.844}
+                            });
+                            const infowindow = new google.maps.InfoWindow({
+                                content: '<h3 class="map-title">Adresse complèteeee</h3>'
+                            });
+                            infowindow.open(map, marker);
+                        }, 300)
+                    });
                 }
             }
         );
