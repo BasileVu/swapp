@@ -8,7 +8,6 @@ from rest_framework import status
 from items.models import Category, Item
 from notifications.models import Notification, OfferNotification, NewOfferNotification, AcceptedOfferNotification, \
     RefusedOfferNotification, CommentNotification, MessageNotification, NoteNotification
-from offers.models import Offer
 
 
 class NotificationAPITest(TestCase):

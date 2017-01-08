@@ -32,7 +32,6 @@ class AccountCreationAPITests(TestCase):
     def post_user(self, username="username", first_name="first_name", last_name="last_name", email="test@test.com",
                   password="password", password_confirmation="password",
                   street="Route de Cheseaux 1", city="Yverdon-les-Bains", region="VD", country="Switzerland"):
-
         return self.client.post(self.users_url, data=json.dumps({
             "username": username,
             "first_name": first_name,
@@ -199,6 +198,7 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["notes"], 1)
         self.assertEqual(r.data["note_avg"], 4)
         self.assertEqual(r.data["coordinates"], {"latitude": 4, "longitude": 4})
+        self.assertEqual(r.data["pending_offers"], [])
 
     def test_cannot_update_account_if_not_logged_in(self):
         self.client.logout()
@@ -457,6 +457,41 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data, [])
 
+    def test_get_pending_offers(self):
+        c1 = Category.objects.create(name="Test")
+
+        other_user = User.objects.create_user(username="user1", email="test@test.com",
+                                              password="password")
+
+        i1 = Item.objects.create(name="test1", description="test", price_min=50, price_max=60, owner=self.user,
+                                 category=c1)
+        i2 = Item.objects.create(name="test2", description="test", price_min=50, price_max=60, owner=other_user,
+                                 category=c1)
+        i3 = Item.objects.create(name="test3", description="test", price_min=50, price_max=60, owner=other_user,
+                                 category=c1)
+        i4 = Item.objects.create(name="test4", description="test", price_min=50, price_max=60, owner=other_user,
+                                 category=c1)
+        i5 = Item.objects.create(name="test4", description="test", price_min=50, price_max=60, owner=other_user,
+                                 category=c1)
+
+        now = timezone.now()
+
+        o1 = Offer.objects.create(comment="test", item_given=i1, item_received=i2,
+                                  creation_date=now + timezone.timedelta(seconds=4))
+        o2 = Offer.objects.create(comment="test", item_given=i1, item_received=i3,
+                                  creation_date=now + timezone.timedelta(seconds=3))
+        Offer.objects.create(answered=True, comment="test", item_given=i4, item_received=i1)
+        o4 = Offer.objects.create(comment="test", item_given=i5, item_received=i1,
+                                  creation_date=now + timezone.timedelta(seconds=1))
+
+        r = self.client.get(self.account_url)
+
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data["pending_offers"]), 3)
+        self.assertEqual(r.data["pending_offers"][0]["id"], o1.id)
+        self.assertEqual(r.data["pending_offers"][1]["id"], o2.id)
+        self.assertEqual(r.data["pending_offers"][2]["id"], o4.id)
+
 
 class CSRFTests(TestCase):
     client = Client(enforce_csrf_checks=True)
@@ -644,12 +679,13 @@ class NoteAPITests(TestCase):
         self.other_user = User.objects.create_user(username="user1", email="test@test.com",
                                                    password="password")
 
-        self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10, price_max=30)
+        self.myItem = self.create_item(c1, self.current_user, name="Shoes", description="My old shoes", price_min=10,
+                                       price_max=30)
         self.hisItem = self.create_item(c1, self.other_user, name="Shirt", description="My old shirt", price_min=5,
                                         price_max=30)
-        Offer.objects.create(id=1, accepted=1, answered=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(accepted=1, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
-        Offer.objects.create(id=2, accepted=0, answered=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(accepted=0, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
     def login(self):
@@ -789,7 +825,7 @@ class NoteAPITests(TestCase):
         self.assertEqual(r.data["note_avg"], 1)
 
     def test_user_avg_note_two_notes(self):
-        Offer.objects.create(id=3, accepted=1, answered=True, comment="test", item_given=self.myItem,
+        Offer.objects.create(accepted=1, answered=True, comment="test", item_given=self.myItem,
                              item_received=self.hisItem)
 
         self.login()
@@ -821,7 +857,6 @@ class ConsultationTests(TestCase):
         return self.client.get("%s%d/" % (self.items_url, id_item), content_type="application/json")
 
     def test_not_logged_user_consultation_should_do_nothing(self):
-
         r = self.get_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
