@@ -4,15 +4,15 @@
             <div class="col-xs-12">
                 <div class="modal-panel">
                     <div class="text-xs-center infos">
-                        <img class="avatar" src="http://loremflickr.com/200/200">
-                        <h1>Full Name</h1>
+                        <img width="200" class="avatar" src="{{ user.profile_picture_url }}">
+                        <h1>{{ user.first_name }} {{ user.last_name }}</h1>
                         <div class="evaluation">
-                            <i class="star fa fa-star"></i>
-                            <i class="star fa fa-star"></i>
-                            <i class="star fa fa-star"></i>
-                            <i class="star fa fa-star"></i>
-                            <i class="star fa fa-star-o"></i>
-                            (<a href="#">123 votes</a>)
+                            <span *ngFor="let star of stars" [ngSwitch]="star">
+                                <i *ngSwitchCase="0" class="star fa fa-star-o"></i>
+                                <i *ngSwitchCase="0.5" class="star fa fa-star-half-o"></i>
+                                <i *ngSwitchCase="1" class="star fa fa-star"></i>
+                            </span>
+                            (<a href="#">{{ user.notes }} votes</a>)
                         </div>
                     </div>
                     <hr>

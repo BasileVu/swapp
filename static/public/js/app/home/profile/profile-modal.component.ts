@@ -14,19 +14,37 @@ export class ProfileModalComponent implements OnInit {
 
     private loggedIn: boolean;
     user: Account;
+    stars: Array<number>;
     subscription: Subscription;
 
     constructor(private authService : AuthService) {}
 
     ngOnInit() {
+        this.user = new Account();
+        this.stars = [];
+
         this.subscription = this.authService.loggedInSelected$.subscribe(
-            loggedIn => this.loggedIn = loggedIn
-        );
-        this.authService.getAccount().then(
-            account => {
-                this.user = account;
-                console.log(account);
+            loggedIn => {
+                this.loggedIn = loggedIn;
+
+                if (loggedIn) {
+                    this.authService.getAccount().then(
+                        account => {
+                            this.user = account;
+                            this.fillStars(account.note_avg);
+                        }
+                    );
+                }
             }
         );
+    }
+
+    fillStars(note_avg: number) {
+        let fullStars = Math.floor(note_avg);
+        this.stars = Array(fullStars).fill(1);
+        this.stars.push(Math.round( (note_avg % 1) * 2) / 2);
+        let size = this.stars.length;
+        while (5 - size++ > 0)
+            this.stars.push(0);
     }
 }
