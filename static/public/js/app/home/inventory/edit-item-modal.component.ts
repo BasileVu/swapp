@@ -78,15 +78,15 @@ export class EditItemModalComponent implements OnInit {
     categories: Array<Category> = [];
     deliveryMethods: Array<DeliveryMethod> = [];
     userDeliveryMethods: Array<number> = [];
-    newItemId: number;
     
     // images
     file_srcs: Array<string> = [];
     files: Array<File> = [];
+    file_ids: Array<number> = [];
     data: any;
 
     // EventEmitter to inform subscribed components after an item creation
-    @Output() newItemEvent = new EventEmitter();
+    @Output() editItemEvent = new EventEmitter();
 
     // Form fields
     private editItemForm: FormGroup;
@@ -141,6 +141,7 @@ export class EditItemModalComponent implements OnInit {
 
                 // images
                 this.file_srcs = item.images.map(i => i.url);
+                this.file_ids = item.images.map(i => i.id);
 
                 this.editItemForm.patchValue({name: item.name});
                 this.editItemForm.patchValue({min_price: item.price_min});
@@ -149,12 +150,8 @@ export class EditItemModalComponent implements OnInit {
                 this.editItemForm.patchValue({description: item.description});
                 this.userDeliveryMethods = item.delivery_methods.map(d => d.id);
                 for(let deliveryMethod of this.userDeliveryMethods){
-                    console.log("SEARCHING DM");
                     let udm = this.deliveryMethods.find(d => d.id === deliveryMethod);
-
-                    console.log(" DM " + udm);
                     if(udm){
-                        console.log("UDM FOUND");
                         udm.desired = true;
                     }
                 }
@@ -216,6 +213,7 @@ export class EditItemModalComponent implements OnInit {
                         this.addImages(this.item.id);
                         this.toastr.success("Successfully updated the item", "Success")
                         $('#edit-item-modal').modal('hide');
+                        this.editItemEvent.emit(this.item.id);
                     },
                     error => this.toastr.error(error, 'Error'));
         }
@@ -239,7 +237,6 @@ export class EditItemModalComponent implements OnInit {
                     res => {
                         if (++filesUploaded === this.files.length) {
                             this.toastr.success('New item added to your inventory', 'Item editd!');
-                            this.newItemEvent.emit(this.newItemId);
                         }
                     },
                     error => this.toastr.error(error, "Error")
@@ -256,8 +253,22 @@ export class EditItemModalComponent implements OnInit {
     }
 
     removeImage(index: number) {
-        this.file_srcs.splice(index, 1);
-        this.files.splice(index, 1);
+        if(this.file_ids.length <= 1){
+            this.toastr.error("You must leave at least one image in the item!", "Error");
+        } else {
+            if (this.file_ids[index]) {
+                this.inventoryService.deleteImage(this.file_ids[index])
+                    .then( // now signal the ProfileComponent that we uploaded picture
+                        res => {
+                            this.toastr.success('Image successfully removed', 'Image removed!');
+                        },
+                        error => this.toastr.error(error, "Error")
+                    );
+            }
+            this.file_ids.splice(index, 1);
+            this.file_srcs.splice(index, 1);
+            this.files.splice(index, 1);
+        }
     }
   
     // Called when the user selects new files from the upload button
@@ -300,7 +311,8 @@ export class EditItemModalComponent implements OnInit {
                     // This is also the file you want to upload. (either as a
                     // base64 string or img.src = resized_jpeg if you prefer a file). 
                     this.file_srcs.push(resized_jpeg);
-                    
+                    this.file_ids.push(null);
+
                     // Read the next file;
                     this.readFiles(files, index+1);
                 });
