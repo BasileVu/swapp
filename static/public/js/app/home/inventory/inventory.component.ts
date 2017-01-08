@@ -7,7 +7,7 @@ import {
     state,
     style,
     transition,
-    animate,
+    animate, OnChanges,
 } from '@angular/core';
 import { __platform_browser_private__,
     DomSanitizer } from '@angular/platform-browser';
@@ -20,7 +20,7 @@ import { ItemsService } from '../items/items.service';
 import {Subscription} from "rxjs";
 import {User} from "../profile/user";
 
-export let $: any;
+declare let $: any;
 
 @Component({
     moduleId: module.id,
@@ -91,6 +91,42 @@ export class InventoryComponent implements OnInit {
         );
     }
 
+    // We receive the id of the item to edit in the inventory
+    editItemEvent($event: number) {
+        this.itemsService.getDetailedItem(+$event).then(
+            item => {
+                console.log(item);
+                let inventoryItem = this.inventory.find(i => i.id === item.id);
+                inventoryItem.archived = item.archived;
+                inventoryItem.name = item.name;
+                inventoryItem.image_id = item.images[0].id;
+                inventoryItem.image_url = item.images[0].url;
+                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
+            },
+            error => this.toastr.error("Can't get item " + $event, "Error")
+        );
+    }
+    // We receive the id of the item to add to the inventory
+    archive(item: InventoryItem) {
+        this.itemsService.archiveItem(item.id).then(
+            () => {
+                this.inventory.find(i => i.id == item.id).archived = true;
+            },
+            error => this.toastr.error("Error archiving the item " + item, "Error")
+        );
+    }
+
+    // We receive the id of the item to add to the inventory
+    restore(item: InventoryItem) {
+        this.itemsService.restoreItem(item.id).then(
+            () => {
+                this.inventory.find(i => i.id == item.id).archived = false;
+            },
+            error => this.toastr.error("Error restoring the item " + item, "Error")
+        );
+    }
+
+
     gotoDetail(item_id: number): void {
         console.log("clicked. item_id: " + item_id);
 
@@ -115,6 +151,19 @@ export class InventoryComponent implements OnInit {
             .then(
                 comments => {
                     service.selectComments(comments);
+                },
+                error => console.log(error));
+    }
+
+    gotoEdit(item_id: number): void {
+        console.log("clicked for edition. item_id: " + item_id);
+
+        let service = this.itemsService;
+        service.getDetailedItem(item_id)
+            .then(
+                item => {
+                    service.selectItem(item);
+                    $('#edit-item-modal').modal('show');
                 },
                 error => console.log(error));
     }
