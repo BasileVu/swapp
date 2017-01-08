@@ -10,11 +10,12 @@ import { AuthService } from '../../shared/authentication/authentication.service'
 import { OfferService } from '../offers/offers.service';
 
 import { DetailedItem } from './detailed-item';
-import {User, UserInventoryItem} from '../profile/user';
+import {User} from '../profile/user';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import { Subscription }   from 'rxjs/Subscription';
 import {Like} from "./like";
+import {InventoryItem} from "../inventory/inventory-item";
 
 declare let $: any;
 
@@ -43,7 +44,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     item: DetailedItem;
     owner: User;
-    ownerItems: Array<UserInventoryItem>;
+    ownerItems: Array<InventoryItem>;
     stars: Array<number>;
     comments: Array<Comment> = [];
     subscription: Subscription;

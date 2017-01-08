@@ -1,14 +1,4 @@
-export class UserInventoryItem {
-    id: number;
-    image_url: string;
-    name: string;
-
-    constructor() {
-        this.id = null;
-        this.image_url = null;
-        this.name = "";
-    }
-}
+import {InventoryItem} from "../inventory/inventory-item";
 
 export class User {
     id: number;
@@ -17,7 +7,7 @@ export class User {
     first_name: string;
     last_name: string;
     location: string;
-    items: Array<UserInventoryItem>;
+    items: Array<InventoryItem>;
     notes: number;
     note_avg: number;
     interested_by: Array<{id:number,name:string}>;

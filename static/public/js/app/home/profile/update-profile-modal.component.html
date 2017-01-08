@@ -2,7 +2,7 @@
     <div class="container" role="document">
         <div class="row content">
             <div class="col-xs-12">
-                <form class="modal-panel" [formGroup]="updateForm" (ngSubmit)="update()">
+                <form class="modal-panel" [formGroup]="updateForm" (ngSubmit)="updateAccount()">
                     <div class="row">
                         <div class="col-xs-12">
                             <h1>Create an account</h1>
@@ -23,20 +23,6 @@
                             <div class="pull-left">
                                 <img-cropper #cropper [image]="data" [settings]="cropperSettings" ></img-cropper>
                             </div>
-
-                            <div class="form-group row">
-                                <hr>
-                                <h3>Interested by</h3>
-                                <label class="col-sm-4 col-form-label">Categories</label>
-                                <div class="col-sm-8">
-                                    <div *ngFor="let category of categories" class="category-choice">
-                                        <label>
-                                            <input type="checkbox" class="form-check-input" value="{{ category.id }}" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
-                                            <span>{{ category.name }}</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="col-md-8 col-2">
@@ -48,15 +34,21 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="password" class="col-sm-3 col-form-label">Password</label>
+                                <label class="col-sm-3 col-form-label">Old Password</label>
                                 <div class="col-sm-9">
-                                    <input id="password" type="password" class="form-control" formControlName="password">
+                                    <input type="password" class="form-control" formControlName="oldPassword">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="confirmPassword" class="col-sm-3 col-form-label">Confirm Password</label>
+                                <label class="col-sm-3 col-form-label">New Password</label>
                                 <div class="col-sm-9">
-                                    <input id="confirmPassword" type="password" class="form-control" formControlName="confirmPassword">
+                                    <input type="password" class="form-control" formControlName="newPassword">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="confirmNewPassword" class="col-sm-3 col-form-label">Confirm New Password</label>
+                                <div class="col-sm-9">
+                                    <input id="confirmNewPassword" type="password" class="form-control" formControlName="confirmNewPassword">
                                 </div>
                             </div>
                             <h3>Profile</h3>
@@ -102,6 +94,19 @@
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" formControlName="country">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <hr>
+                        <h3>Interested by</h3>
+                        <label class="col-sm-4 col-form-label">Choose the categories you're interested in</label>
+                        <div class="col-sm-8">
+                            <div *ngFor="let c of categories" class="category-choice">
+                                <label>
+                                    <input type="checkbox" class="form-check-input" value="{{ c.category.id }}" [checked]="c.desired" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
+                                    <span>{{ c.category.name }}</span>
+                                </label>
                             </div>
                         </div>
                     </div>

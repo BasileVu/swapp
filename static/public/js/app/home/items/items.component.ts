@@ -6,6 +6,7 @@ import { ItemsService } from './items.service';
 import { DetailedItem } from './detailed-item';
 import {Subscription} from "rxjs";
 import {AuthService} from "../../shared/authentication/authentication.service";
+import {Category} from "../search/category";
 
 export let $: any;
 
@@ -17,7 +18,7 @@ export let $: any;
 })
 export class ItemsComponent implements OnInit, OnChanges {
 
-    items: Array<DetailedItem> = [];
+    items: Array<DetailedItem>;
     loggedIn: boolean;
     subscription: Subscription;
 
@@ -26,6 +27,7 @@ export class ItemsComponent implements OnInit, OnChanges {
                  public toastr: ToastsManager) {}
 
     ngOnInit() {
+        this.items = [];
         this.getItems();
 
         // Listen for login changes
@@ -52,8 +54,7 @@ export class ItemsComponent implements OnInit, OnChanges {
         this.itemsService.getItems()
             .then(
                 items => {
-                    this.items = [];
-                    this.items = items
+                    this.items = items;
                 },
                 error => this.toastr.error(error, "Error")
             );
