@@ -14,6 +14,6 @@
 <update-profile-modal (updateAccountEvent)="profile.getAccount()"></update-profile-modal>
 <profile-modal></profile-modal>
 <add-item-modal (newItemEvent)="inventory.addItemEvent($event)"></add-item-modal>
-<notification-modal [loggedIn]="loggedIn"></notification-modal>
+<notification-modal [loggedIn]="loggedIn" (notificationEvent)="profile.updateNotifications($event)"></notification-modal>
 <send-proposition-modal></send-proposition-modal>
 <accept-proposition-modal></accept-proposition-modal>

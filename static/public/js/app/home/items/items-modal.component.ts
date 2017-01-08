@@ -40,7 +40,7 @@ declare let $: any;
 export class ItemsModalComponent implements OnInit, OnDestroy {
 
     loggedIn: boolean;
-    user: User;
+    user: User = new User;
 
     item: DetailedItem;
     owner: User;

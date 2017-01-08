@@ -57,6 +57,7 @@ export class ProfileComponent implements OnInit {
     loggedIn: boolean;
     subscription: Subscription;
     user: Account;
+    notificationNumber: number;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -184,5 +185,9 @@ export class ProfileComponent implements OnInit {
             },
             error => this.toastr.error(error, "Error")
         );
+    }
+
+    updateNotifications($event: any) {
+        this.notificationNumber = +$event;
     }
 }

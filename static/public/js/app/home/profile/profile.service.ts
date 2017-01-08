@@ -15,7 +15,7 @@ export class ProfileService {
 
         return new Promise(function (resolve, reject) {
             let req = new XMLHttpRequest();
-            req.open("POST", "/api/account/image");
+            req.open("POST", "/api/account/image/");
             req.setRequestHeader("enctype", "multipart/form-data");
             req.setRequestHeader("X-CSRFToken", csrftoken);
             req.send(formData);

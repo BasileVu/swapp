@@ -15,7 +15,7 @@
                                             <p>{{ notification.content }}</p>
                                         </div>
                                         <div class="col-xs-12 date">
-                                            <i class="fa fa-refresh"></i> {{ notification.date }}
+                                            <i class="fa fa-refresh"></i> {{ notification.date | date:'medium'  }}
                                         </div>
                                     </div>
                                 </div>

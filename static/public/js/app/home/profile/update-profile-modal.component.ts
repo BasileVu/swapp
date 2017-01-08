@@ -16,6 +16,7 @@ import {
 } from "./account";
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {ProfileService} from "./profile.service";
+import {UserLoginDTO} from "./user-login-dto";
 
 class CategoryDesired {
     category: Category;
@@ -26,6 +27,8 @@ class CategoryDesired {
         this.desired = desired;
     }
 }
+
+declare let $: any;
 
 @Component({
     moduleId: module.id,
@@ -186,8 +189,6 @@ export class UpdateProfileModalComponent implements OnInit {
                 this.firstName.setValue(this.account.first_name);
                 this.lastName.setValue(this.account.last_name);
 
-                console.log(this.account.categories);
-
                 // Check categories already desired by user
                 for (let c of this.categories)
                     for (let ac of this.account.categories)
@@ -195,10 +196,19 @@ export class UpdateProfileModalComponent implements OnInit {
                             c.desired = true;
                             this.interests.push(c.category.id);
                         }
-
-                console.log(this.categories);
             }
         );
+
+        let that = this;
+        $('#update-user-modal').on('hide.bs.modal', function (e: any) {
+            that.interests = [];
+            for (let category of that.account.categories)
+                that.interests.push(category.id);
+
+            that.newPassword.reset();
+            that.oldPassword.reset();
+            that.confirmNewPassword.reset();
+        });
     }
 
     // Add or remove a category interest if selected/unselected
@@ -221,9 +231,11 @@ export class UpdateProfileModalComponent implements OnInit {
             this.profileService.addProfilePicture(formData)
                 .then( // now signal the ProfileComponent that we uploaded picture
                     res => {
+                        this.toastr.success("", "Image uploaded");
                         this.updateAccountEvent.emit();
                     },
                     error => {
+                        this.toastr.error(error, "Error");
                         this.updateAccountEvent.emit();
                     }
                 );
@@ -241,7 +253,11 @@ export class UpdateProfileModalComponent implements OnInit {
                 this.profileService.updatePassword(passwordUpdateDTO).then(
                     res => {
                         this.toastr.success("", "Password updated");
-                        this.updateAccountEvent.emit();
+                        this.authService.login(new UserLoginDTO(this.account.username, this.newPassword.value)).then(
+                            res => this.updateAccountEvent.emit(),
+                            error => this.toastr.error(error, "Error")
+                        );
+
                     },
                     error =>  {
                         this.toastr.error(error, "Error");
@@ -273,10 +289,6 @@ export class UpdateProfileModalComponent implements OnInit {
 
     updateProfile() {
         // upload profile if changed
-        console.log("this");
-        console.log(this);
-        console.log("this.account");
-        console.log(this.account);
         if (this.username.value != this.account.username
             || this.firstName.value != this.account.first_name
             || this.lastName.value != this.account.last_name
@@ -295,21 +307,41 @@ export class UpdateProfileModalComponent implements OnInit {
     }
 
     updateCategories()  {
-        console.log(this.interests);
-        let obj = {"interested_by": this.interests};
-        this.profileService.updateCategories(obj).then(
-            res => {
-                this.toastr.success("", "Interests updated");
-                this.updateAccountEvent.emit();
-            },
-            error => {
-                this.toastr.error(error, "Error");
+        let doUpdate = false;
+
+        let accountCategories: Array<number> = [];
+        for (let c of this.account.categories)
+            accountCategories.push(c.id);
+
+        for (let interest of this.interests)
+            if (accountCategories.indexOf(interest, 0) < 0) {
+                doUpdate = true;
+                break;
             }
-        );
+
+        if (!doUpdate) {
+            for (let category of accountCategories)
+                if (this.interests.indexOf(category, 0) < 0) {
+                    doUpdate = true;
+                    break;
+                }
+        }
+
+        if (doUpdate) {
+            let obj = {"interested_by": this.interests};
+            this.profileService.updateCategories(obj).then(
+                res => {
+                    this.toastr.success("", "Interests updated");
+                    this.updateAccountEvent.emit();
+                },
+                error => {
+                    this.toastr.error(error, "Error");
+                }
+            );
+        }
     }
 
     updateAccount() {
-        console.log("update Account");
         this.updateProfilePicture();
         this.updateProfile();
         this.updateLocation();
