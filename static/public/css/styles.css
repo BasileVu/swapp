@@ -5467,6 +5467,12 @@ body {
 hr {
   border-top: 1px solid #eed5a9; }
 
+.grayout {
+  opacity: 0.6;
+  /* Real browsers */
+  filter: alpha(opacity=60);
+  /* MSIE */ }
+
 .btn-group-justified {
   display: table;
   width: 100%;
