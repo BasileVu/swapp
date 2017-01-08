@@ -43,15 +43,20 @@ export class ProfileModalComponent implements OnInit {
                             profileModal.on('show.bs.modal', function (e: any) {
                                 setTimeout(function () {
 
+                                    let pos = {
+                                        lat: account.coordinates.latitude,
+                                        lng: account.coordinates.longitude
+                                    };
+
                                     // profile map
                                     const map = new google.maps.Map(document.getElementById('profile-map'), {
-                                        center: account.coordinates,
+                                        center: pos,
                                         scrollwheel: false,
                                         zoom: 8
                                     });
                                     const marker = new google.maps.Marker({
                                         map: map,
-                                        position: account.coordinates
+                                        position: pos
                                     });
                                     const infowindow = new google.maps.InfoWindow({
                                         content: '<h3 class="map-title">'+
