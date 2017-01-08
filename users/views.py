@@ -128,8 +128,9 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         new_username = request.data.get("username", None)
         if new_username is not None and User.objects.filter(username=new_username).count() > 0:
-            return Response(status=status.HTTP_409_CONFLICT,
-                            data={"error": "An user with the same username already exists"})
+            if request.user != User.objects.get(username=new_username):
+                return Response(status=status.HTTP_409_CONFLICT,
+                                data={"error": "An user with the same username already exists"})
         return super(UserAccount, self).update(request, *args, **kwargs)
 
 
