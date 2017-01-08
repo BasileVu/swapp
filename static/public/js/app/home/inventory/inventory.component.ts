@@ -7,7 +7,7 @@ import {
     state,
     style,
     transition,
-    animate,
+    animate, OnChanges,
 } from '@angular/core';
 import { __platform_browser_private__,
     DomSanitizer } from '@angular/platform-browser';
@@ -20,7 +20,7 @@ import { ItemsService } from '../items/items.service';
 import {Subscription} from "rxjs";
 import {User} from "../profile/user";
 
-export let $: any;
+declare let $: any;
 
 @Component({
     moduleId: module.id,
@@ -136,6 +136,19 @@ export class InventoryComponent implements OnInit {
             .then(
                 comments => {
                     service.selectComments(comments);
+                },
+                error => console.log(error));
+    }
+
+    gotoEdit(item_id: number): void {
+        console.log("clicked for edition. item_id: " + item_id);
+
+        let service = this.itemsService;
+        service.getDetailedItem(item_id)
+            .then(
+                item => {
+                    service.selectItem(item);
+                    $('#edit-item-modal').modal('show');
                 },
                 error => console.log(error));
     }
