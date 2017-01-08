@@ -58,6 +58,12 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ("street", "city", "region", "country")
 
 
+class CoordinatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coordinates
+        fields = ("latitude", "longitude")
+
+
 class NoteSerializer(serializers.ModelSerializer):
     note = IntegerField(max_value=5, min_value=0)
 

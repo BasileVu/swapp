@@ -106,7 +106,6 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """Returns the private info of an account."""
         user = request.user
         user_profile = request.user.userprofile
 
@@ -122,7 +121,8 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "categories": CategorySerializer(user_profile.categories.all(), many=True).data,
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
-            "note_avg": user.userprofile.note_avg
+            "note_avg": user.userprofile.note_avg,
+            "coordinates": CoordinatesSerializer(user.coordinates).data
         })
 
     def update(self, request, *args, **kwargs):
