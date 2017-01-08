@@ -91,6 +91,27 @@ export class InventoryComponent implements OnInit {
         );
     }
 
+    // We receive the id of the item to add to the inventory
+    archive(item: InventoryItem) {
+        this.itemsService.archiveItem(item.id).then(
+            () => {
+                this.inventory.find(i => i.id == item.id).archived = true;
+            },
+            error => this.toastr.error("Error archiving the item " + item, "Error")
+        );
+    }
+
+    // We receive the id of the item to add to the inventory
+    restore(item: InventoryItem) {
+        this.itemsService.restoreItem(item.id).then(
+            () => {
+                this.inventory.find(i => i.id == item.id).archived = false;
+            },
+            error => this.toastr.error("Error restoring the item " + item, "Error")
+        );
+    }
+
+
     gotoDetail(item_id: number): void {
         console.log("clicked. item_id: " + item_id);
 

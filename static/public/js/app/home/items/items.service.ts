@@ -9,6 +9,7 @@ import { CommentCreationDTO } from './comment-creation-dto';
 import {User} from "../profile/user";
 import {Like} from "./like";
 import {ProfileService} from "../profile/profile.service";
+import {InventoryItem} from "../inventory/inventory-item";
 
 @Injectable()
 export class ItemsService {
@@ -95,6 +96,18 @@ export class ItemsService {
         return this.http.post('/api/likes/', body, options)
             .toPromise()
             .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    archiveItem(item: number) {
+        return this.http.post(this.itemsUrl + item + "/archive/", null)
+            .toPromise()
+            .catch(this.handleError);
+    }
+
+    restoreItem(item: number) {
+        return this.http.post(this.itemsUrl + item + "/restore/", null)
+            .toPromise()
             .catch(this.handleError);
     }
 
