@@ -1,8 +1,8 @@
 export class KeyInfo {
     key: string;
-    value: string;
-    constructor(key: string, value:string) {
+    info: string;
+    constructor(key: string, info:string) {
         this.key = key;
-        this.value = value;
+        this.info = info;
     }
 }

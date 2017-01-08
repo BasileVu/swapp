@@ -17,15 +17,19 @@ import {ProfileService} from "../profile/profile.service";
 import {SearchService} from "../search/search.service";
 import {Category} from "../search/category";
 import {DetailedItem} from "../items/detailed-item";
+import {Subscription} from "rxjs";
+import {ItemsService} from "../items/items.service";
 
 declare let $:any;
 
 class DeliveryMethod {
     id: number;
     name: string;
+    desired: boolean;
     constructor(id: number, name:string) {
         this.id = id;
         this.name = name;
+        this.desired = false;
     }
 }
 
@@ -67,6 +71,9 @@ class DeliveryMethod {
 })
 export class EditItemModalComponent implements OnInit {
 
+    item: DetailedItem;
+    subscription: Subscription;
+
     keyInfos: Array<KeyInfo> = [];
     categories: Array<Category> = [];
     deliveryMethods: Array<DeliveryMethod> = [];
@@ -82,7 +89,7 @@ export class EditItemModalComponent implements OnInit {
     @Output() newItemEvent = new EventEmitter();
 
     // Form fields
-    private createItemForm: FormGroup;
+    private editItemForm: FormGroup;
     private name = new FormControl("", Validators.required);
     private min_price = new FormControl("", Validators.required);
     private max_price = new FormControl("", Validators.required);
@@ -94,11 +101,13 @@ export class EditItemModalComponent implements OnInit {
                 private profileService: ProfileService,
                 private searchService: SearchService,
                 private formBuilder: FormBuilder,
-                public toastr: ToastsManager) { }
+                public toastr: ToastsManager,
+                private itemsService: ItemsService) { }
 
     ngOnInit(): void {
+
         // Init item creation form
-        this.createItemForm = this.formBuilder.group({
+        this.editItemForm = this.formBuilder.group({
             name: this.name,
             min_price: this.min_price,
             max_price: this.max_price,
@@ -122,6 +131,36 @@ export class EditItemModalComponent implements OnInit {
 
         // Add a blank key info
         this.keyInfos.push(new KeyInfo("", ""));
+
+        // When receiving the detailed item
+        this.subscription = this.itemsService.itemSelected$.subscribe(
+            item => {
+                this.item = item;
+                console.log(this.item);
+                this.keyInfos = item.keyinfo_set;
+
+                // images
+                this.file_srcs = item.images.map(i => i.url);
+
+                this.editItemForm.patchValue({name: item.name});
+                this.editItemForm.patchValue({min_price: item.price_min});
+                this.editItemForm.patchValue({max_price: item.price_max});
+                this.editItemForm.patchValue({category: item.category.id});
+                this.editItemForm.patchValue({description: item.description});
+                this.userDeliveryMethods = item.delivery_methods.map(d => d.id);
+                for(let deliveryMethod of this.userDeliveryMethods){
+                    console.log("SEARCHING DM");
+                    let udm = this.deliveryMethods.find(d => d.id === deliveryMethod);
+
+                    console.log(" DM " + udm);
+                    if(udm){
+                        console.log("UDM FOUND");
+                        udm.desired = true;
+                    }
+                }
+            },
+            error => this.toastr.error("Can't get the detailed item", "Error")
+        );
     }
 
     // Add or remove the delivery method if selected/unselected
@@ -136,8 +175,8 @@ export class EditItemModalComponent implements OnInit {
         }
     }
 
-    // Create the item if valid
-    createItem() {
+    // Edit the item if valid
+    editItem() {
         let errorMessage: string;
 
         // verifications
@@ -150,15 +189,17 @@ export class EditItemModalComponent implements OnInit {
             this.toastr.error(errorMessage, "Error");
 
         } else {
-            // Create the item
+            // edit the item
 
             // Build a proper keyInfos array with trimmed values
             let keyInfos = new Array<KeyInfo>();
-            for (let ki of this.keyInfos)
-                if (ki.key && ki.key.trim() && ki.value && ki.value.trim())
-                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.value.trim()));
+            for (let ki of this.keyInfos) {
+                console.log(ki);
+                if (ki.key && ki.key.trim() && ki.info && ki.info.trim())
+                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.info.trim()));
+            }
 
-            let newItem = new ItemCreationDTO(
+            let editedItem = new ItemCreationDTO(
                 this.name.value,
                 this.min_price.value,
                 this.max_price.value,
@@ -168,24 +209,25 @@ export class EditItemModalComponent implements OnInit {
                 this.userDeliveryMethods
             );
 
-            this.inventoryService.addItem(newItem)
+            this.inventoryService.editItem(editedItem, this.item.id)
                 .then(
-                    res => {
+                    () => {
                         // images can be added only after item creation (api constraint)
-                        this.newItemId = EditItemModalComponent.getItemIdFromResponse(res);
-                        this.addImages(this.newItemId);
+                        this.addImages(this.item.id);
+                        this.toastr.success("Successfully updated the item", "Success")
+                        $('#edit-item-modal').modal('hide');
                     },
                     error => this.toastr.error(error, 'Error'));
         }
     }
 
-    // Get the id of newly created item
+    // Get the id of newly editd item
     static getItemIdFromResponse(res: any) {
         let obj: DetailedItem = JSON.parse(res._body);
         return obj.id;
     }
 
-    // Add images to the newly created item
+    // Add images to the newly editd item
     addImages(item_id: number) {
         let filesUploaded: number = 0;
         for (let f of this.files) {
@@ -196,9 +238,8 @@ export class EditItemModalComponent implements OnInit {
                 .then( // now signal the ProfileComponent that we uploaded picture
                     res => {
                         if (++filesUploaded === this.files.length) {
-                            this.toastr.success('New item added to your inventory', 'Item created!');
+                            this.toastr.success('New item added to your inventory', 'Item editd!');
                             this.newItemEvent.emit(this.newItemId);
-                            $('#add-item-modal').modal('hide');
                         }
                     },
                     error => this.toastr.error(error, "Error")
@@ -241,7 +282,7 @@ export class EditItemModalComponent implements OnInit {
 
     // Read many files
     readFiles(files: Array<File>, index=0){
-        // Create the file reader
+        // edit the file reader
         let reader = new FileReader();
 
         // If there is a file
@@ -291,7 +332,7 @@ export class EditItemModalComponent implements OnInit {
                 }
             }
             
-            // create a canvas object
+            // Create a canvas object
             const canvas = document.createElement("canvas");
 
             // Set the canvas to the new calculated dimensions

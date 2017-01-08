@@ -21,6 +21,17 @@ export class InventoryService {
             .catch(this.handleError);
     }
 
+    editItem(itemCreationDTO: ItemCreationDTO, item_id: number): Promise<any> {
+        let body = JSON.stringify(itemCreationDTO); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        // No content to return, we just catch errors
+        return this.http.put('/api/items/' + item_id + "/", body, options)
+            .toPromise()
+            .catch(this.handleError);
+    }
+
     getDeliveryMethods (): Promise<any> {
         return this.http.get('/api/deliverymethods/')
             .toPromise()
