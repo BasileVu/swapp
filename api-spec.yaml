@@ -156,6 +156,10 @@ paths:
                 type: number
               coordinates:
                 $ref: "#/definitions/Coordinates"
+              pending_offers:
+                type: array
+                items:
+                  $ref: "#/definitions/OfferGet"
                 
         401:
           description: "User is not authenticated."
@@ -936,20 +940,7 @@ paths:
         200:
           description: "Successful operation."
           schema:
-            type: object
-            properties:
-              id:
-                type: number
-              accepted:
-                type: boolean
-              answered:
-                type: boolean
-              comment:
-                type: string
-              item_given:
-                type: number
-              item_received:
-                type: number
+            $ref: "#/definitions/OfferGet"
         401:
           description: "User not authenticated."
           
@@ -1177,6 +1168,22 @@ definitions:
   Offer:
     type: object
     properties:
+      comment:
+        type: string
+      item_given:
+        type: number
+      item_received:
+        type: number
+        
+  OfferGet:
+    type: object
+    properties:
+      id:
+        type: number
+      accepted:
+        type: boolean
+      answered:
+        type: boolean
       comment:
         type: string
       item_given:
