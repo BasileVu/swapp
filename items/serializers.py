@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
+from users.serializers import CoordinatesSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -47,6 +48,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class LikeSerializer(serializers.ModelSerializer):
     user = serializers.CharField(read_only=True)
+    date = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Like
@@ -134,6 +136,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     similar = serializers.SerializerMethodField()
     owner_picture_url = serializers.SerializerMethodField()
     owner_location = serializers.SerializerMethodField()
+    owner_coordinates = serializers.SerializerMethodField()
 
     def get_images(self, obj):
         return ImageSerializer(obj.image_set.all(), many=True).data
@@ -160,11 +163,14 @@ class DetailedItemSerializer(serializers.ModelSerializer):
         location = obj.owner.location
         return "%s, %s" % (location.city, location.country)
 
+    def get_owner_coordinates(self, obj):
+        return CoordinatesSerializer(obj.owner.coordinates).data
+
     class Meta:
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
                   "views", "images", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
-                  "similar", "owner_picture_url", "owner_location", "traded", "archived")
+                  "similar", "owner_picture_url", "owner_location", "owner_coordinates", "traded", "archived")
 
 
 class SearchItemsSerializer(serializers.Serializer):

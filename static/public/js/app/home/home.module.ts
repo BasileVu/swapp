@@ -36,6 +36,7 @@ import { YourInventoryDirective } from './offers/your-inventory.directive';
 import { UpdateGridDirective } from './items/update-grid.directive';
 import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
+import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
 
 
 @NgModule({
@@ -66,7 +67,8 @@ import { UpdateInventoryDirective } from './inventory/update-inventory.directive
         YourInventoryDirective,
         UpdateGridDirective,
         UpdateCarouselDirective,
-        UpdateInventoryDirective
+        UpdateInventoryDirective,
+        EditItemModalComponent
     ],
     providers: [
         InventoryService,
