@@ -35,30 +35,36 @@ export class ProfileModalComponent implements OnInit {
                         account => {
                             this.user = account;
                             this.fillStars(account.note_avg);
+
+                            console.log(account);
+                            console.log(this.user);
+
+                            const profileModal = $('#user-profile-modal');
+                            profileModal.on('show.bs.modal', function (e: any) {
+                                setTimeout(function () {
+
+                                    // profile map
+                                    const map = new google.maps.Map(document.getElementById('profile-map'), {
+                                        center: account.coordinates,
+                                        scrollwheel: false,
+                                        zoom: 8
+                                    });
+                                    const marker = new google.maps.Marker({
+                                        map: map,
+                                        position: account.coordinates
+                                    });
+                                    const infowindow = new google.maps.InfoWindow({
+                                        content: '<h3 class="map-title">'+
+                                            account.location.city +
+                                            ', '+
+                                            account.location.country +
+                                            '</h3>'
+                                    });
+                                    infowindow.open(map, marker);
+                                }, 300)
+                            });
                         }
                     );
-
-                    const profileModal = $('#user-profile-modal');
-                    profileModal.on('show.bs.modal', function (e: any) {
-                        setTimeout(function () {
-                            //inventory.flickity('resize');
-
-                            // profile map
-                            const map = new google.maps.Map(document.getElementById('profile-map'), {
-                                center: {lat: -34.197, lng: 150.844},
-                                scrollwheel: false,
-                                zoom: 8
-                            });
-                            const marker = new google.maps.Marker({
-                                map: map,
-                                position: {lat: -34.197, lng: 150.844}
-                            });
-                            const infowindow = new google.maps.InfoWindow({
-                                content: '<h3 class="map-title">Adresse complèteeee</h3>'
-                            });
-                            infowindow.open(map, marker);
-                        }, 300)
-                    });
                 }
             }
         );
