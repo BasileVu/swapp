@@ -157,8 +157,8 @@ class AccountAPITests(TestCase):
         }), content_type="application/json")
 
     def setUp(self):
-        User.objects.create_user(username="username", password="password", first_name="first_name",
-                                 last_name="last_name", email="test@test.com")
+        self.user = User.objects.create_user(username="username", password="password", first_name="first_name",
+                                             last_name="last_name", email="test@test.com")
         self.login()
 
     def test_get_account_info_not_logged_in(self):
@@ -167,15 +167,16 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_account_info_logged_in(self):
-        # add some data related to user
-        u = User.objects.get(pk=1)
         c = Category.objects.create(name="category")
-        u.userprofile.categories.add(c)
-        i = Item.objects.create(name="test", description="test", price_min=50, price_max=60,
-                                creation_date=timezone.now(), archived=False, owner=u, category=c)
+        i = Item.objects.create(owner=self.user, category=c, price_min=50, price_max=60, )
         o = Offer.objects.create(accepted=True, answered=True, item_given=i, item_received=i)
-        Note.objects.create(user=u, offer=o, text="test", note=4)
-        Like.objects.create(user=u, item=i)
+        Note.objects.create(user=self.user, offer=o, text="test", note=4)
+        Like.objects.create(user=self.user, item=i)
+
+        self.user.userprofile.categories.add(c)
+        self.user.coordinates.latitude = 4
+        self.user.coordinates.longitude = 4
+        self.user.coordinates.save()
 
         r = self.client.get(self.account_url)
 
@@ -196,55 +197,22 @@ class AccountAPITests(TestCase):
         self.assertEqual(r.data["categories"], [{"id": 1, "name": "category"}])
         self.assertEqual(r.data["items"], [1])
         self.assertEqual(r.data["notes"], 1)
+        self.assertEqual(r.data["note_avg"], 4)
+        self.assertEqual(r.data["coordinates"], {"latitude": 4, "longitude": 4})
 
-    def test_update_account_not_logged_in(self):
+    def test_cannot_update_account_if_not_logged_in(self):
         self.client.logout()
-        r = self.client.patch(self.account_url, data=json.dumps({
-            "first_name": "f",
-            "last_name": "l"
-        }), content_type="application/json")
+        r = self.client.patch(self.account_url, data=json.dumps({"first_name": "f"}), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 1)
-
-        self.login()
-
-        # Test if no modification
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["first_name"], "first_name")
-        self.assertEqual(r.data["last_name"], "last_name")
 
     def test_update_account_logged_in(self):
-        r = self.client.patch(self.account_url, data=json.dumps({
-            "first_name": "firstname",
-            "last_name": "lastname"
-        }), content_type="application/json")
+        r = self.client.patch(self.account_url, data=json.dumps({"first_name": "firstname"}),
+                              content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["first_name"], "firstname")
-        self.assertEqual(r.data["last_name"], "lastname")
-
-    def test_cannot_update_account_not_logged_in(self):
-        self.client.logout()
-
-        r = self.client.patch(self.account_url, data=json.dumps({
-            "email": "a@b.com",
-        }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 1)
-
-        self.login()
-
-        # Test if no modification
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertNotEqual(r.data["email"], "a@b.com")
 
     def test_cannot_connect_if_account_not_active(self):
         self.client.logout()
@@ -260,42 +228,30 @@ class AccountAPITests(TestCase):
 
         self.assertEqual(r.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_update_account_empty_json(self):
+    def test_update_account_empty_username(self):
         r = self.client.patch(self.account_url, data=json.dumps({
             "username": "",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 1)
 
-        r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["username"], "username")
-
-    def test_update_one_not_considered_info(self):
+    def test_trying_to_update_last_modification_date_should_not_change_it(self):
         datetime = str(timezone.now())
 
-        r = self.client.patch(self.account_url, data=json.dumps({
+        self.client.patch(self.account_url, data=json.dumps({
             "last_modification_date": datetime,
         }), content_type="application/json")
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
-
         r = self.client.get(self.account_url)
+
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertNotEqual(r.data["last_modification_date"], datetime)
 
-    def test_update_account_malformed_json(self):
+    def test_update_account_field_not_existing(self):
         r = self.client.patch(self.account_url, data=json.dumps({
             "emaaiill": "newemail@newemail.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 0)
 
         r = self.client.get(self.account_url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["email"], "test@test.com")
 
     def test_update_user_account_incomplete_json(self):
@@ -303,8 +259,6 @@ class AccountAPITests(TestCase):
             "email": "newemail@newemail.com",
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual("password" in r.data, False)
-        self.assertEqual(len(r.data), 3)
 
         r = self.client.get(self.account_url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)

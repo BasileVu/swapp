@@ -133,6 +133,11 @@ class ItemGetTests(ItemBaseTest):
         self.current_user.location.country = "country"
         self.current_user.location.save()
 
+        # change owner coordinates to check owner_coordinates
+        self.current_user.coordinates.latitude = 4
+        self.current_user.coordinates.longitude = 4
+        self.current_user.coordinates.save()
+
         r = self.get_item()
 
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -152,6 +157,7 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["similar"][0]["id"], id1)
         self.assertEqual(r.data["similar"][1]["id"], id2)
         self.assertEqual(r.data["owner_location"], "city, country")
+        self.assertEqual(r.data["owner_coordinates"], {"latitude": 4, "longitude": 4})
         self.assertNotEqual(r.data["owner_picture_url"], None)
         self.assertIn("images", r.data)
         self.assertEqual(r.data["traded"], False)
