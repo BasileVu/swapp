@@ -4,10 +4,10 @@ from comments.models import Comment
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(read_only=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_fullname = serializers.SerializerMethodField()
     user_profile_picture = serializers.SerializerMethodField()
+    date = serializers.DateTimeField(read_only=True)
 
     def get_user_fullname(self, obj):
         return "%s %s" % (obj.user.first_name, obj.user.last_name)
@@ -17,4 +17,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'content', 'date', 'user', 'item', 'user_fullname', 'user_profile_picture')
+        fields = ("id", "content", "date", "user", "item", "user_fullname", "user_profile_picture")

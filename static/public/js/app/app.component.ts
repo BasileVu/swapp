@@ -4,7 +4,6 @@ import {Component, OnInit, AfterViewInit, ViewContainerRef,
     style,
     transition,
     animate,
-    keyframes,
 } from '@angular/core';
 
 import './rxjs-operators';
@@ -14,8 +13,8 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from './shared/authentication/authentication.service';
 
-declare var $:any;
-declare var google: any;
+declare let $:any;
+declare let google: any;
 
 @Component({
     moduleId: module.id,
@@ -41,9 +40,7 @@ declare var google: any;
     ]
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    subtitle = '(v1)';
-
-    loggedIn: boolean;
+    loggedIn: boolean = false;
     subscription: Subscription;
 
     constructor (private http: Http,
@@ -53,9 +50,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        let csrf = this.http.get("/api/csrf/");
-
-        this.loggedIn = this.authService.isLoggedIn();
+        this.authService.getCSRF().then(
+            res => console.log(res),
+            error => console.log(error)
+        );
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
@@ -77,44 +75,51 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.authService.logout()
             .then(
                 res => {
-                    if (res.status === 200) {
-                        this.loggedIn = false;
-                        this.authService.selectLoggedIn(this.loggedIn);
-                        this.toastr.success("", "Logged out");
-                    }
+                    this.loggedIn = false;
+                    this.toastr.success("", "Logged out");
+
+                    // Delete the cookie and get a new one for not authenticated queries
+                    localStorage.removeItem("connected");
+                    this.deleteCookie('csrftoken');
+                    this.authService.getCSRF().then(
+                        res => {
+                            // Announce the item component to get a new set of items
+                            // (for a user not logged in)
+                            this.authService.selectLoggedIn(this.loggedIn);
+                        },
+                        error => console.log(error)
+                    );
                 },
                 error => {
                     console.log(error);
                 }
             );
     }
+
+    deleteCookie(name: string) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
     
     ngAfterViewInit() {
 
+        let that = this;
         setTimeout(function() {
+
+            that.loggedIn = localStorage.getItem("connected") === "true";
+            that.authService.selectLoggedIn(that.loggedIn);
+
             $('document').ready(function() {
-                
-                // home grid ///////////////////////////
-                var grid = $('.grid').isotope({
+
+                $('.grid').isotope({
                     // options
                     itemSelector: '.grid-item',
                     layoutMode: 'masonry'
                 });
-                // layout only when images are loaded
-                grid.imagesLoaded().progress( function() {
-                    grid.isotope('layout');
-                });
-                // display items details when hovered
-                $('.grid-item').hover(function () {
-                    $(this).addClass('hovered');
-                    grid.isotope('layout');
-                }, function () {
-                    $(this).removeClass('hovered');
-                    grid.isotope('layout');
-                });
 
+                /*
+                 TODO : remove because it's handled in update-inventory.directive.ts
                 // home inventory ///////////////////////////
-                var inventory = $('.home-inventory').flickity({
+                let inventory = $('.home-inventory').flickity({
                     // options
                     cellAlign: 'center',
                     contain: true,
@@ -124,69 +129,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                     prevNextButtons: false,
                     adaptiveHeight: true
                 });
+                */
 
-                // swapp inventories /////////////////////////
-                var swapp_inventory_mine = $('.swapp-inventory-mine').flickity({
-                    // options
-                    cellAlign: 'center',
-                    contain: true,
-                    imagesLoaded: true,
-                    wrapAround: true,
-                    groupCells: '100%',
-                    prevNextButtons: false,
-                    adaptiveHeight: true,
-                    pageDots: true
-                });
-                var swapp_inventory_yours = $('.swapp-inventory-yours').flickity({
-                    // options
-                    cellAlign: 'center',
-                    contain: true,
-                    imagesLoaded: true,
-                    wrapAround: true,
-                    groupCells: '100%',
-                    prevNextButtons: false,
-                    adaptiveHeight: true,
-                    pageDots: true
-                });
-
-                // modal slider ///////////////////////////
-                var modalCarousel = $('.modal-carousel').flickity({
-                    cellAlign: 'center',
-                    contain: true,
-                    imagesLoaded: true,
-                    wrapAround: true,
-                    prevNextButtons: false,
-                    adaptiveHeight: true
-                });
-
-                var modalCarouselNav = $('.modal-carousel-nav');
-                var modalCarouselNavCells = modalCarouselNav.find('.carousel-cell');
-
-                modalCarouselNav.on( 'click', '.carousel-cell', function( event ) {
-                    var index = $( event.currentTarget ).index();
-                    modalCarousel.flickity( 'select', index );
-                });
-
-                var flkty = modalCarousel.data('flickity');
-                var navCellHeight = modalCarouselNavCells.height();
-                var navHeight = modalCarouselNav.height();
-
-                modalCarousel.on( 'select.flickity', function() {
-                    // set selected nav cell
-                    modalCarouselNav.find('.is-nav-selected').removeClass('is-nav-selected');
-                    var selected = modalCarouselNavCells.eq( flkty.selectedIndex )
-                        .addClass('is-nav-selected');
-                    // scroll nav
-                    var scrollY = selected.position().top +
-                        modalCarouselNav.scrollTop() - ( navHeight + navCellHeight ) / 2;
-                    modalCarouselNav.animate({
-                        scrollTop: scrollY
-                    });
-                });
-
-                // open user creation profile modal /////////////////////
-                var openCreateProfileButtons = $('.open-create-profile-modal');
-                var createProfileModal = $('#create-user-modal');
+                // open user creation modal /////////////////////
+                let openCreateProfileButtons = $('.open-create-profile-modal');
+                let createProfileModal = $('#create-user-modal');
                 openCreateProfileButtons.each(function () {
                     $(this).click(function () {
                         createProfileModal.modal('show');
@@ -194,8 +141,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
 
                 // open item creation modal /////////////////////
-                var addItemButtons = $('.open-new-item-modal');
-                var newItemModal = $('#add-item-modal');
+                let addItemButtons = $('.open-new-item-modal');
+                let newItemModal = $('#add-item-modal');
                 addItemButtons.each(function () {
                     $(this).click(function () {
                         newItemModal.modal('show');
@@ -203,24 +150,28 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
 
                 // open send proposition modal /////////////////////
-                var openSendPropositionButtons = $('.open-send-proposition-modal');
-                var sendPropositionModal = $('#send-proposition-modal');
+                let openSendPropositionButtons = $('.open-send-proposition-modal');
+                let sendPropositionModal = $('#send-proposition-modal');
                 openSendPropositionButtons.each(function () {
                     $(this).click(function () {
                         sendPropositionModal.modal('show');
                     });
                 });
-                sendPropositionModal.on('show.bs.modal', function (e) {
-                    setTimeout(function () {
-                        swapp_inventory_mine.flickity('resize');
-                        swapp_inventory_yours.flickity('resize');
-                    }, 300)
-                });
 
                 // display item modal ///////////////////////////
-                var theItemModal = $('#view-item-x');
+                let theItemModal = $('#view-item-x');
                 // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
-                theItemModal.on('show.bs.modal', function (e) {
+                theItemModal.on('show.bs.modal', function (e: any) {
+                    // modal slider ///////////////////////////
+                    let modalCarousel = $('.modal-carousel').flickity({
+                        cellAlign: 'center',
+                        contain: true,
+                        imagesLoaded: true,
+                        wrapAround: true,
+                        prevNextButtons: false,
+                        adaptiveHeight: true
+                    });
+
                     setTimeout(function () {
                         modalCarousel.flickity('resize');
                         $('.modal-carousel-height').matchHeight({
@@ -234,13 +185,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
 
                 // advanced search ///////////////////////////
-                var advancedSearchModal = $('#advanced-search-modal');
+                let advancedSearchModal = $('#advanced-search-modal');
                 $('.open-modal-advanced-search').click(function () {
                     advancedSearchModal.modal('show');
                 });
-                advancedSearchModal.on('show.bs.modal', function (e) {
+                advancedSearchModal.on('show.bs.modal', function (e: any) {
                     setTimeout(function () {
-                        var map = new google.maps.Map(document.getElementById('search-modal-map'), {
+                        let map = new google.maps.Map(document.getElementById('search-modal-map'), {
                             center: {lat: -34.397, lng: 150.644},
                             scrollwheel: false,
                             zoom: 8
@@ -271,7 +222,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
             });
 
-        }, 500);
+        }, 0);
         
     }
 }

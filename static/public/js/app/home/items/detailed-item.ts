@@ -1,40 +1,48 @@
+import {InventoryItem} from "../inventory/inventory-item";
+
+class KeyInfo {
+    key: string;
+    info: string;
+}
+
+export class Image {
+    id: number;
+    url: string;
+}
+
 export class DetailedItem {
-    owner_username: string;
     id: number;
     name: string;
     description: string;
-    image_urls: Array<string>; // other images
     price_min: number;
     price_max: number;
     creation_date: Date;
-    interested_by: Array<string>;
-    key_informations: Array<{
-        key: string,
-        value: string
-    }>;
-    delivery_from: string;
-    delivery_methods: Array<string>;
-    offers_received: number;
-    comments: number;
-    views: number;
-    likes: number;
+    keyinfo_set: Array<KeyInfo>;
+    delivery_methods: Array<{id:number, name:string}>;
     category: {
         id: number;
         name: string;
     };
-    similars: Array<{
-        item_id: string;
-        image_url: string;
-    }>;
+    views: number;
+    images: Array<Image>;
+    likes: number;
+    comments: number;
+    offers_received: number;
+    similar: Array<InventoryItem>;
+    owner_username: string;
+    owner_picture_url: string;
+    owner_location: string;
+    traded: boolean;
+    archived: boolean;
 
     constructor() {
         this.id = -1;
         this.name = undefined;
         this.description = undefined;
-        this.image_urls = new Array();
+        this.images = [];
         this.price_min = -1;
         this.price_max = -1;
-        this.key_informations = new Array();
+        this.keyinfo_set = [];
         this.creation_date = new Date();
         this.offers_received = 0;
         this.views = 0;
@@ -42,10 +50,12 @@ export class DetailedItem {
         this.comments = 0;
         this.owner_username = "";
         this.category = {id:-1, name:undefined};
-        this.similars = new Array();
-    }
-
-    getId(): number {
-        return this.id;
+        this.similar = [];
+        this.owner_username = "";
+        this.owner_picture_url = null;
+        this.owner_location = "";
+        this.delivery_methods = [];
+        this.traded = false;
+        this.archived = false;
     }
 }

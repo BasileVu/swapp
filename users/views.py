@@ -10,7 +10,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from items.serializers import InventoryItemSerializer
+from items.models import Category, Item
+from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer, \
+    CreateImageSerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -27,7 +29,7 @@ def get_csrf_token(request):
     return Response()
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def login_user(request):
     serializer = LoginUserSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -37,10 +39,10 @@ def login_user(request):
         login(request, user)
         return Response()
     else:
-        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "invalid username/password combination"})
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "Invalid username/password combination"})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes((permissions.IsAuthenticated,))
 def logout_user(request):
     """Logs out an user."""
@@ -71,7 +73,7 @@ def create_user(request):
     location_result = get_coordinates(Location(**location))
 
     if len(location_result) == 0:
-        raise ValidationError("Could not find any match for specified location.")
+        raise ValidationError("Could not find any match for the specified location")
 
     user = User.objects.create_user(
         username=data["username"],
@@ -97,14 +99,13 @@ def create_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
-    """Allows to get the current's account info and update them."""
+    """Allows to get the current user's account info and update them."""
 
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """Returns the private info of an account."""
         user = request.user
         user_profile = request.user.userprofile
 
@@ -117,20 +118,23 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "email": user.email,
             "location": LocationSerializer(user.location).data,
             "last_modification_date": user_profile.last_modification_date,
-            "categories": [c.name for c in user_profile.categories.all()],
+            "categories": CategorySerializer(user_profile.categories.all(), many=True).data,
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
-            "note_avg": user.userprofile.note_avg
+            "note_avg": user.userprofile.note_avg,
+            "coordinates": CoordinatesSerializer(user.coordinates).data
         })
 
     def update(self, request, *args, **kwargs):
         new_username = request.data.get("username", None)
         if new_username is not None and User.objects.filter(username=new_username).count() > 0:
-            return Response(status=status.HTTP_409_CONFLICT, data={"error": "An user with same name already exists"})
+            if request.user != User.objects.get(username=new_username):
+                return Response(status=status.HTTP_409_CONFLICT,
+                                data={"error": "An user with the same username already exists"})
         return super(UserAccount, self).update(request, *args, **kwargs)
 
 
-@api_view(['PUT'])
+@api_view(["PUT"])
 @permission_classes((permissions.IsAuthenticated,))
 def change_password(request):
     """
@@ -143,7 +147,7 @@ def change_password(request):
     new_password = serializer.validated_data["new_password"]
 
     if not request.user.check_password(old_password):
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "wrong password"})
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"old_password": "Wrong password"})
 
     request.user.set_password(new_password)
     request.user.save()
@@ -161,7 +165,7 @@ class LocationView(generics.UpdateAPIView):
         data = get_coordinates(Location(**serializer.validated_data))
 
         if len(data) == 0:
-            raise ValidationError("Could not find any match for specified location.")
+            raise ValidationError("Could not find any match for the specified location")
 
         u = self.request.user
         c = u.coordinates
@@ -170,6 +174,23 @@ class LocationView(generics.UpdateAPIView):
         c.save()
 
         serializer.save()
+
+
+class CategoriesView(generics.UpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        serializer = InterestedByCategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        userprofile = self.request.user.userprofile
+        userprofile.categories.clear()
+
+        for id in serializer.validated_data["interested_by"]:
+            userprofile.categories.add(Category.objects.get(pk=id))
+            userprofile.save()
+
+        return Response(CategorySerializer(userprofile.categories.all(), many=True).data)
 
 
 @api_view(["GET"])
@@ -186,7 +207,8 @@ def get_public_account_info(request, username):
         "location": "%s, %s, %s" % (user.location.city, user.location.region, user.location.country),
         "items": InventoryItemSerializer(user.item_set.all(), many=True).data,
         "notes": user.note_set.count(),
-        "note_avg": user.userprofile.note_avg
+        "note_avg": user.userprofile.note_avg,
+        "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
     })
 
 
@@ -198,7 +220,7 @@ class NoteViewSet(mixins.CreateModelMixin,
     queryset = Note.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'update':
+        if self.action == "update":
             return NoteUpdateSerializer
         return NoteSerializer
 
@@ -207,7 +229,7 @@ class NoteViewSet(mixins.CreateModelMixin,
         offer = serializer.validated_data["offer"]
 
         if offer.accepted is not True:
-            raise ValidationError("You can't not make a note if the offer has not been accepted")
+            raise ValidationError("You can't make a note if the offer has not been accepted")
         if offer.item_given.owner == self.request.user:
             serializer.validated_data["user"] = offer.item_received.owner
         elif offer.item_received.owner == self.request.user:
@@ -218,3 +240,16 @@ class NoteViewSet(mixins.CreateModelMixin,
         if Note.objects.filter(offer=offer, user=serializer.validated_data["user"]).count() > 0:
             raise ValidationError("You have already noted this offer")
         serializer.save()
+
+
+@api_view(["POST"])
+@permission_classes((permissions.IsAuthenticated,))
+def set_profile_image(request):
+    serializer = CreateImageSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    userprofile = request.user.userprofile
+    userprofile.image = serializer.validated_data["image"]
+    userprofile.save()
+
+    return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})

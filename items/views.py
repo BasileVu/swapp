@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
-from django.db.models import F, FloatField, Avg, IntegerField
+from django.db.models import F, FloatField, IntegerField
 from django.db.models import Func
 from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
@@ -39,7 +38,7 @@ def filter_items(data, user):
 
     queryset = Item.objects.filter(
         Q(name__icontains=q) | Q(description__icontains=q),
-        price_min__gte=price_min, archived=False
+        price_min__gte=price_min, traded=False, archived=False
     )
 
     if user.is_authenticated:
@@ -124,14 +123,13 @@ def num_offers_points(n_offers, mean_offer_number):
 
 
 def build_item_suggestions(user):
-    queryset = Item.objects.filter(archived=False)
+    queryset = Item.objects.filter(traded=False, archived=False)
 
     if user.is_authenticated:
         lon = user.coordinates.longitude
         lat = user.coordinates.latitude
         queryset = queryset.filter(~Q(owner=user))
     else:
-        # FIXME provide lon/lat if not connected or not ?
         lon = 0
         lat = 0
 
@@ -200,8 +198,8 @@ class ItemViewSet(mixins.CreateModelMixin,
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return AggregatedItemSerializer
+        if self.action == "list" or self.action == "retrieve":
+            return DetailedItemSerializer
         return ItemSerializer
 
     def retrieve(self, request, pk=None, *args, **kwargs):
@@ -214,12 +212,38 @@ class ItemViewSet(mixins.CreateModelMixin,
         item.views += 1
         item.save()
 
-        serializer = AggregatedItemSerializer(item)
+        serializer = DetailedItemSerializer(item)
         return Response(serializer.data)
 
     @detail_route(methods=["GET"])
     def comments(self, request, pk=None):
-        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.all(), many=True).data)
+        return Response(CommentSerializer(Item.objects.get(pk=pk).comment_set.order_by("-date"), many=True).data)
+
+    @detail_route(methods=["POST"])
+    def archive(self, request, pk=None):
+        item = Item.objects.get(pk=pk)
+        item.archived = True
+        item.save()
+
+        return Response()
+
+    @detail_route(methods=["POST"])
+    def restore(self, request, pk=None):
+        item = Item.objects.get(pk=pk)
+        item.archived = False
+        item.save()
+
+        return Response()
+
+    @detail_route(methods=["POST"])
+    def images(self, request, pk=None):
+        serializer = CreateImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        item = get_object_or_404(Item, pk=pk)
+        i = Image.objects.create(image=serializer.validated_data["image"], item=item)
+
+        return Response(status=status.HTTP_201_CREATED, data=ImageSerializer(i).data, headers={"Location": i.image.url})
 
     def list(self, request, *args, **kwargs):
         serializer = SearchItemsSerializer(data=request.query_params)
@@ -229,24 +253,37 @@ class ItemViewSet(mixins.CreateModelMixin,
 
         if len(request.query_params) == 0:
             items = build_item_suggestions(user)
-            return Response(AggregatedItemSerializer(items, many=True).data)
+            return Response(DetailedItemSerializer(items, many=True).data)
         else:
             queryset = filter_items(serializer.validated_data, user)
-            return Response(AggregatedItemSerializer(queryset, many=True).data)
+            return Response(DetailedItemSerializer(queryset, many=True).data)
 
     def perform_create(self, serializer):
         price_min = serializer.validated_data.get("price_min", None)
         price_max = serializer.validated_data.get("price_max", None)
 
         check_prices(price_min, price_max)
-
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
+        item = serializer.instance
+
+        if item.traded:
+            raise ValidationError("Can't update a traded item")
+
+        if item.archived:
+            raise ValidationError("Can't update an archived item")
+
+        offers_received_pending = item.offers_received.filter(answered=False)
+        offers_done_pending = item.offers_done.filter(answered=False)
+
+        if offers_done_pending.count() > 0 or offers_received_pending.count() > 0:
+            raise ValidationError("Can't update an item with pending offers")
+
         price_min = serializer.validated_data.get("price_min", serializer.instance.price_min)
         price_max = serializer.validated_data.get("price_max", serializer.instance.price_max)
-
         check_prices(price_min, price_max)
+
         serializer.save()
 
 
@@ -255,37 +292,15 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
 
 
-class ImageViewSet(mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
+class DeliveryMethodViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DeliveryMethod.objects.all()
+    serializer_class = DeliveryMethodSerializer
+
+
+class ImageViewSet(mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     queryset = Image.objects.all()
     permission_classes = (IsAuthenticated,)
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return CreateImageSerializer
-
-        return ImageSerializer
-
-    def perform_create(self, serializer):
-        item_id = serializer.validated_data.get("item", None)
-        user_id = serializer.validated_data.get("user", None)
-        image = serializer.validated_data.get("image", None)
-
-        if item_id is not None:
-            item = get_object_or_404(Item, pk=item_id)
-            i = Image.objects.create(image=image, item=item)
-
-            return Response(status=status.HTTP_201_CREATED, headers={"Location": i.image.url})
-
-        if user_id is not None and self.request.user.is_authenticated:
-            userprofile = self.request.user.userprofile
-            userprofile.image = image
-            userprofile.save()
-
-            return Response(status=status.HTTP_201_CREATED, headers={"Location": userprofile.image.url})
-
-        raise ValidationError("Item or user is required")
 
 
 class LikeViewSet(mixins.ListModelMixin,
@@ -305,10 +320,10 @@ class LikeViewSet(mixins.ListModelMixin,
         user = self.request.user
 
         if item in user.item_set.all():
-            raise ValidationError("You cannot like your own item.")
+            raise ValidationError("You cannot like your own item")
 
         for like in self.request.user.like_set.all():
             if like.item == item:
-                raise ValidationError("An item cannot be liked twice.")
+                raise ValidationError("An item cannot be liked twice")
 
         serializer.save(user=user)

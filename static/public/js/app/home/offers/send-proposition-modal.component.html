@@ -8,10 +8,11 @@
                             <div class="col-lg-6 my-inventory">
                                 <div class="row">
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url}}">
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>Mathieu Urstein</h3>
+                                        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
                                     </div>
                                     <div class="hidden-lg-down col-lg-3 actions">
                                         <div class="btn-group btn-group-justified">
@@ -21,34 +22,12 @@
                                     </div>
                                 </div>
                                 <div class="row inventory swapp-inventory-mine">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
+                                        *ngFor="let userItem of user.items; let last = last" [update-my-inventory]="last">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="userItem.image_url === null" class="img-fluid" src="http://loremflickr.com/400/400"/>
+                                            <img *ngIf="userItem.image_url != null" class="img-fluid" src="{{ userItem.image_url }}"/>
+                                            <span>{{ userItem.name }}</span>
                                         </a>
                                     </div>
                                 </div>
@@ -62,53 +41,50 @@
                                         </div>
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>George Loosdé</h3>
+                                        <h3>{{ owner.first_name }} {{ owner.last_name }}</h3>
                                     </div>
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="owner.profile_picture_url=== null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="owner.profile_picture_url!= null" class="img-fluid avatar" src="{{ owner.profile_picture_url}}">
                                     </div>
                                 </div>
                                 <div class="row inventory swapp-inventory-yours">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell"
+                                        *ngFor="let ownerItem of ownerItems; let last = last" [update-your-inventory]="last">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="ownerItem.image_url === null" class="img-fluid" src="http://loremflickr.com/400/400"/>
+                                            <img *ngIf="ownerItem.image_url != null" class="img-fluid" src="{{ ownerItem.image_url }}"/>
+                                            <span>{{ ownerItem.name }}</span>
                                         </a>
                                     </div>
                                 </div>
-                                <a href="#" class="swap hidden-md-down">
+                                <a href="#" class="swap hidden-md-down" (click)="validOffer()">
                                     <i class="fa fa-refresh"></i>
                                 </a>
                             </div>
                             <div class="col-xs-12 swap-md hidden-lg-up">
-                                <a href="#" class="swap">
+                                <a href="#" class="swap" (click)="validOffer()">
                                     <i class="fa fa-refresh"></i>
                                 </a>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="displayMessage" [@flyInOut]>
+                    <div class="col-xs-12">
+                        <div class="row comment new" style="margin: auto; width: 70%">
+                            <form [formGroup]="offerForm" (ngSubmit)="sendOffer()">
+                                <div class="col-xs-1">
+                                    <img *ngIf="user.profile_picture_url=== null" class="img-fluid avatar" src="http://loremflickr.com/100/100"/>
+                                    <img *ngIf="user.profile_picture_url!= null" class="img-fluid avatar" src="{{ user.profile_picture_url}}"/>
+                                </div>
+                                <div class="col-xs-11">
+                                    <textarea rows="5" style="width: 100%" name="" placeholder="Write your message here" formControlName="message">{{ defaultMessage }}</textarea>
+                                </div>
+                                <button class="btn btn-primary submit" [disabled]="!message.valid" type="submit" style="float:right;">
+                                    Send offer
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

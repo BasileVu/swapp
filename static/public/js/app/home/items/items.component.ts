@@ -1,108 +1,66 @@
-import {Component, ViewEncapsulation, OnInit, OnChanges} from '@angular/core';
+import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { ItemsService } from './items.service';
 
 import { DetailedItem } from './detailed-item';
-import { Item } from './item';
-import { Owner } from './owner';
-import { Comment } from './comment';
-import {Subscription} from 'rxjs';
+import {Subscription} from "rxjs";
+import {AuthService} from "../../shared/authentication/authentication.service";
 
-declare var $:any;
+export let $: any;
 
 @Component({
     moduleId: module.id,
     selector: 'items',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './items.component.html',
-    providers: []
+    templateUrl: './items.component.html'
 })
-export class ItemsComponent implements OnInit, OnChanges {
+export class ItemsComponent implements OnInit {
 
-    errorMessage: string = "No items available for now";
-    items: Array<Item>;
-    selectedItem: DetailedItem;
-    selectedOwner: Owner;
-    selectedComments: Array<Comment>;
+    items: Array<DetailedItem>;
+    loggedIn: boolean;
+    subscription: Subscription;
+    infoMessage: string = "Loading items...";
 
-    constructor (private itemsService: ItemsService) {}
+    constructor (private itemsService: ItemsService,
+                 private authService: AuthService,
+                 public toastr: ToastsManager) {}
 
     ngOnInit() {
-        this.getItems();
-        
-        this.itemsService.getItemsSubject().subscribe((items: Item[]) => {
+        this.items = [];
+
+        // Listen for login changes
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => {
+                this.loggedIn = loggedIn;
+                this.getItems();
+            }
+        );
+
+        this.itemsService.getItemsSubject().subscribe((items: DetailedItem[]) => {
             this.items = items;
-
-            setTimeout(function(){
-                $('.grid').isotope({
-                    // options
-                    itemSelector: '.grid-item',
-                    layoutMode: 'masonry'
-                });
-                // layout only when images are loaded
-                $('.grid').imagesLoaded().progress( function() {
-                    $('.grid').isotope('layout');
-                });
-                // display items details when hovered
-                $('.grid-item').hover(function () {
-                    $(this).addClass('hovered');
-                    $('.grid').isotope('layout');
-                }, function () {
-                    $(this).removeClass('hovered');
-                    $('.grid').isotope('layout');
-                });
-                
-                $('.open-modal-item-x').click(function () {
-                    $('#view-item-x').modal('show');
-                });
-            }, 100);
+            if (items.length === 0)
+                this.infoMessage = "No item found";
+            else
+                this.infoMessage = "Loading items...";
         });
-    }
-
-    ngOnChanges() {
-        console.log("changes");
     }
 
     getItems() {
         this.itemsService.getItems()
             .then(
                 items => {
-                    this.items = items;
+                    this.items = [];
+                    this.items = items
                 },
-                error =>  this.errorMessage = <any>error);
+                error => this.toastr.error(error, "Error")
+            );
     }
 
-    gotoDetail(item_id: number, owner_id: number): void {
-        console.log("clicked. item_id: " + item_id);
-
-        let service = this.itemsService;
-        service.getDetailedItem(item_id)
-            .then(
-                item => {
-                    this.selectedItem = item;
-                    service.selectItem(this.selectedItem);
-
-                    setTimeout(function(){
-                $('.grid').isotope({
-                    // options
-                    itemSelector: '.grid-item',
-                    layoutMode: 'masonry'
-                });
-                // layout only when images are loaded
-                $('.grid').imagesLoaded().progress( function() {
-                    $('.grid').isotope('layout');
-                });
-                // display items details when hovered
-                $('.grid-item').hover(function () {
-                    $(this).addClass('hovered');
-                    $('.grid').isotope('layout');
-                }, function () {
-                    $(this).removeClass('hovered');
-                    $('.grid').isotope('layout');
-                });
-            }, 200);
-                },
-                error => this.errorMessage = <any>error);
+    gotoDetail(item: DetailedItem): void {
+        // Inform the item modal about the item we just clicked.
+        // (ItemComponent and ItemModalComponent communicate via ItemService)
+        this.itemsService.selectItem(item);
     }
 
     searchCategory(category_id: number) {

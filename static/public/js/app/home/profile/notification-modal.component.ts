@@ -1,4 +1,7 @@
-import {Component, ViewEncapsulation, OnInit, Input} from '@angular/core';
+import {
+    Component, ViewEncapsulation, OnInit, Input,
+    EventEmitter, Output
+} from '@angular/core';
 import {NotificationsService} from "./notifications.service";
 import {Notification} from "./notification";
 import {Subscription} from "rxjs";
@@ -13,6 +16,7 @@ import {AuthService} from "../../shared/authentication/authentication.service";
 export class NotificationModalComponent implements OnInit {
 
     @Input() loggedIn: boolean;
+    @Output() notificationEvent = new EventEmitter();
 
     notifications: Notification[];
     subscription: Subscription;
@@ -29,6 +33,7 @@ export class NotificationModalComponent implements OnInit {
             this.notificationsService.getNotification().then(res => {
                 console.log(res);
                 this.notifications = res;
+                this.notificationEvent.emit(this.notifications.length);
             });
         }
     }

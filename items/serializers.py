@@ -1,53 +1,84 @@
+from django.db.models import Q
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from items.models import Category, Item, Image, Like, KeyInfo
+from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
+from users.serializers import CoordinatesSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name')
+        fields = ("id", "name")
+
+
+class DeliveryMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryMethod
+        fields = ("id", "name")
+
+
+class InterestedByCategorySerializer(serializers.Serializer):
+    interested_by = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+
+    class Meta:
+        fields = ("interested_by",)
 
 
 class CreateImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
-    item = serializers.IntegerField(required=False)
-    user = serializers.IntegerField(required=False)
 
     class Meta:
-        field = ('image', 'item', 'user')
+        fields = ("image",)
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return obj.image.url
+
     class Meta:
         model = Image
-        fields = ('id', 'image', 'item')
+        fields = ("id", "url")
 
 
 class LikeSerializer(serializers.ModelSerializer):
     user = serializers.CharField(read_only=True)
+    date = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Like
-        fields = ('id', 'user', 'item', 'date')
+        fields = ("id", "user", "item", "date")
 
 
 class KeyInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyInfo
-        fields = ('key', 'info')
+        fields = ("key", "info")
 
 
 class ItemSerializer(serializers.ModelSerializer):
     keyinfo_set = KeyInfoSerializer(many=True)
+    delivery_methods = serializers.PrimaryKeyRelatedField(many=True, queryset=DeliveryMethod.objects.all())
 
     def create(self, validated_data):
         key_info_set = validated_data.pop("keyinfo_set")
+        delivery_methods = validated_data.pop("delivery_methods")
+
+        if len(delivery_methods) == 0:
+            raise ValidationError("A least one delivery method should be specified")
+
         item = Item.objects.create(**validated_data)
 
         for key_info in key_info_set:
             item.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"], item=item))
+
+        for delivery_method in delivery_methods:
+            item.delivery_methods.add(DeliveryMethod.objects.get(pk=delivery_method.id))
 
         return item
 
@@ -60,36 +91,55 @@ class ItemSerializer(serializers.ModelSerializer):
                 instance.keyinfo_set.add(KeyInfo.objects.create(key=key_info["key"], info=key_info["info"],
                                                                 item=instance))
 
+        if validated_data.get("delivery_methods", None) is not None:
+            delivery_methods = validated_data.pop("delivery_methods")
+
+            if len(delivery_methods) == 0:
+                raise ValidationError("A least one delivery method should be specified")
+
+            instance.delivery_methods.clear()
+
+            for delivery_method in delivery_methods:
+                instance.delivery_methods.add(DeliveryMethod.objects.get(pk=delivery_method.id))
+
         return super().update(instance, validated_data)
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'category', 'keyinfo_set')
+        fields = ("id", "name", "description", "price_min", "price_max", "category", "keyinfo_set", "delivery_methods")
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
+    image_id = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+
+    def get_image_id(self, obj):
+        return obj.image_set.first().id if obj.image_set.count() > 0 else None
 
     def get_image_url(self, obj):
         return obj.image_set.first().image.url if obj.image_set.count() > 0 else None
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'image_url')
+        fields = ("id", "name", "image_id", "image_url", "archived")
 
 
-class AggregatedItemSerializer(serializers.ModelSerializer):
+class DetailedItemSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     keyinfo_set = KeyInfoSerializer(many=True)
-    image_urls = serializers.SerializerMethodField()
+    delivery_methods = DeliveryMethodSerializer(many=True)
+    images = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     offers_received = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
     similar = serializers.SerializerMethodField()
+    owner_picture_url = serializers.SerializerMethodField()
+    owner_location = serializers.SerializerMethodField()
+    owner_coordinates = serializers.SerializerMethodField()
 
-    def get_image_urls(self, obj):
-        return [i.image.url for i in obj.image_set.all()]
+    def get_images(self, obj):
+        return ImageSerializer(obj.image_set.all(), many=True).data
 
     def get_likes(self, obj):
         return obj.like_set.count()
@@ -104,12 +154,23 @@ class AggregatedItemSerializer(serializers.ModelSerializer):
         return obj.owner.username
 
     def get_similar(self, obj):
-        return InventoryItemSerializer(Item.objects.filter(category=obj.category).exclude(pk=obj.id), many=True).data
+        return InventoryItemSerializer(Item.objects.filter(~Q(pk=obj.id), category=obj.category), many=True).data
+
+    def get_owner_picture_url(self, obj):
+        return obj.owner.userprofile.image.url if obj.owner.userprofile.image.name != "" else None
+
+    def get_owner_location(self, obj):
+        location = obj.owner.location
+        return "%s, %s" % (location.city, location.country)
+
+    def get_owner_coordinates(self, obj):
+        return CoordinatesSerializer(obj.owner.coordinates).data
 
     class Meta:
         model = Item
-        fields = ('id', 'name', 'description', 'price_min', 'price_max', 'creation_date', 'owner_username', 'category',
-                  'views', 'image_urls', 'likes', 'comments', 'offers_received', 'keyinfo_set', 'similar')
+        fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
+                  "views", "images", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
+                  "similar", "owner_picture_url", "owner_location", "owner_coordinates", "traded", "archived")
 
 
 class SearchItemsSerializer(serializers.Serializer):

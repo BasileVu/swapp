@@ -5,57 +5,63 @@ from users.models import *
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True, required=True)
-    first_name = serializers.CharField(write_only=True, required=True)
-    last_name = serializers.CharField(write_only=True, required=True)
-    email = serializers.EmailField(write_only=True, required=True)
-    password = serializers.CharField(write_only=True, required=True)
-    password_confirmation = serializers.CharField(write_only=True, required=True)
-    street = serializers.CharField(write_only=True, required=True)
-    city = serializers.CharField(write_only=True, required=True)
-    region = serializers.CharField(write_only=True, required=True)
-    country = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    password_confirmation = serializers.CharField(write_only=True)
+    street = serializers.CharField(write_only=True)
+    city = serializers.CharField(write_only=True)
+    region = serializers.CharField(write_only=True)
+    country = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password', 'password_confirmation',
-                  'street', 'city', 'region', 'country')
+        fields = ("username", "first_name", "last_name", "email", "password", "password_confirmation",
+                  "street", "city", "region", "country")
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True, required=True)
-    first_name = serializers.CharField(write_only=True, required=True)
-    last_name = serializers.CharField(write_only=True, required=True)
-    email = serializers.EmailField(write_only=True, required=True)
+    username = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+        fields = ("username", "first_name", "last_name", "email")
 
 
 class LoginUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True, required=True)
-    password = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = ("username", "password")
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(write_only=True, required=True)
-    new_password = serializers.CharField(write_only=True, required=True)
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    street = serializers.CharField(required=True)
-    city = serializers.CharField(required=True)
-    region = serializers.CharField(required=True)
-    country = serializers.CharField(required=True)
+    street = serializers.CharField()
+    city = serializers.CharField()
+    region = serializers.CharField()
+    country = serializers.CharField()
 
     class Meta:
         model = Location
-        fields = ('street', 'city', 'region', 'country')
+        fields = ("street", "city", "region", "country")
+
+
+class CoordinatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coordinates
+        fields = ("latitude", "longitude")
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -63,8 +69,8 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('id', 'user', 'offer', 'text', 'note')
-        read_only_fields = ('user',)
+        fields = ("id", "user", "offer", "text", "note")
+        read_only_fields = ("user",)
 
 
 class NoteUpdateSerializer(serializers.ModelSerializer):
@@ -72,4 +78,4 @@ class NoteUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('text', 'note')
+        fields = ("text", "note")

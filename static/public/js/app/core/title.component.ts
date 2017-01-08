@@ -1,6 +1,5 @@
 // Exact copy of app/title.component.ts except import UserService from shared
-import { Component, Input } from '@angular/core';
-import { UserService }      from '../core/user.service';
+import { Component } from '@angular/core';
 
 @Component({
   moduleId: module.id,
@@ -9,12 +8,9 @@ import { UserService }      from '../core/user.service';
 })
 export class TitleComponent {
 
-  @Input() subtitle = '';
   title = 'SWAPP';
-  user = '';
 
-  constructor(userService: UserService) {
-    this.user = userService.userFirstName;
+  constructor() {
   }
 
 }

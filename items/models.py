@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils import timezone
 
 
@@ -9,11 +11,20 @@ class Item(models.Model):
     price_min = models.IntegerField(default=0)
     price_max = models.IntegerField(default=0)
     creation_date = models.DateTimeField("date published", default=timezone.now)
-    archived = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
+    traded = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey("items.Category", on_delete=models.CASCADE)
+    delivery_methods = models.ManyToManyField("items.DeliveryMethod")
+
+    def __str__(self):
+        return self.name
+
+
+class DeliveryMethod(models.Model):
+    name = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
         return self.name
@@ -27,12 +38,22 @@ class KeyInfo(models.Model):
 
 
 class Image(models.Model):
-    image = models.ImageField('Uploaded image', null=True)
+    image = models.ImageField("Uploaded image", null=True)
 
     item = models.ForeignKey("items.Item", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.image.name
+
+
+@receiver(pre_delete, sender=Image)
+def image_delete(sender, instance, **kwargs):
+    """
+    Delete the file associated with the image field.
+    """
+
+    # Pass false so ImageField doesn't save the model
+    instance.image.delete(False)
 
 
 class Category(models.Model):

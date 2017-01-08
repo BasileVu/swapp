@@ -6,7 +6,7 @@ from . import views
 app_name = "users"
 
 router = DefaultRouter()
-router.register(r'notes', views.NoteViewSet)
+router.register(r"notes", views.NoteViewSet)
 
 urlpatterns = [
     url(r"csrf/$", views.get_csrf_token, name="get_csrf"),
@@ -17,4 +17,6 @@ urlpatterns = [
     url(r"account/$", views.UserAccount.as_view(), name="user_account"),
     url(r"account/password/", views.change_password, name="change_password"),
     url(r"account/location/", views.LocationView.as_view(), name="location"),
+    url(r"account/categories/", views.CategoriesView.as_view(), name="categories"),
+    url(r"account/image/", views.set_profile_image, name="profile_image")
 ] + router.urls

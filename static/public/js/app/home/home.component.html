@@ -2,7 +2,7 @@
 
 <div id="content-main" class="container">
     <inventory #inventory [loggedIn]="loggedIn"></inventory>
-    <div class="row grid" #classGrid>
+    <div class="row grid" #classGrid style="margin-bottom: 60px">
         <profile #profile (profilePictureEvent)="createAccount.addProfilePicture()"></profile>
         <items></items>
     </div>
@@ -11,9 +11,9 @@
 <search-modal></search-modal>
 <register-user-modal></register-user-modal>
 <create-account-modal #createAccount (loginEvent)="profile.login($event)" (updateAccountEvent)="profile.getAccount()"></create-account-modal>
-<update-profile-modal></update-profile-modal>
+<update-profile-modal (updateAccountEvent)="profile.getAccount()"></update-profile-modal>
 <profile-modal></profile-modal>
 <add-item-modal (newItemEvent)="inventory.addItemEvent($event)"></add-item-modal>
-<notification-modal [loggedIn]="loggedIn"></notification-modal>
+<notification-modal [loggedIn]="loggedIn" (notificationEvent)="profile.updateNotifications($event)"></notification-modal>
 <send-proposition-modal></send-proposition-modal>
 <accept-proposition-modal></accept-proposition-modal>

@@ -1,54 +1,27 @@
-class Location {
-    street: string;
-    city: string;
-    region: string;
-    country: string;
-    
-    constructor(street: string, city: string, region: string, country: string) {
-        this.street = street;
-        this.city = city;
-        this.region = region;
-        this.country = country;
-    }
-}
+import {InventoryItem} from "../inventory/inventory-item";
 
 export class User {
-    id: number
-    profile_picture: string;
+    id: number;
+    profile_picture_url: string;
     username: string;
     first_name: string;
     last_name: string;
-    email: string;
-    location: Location;
-    last_modification_date: Date;
-    notes: Array<number>;
-    likes: Array<number>;
-    items: Array<number>;
+    location: string;
+    items: Array<InventoryItem>;
+    notes: number;
+    note_avg: number;
+    interested_by: Array<{id:number,name:string}>;
 
-    constructor(id: number,
-                profile_picture: string,
-                username: string,
-                first_name: string,
-                last_name: string,
-                email: string,
-                street: string,
-                city: string,
-                region: string,
-                country: string,
-                last_modification_date: string,
-                notes: Array<number>,
-                likes: Array<number>,
-                items: Array<number>) {
-        this.id = id;
-        this.profile_picture = profile_picture;
-        this.username = username;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.email = email;
-        this.location = new Location(street, city, region, country);
-        this.last_modification_date = new Date(last_modification_date);
-        this.notes = notes;
-        this.likes = likes;
-        this.items = items;
+    constructor() {
+        this.id = -1;
+        this.profile_picture_url = null;
+        this.username = "";
+        this.first_name = "";
+        this.last_name = "";
+        this.location = "";
+        this.items = [];
+        this.notes = 0;
+        this.note_avg = 0;
+        this.interested_by = [];
     }
 }

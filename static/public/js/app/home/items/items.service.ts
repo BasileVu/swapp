@@ -3,26 +3,25 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 import { Observable } from 'rxjs';
 
-import { Item } from './item';
 import { DetailedItem } from './detailed-item';
-import { Owner } from './owner';
 import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
+import {User} from "../profile/user";
+import {Like} from "./like";
+import {ProfileService} from "../profile/profile.service";
 
 @Injectable()
 export class ItemsService {
 
     // Observable string sources
     private itemSelectedSource = new Subject<DetailedItem>();
-    private ownerSelectedSource = new Subject<Owner>();
+    private userSelectedSource = new Subject<User>();
     private commentsSelectedSource = new Subject<Comment[]>();
 
     // Observable string streams
     itemSelected$ = this.itemSelectedSource.asObservable();
-    ownerSelected$ = this.ownerSelectedSource.asObservable();
-    commentsSelected$ = this.commentsSelectedSource.asObservable();
 
-    private itemsSubject: Subject<Item[]> = new Subject<Item[]>();
+    private itemsSubject: Subject<DetailedItem[]> = new Subject<DetailedItem[]>();
 
     private itemsUrl = '/api/items/';  // URL to web API
 
@@ -33,23 +32,23 @@ export class ItemsService {
         this.itemSelectedSource.next(item);
     }
 
-    selectOwner(owner: Owner) {
-        this.ownerSelectedSource.next(owner);
+    selectUser(user: User) {
+        this.userSelectedSource.next(user);
     }
 
     selectComments(comments: Comment[]) {
         this.commentsSelectedSource.next(comments);
     }
 
-    updateItems(items: Item[]){
+    updateItems(items: DetailedItem[]){
         this.itemsSubject.next(items);
     }
 
-    getItemsSubject(): Observable<Item[]> {
+    getItemsSubject(): Observable<DetailedItem[]> {
         return this.itemsSubject.asObservable();
     }
 
-    getItems (): Promise<Item[]> {
+    getItems (): Promise<DetailedItem[]> {
         return this.http.get(this.itemsUrl)
             .toPromise()
             .then(this.extractData)
@@ -63,7 +62,7 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
-    getOwner (owner_username: string): Promise<Owner> {
+    getUser (owner_username: string): Promise<User> {
         return this.http.get('/api/users/' + owner_username)
             .toPromise()
             .then(this.extractData)
@@ -88,18 +87,29 @@ export class ItemsService {
             .catch(this.handleError);
     }
 
+    like(l: Like): Promise<any> {
+        let body = JSON.stringify(l); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.post('/api/likes/', body, options)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
     private extractData(res: Response) {
         let body = res.json();
         return body || { };
     }
 
     private handleError (error: Response | any) {
+        console.log(error);
         // TODO : In a real world app, we might use a remote logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {
             const body = error.json() || '';
-            const err = body.error || JSON.stringify(body);
-            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+            errMsg = body[0];
         } else {
             errMsg = error.message ? error.message : error.toString();
         }

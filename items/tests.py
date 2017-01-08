@@ -1,11 +1,11 @@
 import json
 
-from PIL import Image as ImagePil
-from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from rest_framework import status
 
 from items.models import *
+from swapp import settings
 from users.models import *
 
 
@@ -13,6 +13,12 @@ class CategoryTests(TestCase):
     def test_category_name_unique(self):
         Category.objects.create(name="test")
         self.assertRaises(IntegrityError, Category.objects.create, name="test")
+
+
+class DeliveryMethodTests(TestCase):
+    def test_delivery_method_name_unique(self):
+        DeliveryMethod.objects.create(name="test")
+        self.assertRaises(IntegrityError, DeliveryMethod.objects.create, name="test")
 
 
 class ItemTests(TestCase):
@@ -28,6 +34,10 @@ class ItemTests(TestCase):
 
 
 class ImageAPITests(TestCase):
+    images_url = "/api/images/"
+    items_url = "/api/items/"
+    image_file_delete_path = "%s/%s" % (settings.MEDIA_ROOT, "delete_image.png")
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -40,98 +50,177 @@ class ImageAPITests(TestCase):
     def login(self):
         self.client.login(username="username", password="password")
 
-    def post_image(self, item):
-        image = ImagePil.new("RGBA", size=(50, 50), color=(155, 0, 0))
-        image.save("test.png")
+    def post_image(self, image_name="test.png", item_id=1):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
+            return self.client.post("%s%d/%s/" % (self.items_url, item_id, "images"), {"image": data},
+                                    format="multipart")
 
-        with open("test.png", "rb") as data:
-            return self.client.post("/api/images/", {"image": data, "item": item}, format="multipart")
-
-    def get_image(self, id_image=1):
-        return self.client.get("/api/images/" + str(id_image) + "/", content_type="application/json")
-
-    def delete_image(self, id_image=1):
-        return self.client.delete("/api/images/" + str(id_image) + "/", content_type="application/json")
+    def delete_image(self, image_id=1):
+        return self.client.delete("%s%d/" % (self.images_url, image_id), content_type="application/json")
 
     def test_post_image(self):
         self.assertEqual(Image.objects.count(), 0)
 
         self.login()
-        r = self.post_image(1)
+        r = self.post_image()
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(self.item.image_set.count(), 1)
         self.assertNotEqual(self.item.image_set.first().image.name, "")
+        self.assertNotEqual(self.item.image_set.first().image.url, "")
+
+        r = self.client.get("%s%d/" % (self.items_url, self.item.id))
+        self.assertEqual(r.data["images"][0]["id"], 1)
+        self.assertNotEqual(r.data["images"][0]["url"], None)
+
+    def test_post_images(self):
+        self.assertEqual(Image.objects.count(), 0)
+
+        self.login()
+        self.post_image()
+        self.post_image()
+
+        self.assertEqual(Image.objects.count(), 2)
+        self.assertEqual(self.item.image_set.count(), 2)
+
+        r = self.client.get("%s%d/" % (self.items_url, self.item.id))
+        self.assertEqual(r.data["images"][0]["id"], 1)
+        self.assertNotEqual(r.data["images"][0]["url"], None)
+        self.assertEqual(r.data["images"][1]["id"], 2)
+        self.assertNotEqual(r.data["images"][1]["url"], None)
 
     def test_delete_image(self):
         self.login()
-        r = self.post_image(1)
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        self.post_image(image_name="delete_image.png")
 
-        r = self.delete_image(id_image=1)
+        self.assertEqual(Image.objects.count(), 1)
+
+        r = self.delete_image()
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(Image.objects.count(), 0)
+        self.assertRaises(FileNotFoundError, open, self.image_file_delete_path, "rb")
 
-        r = self.delete_image(id_image=10)
+        r = self.delete_image(image_id=10)
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class CategoryAPITests(TestCase):
+class DeliveryMethodAPITests(TestCase):
+    delivery_methods_url = "/api/deliverymethods/"
+
     def setUp(self):
-        self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
-        self.current_user.userprofile.save()
+        DeliveryMethod.objects.create(name="At my place")
+        DeliveryMethod.objects.create(name="At any place")
+        DeliveryMethod.objects.create(name="By mail")
 
-        Category.objects.create(name="Test")
-        Category.objects.create(name="Test2")
+    def get_delivery_methods(self):
+        return self.client.get(self.delivery_methods_url, content_type="application/json")
 
-        self.login()
+    def get_delivery_method(self, id_delivery_method=1):
+        return self.client.get("%s%d/" % (self.delivery_methods_url, id_delivery_method),
+                               content_type="application/json")
 
-    def login(self):
+    def test_get_delivery_method(self):
+        r = self.get_delivery_method()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["name"], "At my place")
+
+        r = self.get_delivery_method(id_delivery_method=100)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_delivery_methods(self):
+        r = self.get_delivery_methods()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(r.data), 3)
+        self.assertEqual(r.data[0]["id"], 1)
+        self.assertEqual(r.data[0]["name"], "At my place")
+        self.assertEqual(r.data[1]["id"], 2)
+        self.assertEqual(r.data[1]["name"], "At any place")
+        self.assertEqual(r.data[2]["id"], 3)
+        self.assertEqual(r.data[2]["name"], "By mail")
+
+    def test_post_delete_put_patch_should_not_work_delivery_method(self):
+        User.objects.create_user(username="username", email="test@test.com", password="password")
         self.client.login(username="username", password="password")
 
+        r = self.client.post(self.delivery_methods_url, data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        r = self.client.put("%s%d/" % (self.delivery_methods_url, 1), data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        r = self.client.patch("%s%d/" % (self.delivery_methods_url, 1), data=json.dumps({
+            "name": "test"
+        }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        r = self.client.delete("%s%d/" % (self.delivery_methods_url, 1), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class CategoryAPITests(TestCase):
+    categories_url = "/api/categories/"
+
+    def setUp(self):
+        Category.objects.create(name="Test1")
+        Category.objects.create(name="Test2")
+
     def get_categories(self):
-        return self.client.get("/api/categories/", content_type="application/json")
+        return self.client.get(self.categories_url, content_type="application/json")
 
     def get_category(self, id_category=1):
-        return self.client.get("/api/categories/" + str(id_category) + "/", content_type="application/json")
+        return self.client.get("%s%d/" % (self.categories_url, id_category), content_type="application/json")
+
+    def test_get_category(self):
+        r = self.get_category()
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["id"], 1)
+        self.assertEqual(r.data["name"], "Test1")
+
+        r = self.get_category(id_category=100)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_categories(self):
         r = self.get_categories()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(len(r.data), 2)
-
-    def test_get_category(self):
-        r = self.get_category(id_category=1)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-        r = self.get_category(id_category=100)
-        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(r.data[0]["id"], 1)
+        self.assertEqual(r.data[0]["name"], "Test1")
+        self.assertEqual(r.data[1]["id"], 2)
+        self.assertEqual(r.data[1]["name"], "Test2")
 
     def test_post_delete_put_patch_should_not_work_category(self):
-        self.login()
+        User.objects.create_user(username="username", email="test@test.com", password="password")
+        self.client.login(username="username", password="password")
 
-        r = self.client.post("/api/categories/", data=json.dumps({
+        r = self.client.post(self.categories_url, data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        r = self.client.put("/api/categories/1/", data=json.dumps({
+        r = self.client.put("%s%d/" % (self.categories_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        r = self.client.patch("/api/categories/1/", data=json.dumps({
+        r = self.client.patch("%s%d/" % (self.categories_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        r = self.client.delete("/api/categories/1/", content_type="application/json")
+        r = self.client.delete("%s%d/" % (self.categories_url, 1), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class LikeAPITests(TestCase):
+    likes_url = "/api/likes/"
+
     def setUp(self):
         self.current_user = User.objects.create_user(username="username", email="test@test.com", password="password")
 
@@ -152,18 +241,18 @@ class LikeAPITests(TestCase):
                                    archived=archived, category=category, owner=owner)
 
     def post_like(self, item):
-        return self.client.post("/api/likes/", data=json.dumps({
+        return self.client.post(self.likes_url, data=json.dumps({
             "item": item
         }), content_type="application/json")
 
     def get_likes(self):
-        return self.client.get("/api/likes/", content_type="application/json")
+        return self.client.get(self.likes_url, content_type="application/json")
 
     def get_like(self, id_like):
-        return self.client.get("/api/likes/%d/" % id_like, content_type="application/json")
+        return self.client.get("%s%d/" % (self.likes_url, id_like), content_type="application/json")
 
     def delete_like(self, id_like):
-        return self.client.delete("/api/likes/%d/" % id_like, content_type="application/json")
+        return self.client.delete("%s%d/" % (self.likes_url, id_like), content_type="application/json")
 
     def test_post_like(self):
         r = self.post_like(1)
@@ -221,12 +310,12 @@ class LikeAPITests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_patch_should_be_denied(self):
-        r = self.client.put("/api/likes/1/", data=json.dumps({
+        r = self.client.put("%s%d/" % (self.likes_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        r = self.client.patch("/api/likes/1/", data=json.dumps({
+        r = self.client.patch("%s%d/" % (self.likes_url, 1), data=json.dumps({
             "name": "test"
         }), content_type="application/json")
         self.assertEqual(r.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

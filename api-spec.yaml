@@ -38,7 +38,7 @@ paths:
         200:
           description: "Successful operation."
         401:
-          description: "Invalid username/password combination or account not active."
+          description: "Invalid username/password combination. \n\r Account not active."
           
   /logout/:
     get:
@@ -62,8 +62,12 @@ paths:
       responses:
         201:
           description: "Successful operation."
+          headers:
+            Location: 
+              description: "Location of the created user."
+              type: string
         400:
-          description: "Location not existing."
+          description: "Location not existing. \n\r Passwords don't match."
         409:
           description: "An user with the same username already exists."
           
@@ -102,6 +106,15 @@ paths:
                 type: number
               note_avg:
                 type: number
+              interested_by:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
           
   /account/:
     get:
@@ -125,21 +138,25 @@ paths:
               email:
                 type: string
               location:
-                  $ref: "#/definitions/Location"
+                $ref: "#/definitions/Location"
               last_modification_date:
                 type: string
               categories:
                 type: array
                 items:
-                  type: string
-              items:
-                type: array
-                items:
-                  type: number
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
               notes:
                 type: number
               note_avg:
                 type: number
+              coordinates:
+                $ref: "#/definitions/Coordinates"
+                
         401:
           description: "User is not authenticated."
     put:
@@ -231,6 +248,56 @@ paths:
         401:
           description: "User not authenticated."
           
+  /account/categories/:
+    put:
+      description: "Updates the interested by categories of the current user logged in."
+      parameters:
+        - in: body
+          name: body
+          description: "The interested by categories to update."
+          required: true
+          schema:
+            $ref: "#/definitions/InterestedBy"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+      
+    patch:
+      description: "Updates the interested by categories of the current user logged in."
+      parameters:
+      - in: body
+        name: body
+        description: "The interested by categories to update."
+        required: false
+        schema:
+          $ref: "#/definitions/InterestedBy"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /account/image/:
+    post:
+      description: "Creates a new image for the user profile. The encoding must be **multipart/form-data**."
+      parameters:
+      - in: formData
+        name: image
+        description: "The image to upload."
+        required: true
+        type: file
+      responses:
+        201:
+          description: "Successful operation."
+          headers:
+            Location: 
+              description: "Location of the created image (url)."
+              type: string
+        401:
+          description: "User not authenticated."
+          
   /notes/:
     post:
       description: "Creates a new note."
@@ -240,12 +307,21 @@ paths:
         description: "The content of the note."
         required: true
         schema:
-          $ref: "#/definitions/Note"
+          type: object
+          properties:
+            offer:
+              type: number
+            text:
+              type: string
+            note:
+              type: number
       responses:
         201:
           description: "Successful operation."
+          schema:
+            $ref: "#/definitions/Note"
         400:
-          description: "The related offer has not been accepted, the user is not linked to the related offer or the user has already noted the related offer."
+          description: "The related offer has not been accepted. \n\r The user is not linked to the related offer. \n\r The user has already noted the related offer."
         401:
           description: "User not authenticated."
           
@@ -279,7 +355,12 @@ paths:
           description: "The content of the note."
           required: true
           schema:
-            $ref: "#/definitions/Note"
+            type: object
+            properties:
+              text:
+                type: string
+              note:
+                type: number
       responses:
         200:
           description: "Successful operation."
@@ -299,7 +380,12 @@ paths:
           description: "The content of the note."
           required: false
           schema:
-            $ref: "#/definitions/Note"
+            type: object
+            properties:
+              text:
+                type: string
+              note:
+                type: number
       responses:
         200:
           description: "Successful operation."
@@ -322,7 +408,7 @@ paths:
           
   /categories/:
     get:
-      description: "Gets all the categories for the current user."
+      description: "Gets all the categories."
       responses:
         200:
           description: "Successful operation."
@@ -335,8 +421,6 @@ paths:
                   type: number
                 name:
                   type: string
-        401:
-          description: "User not authenticated."
           
   /categories/{id}/:
     get:
@@ -357,8 +441,42 @@ paths:
                   type: number
                 name:
                   type: string
-        401:
-          description: "User not authenticated."
+                  
+  /deliverymethods/:
+    get:
+      description: "Gets all the delivery methods."
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+          
+  /deliverymethods/{id}/:
+    get:
+      description: "Gets a detailed delivery method."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the delivery method."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
           
   /items/:
     get:
@@ -424,12 +542,37 @@ paths:
       responses:
         201:
           description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              name: 
+                type: string
+              description:
+                type: string
+              price_min:
+                type: number
+              price_max:
+                type: number
+              category:
+                type: number
+              keyinfo_set:
+                type: array
+                items:
+                  $ref: "#/definitions/KeyInfo"
+              delivery_methods:
+                type: array
+                items:
+                  type: number
+        400:
+          description: "Price min is negative. \n\r Price max is negative. \n\r Price min is higher than price max. \n\r One delivery method should be specified."
         401:
           description: "User not authenticated."
           
   /items/{id}/:
     get:
-      description: "Gets a detailed unarchived item."
+      description: "Gets a detailed item."
       parameters:
         - in: path
           name: id
@@ -459,6 +602,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "Can't update a traded item. \n\r Can't update an archived item. \n\r Can't update an item with pending offers. \n\r Price min is negative. \n\r Price max is negative. \n\r Price min is higher than price max. \n\r One delivery method should be specified."
         401:
           description: "User not authenticated."
               
@@ -479,6 +624,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "Can't update a traded item. \n\r Can't update an archived item. \n\r Can't update an item with pending offers. \n\r Price min is negative. \n\r Price max is negative. \n\r Price min is higher than price max. \n\r One delivery method should be specified."
         401:
           description: "User not authenticated."
             
@@ -514,6 +661,60 @@ paths:
                 user_profile_picture:
                   type: string
                   
+  /items/{id}/archive/:
+    post:
+      description: "Archives a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /items/{id}/restore/:
+    post:
+      description: "Restores a specified item."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the item."
+          required: true
+          type: number
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+          
+  /items/{id}/images/:
+    post:
+      description: "Creates a new image for an item. The encoding must be **multipart/form-data**."
+      parameters:
+      - in: path
+        name: id
+        description: "The id of the item."
+        required: true
+        type: number
+      - in: formData
+        name: image
+        description: "The image to upload."
+        required: true
+        type: file
+      responses:
+        201:
+          description: "Successful operation."
+          headers:
+            Location: 
+              description: "Location of the created image (url)."
+              type: string
+        401:
+          description: "User not authenticated."
+                  
   /comments/:
     post:
       description: "Creates a new comment."
@@ -527,6 +728,8 @@ paths:
       responses:
         201:
           description: "Successful operation."
+          schema:
+            $ref: "#/definitions/CommentGet"
         401:
           description: "User not authenticated."
           
@@ -538,18 +741,7 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                id:
-                  type: number
-                content:
-                  type: string
-                date:
-                  type: string
-                user:
-                  type: number
-                item:
-                  type: number
+              $ref: "#/definitions/CommentGet"
         401:
           description: "User not authenticated."
           
@@ -566,18 +758,7 @@ paths:
         200:
           description: "Successful operation."
           schema:
-            type: object
-            properties:
-              id:
-                type: number
-              content:
-                type: string
-              date:
-                type: string
-              user:
-                type: number
-              item:
-                type: number
+            $ref: "#/definitions/CommentGet"
         401:
           description: "User not authenticated."
           
@@ -658,6 +839,26 @@ paths:
           description: "User not authenticated."
           
   /notifications/{id}/:
+    put:
+      description: "Sets a notification as read or not."
+      parameters:
+        - in: path
+          name: id
+          description: "The id of the notification."
+          required: true
+          type: number
+        - in: body
+          name: body
+          description: "The content of the notification."
+          required: true
+          schema:
+            $ref: "#/definitions/Notification"
+      responses:
+        200:
+          description: "Successful operation."
+        401:
+          description: "User not authenticated."
+  
     patch:
       description: "Sets a notification as read or not."
       parameters:
@@ -671,47 +872,16 @@ paths:
         description: "The content of the notification."
         required: false
         schema:
-          type: object
-          properties:
-            read:
-              type: boolean
+          $ref: "#/definitions/Notification"
       responses:
         200:
           description: "Successful operation."
         401:
           description: "User not authenticated."
           
-  /images/:
-    post:
-      description: "Creates a new image, either for an item or for an user, according to the payload. The encoding must be **multipart/form-data**."
-      parameters:
-        - in: formData
-          name: image
-          description: "The image to updload."
-          required: true
-          type: file
-        - in: formData
-          name: item
-          description: 
-            "The id of the item that will be linked to the image. If this parameter is specified, the image will be linked to the item."
-          required: false
-          type: number
-        - in: formData
-          name: user
-          description: "The id of the user having the account. If this parameter is specified, the image will be the user's picture."
-          required: false
-          type: number
-      responses:
-        201:
-          description: "Successful operation."
-        400:
-          description: "The item field or the user field is missing."
-        401:
-          description: "User not authenticated."
-          
   /images/{id}/:
     delete:
-      description: "Deletes the specified image."
+      description: "Deletes the specified image (associated with an item)."
       parameters:
         - in: path
           name: id
@@ -737,8 +907,19 @@ paths:
       responses:
         201:
           description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              comment:
+                type: string
+              item_given:
+                type: number
+              item_received:
+                type: number
         400:
-          description: "The specified item given is not owned by the user, the specified item received is already owned by the user or the price max of the specified item given is smaller than the price min of the specified item received."
+          description: "The user has already created an offer with the same item for the wanted item. \n\r There is already an offer for the given item with the wanted item. \n\r Can't create an offer with an item that has been traded. \n\r Can't create an offer for an item that has been traded. \n\r The item traded does not exist. \n\r The item wanted does not exist. \n\r Can't trade another person's item. \n\r Can't traded for the own user item. \n\r Price max of the given item is smaller than price min of the wanted item."
         401:
           description: "User not authenticated."
           
@@ -789,6 +970,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "Can't update an accepted offer. \n\r Can't accept or refuse the own user offer. "
         401:
           description: "User not authenticated."
               
@@ -809,6 +992,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "Can't update an accepted offer. \n\r Can't accept or refuse the own user offer. "
         401:
           description: "User not authenticated."
           
@@ -823,6 +1008,8 @@ paths:
       responses:
         204:
           description: "Successful operation."
+        400:
+          description: "Can't delete offer of another user. \n\r Can't delete an accepted offer."
         401:
           description: "User not authenticated."
           
@@ -854,7 +1041,7 @@ paths:
           schema:
             $ref: "#/definitions/Like"
         400:
-          description: "Specified item already owned by the user or already liked."
+          description: "Specified item owned by the user. \n\r Specified item already liked."
         401:
           description: "User not authenticated."
       
@@ -891,6 +1078,14 @@ paths:
           
                
 definitions:
+  Coordinates:
+    type: object
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+
   UserCreation:
     type: object
     properties:
@@ -926,8 +1121,6 @@ definitions:
         type: string
       email:
         type: string
-      password:
-        type: string
 
   Location:
     type: object
@@ -955,23 +1148,35 @@ definitions:
       note:
         type: number
         
+  CommentGet:
+    type: object
+    properties:
+      id:
+        type: number
+      content:
+        type: string
+      date:
+        type: string
+      user:
+        type: number
+      item:
+        type: number
+      user_fullname:
+        type: string
+      user_profile_picture:
+        type: string
+        
   Comment:
     type: object
     properties:
       content:
         type: string
-      user:
-        type: number
       item:
         type: number
         
   Offer:
     type: object
     properties:
-      accepted:
-        type: boolean
-      answered:
-        type: boolean
       comment:
         type: string
       item_given:
@@ -983,8 +1188,6 @@ definitions:
     type: object
     properties:
       accepted:
-        type: boolean
-      answered:
         type: boolean
       comment:
         type: string
@@ -1005,6 +1208,20 @@ definitions:
         type: number
       date:
         type: string
+        
+  Notification:
+    type: object
+    properties:
+      read:
+        type: boolean
+        
+  InterestedBy:
+    type: object
+    properties:
+      interested_by:
+        type: array
+        items:
+          type: number
         
   KeyInfo:
     properties:
@@ -1030,16 +1247,24 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
+      delivery_methods:
+        type: array
+        items:
+          type: number
   
   InventoryItem:    
     type: object
     properties:
       id:
         type: number
+      image_id:
+        type: number
       image_url:
         type: string
       name:
         type: string
+      archived:
+        type: boolean
         
   DetailedItemInfo:
     type: object
@@ -1060,8 +1285,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/KeyInfo"
-      owner_username:
-        type: string
+      delivery_methods:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
       category:
         type: object
         properties:
@@ -1071,10 +1303,15 @@ definitions:
             type: string
       views:
         type: number
-      image_urls:
+      images:
         type: array
         items:
-          type: string
+          type: object
+          properties:
+            id:
+              type: number
+            url:
+              type: string
       likes:
         type: number
       comments:
@@ -1085,3 +1322,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/InventoryItem"
+      owner_username:
+        type: string
+      owner_picture_url:
+        type: string
+      owner_location:
+        type: string
+      owner_coordinates:
+        $ref: "#/definitions/Coordinates"
+      traded:
+        type: boolean
+      archived:
+        type: boolean
