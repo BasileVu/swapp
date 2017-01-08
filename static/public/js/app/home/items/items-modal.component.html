@@ -6,18 +6,18 @@
                     <div class="row showroom">
                         <div class="col-xs-3 modal-carousel-nav modal-carousel-height">
                             <div class="carousel-cell"
-                                *ngFor="let smallPicture of item.image_urls; let first = first; let last = last"
+                                *ngFor="let smallPicture of item.images; let first = first; let last = last"
                                 [ngClass]="{'is-nav-selected': first}"
                                 [update-carousel]="last">
-                                <img class="img-fluid small-pic" src="{{ smallPicture }}"/>
+                                <img class="img-fluid small-pic" src="{{ smallPicture.url }}"/>
                             </div>
                         </div>
                         <div class="col-xs-9 modal-carousel modal-carousel-height">
                             <div class="carousel-cell"
-                                *ngFor="let bigPicture of item.image_urls; let first = first; let last = last"
+                                *ngFor="let bigPicture of item.images; let first = first; let last = last"
                                 [ngClass]="{'is-nav-selected': first}"
                                 [update-carousel]="last">
-                                <img class="img-fluid big-pic" src="{{ bigPicture }}"/>
+                                <img class="img-fluid big-pic" src="{{ bigPicture.url }}"/>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                                             <li>No specific interest</li>
                                         </ul>
                                         <ul *ngIf="owner.interested_by.length > 0">
-                                            <li *ngFor="let interest of owner.interested_by">{{ interest }}</li>
+                                            <li *ngFor="let interest of owner.interested_by">{{ interest.name }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -151,7 +151,8 @@
                 <div class="row comment new" *ngIf="loggedIn">
                     <form [formGroup]="commentForm" (ngSubmit)="addComment()">
                         <div class="col-xs-1">
-                            <img class="img-fluid avatar" src="http://loremflickr.com/100/100"/>
+                            <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100"/>
+                            <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}"/>
                         </div>
                         <div class="col-xs-11">
                             <textarea name="" placeholder="Write a comment..." formControlName="commentContent"></textarea>
@@ -171,7 +172,7 @@
                         <img *ngIf="comment.user_profile_picture != null" class="img-fluid avatar" src="{{ comment.user_profile_picture }}"/>
                     </div>
                     <div class="col-xs-11">
-                        <p class="writer-infos"><a href="#">{{ comment.user_fullname }}</a> {{ comment.date | date:'longDate' }}</p>
+                        <p class="writer-infos"><a href="#">{{ comment.user_fullname }}</a> {{ comment.date | date:'medium' }}</p>
                         <p>{{ comment.content }}</p>
                     </div>
                 </div>

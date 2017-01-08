@@ -1,8 +1,13 @@
-import {UserInventoryItem} from "../profile/user";
+import {InventoryItem} from "../inventory/inventory-item";
 
 class KeyInfo {
     key: string;
     info: string;
+}
+
+export class Image {
+    id: number;
+    url: string;
 }
 
 export class DetailedItem {
@@ -19,20 +24,22 @@ export class DetailedItem {
         name: string;
     };
     views: number;
-    image_urls: Array<string>; // other images
+    images: Array<Image>;
     likes: number;
     comments: number;
     offers_received: number;
-    similar: Array<UserInventoryItem>;
+    similar: Array<InventoryItem>;
     owner_username: string;
     owner_picture_url: string;
     owner_location: string;
+    traded: boolean;
+    archived: boolean;
 
     constructor() {
         this.id = -1;
         this.name = undefined;
         this.description = undefined;
-        this.image_urls = [];
+        this.images = [];
         this.price_min = -1;
         this.price_max = -1;
         this.keyinfo_set = [];
@@ -48,5 +55,7 @@ export class DetailedItem {
         this.owner_picture_url = null;
         this.owner_location = "";
         this.delivery_methods = [];
+        this.traded = false;
+        this.archived = false;
     }
 }

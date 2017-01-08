@@ -20,6 +20,7 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { ItemsService } from '../items/items.service';
 import { Account } from "./account";
+import {ProfileService} from "./profile.service";
 
 declare let $:any;
 declare let google: any;
@@ -57,6 +58,7 @@ export class ProfileComponent implements OnInit {
     loggedIn: boolean;
     subscription: Subscription;
     user: Account;
+    notificationNumber: number;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -66,6 +68,7 @@ export class ProfileComponent implements OnInit {
 
     constructor(private authService: AuthService,
                 private itemService: ItemsService,
+                private profileService: ProfileService,
                 private formBuilder: FormBuilder,
                 @Inject(DOCUMENT) private document: any,
                 public toastr: ToastsManager) {
@@ -85,7 +88,12 @@ export class ProfileComponent implements OnInit {
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
-            loggedIn => this.loggedIn = loggedIn
+            loggedIn => {
+                this.loggedIn = loggedIn;
+                if (this.loggedIn) {
+                    this.getAccount();
+                }
+            }
         );
     }
 
@@ -94,6 +102,7 @@ export class ProfileComponent implements OnInit {
         this.authService.login($event[0]).then(
             res => {
                 this.loggedIn = true;
+                localStorage.setItem("connected", "true");
                 this.authService.selectLoggedIn(this.loggedIn);
                 let accountOnCreation: boolean = $event[1];
                 if (accountOnCreation) {
@@ -184,5 +193,9 @@ export class ProfileComponent implements OnInit {
             },
             error => this.toastr.error(error, "Error")
         );
+    }
+
+    updateNotifications($event: any) {
+        this.notificationNumber = +$event;
     }
 }

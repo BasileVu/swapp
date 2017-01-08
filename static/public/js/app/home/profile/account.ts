@@ -1,4 +1,43 @@
-class Location {
+import {Category} from "../search/category";
+export class PasswordUpdateDTO {
+    old_password: string;
+    new_password: string;
+
+    constructor(old_password: string, new_password: string) {
+        this.old_password = old_password;
+        this.new_password = new_password;
+    }
+}
+
+export class AccountUpdateDTO {
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+
+    constructor(username: string, first_name: string, last_name: string, email: string) {
+        this.username = username;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.email = email;
+    }
+}
+
+export class LocationDTO {
+    street: string;
+    city: string;
+    region: string;
+    country: string;
+
+    constructor(street: string, city: string, region: string, country: string) {
+        this.street = street;
+        this.city = city;
+        this.region = region;
+        this.country = country;
+    }
+}
+
+export class Location {
     street: string;
     city: string;
     region: string;
@@ -20,7 +59,7 @@ export class Account {
     email: string;
     location: Location;
     last_modification_date: string;
-    categories: Array<string>;
+    categories: Array<Category>;
     items: Array<number>;
     notes: number;
     note_avg: number;

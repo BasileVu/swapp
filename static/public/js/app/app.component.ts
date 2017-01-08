@@ -40,7 +40,7 @@ declare let google: any;
     ]
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    loggedIn: boolean;
+    loggedIn: boolean = false;
     subscription: Subscription;
 
     constructor (private http: Http,
@@ -50,9 +50,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        let csrf = this.http.get("/api/csrf/");
-
-        this.loggedIn = this.authService.isLoggedIn();
+        this.authService.getCSRF().then(
+            res => console.log(res),
+            error => console.log(error)
+        );
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
@@ -74,44 +75,46 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.authService.logout()
             .then(
                 res => {
-                    if (res.status === 200) {
-                        this.loggedIn = false;
-                        this.authService.selectLoggedIn(this.loggedIn);
-                        this.toastr.success("", "Logged out");
-                    }
+                    this.loggedIn = false;
+                    this.toastr.success("", "Logged out");
+
+                    // Delete the cookie and get a new one for not authenticated queries
+                    localStorage.removeItem("connected");
+                    this.deleteCookie('csrftoken');
+                    this.authService.getCSRF().then(
+                        res => {
+                            // Announce the item component to get a new set of items
+                            // (for a user not logged in)
+                            this.authService.selectLoggedIn(this.loggedIn);
+                        },
+                        error => console.log(error)
+                    );
                 },
                 error => {
                     console.log(error);
                 }
             );
     }
+
+    deleteCookie(name: string) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
     
     ngAfterViewInit() {
 
+        let that = this;
         setTimeout(function() {
+
+            that.loggedIn = localStorage.getItem("connected") === "true";
+            that.authService.selectLoggedIn(that.loggedIn);
+
             $('document').ready(function() {
 
-                /*
-                 TODO : remove because it's handled in items/*.directive.ts
-                // home grid ///////////////////////////
-                let grid = $('.grid').isotope({
+                $('.grid').isotope({
                     // options
                     itemSelector: '.grid-item',
                     layoutMode: 'masonry'
                 });
-                // layout only when images are loaded
-                grid.imagesLoaded().progress( function() {
-                    grid.isotope('layout');
-                });
-                // display items details when hovered
-                $('.grid-item').hover(function () {
-                    $(this).addClass('hovered');
-                    grid.isotope('layout');
-                }, function () {
-                    $(this).removeClass('hovered');
-                    grid.isotope('layout');
-                });
-                */
 
                 /*
                  TODO : remove because it's handled in update-inventory.directive.ts
@@ -219,7 +222,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
             });
 
-        }, 500);
+        }, 0);
         
     }
 }

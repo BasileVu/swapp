@@ -8,6 +8,7 @@ import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import {User} from "../profile/user";
 import {Like} from "./like";
+import {ProfileService} from "../profile/profile.service";
 
 @Injectable()
 export class ItemsService {
@@ -103,6 +104,7 @@ export class ItemsService {
     }
 
     private handleError (error: Response | any) {
+        console.log(error);
         // TODO : In a real world app, we might use a remote logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {

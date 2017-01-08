@@ -1,4 +1,4 @@
-import {Component, ViewEncapsulation, OnInit, OnChanges} from '@angular/core';
+import {Component, ViewEncapsulation, OnInit} from '@angular/core';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { ItemsService } from './items.service';
@@ -15,37 +15,35 @@ export let $: any;
     encapsulation: ViewEncapsulation.None,
     templateUrl: './items.component.html'
 })
-export class ItemsComponent implements OnInit, OnChanges {
+export class ItemsComponent implements OnInit {
 
-    items: Array<DetailedItem> = [];
+    items: Array<DetailedItem>;
     loggedIn: boolean;
     subscription: Subscription;
+    infoMessage: string = "Loading items...";
 
     constructor (private itemsService: ItemsService,
                  private authService: AuthService,
                  public toastr: ToastsManager) {}
 
     ngOnInit() {
-        this.getItems();
+        this.items = [];
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
             loggedIn => {
                 this.loggedIn = loggedIn;
-
-                // Get other items when user is logged in
-                // TODO : but the grid's display is breaking (see isotope library)
-                // this.getItems();
+                this.getItems();
             }
         );
 
         this.itemsService.getItemsSubject().subscribe((items: DetailedItem[]) => {
             this.items = items;
+            if (items.length === 0)
+                this.infoMessage = "No item found";
+            else
+                this.infoMessage = "Loading items...";
         });
-    }
-
-    ngOnChanges() {
-        console.log("changes");
     }
 
     getItems() {

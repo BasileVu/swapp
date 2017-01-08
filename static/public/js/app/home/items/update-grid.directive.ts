@@ -9,6 +9,9 @@ export class UpdateGridDirective {
     set updateGrid(update : boolean){
         if(update) {
             setTimeout(function() {
+                // $('.grid').isotope('destroy');
+                $('.grid').isotope('reloadItems')
+
                 $('.grid').isotope({
                     // options
                     itemSelector: '.grid-item',
@@ -32,7 +35,7 @@ export class UpdateGridDirective {
                 });
 
                 console.log("grid updated");
-            }, 200);
+            }, 0);
 
         }
     }

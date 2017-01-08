@@ -31,6 +31,12 @@ export class AuthService {
         this.loggedIn = false;
     }
 
+    getCSRF(): Promise<any> {
+        return this.http.get('/api/csrf/')
+            .toPromise()
+            .catch(this.handleError);
+    }
+
     // Service message commands
     selectLoggedIn(loggedIn: boolean) {
         this.loggedInSelectedSource.next(loggedIn);
