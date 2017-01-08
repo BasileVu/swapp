@@ -21,6 +21,17 @@ export class InventoryService {
             .catch(this.handleError);
     }
 
+    editItem(itemCreationDTO: ItemCreationDTO, item_id: number): Promise<any> {
+        let body = JSON.stringify(itemCreationDTO); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        // No content to return, we just catch errors
+        return this.http.put('/api/items/' + item_id + "/", body, options)
+            .toPromise()
+            .catch(this.handleError);
+    }
+
     getDeliveryMethods (): Promise<any> {
         return this.http.get('/api/deliverymethods/')
             .toPromise()
@@ -44,6 +55,29 @@ export class InventoryService {
             req.onreadystatechange = () => {
                 if(req.readyState === 4) {
                     if(req.status === 201) {
+                        resolve(req.response);
+                    } else {
+                        reject(req.response);
+                    }
+                }
+            }
+        })
+            .catch(this.handleError);
+    }
+
+    deleteImage(imageId: number) {
+        let csrftoken: string = this.profileService.getCookie("csrftoken");
+
+        return new Promise(function (resolve, reject) {
+            let req = new XMLHttpRequest();
+            req.open("DELETE", "/api/images/" + imageId + "/");
+            req.setRequestHeader("enctype", "multipart/form-data");
+            req.setRequestHeader("X-CSRFToken", csrftoken);
+            req.send();
+
+            req.onreadystatechange = () => {
+                if(req.readyState === 4) {
+                    if(req.status === 204 || req.status === 200) {
                         resolve(req.response);
                     } else {
                         reject(req.response);

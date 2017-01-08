@@ -4,6 +4,10 @@ body {
 hr {
   border-top: 1px solid $brand-secondary;
 }
+.grayout {
+    opacity: 0.6; /* Real browsers */
+    filter: alpha(opacity = 60); /* MSIE */
+}
 .btn-group-justified {
   display: table;
   width: 100%;
@@ -59,7 +63,15 @@ hr {
     color: $brand-danger;
     position: absolute;
     top: 3px;
-    right: $grid-gutter-width + 3px;
+    right: $grid-gutter-width + 5px;
+  }
+  a.edit {
+    border: none;
+    text-align: center;
+    color: $brand-danger;
+    position: absolute;
+    top: 3px;
+    left: 10px;
   }
 }
 .modal {

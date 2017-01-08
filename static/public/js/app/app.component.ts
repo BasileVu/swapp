@@ -160,6 +160,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
                 // display item modal ///////////////////////////
                 let theItemModal = $('#view-item-x');
+                let theEditItemModal = $('#edit-item-modal');
                 // show.bs.modal would be better, but not working in bootstrap 4 alpha 4
                 theItemModal.on('show.bs.modal', function (e: any) {
                     // modal slider ///////////////////////////
@@ -182,6 +183,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
                 $('.open-modal-item-x').click(function () {
                     theItemModal.modal('show');
+                });
+                $('.open-modal-edit-item-x').click(function () {
+                    theEditItemModal.modal('show');
                 });
 
                 // advanced search ///////////////////////////
