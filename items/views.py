@@ -130,7 +130,6 @@ def build_item_suggestions(user):
         lat = user.coordinates.latitude
         queryset = queryset.filter(~Q(owner=user))
     else:
-        # FIXME provide lon/lat if not connected or not ?
         lon = 0
         lat = 0
 
@@ -321,10 +320,10 @@ class LikeViewSet(mixins.ListModelMixin,
         user = self.request.user
 
         if item in user.item_set.all():
-            raise ValidationError("You cannot like your own item.")
+            raise ValidationError("You cannot like your own item")
 
         for like in self.request.user.like_set.all():
             if like.item == item:
-                raise ValidationError("An item cannot be liked twice.")
+                raise ValidationError("An item cannot be liked twice")
 
         serializer.save(user=user)

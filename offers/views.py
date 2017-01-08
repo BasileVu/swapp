@@ -58,7 +58,7 @@ class OfferViewSet(mixins.CreateModelMixin,
 
         for o in item_received.offers_done.filter(answered=False):
             if item_given == o.item_received:
-                raise ValidationError("There is already an offer for your item with the wanted item. Please accept it.")
+                raise ValidationError("There is already an offer for your item with the wanted item. Please accept it")
 
         if item_given.traded:
             raise ValidationError("You can't create an offer with an item that has been traded")
@@ -91,7 +91,7 @@ class OfferViewSet(mixins.CreateModelMixin,
 
         if accepted is not None:
             if serializer.instance.item_given.owner == self.request.user:
-                raise ValidationError("You can't accept or refuse own offer")
+                raise ValidationError("You can't accept or refuse your own offer")
 
             serializer.validated_data["answered"] = True
 
