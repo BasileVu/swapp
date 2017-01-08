@@ -4,7 +4,7 @@ import {Response, Headers, RequestOptions, Http} from '@angular/http';
 @Injectable()
 export class ProfileService {
 
-    constructor() {
+    constructor(private http: Http) {
     }
 
     // We must add csrftoken in header manually when we user XMLHttpRequest.

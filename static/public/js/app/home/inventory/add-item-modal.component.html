@@ -85,10 +85,10 @@
                             <span class="img-infos">For example "color": "green" or "condition": "new"</span>
                             <div class="form-group row" *ngFor="let keyInfo of keyInfos; let i = index" [@flyInOut]>
                                 <div class="col-sm-4">
-                                    <input type="text" class="form-control" placeholder="Key">
+                                    <input type="text" class="form-control" placeholder="Key" [value]="keyInfo.key" (input)="keyInfo.key = $event.target.value">
                                 </div>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" placeholder="Value">
+                                    <input type="text" class="form-control" placeholder="Value" [value]="keyInfo.info" (input)="keyInfo.info = $event.target.value">
                                 </div>
                                 <div class="col-sm-1">
                                     <a class="btn btn-sm btn-block" (click)="removeKeyInfo(i)"><i class="fa fa-times remove-element"></i></a>
