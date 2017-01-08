@@ -155,8 +155,8 @@ export class AddItemModalComponent implements OnInit {
             // Build a proper keyInfos array with trimmed values
             let keyInfos = new Array<KeyInfo>();
             for (let ki of this.keyInfos)
-                if (ki.key && ki.key.trim() && ki.value && ki.value.trim())
-                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.value.trim()));
+                if (ki.key && ki.key.trim() && ki.info && ki.info.trim())
+                    keyInfos.push(new KeyInfo(ki.key.trim(), ki.info.trim()));
 
             let newItem = new ItemCreationDTO(
                 this.name.value,

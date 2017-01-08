@@ -2,10 +2,10 @@
     <div class="container" role="document">
         <div class="row content">
             <div class="col-xs-12">
-                <form class="modal-panel" [formGroup]="createItemForm" (ngSubmit)="createItem()">
+                <form class="modal-panel" [formGroup]="editItemForm" (ngSubmit)="editItem()">
                     <div class="row">
                         <div class="col-xs-12">
-                            <h1>Add item to your inventory</h1>
+                            <h1>Edit an item from your inventory</h1>
                         </div>
                     </div>
                     <div class="row">
@@ -36,7 +36,7 @@
                                 <label class="col-sm-4 col-form-label">Methods</label>
                                 <div class="col-sm-8">
                                     <div *ngFor="let dm of deliveryMethods">
-                                        <input type="checkbox" class="form-check-input" value="{{ dm.id }}" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
+                                        <input [checked]="dm.desired"type="checkbox" class="form-check-input" value="{{ dm.id }}" (change)="updateCheckbox($event.target.getAttribute('value'), $event.target.checked)">
                                         {{ dm.name }}
                                     </div>
                                 </div>
@@ -85,10 +85,10 @@
                             <span class="img-infos">For example "color": "green" or "condition": "new"</span>
                             <div class="form-group row" *ngFor="let keyInfo of keyInfos; let i = index" [@flyInOut]>
                                 <div class="col-sm-4">
-                                    <input type="text" class="form-control" placeholder="Key">
+                                    <input type="text" class="form-control" placeholder="Key" [value]="keyInfo.key" (input)="keyInfo.key = $event.target.value">
                                 </div>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" placeholder="Value">
+                                    <input type="text" class="form-control" placeholder="Value" [value]="keyInfo.info" (input)="keyInfo.info = $event.target.value">
                                 </div>
                                 <div class="col-sm-1">
                                     <a class="btn btn-sm btn-block" (click)="removeKeyInfo(i)"><i class="fa fa-times remove-element"></i></a>
@@ -101,8 +101,8 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
-                            <button href="#" class="btn btn-lg btn-block btn-primary submit" type="submit" [disabled]="!createItemForm.valid">
-                                Create item
+                            <button href="#" class="btn btn-lg btn-block btn-primary submit" type="submit" [disabled]="!editItemForm.valid">
+                                Edit item
                             </button>
                         </div>
                     </div>
