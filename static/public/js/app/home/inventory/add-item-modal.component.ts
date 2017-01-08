@@ -192,7 +192,7 @@ export class AddItemModalComponent implements OnInit {
             let formData:FormData = new FormData();
             formData.append('image', f, f.name);
             formData.append('item', item_id);
-            this.profileService.addImage(formData)
+            this.inventoryService.addImage(formData, item_id)
                 .then( // now signal the ProfileComponent that we uploaded picture
                     res => {
                         if (++filesUploaded === this.files.length) {

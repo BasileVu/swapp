@@ -130,8 +130,7 @@ export class CreateAccountModalComponent implements OnInit {
         if (this.data.image != undefined) {
             let formData:FormData = new FormData();
             formData.append('image', this.file, this.file.name);
-            formData.append('user', 10); // 10 is an arbitrary value, we just need to indicate that user has a value
-            this.profileService.addImage(formData)
+            this.profileService.addProfilePicture(formData)
                 .then( // now signal the ProfileComponent that we uploaded picture
                     res => this.updateAccountEvent.emit(),
                     error => this.updateAccountEvent.emit()

@@ -8,6 +8,7 @@ import { Comment } from './comment';
 import { CommentCreationDTO } from './comment-creation-dto';
 import {User} from "../profile/user";
 import {Like} from "./like";
+import {ProfileService} from "../profile/profile.service";
 
 @Injectable()
 export class ItemsService {

@@ -186,13 +186,17 @@ export class UpdateProfileModalComponent implements OnInit {
                 this.firstName.setValue(this.account.first_name);
                 this.lastName.setValue(this.account.last_name);
 
+                console.log(this.account.categories);
+
                 // Check categories already desired by user
                 for (let c of this.categories)
-                    if (this.account.categories.indexOf(c.category, 0) >= 0) {
-                        c.desired = true;
-                        this.interests.push(c.category.id);
-                    }
+                    for (let ac of this.account.categories)
+                        if (c.category.id === ac.id) {
+                            c.desired = true;
+                            this.interests.push(c.category.id);
+                        }
 
+                console.log(this.categories);
             }
         );
     }
@@ -209,32 +213,24 @@ export class UpdateProfileModalComponent implements OnInit {
         }
     }
 
-    updateAccount() {
+    updateProfilePicture() {
         // upload profile picture if changed
         if (this.pictureChanged) {
             let formData:FormData = new FormData();
             formData.append('image', this.file, this.file.name);
-            formData.append('user', 10); // 10 is an arbitrary value, we just need to indicate that user has a value
-            this.profileService.addImage(formData)
+            this.profileService.addProfilePicture(formData)
                 .then( // now signal the ProfileComponent that we uploaded picture
-                    res => this.updateAccountEvent.emit(),
-                    error => this.updateAccountEvent.emit()
+                    res => {
+                        this.updateAccountEvent.emit();
+                    },
+                    error => {
+                        this.updateAccountEvent.emit();
+                    }
                 );
         }
+    }
 
-        // upload location if changed
-        if (this.city.value != this.account.location.city
-            || this.region.value != this.account.location.region
-            || this.street.value != this.account.location.street
-            || this.country.value != this.account.location.country) {
-            let location = new LocationDTO(this.street.value, this.city.value, this.region.value, this.country.value);
-            this.profileService.updateAccount(location).then(
-                res => this.toastr.success("", "Location successfully updated"),
-                error => this.toastr.error(error, "Error")
-            );
-
-        }
-
+    updatePassword() {
         // upload password if changed
         if (this.newPassword.value) {
             if(this.newPassword.value != this.confirmNewPassword.value) {
@@ -243,30 +239,82 @@ export class UpdateProfileModalComponent implements OnInit {
                 // upload
                 let passwordUpdateDTO = new PasswordUpdateDTO(this.oldPassword.value, this.newPassword.value);
                 this.profileService.updatePassword(passwordUpdateDTO).then(
-                    res => this.toastr.success("", "Password successfully updated"),
-                    error => this.toastr.error(error, "Error")
+                    res => {
+                        this.toastr.success("", "Password updated");
+                        this.updateAccountEvent.emit();
+                    },
+                    error =>  {
+                        this.toastr.error(error, "Error");
+                    }
                 );
             }
         }
+    }
 
-        // upload account if changed
+    updateLocation() {
+        // upload location if changed
+        if (this.city.value != this.account.location.city
+            || this.region.value != this.account.location.region
+            || this.street.value != this.account.location.street
+            || this.country.value != this.account.location.country) {
+            let location = new LocationDTO(this.street.value, this.city.value, this.region.value, this.country.value);
+            this.profileService.updateLocation(location).then(
+                res => {
+                    this.toastr.success("", "Location updated");
+                    this.updateAccountEvent.emit();
+                },
+                error => {
+                    this.toastr.error(error, "Error");
+                }
+            );
+
+        }
+    }
+
+    updateProfile() {
+        // upload profile if changed
+        console.log("this");
+        console.log(this);
+        console.log("this.account");
+        console.log(this.account);
         if (this.username.value != this.account.username
             || this.firstName.value != this.account.first_name
             || this.lastName.value != this.account.last_name
             || this.email.value != this.account.email) {
             let accountUpdateDTO = new AccountUpdateDTO(this.username.value, this.firstName.value, this.lastName.value, this.email.value);
             this.profileService.updateAccount(accountUpdateDTO).then(
-                res => this.toastr.success("", "Profile successfully updated"),
-                error => this.toastr.error(error, "Error")
+                res => {
+                    this.toastr.success("", "Profile updated");
+                    this.updateAccountEvent.emit();
+                },
+                error => {
+                    this.toastr.error(error, "Error");
+                }
             );
         }
+    }
 
-        // upload categories if changed
-        // for (let c of this.interests) {
-        //     if (this.account.categories.indexOf(c, 0)) {
-        //
-        //     }
-        // }
+    updateCategories()  {
+        console.log(this.interests);
+        let obj = {"interested_by": this.interests};
+        this.profileService.updateCategories(obj).then(
+            res => {
+                this.toastr.success("", "Interests updated");
+                this.updateAccountEvent.emit();
+            },
+            error => {
+                this.toastr.error(error, "Error");
+            }
+        );
+    }
+
+    updateAccount() {
+        console.log("update Account");
+        this.updateProfilePicture();
+        this.updateProfile();
+        this.updateLocation();
+        this.updatePassword();
+        this.updateCategories();
     }
 
     fileChangeListener($event: any) {
@@ -281,19 +329,6 @@ export class UpdateProfileModalComponent implements OnInit {
         };
 
         myReader.readAsDataURL(this.file);
-    }
-
-    addProfilePicture() {
-        if (this.data.image != undefined) {
-            let formData:FormData = new FormData();
-            formData.append('image', this.file, this.file.name);
-            formData.append('user', 10); // 10 is an arbitrary value, we just need to indicate that user has a value
-            this.profileService.addImage(formData)
-                .then( // now signal the ProfileComponent that we uploaded picture
-                    res => this.updateAccountEvent.emit(),
-                    error => this.updateAccountEvent.emit()
-                );
-        }
     }
 
 }
