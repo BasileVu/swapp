@@ -91,7 +91,6 @@ export class AddItemModalComponent implements OnInit {
 
     constructor(private changeDetectorRef: ChangeDetectorRef,
                 private inventoryService: InventoryService,
-                private profileService: ProfileService,
                 private searchService: SearchService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) { }

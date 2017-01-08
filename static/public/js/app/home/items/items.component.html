@@ -1,5 +1,5 @@
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngIf="items.length === 0">
-    No items for now
+<div class="col-lg-9 col-md-4 col-sm-6 col-xs-12 grid-item" style="float: right; font-size: 2.3em;" *ngIf="items.length === 0">
+    {{ infoMessage }}
 </div>
 
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 grid-item" *ngFor="let item of items; let last = last" [update-grid]="last">

@@ -68,9 +68,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
-            loggedIn => {
-                this.loggedIn = loggedIn;
-            }
+            loggedIn => this.loggedIn = loggedIn
         );
 
         // Listen for user login
@@ -130,21 +128,18 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     addComment() {
         if (this.loggedIn) {
-            console.log("user");
-            console.log(this.user);
             let commentCreationDTO = new CommentCreationDTO(this.user.id, this.item.id, this.commentContent.value);
             console.log(commentCreationDTO);
 
             this.itemsService.addComment(commentCreationDTO).then(
                 res => {
-                    console.log(res);
                     this.commentForm.reset();
                     let comment: Comment = new Comment;
                     comment.fromCreationDTO(commentCreationDTO);
                     comment.user_fullname = this.user.first_name + " " + this.user.last_name;
                     comment.user_profile_picture = this.user.profile_picture_url;
                     comment.date = new Date();
-                    comment.id = -1; // TODO : get comment's id from response
+                    comment.id = res.id;
                     comment.item = this.item.id;
                     this.comments.push(comment);
                     this.toastr.success("", "Comment submitted");
