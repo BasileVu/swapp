@@ -1,10 +1,22 @@
 import { Injectable } from '@angular/core';
 import {Response, Headers, RequestOptions, Http} from '@angular/http';
+import {User} from "./user";
+import {Subject} from "rxjs";
+import {Account} from "./account";
 
 @Injectable()
 export class ProfileService {
 
+    private profileToShow: User;
+    private profileToShowSelectedSource = new Subject<User | Account>();
+    profileToShowSelected$ = this.profileToShowSelectedSource.asObservable();
+
     constructor(private http: Http) { }
+
+    // Service message commands
+    selectProfileToShow(user: User | Account) {
+        this.profileToShowSelectedSource.next(user);
+    }
 
     // We must add csrftoken in header manually when we user XMLHttpRequest.
     // Without XHR, images can't be upload with enctype multipart/form-data

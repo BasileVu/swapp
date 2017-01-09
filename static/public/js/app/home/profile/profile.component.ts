@@ -16,11 +16,13 @@ import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms
 import { Subscription }   from 'rxjs/Subscription';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
+import {Rating} from "ng2-rating";
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { ItemsService } from '../items/items.service';
 import { Account } from "./account";
 import {ProfileService} from "./profile.service";
+
 
 declare let $:any;
 declare let google: any;
@@ -54,11 +56,13 @@ export class ProfileComponent implements OnInit {
 
     // EventEmitter to call login function of the ProfileComponent after registering
     @Output() profilePictureEvent = new EventEmitter();
+    @Output() seeProfileEvent = new EventEmitter();
 
     loggedIn: boolean;
     subscription: Subscription;
     user: Account;
     notificationNumber: number;
+    pendingOffersNumber: number;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -122,6 +126,7 @@ export class ProfileComponent implements OnInit {
         this.authService.getAccount().then(
             account => {
                 this.user = account;
+                this.pendingOffersNumber = this.user.pending_offers.length;
 
                 // Get user public profile to inform subscribed components of it
                 this.itemService.getUser(this.user.username).then(
@@ -177,5 +182,17 @@ export class ProfileComponent implements OnInit {
 
     updateNotifications($event: any) {
         this.notificationNumber = +$event;
+    }
+
+    openEmptyPendingOffers() {
+        this.toastr.warning("Wait for someone to propose you a swap!", "No pending offer");
+    }
+
+    openEmptyNotifications() {
+        this.toastr.warning("", "No new notification");
+    }
+
+    seeMyProfile() {
+        this.profileService.selectProfileToShow(this.user)
     }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
-import { Observable } from 'rxjs';
 
 import { DetailedItem } from './detailed-item';
 import { Comment } from './comment';
@@ -10,6 +9,7 @@ import {User} from "../profile/user";
 import {Like} from "./like";
 import {ProfileService} from "../profile/profile.service";
 import {InventoryItem} from "../inventory/inventory-item";
+import {Observable} from "rxjs";
 
 @Injectable()
 export class ItemsService {

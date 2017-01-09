@@ -20,8 +20,10 @@
             </div>
         </div>
         <div class="row news">
-            <div class="col-xs-12"><a href="#" class="open-notif-modal">{{ notificationNumber }} new notifications</a></div>
-            <div class="col-xs-12"><a href="#" class="open-accept-proposition-modal">X pending offers</a></div>
+            <div *ngIf="notificationNumber === 0" class="col-xs-12"><a href="#" (click)="openEmptyNotifications()">0 new notification</a></div>
+            <div *ngIf="notificationNumber > 0" class="col-xs-12"><a href="#" style="font-weight: 400;" class="open-notif-modal">{{ notificationNumber }} new notifications</a></div>
+            <div *ngIf="pendingOffersNumber === 0" class="col-xs-12"><a href="#" (click)="openEmptyPendingOffers()" class="open-accept-proposition-modal">0 pending offer</a></div>
+            <div *ngIf="pendingOffersNumber > 0" class="col-xs-12"><a href="#" style="font-weight: 400;" class="open-accept-proposition-modal">{{ pendingOffersNumber }} pending offers</a></div>
         </div>
         <div class="row buttons">
             <div class="col-xs-6">
@@ -31,7 +33,7 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <a href="#" class="btn btn-block btn-primary btn-reversed open-profile-modal">
+                <a href="#" class="btn btn-block btn-primary btn-reversed open-profile-modal" (click)="seeMyProfile()">
                     <i class="fa fa-user"></i><br>
                     See profile
                 </a>

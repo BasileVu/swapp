@@ -1,6 +1,6 @@
 import {
     Component, ViewEncapsulation, OnInit, style,
-    animate, transition, state, trigger
+    animate, transition, state, trigger, Output, EventEmitter
 } from '@angular/core';
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {Subscription} from "rxjs";
@@ -11,24 +11,7 @@ import {OfferUpdate} from "./offer-update";
 import {OfferService} from "./offers.service";
 import {ToastsManager} from "ng2-toastr/ng2-toastr";
 import {Note} from "./Note";
-
-export class PendingOffer {
-    id: number;
-    accepted: boolean;
-    answered: boolean;
-    comment: string;
-    item_given: number;
-    item_received: number;
-
-    constructor() {
-        this.id = 0;
-        this.accepted = false;
-        this.answered = false;
-        this.comment = "";
-        this.item_given = 0;
-        this.item_received = 0;
-    }
-}
+import {OfferGet, Account} from "../profile/account";
 
 @Component({
     moduleId: module.id,
@@ -51,14 +34,16 @@ export class PendingOffer {
 export class AcceptPropositionModalComponent implements OnInit {
 
     subscription: Subscription;
-    user: User = new User;
-    pendingOffers: Array<PendingOffer> = [];
-    currentPendingOffer: PendingOffer = new PendingOffer;
+    user: Account = new Account;
+    pendingOffers: Array<OfferGet> = [];
+    currentOfferGet: OfferGet = new OfferGet;
     proposer: User = new User;
     itemProposed: DetailedItem = new DetailedItem;
     itemWanted: DetailedItem = new DetailedItem;
-    displayMessage: boolean;
-    displayRating: boolean;
+    starsCount: number;
+    displayRating: boolean = true;
+
+    @Output() seeProfileEvent = new EventEmitter();
 
     constructor (private authService: AuthService,
                  private itemsService: ItemsService,
@@ -67,9 +52,10 @@ export class AcceptPropositionModalComponent implements OnInit {
 
     ngOnInit() {
         // Listen for user login
-        this.subscription = this.authService.userSelected$.subscribe(
+        this.subscription = this.authService.accountSelected$.subscribe(
             user => {
                 this.user = user;
+                console.log(user);
 
                 // Get the offers and add them to pending offers array
                 for (let pendingOffer of this.user.pending_offers) {
@@ -77,11 +63,13 @@ export class AcceptPropositionModalComponent implements OnInit {
                 }
 
                 // Get the current pending offer
-                this.currentPendingOffer = this.nextOffer();
+                this.currentOfferGet = this.nextOffer();
 
                 // Get data related to it
-                this.getUserOffer(this.currentPendingOffer.item_received);
-                this.getProposerOffer(this.currentPendingOffer.item_given);
+                if (this.currentOfferGet !== null) {
+                    this.getUserOffer(this.currentOfferGet.item_received);
+                    this.getProposerOffer(this.currentOfferGet.item_given);
+                }
             }
         );
 
@@ -89,23 +77,17 @@ export class AcceptPropositionModalComponent implements OnInit {
 
     acceptOffer() {
         console.log("offer accepted");
-        this.displayMessage = true;
-
-        // Get next offer
-        this.nextOffer();
+        this.displayRating = true;
     }
 
     validOffer() {
         // Send the accepted offer with message
         let offerUpdate = new OfferUpdate(true, true);
 
-        this.offerService.updateOffer(this.currentPendingOffer.id, offerUpdate).then(
+        this.offerService.updateOffer(this.currentOfferGet.id, offerUpdate).then(
             res => {
                 // Rate the proposer
                 this.displayRating = true;
-
-                // TODO : Rate the proposer
-                this.rateProposer(5);
             },
             error => this.toastr.error(error, "Error")
         )
@@ -113,6 +95,7 @@ export class AcceptPropositionModalComponent implements OnInit {
 
     refuseOffer() {
         console.log("offer refused");
+
         // Inform the proposer
 
         // Get next offer
@@ -149,14 +132,26 @@ export class AcceptPropositionModalComponent implements OnInit {
         );
     }
 
-    rateProposer(star: number) {
-        let note = new Note(this.currentPendingOffer.id, star);
+    rateProposer() {
+        console.log(this.starsCount);
+        let note = new Note(this.currentOfferGet.id, this.starsCount);
 
         this.offerService.rateUser(note).then(
             res => {
                 this.toastr.success("Thank you for rating", "Offer accepted !");
+
+                // Get next offer
+                this.nextOffer();
             },
             error => this.toastr.error("You accepted this offer!", "Error")
         );
+    }
+
+    seeProfile() {
+        this.seeProfileEvent.emit(this.proposer);
+    }
+
+    sendMessage() {
+        this.toastr.warning("to " + this.proposer.first_name + " " + this.proposer.last_name, "Send message");
     }
 }

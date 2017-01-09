@@ -61,6 +61,24 @@ export class Coordinates {
     }
 }
 
+export class OfferGet {
+    id: number;
+    accepted: boolean;
+    answered: boolean;
+    comment: string;
+    item_given: number;
+    item_received: number;
+
+    constructor() {
+        this.id = 0;
+        this.accepted = false;
+        this.answered = false;
+        this.comment = "";
+        this.item_given = 0;
+        this.item_received = 0;
+    }
+}
+
 export class Account {
     id: number;
     profile_picture_url: string;
@@ -75,6 +93,7 @@ export class Account {
     notes: number;
     note_avg: number;
     coordinates: Coordinates;
+    pending_offers: Array<OfferGet>;
 
     constructor() {
         this.id = null;
@@ -90,5 +109,6 @@ export class Account {
         this.notes = null;
         this.note_avg = null;
         this.coordinates = new Coordinates(null, null);
+        this.pending_offers = [];
     }
 }

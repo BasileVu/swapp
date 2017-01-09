@@ -5,49 +5,51 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="row">
-                            <div class="col-lg-6 my-inventory">
+                            <div *ngIf="currentOfferGet !== null" class="col-lg-6 my-inventory">
                                 <div class="row">
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}">
+                                        <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>Mathieu Urstein</h3>
+                                        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
                                     </div>
                                 </div>
                                 <div class="row inventory">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="itemWanted.images.length > 0" class="img-fluid" src="{{ itemWanted.images[0].url }}"/>
+                                            <span>{{ itemWanted.name }}</span>
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6 your-inventory text-lg-right">
+                            <div *ngIf="currentOfferGet !== null" class="col-lg-6 your-inventory text-lg-right">
                                 <div class="row">
                                     <div class="hidden-lg-down col-lg-3 actions">
                                         <div class="btn-group btn-group-justified">
-                                            <a href="#" class="btn btn-primary"><i class="fa fa-user"></i></a>
-                                            <a href="#" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
+                                            <a href="#" (click)="seeProfile()" class="btn btn-primary"><i class="fa fa-user"></i></a>
+                                            <a href="#" (click)="sendMessage()" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
                                         </div>
                                     </div>
                                     <div class="col-xs-9 col-lg-7 title">
-                                        <h3>George Loosdé</h3>
+                                        <h3>{{ proposer.first_name }} {{ proposer.last_name }}</h3>
                                     </div>
                                     <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="proposer.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        <img *ngIf="proposer.profile_picture_url !== null" class="img-fluid avatar" src="{{ proposer.profile_picture_url }}">
                                     </div>
                                 </div>
                                 <div class="row inventory">
                                     <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
                                         <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
+                                            <img *ngIf="itemProposed.images.length > 0" class="img-fluid" src="{{ itemProposed.images[0].url }}"/>
+                                            <span>{{ itemProposed.name }}</span>
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xs-12 text-xs-center">
+                            <div *ngIf="currentOfferGet !== null" class="col-xs-12 text-xs-center">
                                 <a href="#" class="refuse" (click)="refuseOffer()">
                                     <i class="fa fa-times"></i>
                                 </a>
@@ -55,18 +57,22 @@
                                     <i class="fa fa-check"></i>
                                 </a>
                             </div>
+
+                            <div *ngIf="currentOfferGet === null" class="col-xs-12 text-xs-center">
+                                <h1>No pending offers</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" *ngIf="currentOfferGet !== null">
             <div class="col-xs-12">
                 <div class="row comment new" style="margin: auto; width: 70%">
-                    <div class="alert alert-warning" role="alert" *ngIf="currentPendingOffer.content !== ''">
-                        <strong>{{ currentPendingOffer.content }}</strong>
+                    <div class="alert alert-warning" role="alert" *ngIf="currentOfferGet.comment !== ''">
+                        <strong>{{ currentOfferGet.comment }}</strong>
                     </div>
-                    <div class="alert alert-warning" role="alert" *ngIf="currentPendingOffer.content === ''">
+                    <div class="alert alert-warning" role="alert" *ngIf="currentOfferGet.comment === ''">
                         <strong>No message</strong> specified by {{ proposer.first_name }} {{ proposer.last_name }}
                     </div>
                 </div>
@@ -75,17 +81,7 @@
         <div class="row" *ngIf="displayRating" [@flyInOut]>
             <div class="col-xs-12">
                 <div class="row comment new" style="margin: auto; width: 70%">
-                    <form [formGroup]="ratingForm" (ngSubmit)="validOffer()">
-                        <div class="col-xs-12">
-                            <div class="rating">
-                                <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
-                                <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
-                                <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
-                                <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
-                                <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
-                            </div>
-                        </div>
-                    </form>
+                    <rating [(ngModel)]="starsCount" (click)="rateProposer()"></rating>
                 </div>
             </div>
         </div>

@@ -58,7 +58,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 private sanitizer: DomSanitizer,
-                public toastr: ToastsManager) {console.log("construcot"); }
+                public toastr: ToastsManager) { }
 
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors

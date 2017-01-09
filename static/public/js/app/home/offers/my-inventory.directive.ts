@@ -21,7 +21,7 @@ export class MyInventoryDirective {
                     adaptiveHeight: true,
                     pageDots: true
                 });
-            }, 300);
+            }, 250);
         }
     }
 }

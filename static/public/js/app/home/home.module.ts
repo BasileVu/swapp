@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // External angular2 libraries
 import { ImageCropperComponent } from 'ng2-img-cropper';
+import { RatingModule } from "ng2-rating";
 
 import { HomeComponent } from './home.component';
 import { routing }       from './home.routing';
@@ -45,6 +46,7 @@ import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
         FormsModule,
         ReactiveFormsModule,
         routing,
+        RatingModule
     ],
     declarations: [
         InventoryComponent,
