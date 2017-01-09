@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Response, Headers, RequestOptions, Http} from '@angular/http';
 import {User} from "./user";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 import {Account} from "./account";
 
 @Injectable()
