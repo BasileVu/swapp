@@ -213,7 +213,8 @@ def get_public_account_info(request, username):
         "items": InventoryItemSerializer(user.item_set.all(), many=True).data,
         "notes": user.note_set.count(),
         "note_avg": user.userprofile.note_avg,
-        "interested_by": CategorySerializer(user.userprofile.categories, many=True).data
+        "interested_by": CategorySerializer(user.userprofile.categories, many=True).data,
+        "coordinates": CoordinatesSerializer(user.coordinates).data
     })
 
 
