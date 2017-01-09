@@ -48,15 +48,44 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 text-xs-center">
-                                <a href="#" class="refuse">
+                                <a href="#" class="refuse" (click)="refuseOffer()">
                                     <i class="fa fa-times"></i>
                                 </a>
-                                <a href="#" class="accept">
+                                <a href="#" class="accept" (click)="acceptOffer()">
                                     <i class="fa fa-check"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row comment new" style="margin: auto; width: 70%">
+                    <div class="alert alert-warning" role="alert" *ngIf="currentPendingOffer.content !== ''">
+                        <strong>{{ currentPendingOffer.content }}</strong>
+                    </div>
+                    <div class="alert alert-warning" role="alert" *ngIf="currentPendingOffer.content === ''">
+                        <strong>No message</strong> specified by {{ proposer.first_name }} {{ proposer.last_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="displayRating" [@flyInOut]>
+            <div class="col-xs-12">
+                <div class="row comment new" style="margin: auto; width: 70%">
+                    <form [formGroup]="ratingForm" (ngSubmit)="validOffer()">
+                        <div class="col-xs-12">
+                            <div class="rating">
+                                <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+                                <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+                                <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+                                <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+                                <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

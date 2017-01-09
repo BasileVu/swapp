@@ -1,4 +1,5 @@
 import {InventoryItem} from "../inventory/inventory-item";
+import {PendingOffer} from "../offers/accept-proposition-modal.component";
 
 export class User {
     id: number;
@@ -11,6 +12,7 @@ export class User {
     notes: number;
     note_avg: number;
     interested_by: Array<{id:number,name:string}>;
+    pending_offers: Array<PendingOffer>;
 
     constructor() {
         this.id = -1;
@@ -23,5 +25,6 @@ export class User {
         this.notes = 0;
         this.note_avg = 0;
         this.interested_by = [];
+        this.pending_offers = [];
     }
 }

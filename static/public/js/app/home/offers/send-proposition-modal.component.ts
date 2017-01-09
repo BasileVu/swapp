@@ -29,7 +29,7 @@ declare let $:any;
                 animate('0.2s 10 ease-out', style({transform: 'translateX(0) scale(0)'}))
             ])
         ])
-    ],
+    ]
 })
 export class SendPropositionModalComponent implements OnInit {
 
