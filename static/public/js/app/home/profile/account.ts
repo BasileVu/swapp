@@ -50,6 +50,17 @@ export class Location {
         this.country = country;
     }
 }
+
+export class Coordinates {
+    latitude: number;
+    longitude: number;
+
+    constructor(lat: number, lng: number) {
+        this.latitude = lat;
+        this.longitude = lng;
+    }
+}
+
 export class Account {
     id: number;
     profile_picture_url: string;
@@ -63,6 +74,7 @@ export class Account {
     items: Array<number>;
     notes: number;
     note_avg: number;
+    coordinates: Coordinates;
 
     constructor() {
         this.id = null;
@@ -77,5 +89,6 @@ export class Account {
         this.items = [];
         this.notes = null;
         this.note_avg = null;
+        this.coordinates = new Coordinates(null, null);
     }
 }

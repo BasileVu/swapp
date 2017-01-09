@@ -1,4 +1,5 @@
 from django.contrib.auth import logout, authenticate, login
+from django.db.models import Q
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics
 from rest_framework import mixins
@@ -13,6 +14,7 @@ from rest_framework.response import Response
 from items.models import Category, Item
 from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer, \
     CreateImageSerializer
+from offers.serializers import RetrieveOfferSerializer
 from swapp.gmaps_api_utils import get_coordinates
 from users.serializers import *
 
@@ -122,7 +124,10 @@ class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
             "items": [i.id for i in user.item_set.all()],
             "notes": user.note_set.count(),
             "note_avg": user.userprofile.note_avg,
-            "coordinates": CoordinatesSerializer(user.coordinates).data
+            "coordinates": CoordinatesSerializer(user.coordinates).data,
+            "pending_offers": RetrieveOfferSerializer(
+                Offer.objects.filter((Q(item_given__owner=user) | Q(item_received__owner=user)),
+                                     Q(answered=False)).order_by("-creation_date"), many=True).data
         })
 
     def update(self, request, *args, **kwargs):
