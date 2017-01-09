@@ -4,12 +4,12 @@ declare let $: any;
 
 @Component({
     moduleId: module.id,
-    selector: 'infos-modal',
+    selector: 'messages-modal',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './infos-modal.component.html'
+    templateUrl: 'messages-modal.component.html'
 })
 
-export class InfosModalComponent implements OnInit {
+export class MessagesModalComponent implements OnInit {
 
     constructor() {}
 
