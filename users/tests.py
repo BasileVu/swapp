@@ -601,9 +601,13 @@ class LocationCoordinatesTests(TestCase):
 class PublicAccountInfoTests(TestCase):
     users_url = "/api/users/"
 
-    def post_image(self, image_name="test.png", item_id=1):
+    def post_item_image(self, image_name="test.png", item_id=1):
         with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
             return self.client.post("/api/items/%d/images/" % item_id, {"image": data}, format="multipart")
+
+    def post_user_image(self, image_name="test.png"):
+        with open("%s/%s" % (settings.MEDIA_TEST, image_name), "rb") as data:
+            return self.client.post("/api/account/image/", {"image": data}, format="multipart")
 
     def setUp(self):
         self.user = User.objects.create_user(username="username", first_name="first_name", last_name="last_name",
@@ -628,6 +632,14 @@ class PublicAccountInfoTests(TestCase):
         self.user.userprofile.categories.add(self.c3)
         self.user.userprofile.save()
 
+        self.user.coordinates.latitude = 4
+        self.user.coordinates.longitude = 4
+        self.user.coordinates.save()
+
+        self.client.login(username="username", password="password")
+        self.post_user_image()
+        self.client.logout()
+
     def test_get_user_info_not_found(self):
         r = self.client.get("%s%s%s/" % (self.users_url, self.user.username, "42"))
         self.assertEquals(r.status_code, status.HTTP_404_NOT_FOUND)
@@ -635,6 +647,8 @@ class PublicAccountInfoTests(TestCase):
     def test_get_user_info(self):
         r = self.client.get("%s%s/" % (self.users_url, self.user.username))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.data["id"], 1)
+        self.assertIsNotNone(r.data["profile_picture_url"])
         self.assertEqual(r.data["first_name"], "first_name")
         self.assertEqual(r.data["last_name"], "last_name")
         self.assertEqual(r.data["username"], "username")
@@ -646,6 +660,7 @@ class PublicAccountInfoTests(TestCase):
             {"id": self.c2.id, "name": self.c2.name},
             {"id": self.c3.id, "name": self.c3.name}
         ])
+        self.assertEqual(r.data["coordinates"], {"latitude": 4, "longitude": 4})
 
         self.assertEqual(len(r.data["items"]), 1)
         item_received = r.data["items"][0]
@@ -655,9 +670,9 @@ class PublicAccountInfoTests(TestCase):
         self.assertEqual(item_received["name"], "test")
         self.assertEqual(item_received["archived"], False)
 
-    def test_get_user_info_image(self):
+    def test_get_inventory_item_images(self):
         self.client.login(username="username", password="password")
-        self.post_image()
+        self.post_item_image()
         self.client.logout()
 
         r = self.client.get("%s%s/" % (self.users_url, self.user.username))
