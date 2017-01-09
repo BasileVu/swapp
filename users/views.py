@@ -15,7 +15,7 @@ from items.models import Category, Item
 from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer, \
     CreateImageSerializer
 from offers.serializers import RetrieveOfferSerializer
-from swapp.gmaps_api_utils import get_coordinates
+from swapp.gmaps_api_utils import get_coordinates, OverQueryLimitError
 from users.serializers import *
 
 
@@ -72,10 +72,13 @@ def create_user(request):
         "country": data["country"]
     }
 
-    location_result = get_coordinates(Location(**location))
+    try:
+        location_result = get_coordinates(Location(**location))
+    except OverQueryLimitError:
+        raise ValidationError("The location you specified could not be resolved by our service. Please retry later")
 
     if len(location_result) == 0:
-        raise ValidationError("Could not find any match for the specified location")
+        raise ValidationError("The location you specified does not exist")
 
     user = User.objects.create_user(
         username=data["username"],
@@ -167,7 +170,11 @@ class LocationView(generics.UpdateAPIView):
         return self.request.user.location
 
     def perform_update(self, serializer):
-        data = get_coordinates(Location(**serializer.validated_data))
+        try:
+            data = get_coordinates(Location(**serializer.validated_data))
+        except OverQueryLimitError:
+            raise ValidationError("The location you specified could not be resolved by our service. "
+                                   "Please retry later")
 
         if len(data) == 0:
             raise ValidationError("Could not find any match for the specified location")

@@ -6,7 +6,12 @@ from rest_framework import status
 
 from items.models import *
 from swapp import settings
+from swapp.gmaps_api_utils import OverQueryLimitError
 from users.models import *
+
+
+def raise_over_query_limit_error(_):
+    raise OverQueryLimitError()
 
 
 class UserProfileTests(TestCase):
@@ -90,6 +95,11 @@ class AccountCreationAPITests(TestCase):
         r = self.post_user(street="street", city="city", region="region", country="country")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 0)
+
+    def test_user_creation_over_query(self):
+        self.get_coordinates_mock.side_effect = raise_over_query_limit_error
+        r = self.post_user()
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class AccountConnectionAPITests(TestCase):
@@ -561,6 +571,11 @@ class LocationCoordinatesTests(TestCase):
                 "country": ""
             }
         }), content_type="application/json")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_location_over_query_limit(self):
+        self.get_coordinates_mock.side_effect = raise_over_query_limit_error
+        r = self.put_location()
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_coordinates_0_at_beginning(self):
