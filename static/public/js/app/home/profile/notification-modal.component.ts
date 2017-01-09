@@ -28,10 +28,8 @@ export class NotificationModalComponent implements OnInit {
     }
 
     ngOnChanges() {
-        console.log(this.loggedIn);
         if (this.loggedIn) {
             this.notificationsService.getNotification().then(res => {
-                console.log(res);
                 this.notifications = res;
                 this.notificationEvent.emit(this.notifications.length);
             });

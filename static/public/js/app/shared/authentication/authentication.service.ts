@@ -114,6 +114,8 @@ export class AuthService {
         user.notes = body.notes;
         user.note_avg = body.note_avg;
         user.items = body.items;
+        user.coordinates.longitude = body.coordinates.longitude;
+        user.coordinates.latitude = body.coordinates.latitude;
         return user;
     }
 
