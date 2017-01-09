@@ -35,6 +35,7 @@ export class SearchModalComponent {
 
     ngOnInit() {
         this.getCategories();
+        this.model.range = '100';
     }
 
     selectCategory(category: Category){

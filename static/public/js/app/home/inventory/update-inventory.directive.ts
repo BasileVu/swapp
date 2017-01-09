@@ -29,8 +29,6 @@ export class UpdateInventoryDirective {
             $('.open-modal-item-x').click(function () {
                 $('#view-item-x').modal('show');
             });
-
-            console.log("finished updating inventory");
         }
     }
 }
