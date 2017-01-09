@@ -158,6 +158,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                     });
                 });
 
+                // open infos modal ////////////////////////
+                $('.open-modal-infos').click(function () {
+                    $('#view-infos').modal('show');
+                });
+
                 // display item modal ///////////////////////////
                 let theItemModal = $('#view-item-x');
                 let theEditItemModal = $('#edit-item-modal');
