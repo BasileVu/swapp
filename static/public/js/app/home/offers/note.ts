@@ -3,9 +3,9 @@ export class Note {
     text: string;
     note: number;
 
-    constructor(offer: number, note: number) {
+    constructor(offer: number, text: string, note: number) {
         this.offer = offer;
-        this.text = "";
+        this.text = text;
         this.note = note;
     }
 }

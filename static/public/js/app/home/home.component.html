@@ -53,5 +53,6 @@
 <send-proposition-modal></send-proposition-modal>
 
 <accept-proposition-modal
-        (seeProfileEvent)="profileModal.showProfile($event)">
+        (seeProfileEvent)="profileModal.showProfile($event)"
+        (setNumberOfPendingOfferEvent)="profile.updateNumberOfPendingOffer($event)">
 </accept-proposition-modal>

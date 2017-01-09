@@ -102,7 +102,7 @@ export class Account {
         this.first_name = null;
         this.last_name = null;
         this.email = null;
-        this.location = new Location(null, null, null, null);
+        this.location = new Location("", "", "", "");
         this.last_modification_date = null;
         this.categories = [];
         this.items = [];

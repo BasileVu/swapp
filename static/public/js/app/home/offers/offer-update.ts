@@ -1,9 +1,9 @@
 export class OfferUpdate {
     accepted: boolean;
-    answered: boolean;
+    comment: string;
 
-    constructor(accepted: boolean, answered: boolean) {
+    constructor(accepted: boolean, comment: string) {
         this.accepted = accepted;
-        this.answered = answered;
+        this.comment = comment;
     }
 }

@@ -116,6 +116,7 @@ export class AuthService {
         user.items = body.items;
         user.coordinates.longitude = body.coordinates.longitude;
         user.coordinates.latitude = body.coordinates.latitude;
+        user.pending_offers = body.pending_offers;
         return user;
     }
 

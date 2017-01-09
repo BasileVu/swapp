@@ -57,12 +57,13 @@ export class ProfileComponent implements OnInit {
     // EventEmitter to call login function of the ProfileComponent after registering
     @Output() profilePictureEvent = new EventEmitter();
     @Output() seeProfileEvent = new EventEmitter();
+    @Output() openPendingOfferEvent = new EventEmitter();
 
     loggedIn: boolean;
     subscription: Subscription;
-    user: Account;
+    user: Account = new Account();
     notificationNumber: number;
-    pendingOffersNumber: number;
+    pendingOffersNumber: number = 0;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -82,7 +83,6 @@ export class ProfileComponent implements OnInit {
                 }
 
     ngOnInit() {
-        this.user = new Account();
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({
@@ -126,7 +126,18 @@ export class ProfileComponent implements OnInit {
         this.authService.getAccount().then(
             account => {
                 this.user = account;
-                this.pendingOffersNumber = this.user.pending_offers.length;
+
+                this.pendingOffersNumber = 0;
+                // Get the offers and add them to pending offers array
+                for (let pendingOffer of this.user.pending_offers) {
+                    for (let item of this.user.items) {
+                        if (+item === +pendingOffer.item_received) {
+                            +this.pendingOffersNumber++;
+                            break;
+                        }
+                    }
+                }
+
 
                 // Get user public profile to inform subscribed components of it
                 this.itemService.getUser(this.user.username).then(
@@ -182,6 +193,11 @@ export class ProfileComponent implements OnInit {
 
     updateNotifications($event: any) {
         this.notificationNumber = +$event;
+    }
+
+    updateNumberOfPendingOffer($event: number) {
+        console.log("pending offer number: " + $event);
+        this.pendingOffersNumber--;
     }
 
     openEmptyPendingOffers() {

@@ -1,6 +1,7 @@
 import {
     Component, ViewEncapsulation, OnInit, style,
-    animate, transition, state, trigger, Output, EventEmitter
+    animate, transition, state, trigger, Output, EventEmitter, OnChanges, Input,
+    SimpleChanges
 } from '@angular/core';
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {Subscription} from "rxjs";
@@ -12,6 +13,7 @@ import {OfferService} from "./offers.service";
 import {ToastsManager} from "ng2-toastr/ng2-toastr";
 import {Note} from "./Note";
 import {OfferGet, Account} from "../profile/account";
+import {ProfileService} from "../profile/profile.service";
 
 @Component({
     moduleId: module.id,
@@ -31,23 +33,26 @@ import {OfferGet, Account} from "../profile/account";
         ])
     ]
 })
-export class AcceptPropositionModalComponent implements OnInit {
+export class AcceptPropositionModalComponent implements OnInit, OnChanges {
 
     subscription: Subscription;
     user: Account = new Account;
     pendingOffers: Array<OfferGet> = [];
-    currentOfferGet: OfferGet = new OfferGet;
+    @Input() currentOfferGet: OfferGet = new OfferGet;
     proposer: User = new User;
     itemProposed: DetailedItem = new DetailedItem;
     itemWanted: DetailedItem = new DetailedItem;
     starsCount: number;
-    displayRating: boolean = true;
+    displayRating: boolean = false;
+    offerUpdate: OfferUpdate;
 
     @Output() seeProfileEvent = new EventEmitter();
+    @Output() setNumberOfPendingOfferEvent = new EventEmitter();
 
     constructor (private authService: AuthService,
                  private itemsService: ItemsService,
                  private offerService: OfferService,
+                 private profileService: ProfileService,
                  public toastr: ToastsManager) {}
 
     ngOnInit() {
@@ -55,96 +60,108 @@ export class AcceptPropositionModalComponent implements OnInit {
         this.subscription = this.authService.accountSelected$.subscribe(
             user => {
                 this.user = user;
-                console.log(user);
+                console.log("user");
+                console.log(this.user);
 
                 // Get the offers and add them to pending offers array
                 for (let pendingOffer of this.user.pending_offers) {
-                    this.pendingOffers.push(pendingOffer);
+                    for (let item of this.user.items) {
+                        if (item === pendingOffer.item_received) {
+                            this.pendingOffers.push(pendingOffer);
+                            break;
+                        }
+                    }
                 }
 
                 // Get the current pending offer
-                this.currentOfferGet = this.nextOffer();
-
-                // Get data related to it
-                if (this.currentOfferGet !== null) {
-                    this.getUserOffer(this.currentOfferGet.item_received);
-                    this.getProposerOffer(this.currentOfferGet.item_given);
-                }
+                this.nextOffer();
             }
         );
+    }
 
+    ngOnChanges(changes: SimpleChanges) {
     }
 
     acceptOffer() {
-        console.log("offer accepted");
         this.displayRating = true;
-    }
-
-    validOffer() {
-        // Send the accepted offer with message
-        let offerUpdate = new OfferUpdate(true, true);
-
-        this.offerService.updateOffer(this.currentOfferGet.id, offerUpdate).then(
-            res => {
-                // Rate the proposer
-                this.displayRating = true;
-            },
-            error => this.toastr.error(error, "Error")
-        )
+        this.offerUpdate = new OfferUpdate(true, "I accept your offer. Contact me at " + this.user.email);
     }
 
     refuseOffer() {
-        console.log("offer refused");
+        this.offerUpdate = new OfferUpdate(false, "Thank's for your proposition but I refuse your offer.");
 
-        // Inform the proposer
-
-        // Get next offer
-        this.nextOffer();
+        this.offerService.updateOffer(this.currentOfferGet.id, this.offerUpdate).then(
+            res => {
+                this.toastr.success("", "Offer Refused");
+                this.setNumberOfPendingOfferEvent.emit(1);
+                // Get next offer
+                this.nextOffer();
+            },
+            error => this.toastr.error(error, "Error")
+        );
     }
 
     nextOffer() {
-        if (this.pendingOffers.length > 0)
-            return this.pendingOffers.pop();
-        else
-            return null;
+        if (this.pendingOffers.length > 0) {
+            this.currentOfferGet = this.pendingOffers.pop();
+            this.getUserOffer(this.currentOfferGet.item_received);
+            this.getProposerOffer(this.currentOfferGet.item_given);
+        } else {
+            this.currentOfferGet = null; // no next offers
+            this.displayRating = false;
+        }
+        console.log(this.currentOfferGet);
     }
 
     getUserOffer(item_wanted: number) {
         this.itemsService.getDetailedItem(item_wanted).then(
-            item => {
-                this.itemWanted = item;
-            }
+            itemWanted => {
+                this.itemWanted = itemWanted;
+            },
+            error => this.toastr.error(error, "Error")
         );
     }
 
     getProposerOffer(item_proposed: number) {
         this.itemsService.getDetailedItem(item_proposed).then(
-            item => {
-                this.itemProposed = item;
+            itemProposed => {
+                this.itemProposed = itemProposed;
 
                 // Get proposer data
                 this.itemsService.getUser(this.itemProposed.owner_username).then(
                     proposer => {
                         this.proposer = proposer;
-                    }
+                    },
+                    error => this.toastr.error(error, "Error")
                 )
-            }
+            },
+            error => this.toastr.error(error, "Error")
         );
     }
 
     rateProposer() {
-        console.log(this.starsCount);
-        let note = new Note(this.currentOfferGet.id, this.starsCount);
+        let note = new Note(this.currentOfferGet.id, "Default message", this.starsCount);
 
-        this.offerService.rateUser(note).then(
+        // Accept offer then rate user
+        this.offerService.updateOffer(this.currentOfferGet.id, this.offerUpdate).then(
             res => {
-                this.toastr.success("Thank you for rating", "Offer accepted !");
+                this.offerService.rateUser(note).then(
+                    res => {
+                        this.toastr.success("Thank you for rating", "Offer accepted !");
 
-                // Get next offer
-                this.nextOffer();
+                        this.displayRating = false;
+                        this.starsCount = 0;
+
+                        this.setNumberOfPendingOfferEvent.emit(1);
+                        // Get next offer
+                        this.nextOffer();
+                    },
+                    error => this.toastr.error(error, "Error")
+                );
             },
-            error => this.toastr.error("You accepted this offer!", "Error")
+            error => this.toastr.error(error, "Error")
         );
+
     }
 
     seeProfile() {
