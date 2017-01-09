@@ -679,6 +679,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "The item has pending offers"
         401:
           description: "User not authenticated."
           
