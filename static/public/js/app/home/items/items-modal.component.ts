@@ -58,7 +58,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 private sanitizer: DomSanitizer,
-                public toastr: ToastsManager) {console.log("construcot"); }
+                public toastr: ToastsManager) {}
 
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors
@@ -85,7 +85,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 for (let userInventoryItem of this.item.similar)
                     this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
 
-                console.log(this.item);
                 // Get the owner
                 this.itemsService.getUser(item.owner_username)
                     .then(
@@ -129,7 +128,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     addComment() {
         if (this.loggedIn) {
             let commentCreationDTO = new CommentCreationDTO(this.user.id, this.item.id, this.commentContent.value);
-            console.log(commentCreationDTO);
 
             this.itemsService.addComment(commentCreationDTO).then(
                 res => {

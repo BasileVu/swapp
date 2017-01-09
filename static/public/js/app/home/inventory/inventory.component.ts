@@ -95,7 +95,6 @@ export class InventoryComponent implements OnInit {
     editItemEvent($event: number) {
         this.itemsService.getDetailedItem(+$event).then(
             item => {
-                console.log(item);
                 let inventoryItem = this.inventory.find(i => i.id === item.id);
                 inventoryItem.archived = item.archived;
                 inventoryItem.name = item.name;

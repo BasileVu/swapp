@@ -64,7 +64,7 @@ export class SearchModalComponent {
         this.model.orderBy = this.selectedOrderBy;
         this.searchService.search(this.model)
             .then(
-                items => { this.itemsService.updateItems(items); console.log(items);},
+                items => { this.itemsService.updateItems(items); },
                 error => this.errorMessage = <any>error);
     }
 }
