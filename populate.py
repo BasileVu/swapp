@@ -247,7 +247,9 @@ if __name__ == "__main__":
     o2 = create_offer(i5, i6, "A very good offer my piano")
     o3 = create_offer(i3, i4, "A very very good offer for my old ring")
     o4 = create_offer(i7, i9, "Please accept my offer for my flute")
+    # These offers will be not accepted or refused (not answered)
     o5 = create_offer(i5, i3, "I want your precious ring")
+    o6 = create_offer(i8, i4, "I want your brand new mouse")
 
     # Change read to True for new offers notifications 2 and 4
     n2 = Notification.objects.get(pk=2)
