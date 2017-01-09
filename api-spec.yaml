@@ -115,6 +115,8 @@ paths:
                       type: number
                     name:
                       type: string
+              coordinates:
+                $ref: "#/definitions/Coordinates"
           
   /account/:
     get:
