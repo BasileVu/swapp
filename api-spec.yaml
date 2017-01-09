@@ -679,6 +679,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "Can't archive this item since it has pending offers"
         401:
           description: "User not authenticated."
           
