@@ -94,7 +94,6 @@ export class SearchModalComponent {
     }
 
     search(){
-        console.log(this.model);
         this.model.category = "";
         if(this.selectedCategory.name != this.allCategories.name){
             this.model.category = this.selectedCategory.name;

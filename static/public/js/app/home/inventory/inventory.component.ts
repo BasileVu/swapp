@@ -127,8 +127,6 @@ export class InventoryComponent implements OnInit {
 
 
     gotoDetail(item_id: number): void {
-        console.log("clicked. item_id: " + item_id);
-
         let service = this.itemsService;
         service.getDetailedItem(item_id)
             .then(
@@ -155,8 +153,6 @@ export class InventoryComponent implements OnInit {
     }
 
     gotoEdit(item_id: number): void {
-        console.log("clicked for edition. item_id: " + item_id);
-
         let service = this.itemsService;
         service.getDetailedItem(item_id)
             .then(

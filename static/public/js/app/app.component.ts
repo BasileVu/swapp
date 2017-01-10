@@ -51,7 +51,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.authService.getCSRF().then(
-            res => console.log(res),
             error => console.log(error)
         );
 
