@@ -34,6 +34,7 @@ export class SearchModalComponent {
     hideModal: boolean = false;
     model: Search = new Search();
     map: any;
+    advancedSearchModal: any;
 
     constructor (private searchService: SearchService, private itemsService: ItemsService) {}
 
@@ -41,8 +42,8 @@ export class SearchModalComponent {
         this.getCategories();
         this.model.range = '100';
 
-        let advancedSearchModal = $('#advanced-search-modal');
-        advancedSearchModal.on('show.bs.modal', function (e: any) {
+        this.advancedSearchModal = $('#advanced-search-modal');
+        this.advancedSearchModal.on('show.bs.modal', function (e: any) {
             setTimeout(function () {
                 this.map = new google.maps.Map(document.getElementById('search-modal-map'), {
                     center: {lat: -34.397, lng: 150.644},
