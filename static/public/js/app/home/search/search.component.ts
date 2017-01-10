@@ -17,9 +17,6 @@ export class SearchComponent {
 
     errorMessage: string = "No category available for now";
     categories: Category[];
-    allCategories: Category = new Category("All categories");
-    selectedCategory: Category = new Category("All categories");
-    selectedOrderBy = new OrderBy("Recommended", "");
     orderBys: OrderBy[] = [
         new OrderBy("Recommended", ""),
         new OrderBy("Newest", "date"),
@@ -29,20 +26,31 @@ export class SearchComponent {
         new OrderBy("Most expensive", "price_max"),
         new OrderBy("Closest", "range"),
     ];
-    model: Search = new Search()    ;
+    model: Search = new Search();
 
     constructor (private searchService: SearchService, private itemsService: ItemsService) {}
 
     ngOnInit() {
         this.getCategories();
+
+        this.searchService.model.subscribe(model => {
+            this.model = model;
+        });
     }
 
-    selectCategory(category: Category){
-        this.selectedCategory = category;
+    selectCategory(category: Category) {
+        this.model.category = category;
+        this.searchService.model.next(this.model);
     }
 
-    selectOrderBy(OrderBy: OrderBy){
-        this.selectedOrderBy = OrderBy;
+    selectOrderBy(orderBy: OrderBy) {
+        this.model.orderBy = orderBy;
+        this.searchService.model.next(this.model);
+    }
+
+    newVal(value: any) {
+        this.model.q = value;
+        this.searchService.model.next(this.model);
     }
 
     getCategories() {
@@ -50,18 +58,12 @@ export class SearchComponent {
             .then(
                  categories => {
                      this.categories = categories;
-                     this.categories.unshift(this.allCategories);
                  },
                 error =>  this.errorMessage = <any>error);
     }
 
     search(){
-        this.model.category = "";
-        if(this.selectedCategory.name != this.allCategories.name){
-            this.model.category = this.selectedCategory.name;
-        }
-        this.model.orderBy = this.selectedOrderBy;
-        this.searchService.search(this.model)
+        this.searchService.search()
             .then(
                 items => { this.itemsService.updateItems(items); },
                 error => this.errorMessage = <any>error);

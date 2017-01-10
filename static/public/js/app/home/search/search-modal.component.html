@@ -8,7 +8,7 @@
                             <div class="input-group input-group-lg">
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
+                                        <span class="hidden-sm-down">{{ model.orderBy.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
@@ -17,14 +17,14 @@
                                 </div>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
+                                        <span class="hidden-sm-down">{{ model.category.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
                                         <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
                                     </div>
                                 </div>
-                                <input [(ngModel)]="model.q" type="text" class="form-control" name="q">
+                                <input #q type="text" [value]="model.q" (keyup)="newVal(q.value)" class="form-control" name="q">
                             </div>
                         </div>
                         <div class="col-md-3 col-xs-2 advanced open-modal-advanced-search">
