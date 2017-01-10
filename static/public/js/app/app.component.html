@@ -3,7 +3,7 @@
         <div class="pull-lg-left">
             <ul class="nav navbar-nav pull-lg-left">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#"><i class="fa fa-home"></i> Home</a>
+                    <a class="nav-link home-link" href="#"><i class="fa fa-home"></i> Home</a>
                 </li>
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">
                     <a class="nav-link open-notif-modal" href="#"><i class="fa fa-bell"></i> Notifs</a>
@@ -29,7 +29,7 @@
         </div>
     </div>
     <div id="responsive-menu" class="container hidden-md-up">
-        <a id="responsive-header-logo" href="#">SWAPP</a>
+        <a class="home-link" id="responsive-header-logo" href="#">SWAPP</a>
         <button id="responsive-menu-toggle" class="btn btn-reversed btn-primary" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fa fa-bars"></i>
         </button>

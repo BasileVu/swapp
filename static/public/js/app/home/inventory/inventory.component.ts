@@ -112,7 +112,7 @@ export class InventoryComponent implements OnInit {
             () => {
                 this.inventory.find(i => i.id == item.id).archived = true;
             },
-            error => this.toastr.error("Error archiving the item " + item, "Error")
+            error => this.toastr.error("Error archiving the item " + error, "Error")
         );
     }
 
@@ -122,7 +122,7 @@ export class InventoryComponent implements OnInit {
             () => {
                 this.inventory.find(i => i.id == item.id).archived = false;
             },
-            error => this.toastr.error("Error restoring the item " + item, "Error")
+            error => this.toastr.error("Error restoring the item " + error, "Error")
         );
     }
 
