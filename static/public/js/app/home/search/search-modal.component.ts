@@ -5,6 +5,7 @@ import { Category } from './category';
 import {OrderBy} from "./orderby";
 import {ItemsService} from "../items/items.service";
 import {Search} from "./search";
+import {AuthService} from "../../shared/authentication/authentication.service";
 
 declare let $: any;
 declare let google: any;
@@ -31,12 +32,22 @@ export class SearchModalComponent {
     model: Search = new Search();
     map: any;
     advancedSearchModal: any;
+    searchLocation: string = '';
 
-    constructor (private searchService: SearchService, private itemsService: ItemsService) {}
+    constructor (
+        private searchService: SearchService,
+        private itemsService: ItemsService,
+        private authService: AuthService
+    ) {}
 
     ngOnInit() {
         this.getCategories();
         this.model = this.searchService.model.value;
+        this.authService.getAccount().then(res => {
+            this.searchLocation = res.location.street + ', ' +
+                                    res.location.city + ', ' +
+                                    res.location.country;
+        });
 
         this.advancedSearchModal = $('#advanced-search-modal');
         this.advancedSearchModal.on('show.bs.modal', function (e: any) {
