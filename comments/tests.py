@@ -14,7 +14,8 @@ class CommentsTests(TestCase):
     comment1_url = "%s%d/" % (comments_url, 1)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="user1", password="password")
+        self.user = User.objects.create_user(first_name="first", last_name="last", username="user1",
+                                             password="password")
         self.client.login(username="user1", password="password")
 
         self.category = Category.objects.create(name="category")
@@ -30,7 +31,10 @@ class CommentsTests(TestCase):
         self.assertEqual(data["content"], content)
         self.assertIn("date", data)
         self.assertEqual(data["user"], self.user.id)
+        self.assertEqual(data["username"], self.user.username)
         self.assertEqual(data["item"], self.item1.id)
+        self.assertEqual(data["user_fullname"], "first last")
+        self.assertEqual(data["user_profile_picture"], None)
 
     def test_post_comment(self):
         r = self.client.post(self.comments_url, data=json.dumps({

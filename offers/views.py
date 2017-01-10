@@ -76,7 +76,7 @@ class OfferViewSet(mixins.CreateModelMixin,
             raise ValidationError("You can't trade another person's item")
 
         if self.request.user == item_received.owner:
-            raise ValidationError("You can't traded for your own item")
+            raise ValidationError("You can't trade your own items")
 
         if item_given.price_max < item_received.price_min:
                 raise ValidationError("Price max of your item is smaller than price min of the wanted item")

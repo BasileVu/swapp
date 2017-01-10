@@ -365,6 +365,7 @@ class ItemCommentTests(ItemBaseTest):
         self.assertEqual(data["content"], comment.content)
         self.assertIn("date", data)
         self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["username"], self.another_user.username)
         self.assertEqual(data["item"], comment.item.id)
         self.assertEqual(data["user_fullname"], "first2 last2")
         self.assertNotEqual(data["user_profile_picture"], None)
