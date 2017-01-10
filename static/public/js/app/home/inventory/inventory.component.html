@@ -1,16 +1,16 @@
 <div class="row personal-inventory" *ngIf="loggedIn" [@flyInOut]>
-        <h3>Inventory <a href="#" class="open-new-item-modal"><i class="fa fa-plus"></i></a></h3>
-        <div class="row home-inventory">
-            <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell" *ngFor="let item of inventory; let last = last" [update-inventory]="last" [ngClass]="{'grayout': item.archived===true}">
-                <div class="inner-item open-modal-item-x" (click)="gotoDetail(item.id)">
-                    <img *ngIf="item.image_url === ''" class="img-fluid" src="http://loremflickr.com/400/400"/>
-                    <div *ngIf="item.image_url != ''" class="bg-img-fluid" [style.background-image]="'url(' + item.image_url + ')'"></div>
-                    <span>{{ item.name }}</span>
-                    <a *ngIf="item.archived === false" (click)="archive(item); $event.stopPropagation();" href="#" class="delete"><i class="fa fa-archive"></i></a>
-                    <a *ngIf="item.archived === true" (click)="restore(item); $event.stopPropagation();"  href="#" class="delete"><i class="fa fa-undo"></i></a>
-                    <a *ngIf="item.archived === false" (click)="gotoEdit(item.id); $event.stopPropagation();"  href="#" class="edit open-modal-edit-item-x"><i class="fa fa-edit"></i></a>
-                </div>
+    <h3>Inventory <a href="#" class="open-new-item-modal"><i class="fa fa-plus"></i></a></h3>
+    <div class="row home-inventory modal-carousel-inventory">
+        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 carousel-cell" *ngFor="let item of inventory; let last = last" [update-inventory]="last" [ngClass]="{'grayout': item.archived===true}">
+            <div class="inner-item" (click)="gotoDetail(item.id)">
+                <img *ngIf="item.image_url === ''" class="img-fluid" src="http://loremflickr.com/400/400"/>
+                <div *ngIf="item.image_url != ''" class="bg-img-fluid" [style.background-image]="'url(' + item.image_url + ')'"></div>
+                <span>{{ item.name }}</span>
+                <a *ngIf="item.archived === false" (click)="archive(item); $event.stopPropagation();" href="#" class="delete"><i class="fa fa-archive"></i></a>
+                <a *ngIf="item.archived === true" (click)="restore(item); $event.stopPropagation();"  href="#" class="delete"><i class="fa fa-undo"></i></a>
+                <a *ngIf="item.archived === false" (click)="gotoEdit(item.id); $event.stopPropagation();"  href="#" class="edit open-modal-edit-item-x"><i class="fa fa-edit"></i></a>
             </div>
         </div>
-        <hr class="inventory-separation">
+    </div>
+    <hr class="inventory-separation">
 </div>

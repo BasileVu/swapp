@@ -7,8 +7,8 @@
         <img *ngIf="item.images.length === 0" class="img-fluid" src="http://loremflickr.com/600/600"/>
         <img *ngIf="item.images.length != 0" class="img-fluid" src="{{ item.images[0].url }}"/>
         <div class="infos">
-            <a href="#" (click)="searchCategory(item.category)"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
-            <a href="#"><i class="fa fa-map-marker"></i>{{ item.owner_location }}</a>
+            <a (click)="searchCategory(item.category); $event.stopPropagation(); $event.preventDefault();" href="#"><i class="fa fa-folder"></i>{{ item.category.name }}</a>
+            <a (click)="searchLocation(item.owner_location); $event.stopPropagation(); $event.preventDefault();" href="#"><i class="fa fa-map-marker"></i>{{ item.owner_location }}</a>
         </div>
         <div class="row user">
             <div class="col-xs-3">
@@ -39,7 +39,7 @@
                 </li>
             </ul>
         </div>
-        <div class="swap btn btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
-        <div class="share btn btn-primary"><i class="fa fa-share"></i></div>
+        <div (click)="swap(item); $event.stopPropagation();" class="swap btn btn btn-primary"><i class="fa fa-refresh"></i> Swap</div>
+        <div (click)="share(item); $event.stopPropagation();" class="share btn btn-primary"><i class="fa fa-share"></i></div>
     </div>
 </div>

@@ -131,6 +131,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
                 */
 
+                // Home link reload page
+                $(".home-link").click(function(){
+                    location.reload();
+                });
+
                 // open user creation modal /////////////////////
                 let openCreateProfileButtons = $('.open-create-profile-modal');
                 let createProfileModal = $('#create-user-modal');
