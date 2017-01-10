@@ -18,7 +18,7 @@
                                     </div>
                                     <div class="row inventory">
                                         <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                            <a href="#">
+                                            <a href="#" class="open-modal-item-x" (click)="showItem(itemWanted)">
                                                 <img *ngIf="itemWanted.images.length > 0" class="img-fluid" src="{{ itemWanted.images[0].url }}"/>
                                                 <span>{{ itemWanted.name }}</span>
                                             </a>
@@ -43,7 +43,7 @@
                                     </div>
                                     <div class="row inventory">
                                         <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                            <a href="#">
+                                            <a href="#" class="open-modal-item-x" (click)="showItem(item)">
                                                 <img *ngIf="itemProposed.images.length > 0" class="img-fluid" src="{{ itemProposed.images[0].url }}"/>
                                                 <span>{{ itemProposed.name }}</span>
                                             </a>

@@ -195,8 +195,7 @@ export class ProfileComponent implements OnInit {
         this.notificationNumber = +$event;
     }
 
-    updateNumberOfPendingOffer($event: number) {
-        console.log("pending offer number: " + $event);
+    removeOnePendingOffer() {
         this.pendingOffersNumber--;
     }
 
