@@ -40,10 +40,18 @@ def set_image_item(item, image_name):
 
 if __name__ == "__main__":
     # Users
-    u1 = User.objects.create_user(username="user1", first_name="François", last_name="LePoulpe", email="test1@test.com", password="password")
-    u2 = User.objects.create_user(username="user2", first_name="Margerite", last_name="Ducosset", email="test2@test.com", password="password")
-    u3 = User.objects.create_user(username="user3", first_name="Jack", last_name="Ometti", email="test3@test.com", password="password")
-    u4 = User.objects.create_user(username="user4", first_name="Ania", last_name="Mongrito", email="test4@test.com", password="password")
+    u1 = User.objects.create_user(username="user1", first_name="François", last_name="LePoulpe", email="test1@test.com",
+                                  password="password")
+    u2 = User.objects.create_user(username="user2", first_name="Marguerite", last_name="Ducosset",
+                                  email="test2@test.com", password="password")
+    u3 = User.objects.create_user(username="user3", first_name="Jack", last_name="Ometti", email="test3@test.com",
+                                  password="password")
+    u4 = User.objects.create_user(username="user4", first_name="Ania", last_name="Mongrito", email="test4@test.com",
+                                  password="password")
+    u5 = User.objects.create_user(username="user5", first_name="Jean", last_name="Duroux", email="test5@test.com",
+                                  password="password")
+    u6 = User.objects.create_user(username="user6", first_name="Claudine", last_name="Michel", email="test6@test.com",
+                                  password="password")
 
     # Add locations to users
     u1.location.street = "Route de Cheseaux 1"
@@ -52,16 +60,16 @@ if __name__ == "__main__":
     u1.location.country = "Switzerland"
     u1.location.save()
 
-    u2.location.street = "Avenue des Sports 20"
-    u2.location.city = "Yverdon-les-Bains"
-    u2.location.region = "VD"
+    u2.location.street = "Limmatstrasse 23"
+    u2.location.city = "Zürich"
+    u2.location.region = "ZH"
     u2.location.country = "Switzerland"
     u2.location.save()
 
-    u3.location.street = "Place Pestalozzi 14"
-    u3.location.city = "Yverdon-les-Bains"
-    u3.location.region = "VD"
-    u3.location.country = "Switzerland"
+    u3.location.street = "17 Boulevard de Vaugirard"
+    u3.location.city = "Paris"
+    u3.location.region = "Île-de-France"
+    u3.location.country = "France"
     u3.location.save()
 
     u4.location.street = "385 Route de Meyrin"
@@ -70,22 +78,42 @@ if __name__ == "__main__":
     u4.location.country = "Switzerland"
     u4.location.save()
 
+    u5.location.street = "85 quai d'Austerlitz"
+    u5.location.city = "Paris"
+    u5.location.region = "Île-de-France"
+    u5.location.country = "France"
+    u5.location.save()
+
+    u6.location.street = "Place Pestalozzi 14"
+    u6.location.city = "Yverdon-les-Bains"
+    u6.location.region = "VD"
+    u6.location.country = "Switzerland"
+    u6.location.save()
+
     # Add coordinates to users
     u1.coordinates.latitude = 46.7793801
     u1.coordinates.longitude = 6.659497600000001
     u1.coordinates.save()
 
-    u2.coordinates.latitude = 46.7812274
-    u2.coordinates.longitude = 6.6473097
+    u2.coordinates.latitude = 47.380754
+    u2.coordinates.longitude = 8.5365015
     u2.coordinates.save()
 
-    u3.coordinates.latitude = 46.77866239999999
-    u3.coordinates.longitude = 6.6419655
+    u3.coordinates.latitude = 48.8407963
+    u3.coordinates.longitude = 2.3201484
     u3.coordinates.save()
 
     u4.coordinates.latitude = 46.2337481
     u4.coordinates.longitude = 6.0523948
     u4.coordinates.save()
+
+    u5.coordinates.latitude = 48.8419695
+    u5.coordinates.longitude = 2.3665938
+    u5.coordinates.save()
+
+    u6.coordinates.latitude = 46.77866239999999
+    u6.coordinates.longitude = 6.6419655
+    u6.coordinates.save()
 
     # Categories
     c1 = Category.objects.create(name="Antiques")
@@ -146,6 +174,8 @@ if __name__ == "__main__":
     set_image_profile(u2, "user2.jpg")
     set_image_profile(u3, "user3.jpg")
     set_image_profile(u4, "user4.jpg")
+    set_image_profile(u5, "user5.jpg")
+    set_image_profile(u6, "user6.jpg")
 
     # Set items images
     set_image_item(i1, "shoes_1.jpg")

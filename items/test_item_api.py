@@ -151,6 +151,7 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["category"]["name"], "test")
         self.assertEqual(r.data["views"], 1)
         self.assertEqual(r.data["comments"], 0)
+        self.assertEqual(r.data["liked"], False)
         self.assertEqual(r.data["likes"], 1)
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
         self.assertEqual(r.data["delivery_methods"], self.get_default_delivery_methods)
@@ -175,6 +176,19 @@ class ItemGetTests(ItemBaseTest):
         r = self.get_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["views"], 2)
+
+    def test_get_item_not_liked_logged_in(self):
+        self.login()
+        r = self.get_item()
+        self.assertEqual(r.data["liked"], False)
+
+    def test_get_item_liked(self):
+        self.item = Item.objects.get(pk=1)
+        Like.objects.create(user=self.another_user, item=self.item)
+
+        self.login2()
+        r = self.get_item()
+        self.assertEqual(r.data["liked"], True)
 
 
 class ItemPatchTests(ItemBaseTest):
@@ -351,14 +365,19 @@ class ItemCommentTests(ItemBaseTest):
         self.assertEqual(data["content"], comment.content)
         self.assertIn("date", data)
         self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["username"], self.another_user.username)
         self.assertEqual(data["item"], comment.item.id)
         self.assertEqual(data["user_fullname"], "first2 last2")
         self.assertNotEqual(data["user_profile_picture"], None)
 
     def test_get_item_comments(self):
-        c1 = Comment.objects.create(user=self.another_user, item=self.item, content="nice")
-        c2 = Comment.objects.create(user=self.another_user, item=self.item, content="cool")
-        c3 = Comment.objects.create(user=self.another_user, item=self.item, content="fun")
+        now = timezone.now()
+        c1 = Comment.objects.create(user=self.another_user, item=self.item, content="nice",
+                                    date=now)
+        c2 = Comment.objects.create(user=self.another_user, item=self.item, content="cool",
+                                    date=now + timezone.timedelta(seconds=1))
+        c3 = Comment.objects.create(user=self.another_user, item=self.item, content="fun",
+                                    date=now + timezone.timedelta(seconds=2))
 
         r = self.client.get("%s%d/comments/" % (self.url, self.item.id))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
@@ -381,6 +400,8 @@ class ArchiveRestoreItemTests(ItemBaseTest):
         self.item2 = Item.objects.create(name="Test2", description="Description2", owner=self.current_user,
                                          price_min=1, price_max=2, category=self.c1)
         self.item3 = Item.objects.create(name="Test3", description="Description3", owner=self.current_user,
+                                         price_min=1, price_max=2, category=self.c1)
+        self.item4 = Item.objects.create(name="Test3", description="Description3", owner=self.another_user,
                                          price_min=1, price_max=2, category=self.c1)
 
     def archive_item(self, item_id=1):
@@ -407,6 +428,16 @@ class ArchiveRestoreItemTests(ItemBaseTest):
 
         r = self.get_item()
         self.assertEqual(r.data["archived"], True)
+
+    def test_cannot_archive_item_if_pending_offers_done(self):
+        Offer.objects.create(item_given=self.item1, item_received=self.item4)
+        r = self.archive_item()
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_archive_item_if_pending_offers_received(self):
+        Offer.objects.create(item_received=self.item4, item_given=self.item1)
+        r = self.archive_item()
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_restore_item(self):
         self.archive_item()

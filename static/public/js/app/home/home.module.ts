@@ -24,6 +24,8 @@ import { RegisterUserModalComponent } from './register/register-user-modal.compo
 import { SendPropositionModalComponent } from './offers/send-proposition-modal.component';
 import { AcceptPropositionModalComponent } from './offers/accept-proposition-modal.component';
 import { NotificationModalComponent } from './profile/notification-modal.component';
+import { EditItemModalComponent } from "./inventory/edit-item-modal.component";
+import { InfosModalComponent } from "./infos/infos-modal.component";
 
 import { InventoryService } from './inventory/inventory.service';
 import { ProfileService } from './profile/profile.service';
@@ -37,7 +39,7 @@ import { YourInventoryDirective } from './offers/your-inventory.directive';
 import { UpdateGridDirective } from './items/update-grid.directive';
 import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
-import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
+import {MessagesModalComponent} from "./messages/messages-modal.component";
 
 
 @NgModule({
@@ -70,7 +72,9 @@ import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
         UpdateGridDirective,
         UpdateCarouselDirective,
         UpdateInventoryDirective,
-        EditItemModalComponent
+        EditItemModalComponent,
+        InfosModalComponent,
+        MessagesModalComponent
     ],
     providers: [
         InventoryService,

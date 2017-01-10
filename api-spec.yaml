@@ -650,22 +650,7 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                id:
-                  type: number
-                content:
-                  type: string
-                date:
-                  type: string
-                user:
-                  type: number
-                item:
-                  type: number
-                user_fullname:
-                  type: string
-                user_profile_picture:
-                  type: string
+              $ref: "#/definitions/CommentGet"
                   
   /items/{id}/archive/:
     post:
@@ -679,6 +664,8 @@ paths:
       responses:
         200:
           description: "Successful operation."
+        400:
+          description: "The item has pending offers"
         401:
           description: "User not authenticated."
           
@@ -925,7 +912,7 @@ paths:
               item_received:
                 type: number
         400:
-          description: "The user has already created an offer with the same item for the wanted item. \n\r There is already an offer for the given item with the wanted item. \n\r Can't create an offer with an item that has been traded. \n\r Can't create an offer for an item that has been traded. \n\r The item traded does not exist. \n\r The item wanted does not exist. \n\r Can't trade another person's item. \n\r Can't traded for the own user item. \n\r Price max of the given item is smaller than price min of the wanted item."
+          description: "The user has already created an offer with the same item for the wanted item. \n\r There is already an offer for the given item with the wanted item. \n\r Can't create an offer with an item that has been traded. \n\r Can't create an offer for an item that has been traded. \n\r The item traded does not exist. \n\r The item wanted does not exist. \n\r Can't trade another person's item. \n\r Can't trade the own user items. \n\r Price max of the given item is smaller than price min of the wanted item."
         401:
           description: "User not authenticated."
           
@@ -1152,6 +1139,8 @@ definitions:
         type: string
       user:
         type: number
+      username:
+        type: string
       item:
         type: number
       user_fullname:
@@ -1321,6 +1310,8 @@ definitions:
               type: number
             url:
               type: string
+      liked:
+        type: boolean
       likes:
         type: number
       comments:

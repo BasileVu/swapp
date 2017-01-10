@@ -154,6 +154,11 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // TODO
     }
 
+    contact() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Contact owner");
+        // TODO
+    }
+
     security() {
         this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Security");
         // TODO

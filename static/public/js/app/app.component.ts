@@ -146,6 +146,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
                 */
 
+                // Home link reload page
+                $(".home-link").click(function(){
+                    location.reload();
+                });
+
                 // open user creation modal /////////////////////
                 let openCreateProfileButtons = $('.open-create-profile-modal');
                 let createProfileModal = $('#create-user-modal');
@@ -171,6 +176,16 @@ export class AppComponent implements OnInit, AfterViewInit {
                     $(this).click(function () {
                         sendPropositionModal.modal('show');
                     });
+                });
+
+                // open infos modal ////////////////////////
+                $('.open-modal-infos').click(function () {
+                    $('#view-infos').modal('show');
+                });
+
+                // open messages modal ////////////////////////
+                $('.open-messages-modal').click(function () {
+                    $('#view-messages').modal('show');
                 });
 
                 // display item modal ///////////////////////////

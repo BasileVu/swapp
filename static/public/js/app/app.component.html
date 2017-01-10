@@ -3,13 +3,13 @@
         <div class="pull-lg-left">
             <ul class="nav navbar-nav pull-lg-left">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#"><i class="fa fa-home"></i> Home</a>
+                    <a class="nav-link home-link" href="#"><i class="fa fa-home"></i> Home</a>
                 </li>
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">
                     <a class="nav-link open-notif-modal" href="#"><i class="fa fa-bell"></i> Notifs</a>
                 </li>
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">
-                    <a class="nav-link" href="#"><i class="fa fa-envelope"></i> Messages</a>
+                    <a class="nav-link open-messages-modal" href="#"><i class="fa fa-envelope"></i> Messages</a>
                 </li>
             </ul>
         </div>
@@ -17,7 +17,7 @@
         <div class="pull-md-right">
             <ul class="nav navbar-nav pull-lg-left">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Infos <i class="fa fa-info-circle"></i></a>
+                    <a class="nav-link open-modal-infos" href="#">Infos <i class="fa fa-info-circle"></i></a>
                 </li>
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">
                     <a class="nav-link open-profile-modal" (click)="seeProfile()" href="#">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div id="responsive-menu" class="container hidden-md-up">
-        <a id="responsive-header-logo" href="#">SWAPP</a>
+        <a class="home-link" id="responsive-header-logo" href="#">SWAPP</a>
         <button id="responsive-menu-toggle" class="btn btn-reversed btn-primary" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fa fa-bars"></i>
         </button>
@@ -42,10 +42,10 @@
                     <a class="nav-link open-notif-modal" href="#"><i class="fa fa-bell"></i> Notifs</a>
                 </li>
                 <li *ngIf="loggedIn" class="nav-item">
-                    <a class="nav-link" href="#"><i class="fa fa-envelope"></i> Messages</a>
+                    <a class="nav-link open-messages-modal" href="#"><i class="fa fa-envelope"></i> Messages</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fa fa-info-circle"></i> Infos</a>
+                    <a class="nav-link open-modal-infos" href="#"><i class="fa fa-info-circle"></i> Infos</a>
                 </li>
                 <li *ngIf="loggedIn" class="nav-item">
                     <a class="nav-link open-profile-modal" href="#"><img class="avatar" src="http://loremflickr.com/25/25"/> Profile</a>
