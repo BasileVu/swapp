@@ -9,7 +9,7 @@
                                 <div class="col-lg-6 my-inventory">
                                     <div class="row">
                                         <div class="col-xs-3 col-lg-2">
-                                            <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}">
+                                            <div *ngIf="user.profile_picture_url != null" class="avatar-img-fluid" [style.background-image]="'url(' + user.profile_picture_url + ')'"></div>
                                             <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
                                         </div>
                                         <div class="col-xs-9 col-lg-7 title">
@@ -19,7 +19,7 @@
                                     <div class="row inventory">
                                         <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
                                             <a href="#" class="open-modal-item-x" (click)="showItem(itemWanted)">
-                                                <img *ngIf="itemWanted.images.length > 0" class="img-fluid" src="{{ itemWanted.images[0].url }}"/>
+                                                <div *ngIf="itemWanted.images.length > 0" class="bg-img-fluid" [style.background-image]="'url(' + itemWanted.images[0].url + ')'"></div>
                                                 <span>{{ itemWanted.name }}</span>
                                             </a>
                                         </div>
@@ -38,13 +38,13 @@
                                         </div>
                                         <div class="col-xs-3 col-lg-2">
                                             <img *ngIf="proposer.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
-                                            <img *ngIf="proposer.profile_picture_url !== null" class="img-fluid avatar" src="{{ proposer.profile_picture_url }}">
+                                            <div *ngIf="proposer.profile_picture_url != null" class="avatar-img-fluid" [style.background-image]="'url(' + proposer.profile_picture_url + ')'"></div>
                                         </div>
                                     </div>
                                     <div class="row inventory">
                                         <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                            <a href="#" class="open-modal-item-x" (click)="showItem(item)">
-                                                <img *ngIf="itemProposed.images.length > 0" class="img-fluid" src="{{ itemProposed.images[0].url }}"/>
+                                            <a href="#" class="open-modal-item-x" (click)="showItem(itemProposed)">
+                                                <div *ngIf="itemProposed.images.length > 0" class="bg-img-fluid" [style.background-image]="'url(' + itemProposed.images[0].url + ')'"></div>
                                                 <span>{{ itemProposed.name }}</span>
                                             </a>
                                         </div>

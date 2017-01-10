@@ -48,11 +48,14 @@
         (editItemEvent)="inventory.editItemEvent($event)">
 </edit-item-modal>
 
-<items-modal></items-modal>
-
-<send-proposition-modal></send-proposition-modal>
-
 <accept-proposition-modal
         (seeProfileEvent)="profileModal.showProfile($event)"
-        (removeOnePendingOfferEvent)="profile.removeOnePendingOffer()">
+        (removeOnePendingOfferEvent)="profile.removeOnePendingOffer($event)"
+        (showItemFromAcceptOfferEvent)="itemModal.showItem($event)">
 </accept-proposition-modal>
+
+<items-modal
+        #itemModal>
+</items-modal>
+
+<send-proposition-modal></send-proposition-modal>

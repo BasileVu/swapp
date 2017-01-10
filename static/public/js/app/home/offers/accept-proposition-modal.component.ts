@@ -14,6 +14,9 @@ import {ToastsManager} from "ng2-toastr/ng2-toastr";
 import {Note} from "./Note";
 import {OfferGet, Account} from "../profile/account";
 import {ProfileService} from "../profile/profile.service";
+import { __platform_browser_private__,
+    DomSanitizer } from '@angular/platform-browser';
+
 
 @Component({
     moduleId: module.id,
@@ -31,9 +34,10 @@ import {ProfileService} from "../profile/profile.service";
                 animate('0.2s 10 ease-out', style({transform: 'translateX(0) scale(0)'}))
             ])
         ])
-    ]
+    ],
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
-export class AcceptPropositionModalComponent implements OnInit, OnChanges {
+export class AcceptPropositionModalComponent implements OnInit {
 
     subscription: Subscription;
     user: Account = new Account;
@@ -47,12 +51,14 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
 
     @Output() seeProfileEvent = new EventEmitter();
     @Output() removeOnePendingOfferEvent = new EventEmitter();
+    @Output() showItemFromAcceptOfferEvent = new EventEmitter();
 
     constructor (private authService: AuthService,
                  private itemsService: ItemsService,
                  private offerService: OfferService,
                  private profileService: ProfileService,
-                 public toastr: ToastsManager) {}
+                 public toastr: ToastsManager,
+                 private sanitizer: DomSanitizer) {}
 
     ngOnInit() {
         // Listen for user login
@@ -86,7 +92,7 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
         this.offerService.updateOffer(this.currentOfferGet.id, this.offerUpdate).then(
             res => {
                 this.toastr.success("", "Offer Refused");
-                this.removeOnePendingOfferEvent.emit();
+                this.removeOnePendingOfferEvent.emit(null);
                 this.displayRating = false;
                 // Get next offer
                 this.nextOffer();
@@ -100,12 +106,26 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
         this.authService.getAccount().then(
             account => {
                 this.user = account;
-                if (this.user.pending_offers.length > 0) {
-                    this.currentOfferGet = this.user.pending_offers.pop();
+                this.sanitizer.bypassSecurityTrustUrl(this.user.profile_picture_url);
+
+                let leave = false;
+                this.currentOfferGet = null;
+                // Get the offers and add them to pending offers array
+                for (let pendingOffer of this.user.pending_offers) {
+                    for (let item of this.user.items) {
+                        if (item === pendingOffer.item_received) {
+                            this.currentOfferGet = pendingOffer;
+                            leave = true;
+                            break;
+                        }
+                    }
+                    if (leave) break;
+                }
+
+                if (this.currentOfferGet !== null) {
                     this.getUserOffer(this.currentOfferGet.item_received);
                     this.getProposerOffer(this.currentOfferGet.item_given);
                 } else {
-                    this.currentOfferGet = null;
                     this.displayRating = false;
                 }
             },
@@ -117,6 +137,7 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
         this.itemsService.getDetailedItem(item_wanted).then(
             itemWanted => {
                 this.itemWanted = itemWanted;
+                this.sanitizer.bypassSecurityTrustUrl(this.itemWanted.images[0].url);
             },
             error => this.toastr.error(error, "Error")
         );
@@ -126,11 +147,13 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
         this.itemsService.getDetailedItem(item_proposed).then(
             itemProposed => {
                 this.itemProposed = itemProposed;
+                this.sanitizer.bypassSecurityTrustUrl(this.itemProposed.images[0].url);
 
                 // Get proposer data
                 this.itemsService.getUser(this.itemProposed.owner_username).then(
                     proposer => {
                         this.proposer = proposer;
+                        this.sanitizer.bypassSecurityTrustUrl(this.proposer.profile_picture_url);
                     },
                     error => this.toastr.error(error, "Error")
                 )
@@ -150,7 +173,7 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
                 this.displayRating = false;
                 this.starsCount = 0;
 
-                this.removeOnePendingOfferEvent.emit();
+                this.removeOnePendingOfferEvent.emit(null);
                 // Get next offer
                 this.nextOffer();
             },
@@ -168,6 +191,6 @@ export class AcceptPropositionModalComponent implements OnInit, OnChanges {
     }
 
     showItem(item: DetailedItem): void {
-        this.itemsService.selectItem(item);
+        this.showItemFromAcceptOfferEvent.emit(item);
     }
 }

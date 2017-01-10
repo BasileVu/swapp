@@ -14,9 +14,10 @@ import {
 import { DOCUMENT } from '@angular/platform-browser'
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 import { Subscription }   from 'rxjs/Subscription';
+import { __platform_browser_private__,
+    DomSanitizer } from '@angular/platform-browser';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
-import {Rating} from "ng2-rating";
 
 import { AuthService } from '../../shared/authentication/authentication.service';
 import { ItemsService } from '../items/items.service';
@@ -49,7 +50,8 @@ declare let google: any;
                 }))
             ])
         ])
-    ]
+    ],
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
 
 export class ProfileComponent implements OnInit {
@@ -76,11 +78,12 @@ export class ProfileComponent implements OnInit {
                 private profileService: ProfileService,
                 private formBuilder: FormBuilder,
                 @Inject(DOCUMENT) private document: any,
-                public toastr: ToastsManager) {
-                    this.url = this.document.location.href;
-                    if (this.url.slice(-1) === '/') 
-                        this.url = this.url.substr(0, this.url.length - 1);
-                }
+                public toastr: ToastsManager,
+                private sanitizer: DomSanitizer) {
+        this.url = this.document.location.href;
+        if (this.url.slice(-1) === '/')
+            this.url = this.url.substr(0, this.url.length - 1);
+    }
 
     ngOnInit() {
         this.loggedIn = this.authService.isLoggedIn();
@@ -126,6 +129,7 @@ export class ProfileComponent implements OnInit {
         this.authService.getAccount().then(
             account => {
                 this.user = account;
+                this.sanitizer.bypassSecurityTrustUrl(this.user.profile_picture_url);
 
                 this.pendingOffersNumber = 0;
                 // Get the offers and add them to pending offers array
@@ -195,8 +199,10 @@ export class ProfileComponent implements OnInit {
         this.notificationNumber = +$event;
     }
 
-    removeOnePendingOffer() {
-        this.pendingOffersNumber--;
+    // $event is a null object
+    removeOnePendingOffer($event: any) {
+        this.pendingOffersNumber = this.pendingOffersNumber - 1;
+        console.log("pendingOffersNumber = " + this.pendingOffersNumber);
     }
 
     openEmptyPendingOffers() {

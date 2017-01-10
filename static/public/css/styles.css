@@ -6072,6 +6072,18 @@ my-app:empty + .loading div {
   background-size: cover;
   border-radius: 0.3rem; }
 
+.avatar-img-fluid {
+  display: block;
+  width: 100%;
+  padding-top: 100%;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  border: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover; }
+
 .alert {
   padding: 15px;
   margin-bottom: 20px;

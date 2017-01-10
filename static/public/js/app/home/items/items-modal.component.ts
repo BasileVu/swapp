@@ -81,36 +81,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // When receiving the detailed item
         this.subscription = this.itemsService.itemSelected$.subscribe(
             item => {
-                this.item = item;
-                for (let userInventoryItem of this.item.similar)
-                    this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
-
-                console.log(this.item);
-                // Get the owner
-                this.itemsService.getUser(item.owner_username)
-                    .then(
-                        owner => {
-                            this.owner = owner;
-                            this.fillStars(owner.note_avg);
-                            this.ownerItems = [];
-
-                            for (let inventoryItem of owner.items) {
-                                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
-                                if (inventoryItem.id != item.id)
-                                    this.ownerItems.push(inventoryItem);
-                            }
-                        },
-                        error => this.toastr.error("Can't get the owner", "Error")
-                    );
-
-                // Get the comments
-                this.itemsService.getComments(item.id)
-                    .then(
-                        comments => {
-                            this.comments = comments;
-                        },
-                        error => this.toastr.error("Can't get the comments", "Error")
-                    );
+                this.showItem(item);
             },
             error => this.toastr.error("Can't get the detailed item", "Error")
         );
@@ -215,7 +186,41 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     }
 
     shareItem() {
+        this.toastr.warning("share this '" + this.item.name + "' (TODO)", "Share item");
+        // TODO
+    }
 
+    showItem(item: DetailedItem) {
+        this.item = item;
+        for (let userInventoryItem of this.item.similar)
+            this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
+
+        console.log(this.item);
+        // Get the owner
+        this.itemsService.getUser(item.owner_username)
+            .then(
+                owner => {
+                    this.owner = owner;
+                    this.fillStars(owner.note_avg);
+                    this.ownerItems = [];
+
+                    for (let inventoryItem of owner.items) {
+                        this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
+                        if (inventoryItem.id != item.id)
+                            this.ownerItems.push(inventoryItem);
+                    }
+                },
+                error => this.toastr.error("Can't get the owner", "Error")
+            );
+
+        // Get the comments
+        this.itemsService.getComments(item.id)
+            .then(
+                comments => {
+                    this.comments = comments;
+                },
+                error => this.toastr.error("Can't get the comments", "Error")
+            );
     }
 
     ngOnDestroy() {
