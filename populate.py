@@ -184,17 +184,23 @@ if __name__ == "__main__":
 
     set_image_item(i2, "shirt_1.jpg")
     set_image_item(i2, "shirt_2.jpg")
+    set_image_item(i2, "shirt_3.jpg")
 
     set_image_item(i3, "ring_1.jpg")
+    set_image_item(i3, "ring_2.jpg")
+    set_image_item(i3, "ring_3.jpg")
 
     set_image_item(i4, "newMouse_1.jpg")
-    set_image_item(i4, "newMouse_2.png")
+    set_image_item(i4, "newMouse_2.jpg")
     set_image_item(i4, "newMouse_3.jpg")
 
-    set_image_item(i5, "piano_1.png")
+    set_image_item(i5, "piano_1.jpg")
     set_image_item(i5, "piano_2.jpg")
+    set_image_item(i5, "piano_3.jpg")
 
     set_image_item(i6, "violin_1.jpg")
+    set_image_item(i6, "violin_2.jpg")
+    set_image_item(i6, "violin_3.jpg")
 
     set_image_item(i7, "flute_1.jpg")
     set_image_item(i7, "flute_2.jpg")
@@ -202,6 +208,7 @@ if __name__ == "__main__":
 
     set_image_item(i8, "electricGuitar_1.jpg")
     set_image_item(i8, "electricGuitar_2.jpg")
+    set_image_item(i8, "electricGuitar_3.jpg")
 
     set_image_item(i9, "trumpet_1.jpg")
     set_image_item(i9, "trumpet_2.jpg")
