@@ -222,6 +222,10 @@ class ItemViewSet(mixins.CreateModelMixin,
     @detail_route(methods=["POST"])
     def archive(self, request, pk=None):
         item = Item.objects.get(pk=pk)
+
+        if item.offers_received.filter(answered=False).count() > 0 or item.offers_done.filter(answered=False).count() > 0:
+            raise ValidationError("You can't archive this item since it has pending offers")
+
         item.archived = True
         item.save()
 
