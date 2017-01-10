@@ -46,6 +46,7 @@ export class SendPropositionModalComponent implements OnInit {
     constructor(private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) {
+
         offerService.offerModalSelected$.subscribe(
             offerArray => {
                 this.initOffer(offerArray);

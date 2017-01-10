@@ -94,6 +94,7 @@ export class AcceptPropositionModalComponent implements OnInit {
                 this.toastr.success("", "Offer Refused");
                 this.removeOnePendingOfferEvent.emit(null);
                 this.displayRating = false;
+                this.currentOfferGet = null;
                 // Get next offer
                 this.nextOffer();
             },
@@ -182,12 +183,12 @@ export class AcceptPropositionModalComponent implements OnInit {
 
     }
 
-    seeProfile() {
-        this.seeProfileEvent.emit(this.proposer);
+    seeProfile(proposer: User) {
+        this.seeProfileEvent.emit(proposer);
     }
 
     sendMessage() {
-        this.toastr.warning("to " + this.proposer.first_name + " " + this.proposer.last_name, "Send message");
+        this.toastr.warning("to " + this.proposer.first_name + " " + this.proposer.last_name + " (TODO)", "Send message");
     }
 
     showItem(item: DetailedItem): void {

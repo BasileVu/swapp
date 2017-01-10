@@ -49,6 +49,10 @@ export class Location {
         this.region = region;
         this.country = country;
     }
+
+    public toString = () : string => {
+        return this.city + ", " + this.country;
+    }
 }
 
 export class Coordinates {

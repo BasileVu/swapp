@@ -36,10 +36,6 @@
         (updateAccountEvent)="profile.getAccount()">
 </update-profile-modal>
 
-<profile-modal
-        #profileModal>
-</profile-modal>
-
 <add-item-modal
         (newItemEvent)="inventory.addItemEvent($event)">
 </add-item-modal>
@@ -55,7 +51,13 @@
 </accept-proposition-modal>
 
 <items-modal
-        #itemModal>
+        #itemModal
+        (openProfileModalEvent)="profileModal.showProfile($event)"
+        (openProfileModalFromUsernameEvent)="profileModal.showProfileFromUsername($event)">
 </items-modal>
 
 <send-proposition-modal></send-proposition-modal>
+
+<profile-modal
+        #profileModal>
+</profile-modal>

@@ -1,4 +1,7 @@
-import {Component, ViewEncapsulation, OnDestroy, OnInit } from '@angular/core';
+import {
+    Component, ViewEncapsulation, OnDestroy, OnInit,
+    Output, EventEmitter
+} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 import { __platform_browser_private__,
     DomSanitizer } from '@angular/platform-browser';
@@ -49,6 +52,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     comments: Array<Comment> = [];
     subscription: Subscription;
 
+    @Output() openProfileModalEvent = new EventEmitter();
+    @Output() openProfileModalFromUsernameEvent = new EventEmitter();
+
     // Form fields
     private commentForm: FormGroup;
     private commentContent = new FormControl("", Validators.required);
@@ -74,6 +80,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // Listen for user login
         this.subscription = this.authService.userSelected$.subscribe(
             user => {
+                this.sanitizer.bypassSecurityTrustUrl(user.profile_picture_url);
                 this.user = user;
             }
         );
@@ -117,7 +124,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 },
                 error => {
                     console.log(error);
-                
                 }
             );
         } else {
@@ -163,9 +169,12 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // TODO
     }
 
-    openProfileModal() {
-        this.toastr.warning("TODO (profile modal subscribed and we signal the profile)", "Open profile");
-        // TODO : voir avec Mathieu
+    openProfileModal(user: User) {
+        this.openProfileModalEvent.emit(user);
+    }
+
+    openProfileModalFromUsername(username: string) {
+        this.openProfileModalFromUsernameEvent.emit(username);
     }
 
     seeMore() {
@@ -200,6 +209,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         this.itemsService.getUser(item.owner_username)
             .then(
                 owner => {
+                    this.sanitizer.bypassSecurityTrustUrl(owner.profile_picture_url);
                     this.owner = owner;
                     this.fillStars(owner.note_avg);
                     this.ownerItems = [];
@@ -217,6 +227,8 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         this.itemsService.getComments(item.id)
             .then(
                 comments => {
+                    for (let comment of comments)
+                        this.sanitizer.bypassSecurityTrustUrl(comment.user_profile_picture);
                     this.comments = comments;
                 },
                 error => this.toastr.error("Can't get the comments", "Error")

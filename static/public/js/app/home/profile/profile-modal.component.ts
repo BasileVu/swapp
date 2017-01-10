@@ -1,9 +1,13 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { __platform_browser_private__,
+    DomSanitizer } from '@angular/platform-browser';
+
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {Subscription} from "rxjs";
 import {Account} from "./account";
 import {User} from "./user";
 import {ToastsManager} from "ng2-toastr/ng2-toastr";
+import {ItemsService} from "../items/items.service";
 
 declare let $: any;
 declare let google: any;
@@ -12,7 +16,8 @@ declare let google: any;
     moduleId: module.id,
     selector: 'profile-modal',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './profile-modal.component.html'
+    templateUrl: './profile-modal.component.html',
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
 
 export class ProfileModalComponent implements OnInit {
@@ -23,6 +28,8 @@ export class ProfileModalComponent implements OnInit {
     subscription: Subscription;
 
     constructor(private authService : AuthService,
+                private itemsService: ItemsService,
+                private sanitizer: DomSanitizer,
                 public toastr: ToastsManager) {}
 
     ngOnInit() {
@@ -36,17 +43,27 @@ export class ProfileModalComponent implements OnInit {
         );
     }
 
+    showProfileFromUsername(username: string) {
+        this.itemsService.getUser(username).then(
+            user => this.showProfile(user),
+            error => this.toastr.error(error, "Error")
+        );
+    }
+
     showProfile(account: Account | User) {
+
         this.user = account;
         this.fillStars(account.note_avg);
+        this.sanitizer.bypassSecurityTrustUrl(this.user.profile_picture_url);
 
         const profileModal = $('#user-profile-modal');
+        let that = this;
         profileModal.on('show.bs.modal', function (e: any) {
             setTimeout(function () {
 
                 let pos = {
-                    lat: account.coordinates.latitude, // TODO
-                    lng: account.coordinates.longitude // TODO
+                    lat: account.coordinates.latitude,
+                    lng: account.coordinates.longitude
                 };
 
                 // profile map
@@ -60,23 +77,11 @@ export class ProfileModalComponent implements OnInit {
                     position: pos
                 });
                 let infowindow;
-                if (account instanceof Account) {
-                    infowindow = new google.maps.InfoWindow({
-                        content: '<h3 class="map-title">' +
-                        account.location.city +
-                        ', ' +
-                        account.location.country +
-                        '</h3>'
-                    });
-                } else if (account instanceof User) {
-                    infowindow = new google.maps.InfoWindow({
-                        content: '<h3 class="map-title">' +
-                        account.location +
-                        '</h3>'
-                    });
-                } else {
-                    this.toastr.error("Unknown user type", "Error");
-                }
+                infowindow = new google.maps.InfoWindow({
+                    content: '<h3 class="map-title">' +
+                    account.location +
+                    '</h3>'
+                });
                 infowindow.open(map, marker);
             }, 300)
         });

@@ -6076,9 +6076,9 @@ my-app:empty + .loading div {
   display: block;
   width: 100%;
   padding-top: 100%;
-  -webkit-border-radius: 50px;
-  -moz-border-radius: 50px;
-  border-radius: 50px;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
   border: none;
   background-repeat: no-repeat;
   background-position: center center;
