@@ -1323,6 +1323,8 @@ definitions:
               type: number
             url:
               type: string
+      liked:
+        type: boolean
       likes:
         type: number
       comments:
