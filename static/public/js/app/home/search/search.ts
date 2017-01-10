@@ -12,8 +12,8 @@ export class Search {
         this.q = '';
         this.category = new Category("All categories");
         this.orderBy = new OrderBy("Recommended", "");
-        this.price_min = '0';
-        this.price_max = '0';
+        this.price_min = '';
+        this.price_max = '';
         this.range = '0';
     }
 }

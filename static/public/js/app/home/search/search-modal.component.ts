@@ -36,10 +36,7 @@ export class SearchModalComponent {
 
     ngOnInit() {
         this.getCategories();
-
-        this.searchService.model.subscribe(model => {
-            this.model = model;
-        });
+        this.model = this.searchService.model.value;
 
         this.advancedSearchModal = $('#advanced-search-modal');
         this.advancedSearchModal.on('show.bs.modal', function (e: any) {
@@ -75,6 +72,10 @@ export class SearchModalComponent {
         });
     }
 
+    ngOnDestroy() {
+        this.searchService.model.unsubscribe();
+    }
+
     selectCategory(category: Category) {
         this.model.category = category;
         this.searchService.model.next(this.model);
@@ -95,6 +96,7 @@ export class SearchModalComponent {
             .then(
                  categories => {
                      this.categories = categories;
+                     this.categories.unshift(new Category("All categories"));
                  },
                 error =>  this.errorMessage = <any>error);
     }

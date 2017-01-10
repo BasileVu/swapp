@@ -25,12 +25,18 @@ export class SearchService {
 
     search (): Promise<DetailedItem[]> {
         let params: URLSearchParams = new URLSearchParams();
+
         params.set('q', this.model.value.q);
-        params.set('category', this.model.value.category.name);
+        if (this.model.value.category.name == 'All categories') {
+            params.set('category', '');
+        } else {
+            params.set('category', this.model.value.category.name);
+        }
         params.set('order_by', this.model.value.orderBy.value);
         params.set('price_min', this.model.value.price_min);
         params.set('price_max', this.model.value.price_max);
         params.set('range', this.model.value.range);
+
         return this.http.get(this.itemsUrl, { search: params })
             .toPromise()
             .then(this.extractData)

@@ -10,8 +10,7 @@ import {OrderBy} from "./OrderBy";
     moduleId: module.id,
     selector: 'search',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './search.component.html',
-    providers: [SearchService]
+    templateUrl: './search.component.html'
 })
 export class SearchComponent {
 
@@ -32,10 +31,11 @@ export class SearchComponent {
 
     ngOnInit() {
         this.getCategories();
+        this.model = this.searchService.model.value;
+    }
 
-        this.searchService.model.subscribe(model => {
-            this.model = model;
-        });
+    ngOnDestroy() {
+        this.searchService.model.unsubscribe();
     }
 
     selectCategory(category: Category) {
@@ -58,6 +58,7 @@ export class SearchComponent {
             .then(
                  categories => {
                      this.categories = categories;
+                     this.categories.unshift(new Category("All categories"));
                  },
                 error =>  this.errorMessage = <any>error);
     }
