@@ -650,22 +650,7 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                id:
-                  type: number
-                content:
-                  type: string
-                date:
-                  type: string
-                user:
-                  type: number
-                item:
-                  type: number
-                user_fullname:
-                  type: string
-                user_profile_picture:
-                  type: string
+              $ref: "#/definitions/CommentGet"
                   
   /items/{id}/archive/:
     post:
@@ -1154,6 +1139,8 @@ definitions:
         type: string
       user:
         type: number
+      username:
+        type: string
       item:
         type: number
       user_fullname:
