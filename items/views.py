@@ -212,7 +212,7 @@ class ItemViewSet(mixins.CreateModelMixin,
         item.views += 1
         item.save()
 
-        serializer = DetailedItemSerializer(item)
+        serializer = DetailedItemSerializer(item, context={"request": self.request})
         return Response(serializer.data)
 
     @detail_route(methods=["GET"])
@@ -257,10 +257,10 @@ class ItemViewSet(mixins.CreateModelMixin,
 
         if len(request.query_params) == 0:
             items = build_item_suggestions(user)
-            return Response(DetailedItemSerializer(items, many=True).data)
+            return Response(DetailedItemSerializer(items, many=True, context={"request": self.request}).data)
         else:
             queryset = filter_items(serializer.validated_data, user)
-            return Response(DetailedItemSerializer(queryset, many=True).data)
+            return Response(DetailedItemSerializer(queryset, many=True, context={"request": self.request}).data)
 
     def perform_create(self, serializer):
         price_min = serializer.validated_data.get("price_min", None)

@@ -1,6 +1,7 @@
 from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.fields import CurrentUserDefault
 
 from items.models import Category, Item, Image, Like, KeyInfo, DeliveryMethod
 from swapp.gmaps_api_utils import MAX_RADIUS
@@ -129,6 +130,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     keyinfo_set = KeyInfoSerializer(many=True)
     delivery_methods = DeliveryMethodSerializer(many=True)
     images = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     offers_received = serializers.SerializerMethodField()
@@ -140,6 +142,10 @@ class DetailedItemSerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         return ImageSerializer(obj.image_set.all(), many=True).data
+
+    def get_liked(self, obj):
+        user = self.context["request"].user
+        return True if user.is_authenticated and obj.like_set.filter(user=user).count() > 0 else False
 
     def get_likes(self, obj):
         return obj.like_set.count()
@@ -169,7 +175,7 @@ class DetailedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ("id", "name", "description", "price_min", "price_max", "creation_date", "owner_username", "category",
-                  "views", "images", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
+                  "views", "images", "liked", "likes", "comments", "offers_received", "keyinfo_set", "delivery_methods",
                   "similar", "owner_picture_url", "owner_location", "owner_coordinates", "traded", "archived")
 
 
