@@ -35,7 +35,7 @@ export class SearchService {
         params.set('order_by', this.model.value.orderBy.value);
         params.set('price_min', this.model.value.price_min);
         params.set('price_max', this.model.value.price_max);
-        params.set('range', this.model.value.range);
+        params.set('range', '0');
 
         return this.http.get(this.itemsUrl, { search: params })
             .toPromise()

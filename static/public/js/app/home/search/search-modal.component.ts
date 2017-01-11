@@ -8,6 +8,7 @@ import {Search} from "./search";
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {Http, RequestOptions, Headers, Response} from "@angular/http";
 import {GoogleService} from "./googleService";
+import {DetailedItem} from "../items/detailed-item";
 
 declare let $: any;
 declare let google: any;
@@ -38,6 +39,7 @@ export class SearchModalComponent {
     center: any = {lat: 0, lng: 0};
     advancedSearchModal: any;
     searchLocation: string = '';
+    items: DetailedItem[] = [];
 
     constructor (
         private searchService: SearchService,
@@ -84,6 +86,7 @@ export class SearchModalComponent {
 
     private setLocation() {
         this.deleteMarkers();
+        this.getMarkers();
 
         let url = 'https://maps.googleapis.com/maps/api/geocode/json?address='+this.searchLocation+'&key=AIzaSyDNi0DkJRcQiOhJzSitoV5GhlacK6fNtKs';
 
@@ -102,6 +105,17 @@ export class SearchModalComponent {
                 error => this.handleError(error)
             );
         }
+    }
+
+    private getMarkers() {
+        this.search().then(data => {
+            for (let item of this.items) {
+                this.addMarker({
+                    lng: item.owner_coordinates.longitude,
+                    lat: item.owner_coordinates.latitude
+                });
+            }
+        });
     }
 
     private recenterMap() {
@@ -229,10 +243,13 @@ export class SearchModalComponent {
                 error =>  this.errorMessage = <any>error);
     }
 
-    search(){
-        this.searchService.search()
+    search(): Promise<DetailedItem[]> {
+        return this.searchService.search()
             .then(
-                items => { this.itemsService.updateItems(items); },
+                items => {
+                    this.items = items;
+                    this.itemsService.updateItems(items);
+                },
                 error => this.errorMessage = <any>error);
     }
 }
