@@ -140,6 +140,7 @@ export class InventoryComponent implements OnInit {
                 error => console.log(error));
     }
 
+
     gotoEdit(item_id: number): void {
         let service = this.itemsService;
         service.getDetailedItem(item_id)

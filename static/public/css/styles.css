@@ -6031,7 +6031,7 @@ input[type=file] {
   top: 0;
   left: 0;
   z-index: -1;
-  background-image: url("../../static/images/fondmodal.jpg"); }
+  background-image: url(../../static/images/fond.jpg); }
 
 my-app:empty + .loading {
   opacity: 1;
