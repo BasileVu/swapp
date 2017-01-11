@@ -87,8 +87,4 @@ import {AuthService} from "../shared/authentication/authentication.service";
     ]
 })
 
-export class HomeModule {
-    constructor() {
-        console.log("home module constructor");
-    }
-}
+export class HomeModule {}
