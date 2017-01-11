@@ -118,7 +118,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         setTimeout(function() {
 
             that.loggedIn = localStorage.getItem("connected") === "true";
-            that.authService.selectLoggedIn(that.loggedIn);
+            if (that.loggedIn)
+                that.authService.selectLoggedIn(that.loggedIn);
 
             $('document').ready(function() {
 

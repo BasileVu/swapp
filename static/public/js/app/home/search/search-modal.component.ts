@@ -7,8 +7,9 @@ import {ItemsService} from "../items/items.service";
 import {Search} from "./search";
 import {AuthService} from "../../shared/authentication/authentication.service";
 import {Http, RequestOptions, Headers, Response} from "@angular/http";
-import {GoogleService} from "./googleService";
+import {GoogleService} from "./google.service";
 import {DetailedItem} from "../items/detailed-item";
+import {Subscription} from "rxjs/Subscription";
 
 declare let $: any;
 declare let google: any;
@@ -40,6 +41,7 @@ export class SearchModalComponent {
     advancedSearchModal: any;
     searchLocation: string = '';
     items: DetailedItem[] = [];
+    subscription: Subscription = new Subscription;
 
     constructor (
         private searchService: SearchService,
@@ -49,39 +51,50 @@ export class SearchModalComponent {
     ) { }
 
     ngOnInit() {
-        let that = this;
-        this.getCategories();
-        this.model = this.searchService.model.value;
-        this.searchService.model.subscribe(newModel => {
-            if(typeof that.map !== "undefined") {
-                that.setLocation();
-            }
-        });
 
-        this.authService.getAccount().then(res => {
-            this.searchLocation = res.location.street + ', ' +
-                res.location.city + ', ' +
-                res.location.country;
-        });
-        this.advancedSearchModal = $('#advanced-search-modal');
-        this.advancedSearchModal.on('show.bs.modal', function (e: any) {
-            setTimeout(function () {
-                that.map = new google.maps.Map(document.getElementById('search-modal-map'), {
-                    scrollwheel: false
-                });
-                that.circle = new google.maps.Circle({
-                    map: that.map,
-                    center: that.center,
-                    radius: 100000,    // 10 miles in metres
-                    fillColor: '#eed5a9',
-                    fillOpacity: 0.3,
-                    strokeColor: '#40b2cd',
-                    strokeOpacity: 1,
-                    strokeWeight: 3
-                });
-                that.setLocation();
-            }, 300)
-        });
+        // Listen for login changes
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => {
+                if(loggedIn) {
+
+                    let that = this;
+                    this.getCategories();
+                    this.model = this.searchService.model.value;
+                    this.searchService.model.subscribe(newModel => {
+                        if(typeof that.map !== "undefined") {
+                            that.setLocation();
+                        }
+                    });
+
+                    this.authService.getAccount().then(res => {
+                        this.searchLocation = res.location.street + ', ' +
+                            res.location.city + ', ' +
+                            res.location.country;
+                    });
+                    this.advancedSearchModal = $('#advanced-search-modal');
+                    this.advancedSearchModal.on('show.bs.modal', function (e: any) {
+                        setTimeout(function () {
+                            that.map = new google.maps.Map(document.getElementById('search-modal-map'), {
+                                scrollwheel: false
+                            });
+                            that.circle = new google.maps.Circle({
+                                map: that.map,
+                                center: that.center,
+                                radius: 100000,    // 10 miles in metres
+                                fillColor: '#eed5a9',
+                                fillOpacity: 0.3,
+                                strokeColor: '#40b2cd',
+                                strokeOpacity: 1,
+                                strokeWeight: 3
+                            });
+                            that.setLocation();
+                        }, 300)
+                    });
+
+                }
+            }
+        );
+
     }
 
     private setLocation() {

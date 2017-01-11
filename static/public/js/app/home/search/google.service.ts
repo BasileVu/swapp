@@ -4,17 +4,10 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 @Injectable()
 export class GoogleService {
 
-    searchLocation = "New+York";
+    constructor(private http: Http) { }
 
-    constructor(private http: Http) {}
-
-    testgoogle(): Promise<any> {
-        let url = 'https://maps.googleapis.com/maps/api/geocode/json?address='+this.searchLocation+'&key=AIzaSyDNi0DkJRcQiOhJzSitoV5GhlacK6fNtKs';
-        return this.http.get(url).toPromise().then(this.extractData).catch(this.handleError);
-    }
-
-    testgetItems(): Promise<any> {
-        return this.http.get('/api/items/').toPromise().then(this.extractData).catch(this.handleError);
+    find(url: any): Promise<any> {
+        return this.http.get(url).toPromise().catch(this.handleError);
     }
 
     private extractData(res: Response) {

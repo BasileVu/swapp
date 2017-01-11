@@ -32,6 +32,7 @@ export class ItemsComponent implements OnInit {
 
     ngOnInit() {
         this.items = [];
+        this.getItems();
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
