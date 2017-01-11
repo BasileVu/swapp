@@ -36,6 +36,10 @@ export class ProfileModalComponent implements OnInit {
         this.user = new Account();
         this.stars = [];
 
+        this.subscription = this.authService.loggedInSelected$.subscribe(
+            loggedIn => this.loggedIn = loggedIn
+        );
+
         this.subscription = this.authService.accountSelected$.subscribe(
             account => {
                 this.showProfile(account);

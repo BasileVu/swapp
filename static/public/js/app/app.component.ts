@@ -13,6 +13,7 @@ import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from './shared/authentication/authentication.service';
 import {Account} from "./home/profile/account";
+import {ItemsService} from "./home/items/items.service";
 
 declare let $:any;
 declare let google: any;
@@ -47,12 +48,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     constructor (private http: Http,
                  private authService: AuthService,
+                 private itemsService: ItemsService,
                  public toastr: ToastsManager, vRef: ViewContainerRef) {
         this.toastr.setRootViewContainerRef(vRef);
     }
 
     ngOnInit() {
         this.authService.getCSRF();
+
+
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
@@ -62,22 +66,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.seeProfile();
             }
         );
-
-        // TODO : make a proper service to store geolocation
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(function(position) {
-                localStorage.setItem("latitude", String(position.coords.latitude));
-                localStorage.setItem("longitude", String(position.coords.longitude));
-            });
-        } else {
-            console.log("Geolocation not available");
-        }
     }
 
     seeProfile() {
         this.authService.getAccount().then(
             account => {
                 this.account = account;
+                this.authService.selectAccount(account);
             },
             error => this.toastr.error(error, "Error")
         )
@@ -90,8 +85,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.loggedIn = false;
                     this.toastr.success("", "Logged out");
 
-                    // Delete the cookie and get a new one for not authenticated queries
-                    localStorage.removeItem("connected");
+                    document.cookie = "connected=false";
                     this.deleteCookie('csrftoken');
                     this.authService.getCSRF().then(
                         res => {
@@ -117,8 +111,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         let that = this;
         setTimeout(function() {
 
-            that.loggedIn = localStorage.getItem("connected") === "true";
-            if (that.loggedIn)
+            let isConnected = that.getCookie('connected') === "true";
+            that.loggedIn = isConnected;
+            if (isConnected)
                 that.authService.selectLoggedIn(that.loggedIn);
 
             $('document').ready(function() {
@@ -225,5 +220,19 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         }, 0);
         
+    }
+
+    // Get cookie value from its name
+    getCookie(name: string): string {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+
+    getItems() {
+        this.itemsService.getItems().then(
+            items => this.itemsService.updateItems(items),
+            error => this.toastr.error(error, "Error")
+        )
     }
 }

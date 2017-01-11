@@ -186,23 +186,45 @@ export class AddItemModalComponent implements OnInit {
 
     // Add images to the newly created item
     addImages(item_id: number) {
-        let filesUploaded: number = 0;
-        for (let f of this.files) {
-            let formData:FormData = new FormData();
-            formData.append('image', f, f.name);
-            formData.append('item', item_id);
-            this.inventoryService.addImage(formData, item_id)
-                .then( // now signal the ProfileComponent that we uploaded picture
-                    res => {
-                        if (++filesUploaded === this.files.length) {
-                            this.toastr.success('New item added to your inventory', 'Item created!');
-                            this.newItemEvent.emit(this.newItemId);
-                            $('#add-item-modal').modal('hide');
-                        }
-                    },
-                    error => this.toastr.error(error, "Error")
-                );
+        if (this.files.length > 6) {
+            this.toastr.error("Cannot add more than 6 images", "Error");
+        } else {
+            let filesUploaded: number = 0;
+            for (let f of this.files) {
+                let formData:FormData = new FormData();
+                formData.append('image', f, f.name);
+                formData.append('item', item_id);
+                this.inventoryService.addImage(formData, item_id)
+                    .then( // now signal the ProfileComponent that we uploaded picture
+                        res => {
+                            if (++filesUploaded === this.files.length) {
+                                this.toastr.success('New item added to your inventory', 'Item created!');
+                                this.newItemEvent.emit(this.newItemId);
+                                $('#add-item-modal').modal('hide');
+                                this.resetForm();
+                            }
+                        },
+                        error => this.toastr.error(error, "Error")
+                    );
+            }
         }
+    }
+
+    resetForm() {
+        this.createItemForm.reset();
+        this.keyInfos = [];
+        this.keyInfos.push(new KeyInfo("", ""));
+        this.userDeliveryMethods = [];
+        this.file_srcs = [];
+        this.files = [];
+        this.data = {};
+        // Get all delivery methods
+        this.inventoryService.getDeliveryMethods().then(
+            deliveryMethods => {
+                this.deliveryMethods = deliveryMethods;
+            },
+            error => this.toastr.error("Can't get all delivery methods")
+        );
     }
 
     addKeyInfo() {

@@ -5693,7 +5693,7 @@ hr {
           padding: 20px 10px; }
           .modal .container .content .comments .comment p {
             margin: 0;
-            white-space: pre; }
+            white-space: pre-line; }
           .modal .container .content .comments .comment .writer-infos {
             font-size: 0.875rem;
             font-style: italic;
@@ -6031,7 +6031,7 @@ input[type=file] {
   top: 0;
   left: 0;
   z-index: -1;
-  background-image: url(../../static/images/fond.jpg); }
+  background-image: url("../../static/images/fondmodal.jpg"); }
 
 my-app:empty + .loading {
   opacity: 1;
@@ -6102,6 +6102,6 @@ my-app:empty + .loading div {
   border-color: #faebcc; }
 
 p .mydescription {
-  white-space: pre; }
+  white-space: pre-line; }
 
 /*# sourceMappingURL=styles.css.map */
