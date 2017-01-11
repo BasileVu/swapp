@@ -111,7 +111,11 @@ export class ProfileComponent implements OnInit {
         this.authService.login($event[0]).then(
             res => {
                 this.loggedIn = true;
-                localStorage.setItem("connected", "true");
+
+                let expiringDate = new Date();
+                expiringDate.setDate(expiringDate.getDate()+1);
+                document.cookie = "connected=true; expires=" + expiringDate.toISOString();
+
                 this.authService.selectLoggedIn(this.loggedIn);
                 let accountOnCreation: boolean = $event[1];
                 if (accountOnCreation) {

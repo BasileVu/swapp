@@ -309,7 +309,7 @@ hr {
 
           p {
             margin: 0;
-            white-space: pre;
+            white-space: pre-line;
           }
           .writer-infos {
             font-size: $font-size-sm;
@@ -872,5 +872,5 @@ my-app:empty + .loading div {
 }
 
 p .mydescription {
-  white-space: pre;
+  white-space: pre-line;
 }

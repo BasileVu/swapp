@@ -54,7 +54,7 @@
                                     <div class="col-xs-12">
                                         <div class="row comment new" style="margin: auto; width: 70%">
                                             <div class="alert alert-info" role="alert" *ngIf="currentOfferGet.comment !== ''">
-                                                <p class="mydescription"><strong>{{ proposer.first_name }} {{ proposer.last_name }}: </strong>{{ currentOfferGet.comment }}</p>
+                                                <p class="mydescription" style="white-space: pre-line;"><strong>{{ proposer.first_name }} {{ proposer.last_name }}: </strong>{{ currentOfferGet.comment }}</p>
                                             </div>
                                             <div class="alert alert-warning" role="alert" *ngIf="currentOfferGet.comment === ''">
                                                 <strong>No message</strong> specified by {{ proposer.first_name }} {{ proposer.last_name }}

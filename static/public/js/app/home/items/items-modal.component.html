@@ -27,7 +27,7 @@
                     <div class="row details">
                         <div class="col-lg-7 description">
                             <h5>Description</h5>
-                            <p class="mydescription">{{ item.description }}</p>
+                            <p class="mydescription" style="white-space: pre-line">{{ item.description }}</p>
                         </div>
                         <div class="col-lg-5 specifics">
                             <h5 class="infos">Infos</h5>
@@ -173,7 +173,7 @@
                     </div>
                     <div class="col-xs-11">
                         <p class="writer-infos"><a href="#" class="open-profile-modal" (click)="openProfileModalFromUsername(comment.username)">{{ comment.user_fullname }}</a> {{ comment.date | date:'medium' }}</p>
-                        <p class="mydescription">{{ comment.content }}</p>
+                        <p class="mydescription" style="white-space: pre-line;">{{ comment.content }}</p>
                     </div>
                 </div>
             </div>

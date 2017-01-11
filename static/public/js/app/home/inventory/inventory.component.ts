@@ -7,7 +7,7 @@ import {
     state,
     style,
     transition,
-    animate, OnChanges,
+    animate, OnChanges, Output, EventEmitter,
 } from '@angular/core';
 import { __platform_browser_private__,
     DomSanitizer } from '@angular/platform-browser';
@@ -50,6 +50,7 @@ declare let $: any;
 export class InventoryComponent implements OnInit {
 
     @Input() loggedIn: boolean;
+    @Output() resetAddItemFormEvent = new EventEmitter();
 
     owner: User;
     subscription: Subscription;

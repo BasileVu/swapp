@@ -90,8 +90,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.loggedIn = false;
                     this.toastr.success("", "Logged out");
 
-                    // Delete the cookie and get a new one for not authenticated queries
-                    localStorage.removeItem("connected");
+                    document.cookie = "connected=false";
                     this.deleteCookie('csrftoken');
                     this.authService.getCSRF().then(
                         res => {
@@ -117,7 +116,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         let that = this;
         setTimeout(function() {
 
-            that.loggedIn = localStorage.getItem("connected") === "true";
+            let isConnected = that.getCookie('connected') === "true";
+            that.loggedIn = isConnected;
             that.authService.selectLoggedIn(that.loggedIn);
 
             $('document').ready(function() {
@@ -255,5 +255,12 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         }, 0);
         
+    }
+
+    // Get cookie value from its name
+    getCookie(name: string): string {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
     }
 }
