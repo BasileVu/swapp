@@ -107,7 +107,6 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     addComment() {
         if (this.loggedIn) {
             let commentCreationDTO = new CommentCreationDTO(this.user.id, this.item.id, this.commentContent.value);
-            console.log(commentCreationDTO);
 
             this.itemsService.addComment(commentCreationDTO).then(
                 res => {
@@ -123,7 +122,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     this.toastr.success("", "Comment submitted");
                 },
                 error => {
-                    console.log(error);
+                    this.toastr.error(error, "Error");
                 }
             );
         } else {
@@ -206,10 +205,10 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
 
     showItem(item: DetailedItem) {
         this.item = item;
+        console.log(this.item);
         for (let userInventoryItem of this.item.similar)
             this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
 
-        console.log(this.item);
         // Get the owner
         this.itemsService.getUser(item.owner_username)
             .then(

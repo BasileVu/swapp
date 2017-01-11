@@ -22,7 +22,7 @@
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">
                     <a class="nav-link open-profile-modal" (click)="seeProfile()" href="#">
                         Profile
-                        <div style="width: 25px; height: 25px; padding-top: 0; float: right; margin-left: 5px;" class="avatar-img-fluid" [style.background-image]="'url(' + account.profile_picture_url + ')'"></div>
+                        <div *ngIf="account.profile_picture_url != null" style="width: 25px; height: 25px; padding-top: 0; float: right; margin-left: 5px;" class="avatar-img-fluid" [style.background-image]="'url(' + account.profile_picture_url + ')'"></div>
                     </a>
                 </li>
                 <li *ngIf="loggedIn" [@flyInOut] class="nav-item">

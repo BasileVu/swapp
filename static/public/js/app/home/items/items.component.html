@@ -13,7 +13,7 @@
         <div class="row user">
             <div class="col-xs-3">
                 <img *ngIf="item.owner_picture_url === null" class="avatar img-fluid" src="http://loremflickr.com/50/50"/>
-                <img *ngIf="item.owner_picture_url != null" style="width: 50px; height: 50px;" class="avatar img-fluid" src="{{ item.owner_picture_url }}"/>
+                <img *ngIf="item.owner_picture_url != null" class="avatar img-fluid" src="{{ item.owner_picture_url }}"/>
             </div>
             <div class="col-xs-9">
                 {{ item.name }}

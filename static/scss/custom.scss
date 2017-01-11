@@ -309,6 +309,7 @@ hr {
 
           p {
             margin: 0;
+            white-space: pre;
           }
           .writer-infos {
             font-size: $font-size-sm;
@@ -868,4 +869,8 @@ my-app:empty + .loading div {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc;
+}
+
+p .mydescription {
+  white-space: pre;
 }

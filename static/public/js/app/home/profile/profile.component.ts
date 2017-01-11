@@ -23,6 +23,7 @@ import { AuthService } from '../../shared/authentication/authentication.service'
 import { ItemsService } from '../items/items.service';
 import { Account } from "./account";
 import {ProfileService} from "./profile.service";
+import {GoogleService} from "../search/google.service";
 
 
 declare let $:any;
@@ -78,6 +79,7 @@ export class ProfileComponent implements OnInit {
                 private profileService: ProfileService,
                 private formBuilder: FormBuilder,
                 @Inject(DOCUMENT) private document: any,
+                private googleService: GoogleService,
                 public toastr: ToastsManager,
                 private sanitizer: DomSanitizer) {
         this.url = this.document.location.href;

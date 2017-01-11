@@ -45,7 +45,7 @@ export class ProfileModalComponent implements OnInit {
 
     showProfileFromUsername(username: string) {
         this.itemsService.getUser(username).then(
-            user => this.showProfile(user),
+            user => {this.showProfile(user);},
             error => this.toastr.error(error, "Error")
         );
     }

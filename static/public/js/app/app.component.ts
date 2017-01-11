@@ -52,16 +52,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.authService.getCSRF().then(
-            res => console.log(res),
-            error => console.log(error)
-        );
+        this.authService.getCSRF();
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
             loggedIn => {
                 this.loggedIn = loggedIn;
-                this.seeProfile();
+                if (this.loggedIn)
+                    this.seeProfile();
             }
         );
 
@@ -80,7 +78,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.authService.getAccount().then(
             account => {
                 this.account = account;
-                this.authService.selectAccount(account);
             },
             error => this.toastr.error(error, "Error")
         )

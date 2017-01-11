@@ -6,6 +6,7 @@ export class Comment {
     date: Date;
     user: number;
     item: number;
+    username: string;
     user_fullname: string;
     user_profile_picture: string;
 
@@ -15,6 +16,7 @@ export class Comment {
         this.date = null;
         this.user = null;
         this.item = null;
+        this.username = "";
         this.user_fullname = "";
         this.user_profile_picture = null;
     }

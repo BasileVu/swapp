@@ -5692,7 +5692,8 @@ hr {
           border-top: 1px solid #eed5a9;
           padding: 20px 10px; }
           .modal .container .content .comments .comment p {
-            margin: 0; }
+            margin: 0;
+            white-space: pre; }
           .modal .container .content .comments .comment .writer-infos {
             font-size: 0.875rem;
             font-style: italic;
@@ -6099,5 +6100,8 @@ my-app:empty + .loading div {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc; }
+
+p .mydescription {
+  white-space: pre; }
 
 /*# sourceMappingURL=styles.css.map */
