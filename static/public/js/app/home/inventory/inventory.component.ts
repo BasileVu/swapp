@@ -54,7 +54,7 @@ export class InventoryComponent implements OnInit {
     owner: User;
     subscription: Subscription;
 
-    private inventory: Array<InventoryItem> = [];
+    inventory: Array<InventoryItem> = [];
     
     constructor(private authService: AuthService,
                 private itemsService: ItemsService,
@@ -74,6 +74,7 @@ export class InventoryComponent implements OnInit {
                     let inventoryItem = new InventoryItem(item.id, item.name, item.image_id, item.image_url, item.archived);
                     this.sanitizer.bypassSecurityTrustUrl(item.image_url);
                     this.inventory.push(inventoryItem);
+                    this.inventory = this.inventory.slice();
                 }
             }
         );
@@ -86,6 +87,7 @@ export class InventoryComponent implements OnInit {
                 let inventoryItem = new InventoryItem(item.id, item.name, item.images[0].id, item.images[0].url, item.archived);
                 this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
                 this.inventory.push(inventoryItem);
+                this.inventory = this.inventory.slice();
             },
             error => this.toastr.error("Can't get item " + $event, "Error")
         );
@@ -111,7 +113,7 @@ export class InventoryComponent implements OnInit {
             () => {
                 this.inventory.find(i => i.id == item.id).archived = true;
             },
-            error => this.toastr.error("Error archiving the item " + item, "Error")
+            error => this.toastr.error("Error archiving the item " + error, "Error")
         );
     }
 
@@ -121,7 +123,7 @@ export class InventoryComponent implements OnInit {
             () => {
                 this.inventory.find(i => i.id == item.id).archived = false;
             },
-            error => this.toastr.error("Error restoring the item " + item, "Error")
+            error => this.toastr.error("Error restoring the item " + error, "Error")
         );
     }
 
@@ -131,23 +133,8 @@ export class InventoryComponent implements OnInit {
         service.getDetailedItem(item_id)
             .then(
                 item => {
-                    service.selectItem(item);
-                },
-                error => console.log(error));
-
-        /*
-        service.getOwner(owner_id)
-            .then(
-                owner => {
-                    service.selectOwner(owner);
-                },
-                error => console.log(error));
-                */
-
-        service.getComments(item_id)
-            .then(
-                comments => {
-                    service.selectComments(comments);
+                    this.itemsService.selectItem(item);
+                    $('#view-item-x').modal('show');
                 },
                 error => console.log(error));
     }

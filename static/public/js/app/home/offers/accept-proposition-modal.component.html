@@ -5,61 +5,89 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="row">
-                            <div class="col-lg-6 my-inventory">
-                                <div class="row">
-                                    <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
-                                    </div>
-                                    <div class="col-xs-9 col-lg-7 title">
-                                        <h3>Mathieu Urstein</h3>
-                                    </div>
-                                </div>
-                                <div class="row inventory">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 your-inventory text-lg-right">
-                                <div class="row">
-                                    <div class="hidden-lg-down col-lg-3 actions">
-                                        <div class="btn-group btn-group-justified">
-                                            <a href="#" class="btn btn-primary"><i class="fa fa-user"></i></a>
-                                            <a href="#" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
+                            <div *ngIf="!displayRating && currentOfferGet != null" [@flyInOut]>
+                                <div class="col-lg-6 my-inventory">
+                                    <div class="row">
+                                        <div class="col-xs-3 col-lg-2">
+                                            <div *ngIf="user.profile_picture_url != null" class="avatar-img-fluid" [style.background-image]="'url(' + user.profile_picture_url + ')'"></div>
+                                            <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                        </div>
+                                        <div class="col-xs-9 col-lg-7 title">
+                                            <h3>{{ user.first_name }} {{ user.last_name }}</h3>
                                         </div>
                                     </div>
-                                    <div class="col-xs-9 col-lg-7 title">
-                                        <h3>George Loosdé</h3>
-                                    </div>
-                                    <div class="col-xs-3 col-lg-2">
-                                        <img class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                    <div class="row inventory">
+                                        <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                            <a href="#" class="open-modal-item-x" (click)="showItem(itemWanted)">
+                                                <div *ngIf="itemWanted.images.length > 0" class="bg-img-fluid" [style.background-image]="'url(' + itemWanted.images[0].url + ')'"></div>
+                                                <span>{{ itemWanted.name }}</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row inventory">
-                                    <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
-                                        <a href="#">
-                                            <img class="img-fluid" src="http://loremflickr.com/400/400"/>
-                                            <span>title</span>
-                                        </a>
+                                <div class="col-lg-6 your-inventory text-lg-right">
+                                    <div class="row">
+                                        <div class="hidden-lg-down col-lg-3 actions">
+                                            <div class="btn-group btn-group-justified">
+                                                <a href="#" (click)="seeProfile(proposer)" class="btn btn-primary open-profile-modal"><i class="fa fa-user"></i></a>
+                                                <a href="#" (click)="sendMessage()" class="btn btn-primary"><i class="fa fa-envelope"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-9 col-lg-7 title">
+                                            <h3>{{ proposer.first_name }} {{ proposer.last_name }}</h3>
+                                        </div>
+                                        <div class="col-xs-3 col-lg-2">
+                                            <img *ngIf="proposer.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100">
+                                            <div *ngIf="proposer.profile_picture_url != null" class="avatar-img-fluid" [style.background-image]="'url(' + proposer.profile_picture_url + ')'"></div>
+                                        </div>
                                     </div>
+                                    <div class="row inventory">
+                                        <div class="col-xs-12 offset-sm-2 col-sm-8 offset-md-3 col-md-6 carousel-cell">
+                                            <a href="#" class="open-modal-item-x" (click)="showItem(itemProposed)">
+                                                <div *ngIf="itemProposed.images.length > 0" class="bg-img-fluid" [style.background-image]="'url(' + itemProposed.images[0].url + ')'"></div>
+                                                <span>{{ itemProposed.name }}</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 text-xs-center">
+                                    <div class="col-xs-12">
+                                        <div class="row comment new" style="margin: auto; width: 70%">
+                                            <div class="alert alert-info" role="alert" *ngIf="currentOfferGet.comment !== ''">
+                                                <p class="mydescription"><strong>{{ proposer.first_name }} {{ proposer.last_name }}: </strong>{{ currentOfferGet.comment }}</p>
+                                            </div>
+                                            <div class="alert alert-warning" role="alert" *ngIf="currentOfferGet.comment === ''">
+                                                <strong>No message</strong> specified by {{ proposer.first_name }} {{ proposer.last_name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 text-xs-center">
+                                    <a href="#" class="refuse" (click)="refuseOffer()">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                    <a href="#" class="accept" (click)="acceptOffer()">
+                                        <i class="fa fa-check"></i>
+                                    </a>
                                 </div>
                             </div>
-                            <div class="col-xs-12 text-xs-center">
-                                <a href="#" class="refuse">
-                                    <i class="fa fa-times"></i>
-                                </a>
-                                <a href="#" class="accept">
-                                    <i class="fa fa-check"></i>
-                                </a>
+
+                            <div class="col-xs-12 text-xs-center" *ngIf="displayRating" [@flyInOut]>
+                                <div class="row comment new" style="margin: auto; width: 300px">
+                                    How did you find this offer ?<br>
+                                    <rating [(ngModel)]="starsCount" (click)="rateProposer()"></rating>
+                                </div>
+                            </div>
+
+                            <div *ngIf="currentOfferGet == null" class="col-xs-12 text-xs-center">
+                                <h1>No pending offers</h1>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <a href="#" class="close" data-dismiss="modal">
             <i class="fa fa-times"></i>
         </a>

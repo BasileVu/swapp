@@ -6,8 +6,10 @@ import { ItemsService } from './items.service';
 import { DetailedItem } from './detailed-item';
 import {Subscription} from "rxjs";
 import {AuthService} from "../../shared/authentication/authentication.service";
+import {OfferService} from "../offers/offers.service";
+import {User} from "../profile/user";
 
-export let $: any;
+declare let $: any;
 
 @Component({
     moduleId: module.id,
@@ -19,11 +21,13 @@ export class ItemsComponent implements OnInit {
 
     items: Array<DetailedItem>;
     loggedIn: boolean;
+    user: User;
     subscription: Subscription;
     infoMessage: string = "Loading items...";
 
     constructor (private itemsService: ItemsService,
                  private authService: AuthService,
+                 private offerService: OfferService,
                  public toastr: ToastsManager) {}
 
     ngOnInit() {
@@ -34,6 +38,13 @@ export class ItemsComponent implements OnInit {
             loggedIn => {
                 this.loggedIn = loggedIn;
                 this.getItems();
+            }
+        );
+
+        // Listen for user login
+        this.subscription = this.authService.userSelected$.subscribe(
+            user => {
+                this.user = user;
             }
         );
 
@@ -64,7 +75,29 @@ export class ItemsComponent implements OnInit {
     }
 
     searchCategory(category_id: number) {
-        console.log("category id: " + category_id);
+        this.toastr.warning("for this '" + category_id + "' (TODO)", "Search category");
+        // TODO
+    }
+
+    searchLocation(location: string) {
+        this.toastr.warning("for this '" + location + "' (TODO)", "Search location");
+        // TODO
+    }
+
+    swap(item: DetailedItem) {
+        // Get the owner
+        this.itemsService.getUser(item.owner_username)
+            .then(
+                owner => {
+                    this.offerService.openOfferModal([this.user, owner, item]);
+                    $("#send-proposition-modal").modal('show');
+                },
+                error => this.toastr.error("Can't get the owner", "Error")
+            );
+    }
+
+    share(item: DetailedItem) {
+        this.toastr.warning("for this '" + item.name + "' (TODO)", "Share item");
         // TODO
     }
 }

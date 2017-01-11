@@ -27,17 +27,17 @@
                     <div class="row details">
                         <div class="col-lg-7 description">
                             <h5>Description</h5>
-                            <p>{{ item.description }}</p>
+                            <p class="mydescription">{{ item.description }}</p>
                         </div>
                         <div class="col-lg-5 specifics">
                             <h5 class="infos">Infos</h5>
                             <div class="row user-representation">
                                 <div class="col-lg-3 col-md-2">
                                     <img class="img-fluid avatar" *ngIf="owner.profile_picture_url === null" src="http://loremflickr.com/100/100"/>
-                                    <img class="img-fluid avatar" *ngIf="owner.profile_picture_url != null" src="{{ owner.profile_picture_url }}"/>
+                                    <div class="avatar-img-fluid" *ngIf="owner.profile_picture_url != null" style="width: 200px;" [style.background-image]="'url(' + owner.profile_picture_url + ')'"></div>
                                 </div>
                                 <div class="col-lg-9 col-md-10">
-                                    <h5><a href="#">{{ owner.first_name }} {{ owner.last_name }}</a> <i class="check fa fa-check"></i></h5>
+                                    <h5><a href="#" class="open-profile-modal" (click)="openProfileModal(owner)">{{ owner.first_name }} {{ owner.last_name }}</a> <i class="check fa fa-check"></i></h5>
                                 </div>
                             </div>
                             <div class="row evaluation">
@@ -129,7 +129,7 @@
                                 <div class="title" *ngIf="!loggedIn">
                                     <p>Please log in to access features</p>
                                 </div>
-                                <button class="contact btn btn-block btn-primary btn-reversed" [disabled]="!loggedIn"><i class="fa fa-envelope"></i> Contact</button>
+                                <button (click)="contact()" class="contact btn btn-block btn-primary btn-reversed" [disabled]="!loggedIn"><i class="fa fa-envelope"></i> Contact</button>
                                 <button class="swap btn btn-block btn-primary btn-reversed open-send-proposition-modal" [disabled]="!loggedIn" (click)="swap()"><i class="fa fa-refresh"></i> Swap</button>
                             </div>
                             <div class="row fraud">
@@ -152,7 +152,7 @@
                     <form [formGroup]="commentForm" (ngSubmit)="addComment()">
                         <div class="col-xs-1">
                             <img *ngIf="user.profile_picture_url === null" class="img-fluid avatar" src="http://loremflickr.com/100/100"/>
-                            <img *ngIf="user.profile_picture_url != null" class="img-fluid avatar" src="{{ user.profile_picture_url }}"/>
+                            <div class="avatar-img-fluid" *ngIf="user.profile_picture_url != null" [style.background-image]="'url(' + user.profile_picture_url + ')'"></div>
                         </div>
                         <div class="col-xs-11">
                             <textarea name="" placeholder="Write a comment..." formControlName="commentContent"></textarea>
@@ -169,11 +169,11 @@
                     *ngFor="let comment of comments">
                     <div class="col-xs-1">
                         <img *ngIf="comment.user_profile_picture === null" class="img-fluid avatar" src="http://loremflickr.com/50/50"/>
-                        <img *ngIf="comment.user_profile_picture != null" class="img-fluid avatar" src="{{ comment.user_profile_picture }}"/>
+                        <div class="avatar-img-fluid" *ngIf="comment.user_profile_picture != null" [style.background-image]="'url(' + comment.user_profile_picture + ')'"></div>
                     </div>
                     <div class="col-xs-11">
-                        <p class="writer-infos"><a href="#">{{ comment.user_fullname }}</a> {{ comment.date | date:'medium' }}</p>
-                        <p>{{ comment.content }}</p>
+                        <p class="writer-infos"><a href="#" class="open-profile-modal" (click)="openProfileModalFromUsername(comment.username)">{{ comment.user_fullname }}</a> {{ comment.date | date:'medium' }}</p>
+                        <p class="mydescription">{{ comment.content }}</p>
                     </div>
                 </div>
             </div>
@@ -205,7 +205,7 @@
                     </div>
                     <div class="bottom-link">
                         <a href="#" class="btn btn-block btn-reversed open-profile-modal" style="margin-top: 10px;"
-                           (click)="openProfileModal()">
+                           (click)="openProfileModal(owner)">
                             <i class="fa fa-eye"></i> <span class="hidden-sm-down">See profile</span>
                         </a>
                     </div>
@@ -222,7 +222,7 @@
                         </div>
                     </div>
                     <div class="bottom-link">
-                        <a href="#" class="btn btn-block btn-reversed" (click)="seeMore()">
+                        <a href="#" class="btn btn-block btn-reversed" (click)="seeMore()" style="margin-top: 10px;">
                             <i class="fa fa-eye"></i> <span class="hidden-sm-down">See more</span>
                         </a>
                     </div>

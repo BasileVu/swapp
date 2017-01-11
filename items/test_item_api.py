@@ -151,6 +151,7 @@ class ItemGetTests(ItemBaseTest):
         self.assertEqual(r.data["category"]["name"], "test")
         self.assertEqual(r.data["views"], 1)
         self.assertEqual(r.data["comments"], 0)
+        self.assertEqual(r.data["liked"], False)
         self.assertEqual(r.data["likes"], 1)
         self.assertEqual(r.data["keyinfo_set"], self.default_keyinfo_set)
         self.assertEqual(r.data["delivery_methods"], self.get_default_delivery_methods)
@@ -175,6 +176,19 @@ class ItemGetTests(ItemBaseTest):
         r = self.get_item()
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["views"], 2)
+
+    def test_get_item_not_liked_logged_in(self):
+        self.login()
+        r = self.get_item()
+        self.assertEqual(r.data["liked"], False)
+
+    def test_get_item_liked(self):
+        self.item = Item.objects.get(pk=1)
+        Like.objects.create(user=self.another_user, item=self.item)
+
+        self.login2()
+        r = self.get_item()
+        self.assertEqual(r.data["liked"], True)
 
 
 class ItemPatchTests(ItemBaseTest):
@@ -351,6 +365,7 @@ class ItemCommentTests(ItemBaseTest):
         self.assertEqual(data["content"], comment.content)
         self.assertIn("date", data)
         self.assertEqual(data["user"], comment.user.id)
+        self.assertEqual(data["username"], self.another_user.username)
         self.assertEqual(data["item"], comment.item.id)
         self.assertEqual(data["user_fullname"], "first2 last2")
         self.assertNotEqual(data["user_profile_picture"], None)

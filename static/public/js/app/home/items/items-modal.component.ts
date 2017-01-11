@@ -1,4 +1,7 @@
-import {Component, ViewEncapsulation, OnDestroy, OnInit } from '@angular/core';
+import {
+    Component, ViewEncapsulation, OnDestroy, OnInit,
+    Output, EventEmitter
+} from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 import { __platform_browser_private__,
     DomSanitizer } from '@angular/platform-browser';
@@ -49,6 +52,9 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     comments: Array<Comment> = [];
     subscription: Subscription;
 
+    @Output() openProfileModalEvent = new EventEmitter();
+    @Output() openProfileModalFromUsernameEvent = new EventEmitter();
+
     // Form fields
     private commentForm: FormGroup;
     private commentContent = new FormControl("", Validators.required);
@@ -58,7 +64,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                 private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 private sanitizer: DomSanitizer,
-                public toastr: ToastsManager) {}
+                public toastr: ToastsManager) { }
 
     ngOnInit() {
         this.item = new DetailedItem(); // Initiate an empty item. hack to avoid errors
@@ -74,6 +80,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // Listen for user login
         this.subscription = this.authService.userSelected$.subscribe(
             user => {
+                this.sanitizer.bypassSecurityTrustUrl(user.profile_picture_url);
                 this.user = user;
             }
         );
@@ -81,35 +88,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // When receiving the detailed item
         this.subscription = this.itemsService.itemSelected$.subscribe(
             item => {
-                this.item = item;
-                for (let userInventoryItem of this.item.similar)
-                    this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
-
-                // Get the owner
-                this.itemsService.getUser(item.owner_username)
-                    .then(
-                        owner => {
-                            this.owner = owner;
-                            this.fillStars(owner.note_avg);
-                            this.ownerItems = [];
-
-                            for (let inventoryItem of owner.items) {
-                                this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
-                                if (inventoryItem.id != item.id)
-                                    this.ownerItems.push(inventoryItem);
-                            }
-                        },
-                        error => this.toastr.error("Can't get the owner", "Error")
-                    );
-
-                // Get the comments
-                this.itemsService.getComments(item.id)
-                    .then(
-                        comments => {
-                            this.comments = comments;
-                        },
-                        error => this.toastr.error("Can't get the comments", "Error")
-                    );
+                this.showItem(item);
             },
             error => this.toastr.error("Can't get the detailed item", "Error")
         );
@@ -143,8 +122,7 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
                     this.toastr.success("", "Comment submitted");
                 },
                 error => {
-                    console.log(error);
-                
+                    this.toastr.error(error, "Error");
                 }
             );
         } else {
@@ -175,6 +153,11 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // TODO
     }
 
+    contact() {
+        this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Contact owner");
+        // TODO
+    }
+
     security() {
         this.toastr.warning("for this '" + this.item.name + "' (TODO)", "Security");
         // TODO
@@ -190,9 +173,12 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
         // TODO
     }
 
-    openProfileModal() {
-        this.toastr.warning("TODO (profile modal subscribed and we signal the profile)", "Open profile");
-        // TODO : voir avec Mathieu
+    openProfileModal(user: User) {
+        this.openProfileModalEvent.emit(user);
+    }
+
+    openProfileModalFromUsername(username: string) {
+        this.openProfileModalFromUsernameEvent.emit(username);
     }
 
     seeMore() {
@@ -213,7 +199,44 @@ export class ItemsModalComponent implements OnInit, OnDestroy {
     }
 
     shareItem() {
+        this.toastr.warning("share this '" + this.item.name + "' (TODO)", "Share item");
+        // TODO
+    }
 
+    showItem(item: DetailedItem) {
+        this.item = item;
+        console.log(this.item);
+        for (let userInventoryItem of this.item.similar)
+            this.sanitizer.bypassSecurityTrustUrl(userInventoryItem.image_url);
+
+        // Get the owner
+        this.itemsService.getUser(item.owner_username)
+            .then(
+                owner => {
+                    this.sanitizer.bypassSecurityTrustUrl(owner.profile_picture_url);
+                    this.owner = owner;
+                    this.fillStars(owner.note_avg);
+                    this.ownerItems = [];
+
+                    for (let inventoryItem of owner.items) {
+                        this.sanitizer.bypassSecurityTrustUrl(inventoryItem.image_url);
+                        if (inventoryItem.id != item.id)
+                            this.ownerItems.push(inventoryItem);
+                    }
+                },
+                error => this.toastr.error("Can't get the owner", "Error")
+            );
+
+        // Get the comments
+        this.itemsService.getComments(item.id)
+            .then(
+                comments => {
+                    for (let comment of comments)
+                        this.sanitizer.bypassSecurityTrustUrl(comment.user_profile_picture);
+                    this.comments = comments;
+                },
+                error => this.toastr.error("Can't get the comments", "Error")
+            );
     }
 
     ngOnDestroy() {

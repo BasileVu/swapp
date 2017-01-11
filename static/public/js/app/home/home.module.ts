@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // External angular2 libraries
 import { ImageCropperComponent } from 'ng2-img-cropper';
+import { RatingModule } from "ng2-rating";
 
 import { HomeComponent } from './home.component';
 import { routing }       from './home.routing';
@@ -23,6 +24,8 @@ import { RegisterUserModalComponent } from './register/register-user-modal.compo
 import { SendPropositionModalComponent } from './offers/send-proposition-modal.component';
 import { AcceptPropositionModalComponent } from './offers/accept-proposition-modal.component';
 import { NotificationModalComponent } from './profile/notification-modal.component';
+import { EditItemModalComponent } from "./inventory/edit-item-modal.component";
+import { InfosModalComponent } from "./infos/infos-modal.component";
 
 import { InventoryService } from './inventory/inventory.service';
 import { ProfileService } from './profile/profile.service';
@@ -36,9 +39,9 @@ import { YourInventoryDirective } from './offers/your-inventory.directive';
 import { UpdateGridDirective } from './items/update-grid.directive';
 import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
-import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
+import {MessagesModalComponent} from "./messages/messages-modal.component";
 import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
-
+import {AuthService} from "../shared/authentication/authentication.service";
 
 @NgModule({
     imports: [
@@ -46,6 +49,7 @@ import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
         FormsModule,
         ReactiveFormsModule,
         routing,
+        RatingModule
     ],
     declarations: [
         InventoryComponent,
@@ -69,7 +73,9 @@ import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
         UpdateGridDirective,
         UpdateCarouselDirective,
         UpdateInventoryDirective,
-        EditItemModalComponent
+        EditItemModalComponent,
+        InfosModalComponent,
+        MessagesModalComponent
     ],
     providers: [
         InventoryService,
@@ -77,8 +83,7 @@ import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
         ItemsService,
         SearchService,
         OfferService,
-        NotificationsService,
-        { provide: XSRFStrategy, useValue: new CookieXSRFStrategy('csrftoken', 'X-CSRFToken') }
+        NotificationsService
     ]
 })
 

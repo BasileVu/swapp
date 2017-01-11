@@ -14,6 +14,8 @@ import {
 import { DOCUMENT } from '@angular/platform-browser'
 import { FormGroup, FormControl, Validators, FormBuilder }  from '@angular/forms';
 import { Subscription }   from 'rxjs/Subscription';
+import { __platform_browser_private__,
+    DomSanitizer } from '@angular/platform-browser';
 
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
@@ -21,6 +23,8 @@ import { AuthService } from '../../shared/authentication/authentication.service'
 import { ItemsService } from '../items/items.service';
 import { Account } from "./account";
 import {ProfileService} from "./profile.service";
+import {GoogleService} from "../search/google.service";
+
 
 declare let $:any;
 declare let google: any;
@@ -47,18 +51,22 @@ declare let google: any;
                 }))
             ])
         ])
-    ]
+    ],
+    providers: [__platform_browser_private__.BROWSER_SANITIZATION_PROVIDERS]
 })
 
 export class ProfileComponent implements OnInit {
 
     // EventEmitter to call login function of the ProfileComponent after registering
     @Output() profilePictureEvent = new EventEmitter();
+    @Output() seeProfileEvent = new EventEmitter();
+    @Output() openPendingOfferEvent = new EventEmitter();
 
     loggedIn: boolean;
     subscription: Subscription;
-    user: Account;
+    user: Account = new Account();
     notificationNumber: number;
+    pendingOffersNumber: number = 0;
 
     private loginForm: FormGroup;
     private loginName = new FormControl("", Validators.required);
@@ -71,14 +79,15 @@ export class ProfileComponent implements OnInit {
                 private profileService: ProfileService,
                 private formBuilder: FormBuilder,
                 @Inject(DOCUMENT) private document: any,
-                public toastr: ToastsManager) {
-                    this.url = this.document.location.href;
-                    if (this.url.slice(-1) === '/') 
-                        this.url = this.url.substr(0, this.url.length - 1);
-                }
+                private googleService: GoogleService,
+                public toastr: ToastsManager,
+                private sanitizer: DomSanitizer) {
+        this.url = this.document.location.href;
+        if (this.url.slice(-1) === '/')
+            this.url = this.url.substr(0, this.url.length - 1);
+    }
 
     ngOnInit() {
-        this.user = new Account();
         this.loggedIn = this.authService.isLoggedIn();
 
         this.loginForm = this.formBuilder.group({
@@ -122,6 +131,19 @@ export class ProfileComponent implements OnInit {
         this.authService.getAccount().then(
             account => {
                 this.user = account;
+                this.sanitizer.bypassSecurityTrustUrl(this.user.profile_picture_url);
+
+                this.pendingOffersNumber = 0;
+                // Get the offers and add them to pending offers array
+                for (let pendingOffer of this.user.pending_offers) {
+                    for (let item of this.user.items) {
+                        if (+item === +pendingOffer.item_received) {
+                            +this.pendingOffersNumber++;
+                            break;
+                        }
+                    }
+                }
+
 
                 // Get user public profile to inform subscribed components of it
                 this.itemService.getUser(this.user.username).then(
@@ -177,5 +199,23 @@ export class ProfileComponent implements OnInit {
 
     updateNotifications($event: any) {
         this.notificationNumber = +$event;
+    }
+
+    // $event is a null object
+    removeOnePendingOffer($event: any) {
+        this.pendingOffersNumber = this.pendingOffersNumber - 1;
+        console.log("pendingOffersNumber = " + this.pendingOffersNumber);
+    }
+
+    openEmptyPendingOffers() {
+        this.toastr.warning("Wait for someone to propose you a swap!", "No pending offer");
+    }
+
+    openEmptyNotifications() {
+        this.toastr.warning("", "No new notification");
+    }
+
+    seeMyProfile() {
+        this.profileService.selectProfileToShow(this.user)
     }
 }

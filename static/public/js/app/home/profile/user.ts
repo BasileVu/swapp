@@ -1,4 +1,5 @@
 import {InventoryItem} from "../inventory/inventory-item";
+import { Coordinates } from './account';
 
 export class User {
     id: number;
@@ -11,6 +12,7 @@ export class User {
     notes: number;
     note_avg: number;
     interested_by: Array<{id:number,name:string}>;
+    coordinates: Coordinates;
 
     constructor() {
         this.id = -1;
@@ -23,5 +25,6 @@ export class User {
         this.notes = 0;
         this.note_avg = 0;
         this.interested_by = [];
+        this.coordinates = new Coordinates(0,0);
     }
 }

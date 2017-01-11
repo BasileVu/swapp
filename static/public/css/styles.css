@@ -5526,7 +5526,7 @@ hr {
     color: #d9534f;
     position: absolute;
     top: 3px;
-    left: 10px; }
+    left: 15px; }
 
 .modal {
   cursor: zoom-out;
@@ -5692,7 +5692,8 @@ hr {
           border-top: 1px solid #eed5a9;
           padding: 20px 10px; }
           .modal .container .content .comments .comment p {
-            margin: 0; }
+            margin: 0;
+            white-space: pre; }
           .modal .container .content .comments .comment .writer-infos {
             font-size: 0.875rem;
             font-style: italic;
@@ -6071,5 +6072,36 @@ my-app:empty + .loading div {
   background-position: center center;
   background-size: cover;
   border-radius: 0.3rem; }
+
+.avatar-img-fluid {
+  display: block;
+  width: 100%;
+  padding-top: 100%;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  border: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover; }
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px; }
+
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1; }
+
+.alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc; }
+
+p .mydescription {
+  white-space: pre; }
 
 /*# sourceMappingURL=styles.css.map */

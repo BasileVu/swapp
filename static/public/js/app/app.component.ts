@@ -12,6 +12,7 @@ import { Subscription }   from 'rxjs/Subscription';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from './shared/authentication/authentication.service';
+import {Account} from "./home/profile/account";
 
 declare let $:any;
 declare let google: any;
@@ -42,6 +43,7 @@ declare let google: any;
 export class AppComponent implements OnInit, AfterViewInit {
     loggedIn: boolean = false;
     subscription: Subscription;
+    account: Account = new Account();
 
     constructor (private http: Http,
                  private authService: AuthService,
@@ -50,13 +52,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.authService.getCSRF().then(
-            error => console.log(error)
-        );
+        this.authService.getCSRF();
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
-            loggedIn => this.loggedIn = loggedIn
+            loggedIn => {
+                this.loggedIn = loggedIn;
+                if (this.loggedIn)
+                    this.seeProfile();
+            }
         );
 
         // TODO : make a proper service to store geolocation
@@ -68,6 +72,15 @@ export class AppComponent implements OnInit, AfterViewInit {
         } else {
             console.log("Geolocation not available");
         }
+    }
+
+    seeProfile() {
+        this.authService.getAccount().then(
+            account => {
+                this.account = account;
+            },
+            error => this.toastr.error(error, "Error")
+        )
     }
 
     logout() {
@@ -130,6 +143,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 });
                 */
 
+                // Home link reload page
+                $(".home-link").click(function(){
+                    location.reload();
+                });
+
                 // open user creation modal /////////////////////
                 let openCreateProfileButtons = $('.open-create-profile-modal');
                 let createProfileModal = $('#create-user-modal');
@@ -155,6 +173,16 @@ export class AppComponent implements OnInit, AfterViewInit {
                     $(this).click(function () {
                         sendPropositionModal.modal('show');
                     });
+                });
+
+                // open infos modal ////////////////////////
+                $('.open-modal-infos').click(function () {
+                    $('#view-infos').modal('show');
+                });
+
+                // open messages modal ////////////////////////
+                $('.open-messages-modal').click(function () {
+                    $('#view-messages').modal('show');
                 });
 
                 // display item modal ///////////////////////////

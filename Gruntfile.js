@@ -44,6 +44,11 @@ module.exports = function(grunt) {
                         cwd: 'node_modules/ng2-toastr/',
                         src: ['**'],
                         dest: 'static/public/js/vendor/ng2-toastr/'
+                    }, {
+                        expand: true,
+                        cwd: 'node_modules/ng2-rating/',
+                        src: ['**'],
+                        dest: 'static/public/js/vendor/ng2-rating/'
                     }
                 ]
             }

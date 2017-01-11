@@ -9,9 +9,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from items.models import Category, Item
+from items.models import Category
 from items.serializers import InventoryItemSerializer, CategorySerializer, InterestedByCategorySerializer, \
     CreateImageSerializer
 from offers.serializers import RetrieveOfferSerializer
@@ -104,8 +105,9 @@ def create_user(request):
 
 
 class UserAccount(OwnUserAccountMixin, generics.RetrieveUpdateAPIView):
-    """Allows to get the current user's account info and update them."""
-
+    """
+    Allows to get the current user's account info and update them.
+    """
     queryset = UserProfile.objects.all()
     serializer_class = UserUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -231,6 +233,7 @@ class NoteViewSet(mixins.CreateModelMixin,
                   mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
     queryset = Note.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == "update":

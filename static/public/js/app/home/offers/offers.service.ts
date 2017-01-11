@@ -4,6 +4,8 @@ import { Subject }    from 'rxjs/Subject';
 import {User} from "../profile/user";
 import {Offer} from "./offer";
 import {InventoryItem} from "../inventory/inventory-item";
+import {OfferUpdate} from "./offer-update";
+import {Note} from "./Note";
 
 @Injectable()
 export class OfferService {
@@ -27,6 +29,29 @@ export class OfferService {
         let options = new RequestOptions({ headers: headers }); // Create a request option
 
         return this.http.post('/api/offers/', body, options)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    // Send whether the offer is accepted or not
+    updateOffer(offer_id: number, offerUpdate: OfferUpdate): Promise<any> {
+        let body = JSON.stringify(offerUpdate); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.patch('/api/offers/' + offer_id + '/', body, options)
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+
+    rateUser(note: Note) {
+        let body = JSON.stringify(note); // Stringify payload
+        let headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        let options = new RequestOptions({ headers: headers }); // Create a request option
+
+        return this.http.post('/api/notes/', body, options)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);
