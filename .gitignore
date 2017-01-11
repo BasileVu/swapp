@@ -298,3 +298,6 @@ static/public/js/vendor/
 
 ### generated folders ###
 uploaded_media/
+
+### CSS ###
+*.css.map

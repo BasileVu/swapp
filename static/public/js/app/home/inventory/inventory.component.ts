@@ -97,7 +97,6 @@ export class InventoryComponent implements OnInit {
     editItemEvent($event: number) {
         this.itemsService.getDetailedItem(+$event).then(
             item => {
-                console.log(item);
                 let inventoryItem = this.inventory.find(i => i.id === item.id);
                 inventoryItem.archived = item.archived;
                 inventoryItem.name = item.name;
@@ -130,9 +129,8 @@ export class InventoryComponent implements OnInit {
 
 
     gotoDetail(item_id: number): void {
-        console.log("clicked. item_id: " + item_id);
-
-        this.itemsService.getDetailedItem(item_id)
+        let service = this.itemsService;
+        service.getDetailedItem(item_id)
             .then(
                 item => {
                     this.itemsService.selectItem(item);
@@ -142,8 +140,6 @@ export class InventoryComponent implements OnInit {
     }
 
     gotoEdit(item_id: number): void {
-        console.log("clicked for edition. item_id: " + item_id);
-
         let service = this.itemsService;
         service.getDetailedItem(item_id)
             .then(

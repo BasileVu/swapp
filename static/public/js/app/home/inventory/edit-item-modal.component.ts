@@ -136,7 +136,6 @@ export class EditItemModalComponent implements OnInit {
         this.subscription = this.itemsService.itemSelected$.subscribe(
             item => {
                 this.item = item;
-                console.log(this.item);
                 this.keyInfos = item.keyinfo_set;
 
                 // images
@@ -191,7 +190,6 @@ export class EditItemModalComponent implements OnInit {
             // Build a proper keyInfos array with trimmed values
             let keyInfos = new Array<KeyInfo>();
             for (let ki of this.keyInfos) {
-                console.log(ki);
                 if (ki.key && ki.key.trim() && ki.info && ki.info.trim())
                     keyInfos.push(new KeyInfo(ki.key.trim(), ki.info.trim()));
             }
