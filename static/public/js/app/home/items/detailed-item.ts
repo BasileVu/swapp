@@ -32,6 +32,7 @@ export class DetailedItem {
     owner_username: string;
     owner_picture_url: string;
     owner_location: string;
+    owner_coordinates: Location;
     traded: boolean;
     archived: boolean;
 
@@ -58,4 +59,9 @@ export class DetailedItem {
         this.traded = false;
         this.archived = false;
     }
+}
+
+export class Location {
+    latitude: number;
+    longitude: number;
 }

@@ -157,9 +157,6 @@ export class CreateAccountModalComponent implements OnInit {
                             this.country.value
                         );
 
-            console.log("UserCreationDTO");
-            console.log(user);
-
             this.authService.register(user).then(
                 res => {
                     this.toastr.success('Account successfully created', 'Registration succeed!');

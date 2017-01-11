@@ -1,15 +1,18 @@
 import {Injectable} from '@angular/core';
 import { Http, Response, URLSearchParams} from '@angular/http';
-
 import { Category } from './category';
 import {Search} from "./search";
 import {DetailedItem} from "../items/detailed-item";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class SearchService {
 
     private categoriesUrl = '/api/categories/';  // URL to web API
     private itemsUrl = '/api/items/';
+    private searchVals: Search = new Search();
+
+    model = new BehaviorSubject<Search>(this.searchVals);
 
     constructor (private http: Http) {}
 
@@ -20,14 +23,20 @@ export class SearchService {
             .catch(this.handleError);
     }
 
-    search (s: Search): Promise<DetailedItem[]> {
+    search (): Promise<DetailedItem[]> {
         let params: URLSearchParams = new URLSearchParams();
-        params.set('q', s.q);
-        params.set('category', s.category);
-        params.set('order_by', s.orderBy.value);
-        params.set('price_min', s.price_min);
-        params.set('price_max', s.price_max);
-        params.set('range', s.range);
+
+        params.set('q', this.model.value.q);
+        if (this.model.value.category.name == 'All categories') {
+            params.set('category', '');
+        } else {
+            params.set('category', this.model.value.category.name);
+        }
+        params.set('order_by', this.model.value.orderBy.value);
+        params.set('price_min', this.model.value.price_min);
+        params.set('price_max', this.model.value.price_max);
+        params.set('range', '0');
+
         return this.http.get(this.itemsUrl, { search: params })
             .toPromise()
             .then(this.extractData)

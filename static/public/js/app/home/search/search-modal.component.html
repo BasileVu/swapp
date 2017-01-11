@@ -8,7 +8,7 @@
                             <div class="input-group input-group-lg">
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">{{ selectedOrderBy.name }}</span>
+                                        <span class="hidden-sm-down">{{ model.orderBy.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-filter"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
@@ -17,18 +17,18 @@
                                 </div>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="hidden-sm-down">{{ selectedCategory.name }}</span>
+                                        <span class="hidden-sm-down">{{ model.category.name }}</span>
                                         <span class="hidden-md-up"><i class="fa fa-folder"></i></span>
                                     </button>
                                     <div class="dropdown-menu">
                                         <div class="dropdown-item" *ngFor="let category of categories" (click)="selectCategory(category)">{{ category.name }}</div>
                                     </div>
                                 </div>
-                                <input [(ngModel)]="model.q" type="text" class="form-control" name="q">
+                                <input #q type="text" [value]="model.q" (keyup)="newVal(q.value)" class="form-control" name="q">
                             </div>
                         </div>
                         <div class="col-md-3 col-xs-2 advanced open-modal-advanced-search">
-                            <button type="submit" class="btn btn-block btn-lg btn-primary" (click)="search()">
+                            <button type="submit" class="btn btn-block btn-lg btn-primary" (click)="search()" data-dismiss="modal">
                                 <span class="hidden-sm-down"><i class="fa fa-search"></i> Search</span>
                                 <span class="hidden-md-up"><i class="fa fa-search"></i></span>
                             </button>
@@ -38,7 +38,7 @@
                                 <label class="col-lg-3 col-md-4 col-form-label">Minimum evaluated price</label>
                                 <div class="col-lg-9 col-md-8">
                                     <div class="input-group">
-                                        <input [(ngModel)]="model.price_min" class="form-control" type="text" placeholder="Choose a value" name="price_min">
+                                        <input #lowEval (keyup)="newLowEval(lowEval.value)" [value]="model.price_min" class="form-control" type="text" placeholder="Choose a value" name="price_min">
                                         <div class="input-group-addon">$</div>
                                     </div>
                                 </div>
@@ -47,7 +47,7 @@
                                 <label class="col-lg-3 col-md-4 col-form-label">Maximum evaluated price</label>
                                 <div class="col-lg-9 col-md-8">
                                     <div class="input-group">
-                                        <input [(ngModel)]="model.price_max" class="form-control" type="text" placeholder="Choose a value" name="price_max">
+                                        <input #maxEval (keyup)="newMaxEval(maxEval.value)" [value]="model.price_max" class="form-control" type="text" placeholder="Choose a value" name="price_max">
                                         <div class="input-group-addon">$</div>
                                     </div>
                                 </div>
@@ -55,29 +55,29 @@
                             <div class="form-group row map-position">
                                 <label class="col-lg-3 col-md-4 col-form-label">Your position</label>
                                 <div class="col-lg-9 col-md-8">
-                                    <input class="form-control" type="text" placeholder="Set your position address" name="position">
+                                    <input #location (keyup)="newLocation(location.value)" [value]="searchLocation" class="form-control" type="text" placeholder="Set your position address" name="position">
                                 </div>
                             </div>
                             <div class="form-group row map-range">
                                 <label class="col-lg-3 col-md-4 col-form-label">Range to search in</label>
                                 <div class="col-lg-9 col-md-8">
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="1" [checked]="search.range==1" type="radio" name="rangeOptions"> 1 km
+                                        <input class="form-check-input" (change)="selectRange('1')" [value]="'1'" [checked]="model.range == '1'" type="radio" name="rangeOptions"> 1 km
                                     </label>
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="10" [checked]="search.range==10" type="radio" name="rangeOptions"> 10 km
+                                        <input class="form-check-input" (change)="selectRange('10')" [value]="'10'" [checked]="model.range == '10'" type="radio" name="rangeOptions"> 10 km
                                     </label>
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="50" [checked]="search.range==50" type="radio" name="rangeOptions" checked> 50 km
+                                        <input class="form-check-input" (change)="selectRange('50')" [value]="'50'" [checked]="model.range == '50'" type="radio" name="rangeOptions"> 50 km
                                     </label>
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="100" [checked]="search.range==100" type="radio" name="rangeOptions"> 100 km
+                                        <input class="form-check-input" (change)="selectRange('100')" [value]="'100'" [checked]="model.range == '100'" type="radio" name="rangeOptions"> 100 km
                                     </label>
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="500" [checked]="search.range==500" type="radio" name="rangeOptions"> 500 km
+                                        <input class="form-check-input" (change)="selectRange('500')" [value]="'500'" [checked]="model.range == '500'" type="radio" name="rangeOptions"> 500 km
                                     </label>
                                     <label class="form-check-inline">
-                                        <input class="form-check-input" [(ngModel)]="model.range" [value]="" [checked]="search.range==100000" type="radio" name="rangeOptions"> Earth
+                                        <input class="form-check-input" (change)="selectRange('0')" [value]="'0'" [checked]="model.range == '0'" type="radio" name="rangeOptions"> Earth
                                     </label>
                                 </div>
                             </div>
