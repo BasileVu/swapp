@@ -15,6 +15,7 @@ import { AuthService } from './shared/authentication/authentication.service';
 
 /* Routing Module */
 import { AppRoutingModule } from './app-routing.module';
+import {GoogleService} from "./home/search/googleService";
 
 // Declare the NgModule decorator
 @NgModule({
@@ -35,7 +36,7 @@ import { AppRoutingModule } from './app-routing.module';
     
     providers: [ 
         AuthService,
-        { provide: XSRFStrategy, useValue: new CookieXSRFStrategy('csrftoken', 'X-CSRFToken') }
+        GoogleService
     ],
 
     // Define the root component

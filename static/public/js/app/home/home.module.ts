@@ -37,6 +37,7 @@ import { UpdateGridDirective } from './items/update-grid.directive';
 import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
 import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
+import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
 
 
 @NgModule({
@@ -76,7 +77,8 @@ import {EditItemModalComponent} from "./inventory/edit-item-modal.component";
         ItemsService,
         SearchService,
         OfferService,
-        NotificationsService
+        NotificationsService,
+        { provide: XSRFStrategy, useValue: new CookieXSRFStrategy('csrftoken', 'X-CSRFToken') }
     ]
 })
 
