@@ -204,6 +204,16 @@ export class SearchModalComponent {
         this.setLocation();
     }
 
+    newLowEval(value: string) {
+        this.model.price_min = value;
+        this.searchService.model.next(this.model);
+    }
+
+    newMaxEval(value: string) {
+        this.model.price_max = value;
+        this.searchService.model.next(this.model);
+    }
+
     selectRange(value: any) {
         this.model.range = value;
         this.searchService.model.next(this.model);

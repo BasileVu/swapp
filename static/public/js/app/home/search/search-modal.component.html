@@ -38,7 +38,7 @@
                                 <label class="col-lg-3 col-md-4 col-form-label">Minimum evaluated price</label>
                                 <div class="col-lg-9 col-md-8">
                                     <div class="input-group">
-                                        <input [(ngModel)]="model.price_min" class="form-control" type="text" placeholder="Choose a value" name="price_min">
+                                        <input #lowEval (keyup)="newLowEval(lowEval.value)" [value]="model.price_min" class="form-control" type="text" placeholder="Choose a value" name="price_min">
                                         <div class="input-group-addon">$</div>
                                     </div>
                                 </div>
@@ -47,7 +47,7 @@
                                 <label class="col-lg-3 col-md-4 col-form-label">Maximum evaluated price</label>
                                 <div class="col-lg-9 col-md-8">
                                     <div class="input-group">
-                                        <input [(ngModel)]="model.price_max" class="form-control" type="text" placeholder="Choose a value" name="price_max">
+                                        <input #maxEval (keyup)="newMaxEval(maxEval.value)" [value]="model.price_max" class="form-control" type="text" placeholder="Choose a value" name="price_max">
                                         <div class="input-group-addon">$</div>
                                     </div>
                                 </div>
