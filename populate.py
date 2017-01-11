@@ -148,26 +148,257 @@ if __name__ == "__main__":
     c30 = Category.objects.create(name="Video Games & Consoles")
     c31 = Category.objects.create(name="Everything else")
 
+    # Interested by categories
+    u1.userprofile.categories.add(c8)
+    u1.userprofile.categories.add(c14)
+    u1.userprofile.categories.add(c16)
+    u1.userprofile.categories.add(c25)
+    u1.save()
+
+    u2.userprofile.categories.add(c1)
+    u2.userprofile.categories.add(c8)
+    u2.userprofile.categories.add(c26)
+    u2.userprofile.categories.add(c30)
+    u2.userprofile.categories.add(c31)
+    u2.save()
+
+    u3.userprofile.categories.add(c3)
+    u3.userprofile.categories.add(c4)
+    u3.userprofile.categories.add(c5)
+    u3.userprofile.categories.add(c15)
+    u3.userprofile.categories.add(c16)
+    u3.userprofile.categories.add(c26)
+    u3.save()
+
+    u4.userprofile.categories.add(c1)
+    u4.userprofile.categories.add(c7)
+    u4.userprofile.categories.add(c22)
+    u4.userprofile.categories.add(c23)
+    u4.userprofile.categories.add(c24)
+    u4.userprofile.categories.add(c30)
+    u4.save()
+
+    u5.userprofile.categories.add(c11)
+    u5.userprofile.categories.add(c18)
+    u5.userprofile.categories.add(c23)
+    u5.userprofile.categories.add(c30)
+    u5.userprofile.categories.add(c31)
+    u5.save()
+
+    u6.userprofile.categories.add(c1)
+    u6.userprofile.categories.add(c14)
+    u6.userprofile.categories.add(c18)
+    u6.save()
+
     # Delivery methods
-    DeliveryMethod.objects.create(name="At my place")
-    DeliveryMethod.objects.create(name="At any place")
-    DeliveryMethod.objects.create(name="By mail")
+    d1 = DeliveryMethod.objects.create(name="At my place")
+    d2 = DeliveryMethod.objects.create(name="At any place")
+    d3 = DeliveryMethod.objects.create(name="By mail")
 
     # Items
-    i1 = create_item(c8, u1, name="Shoes", description="My collector shoes", price_min=10, price_max=50, views=800)
-    i2 = create_item(c8, u1, name="Shirt", description="My old shirt", price_min=5, price_max=30, views=100)
-    i3 = create_item(c19, u1, name="Ring", description="My precious", price_min=100, price_max=500, views=400)
-
-    i4 = create_item(c12, u2, name="New mouse", description="Brand new", price_min=40, price_max=150, views=200)
-    i5 = create_item(c22, u2, name="Piano", description="Still nice to the ear", price_min=500, price_max=1000,
-                     views=1000)
-
-    i6 = create_item(c22, u3, name="Violin", description="In good shape", price_min=1000, price_max=2000, views=30)
-    i7 = create_item(c22, u3, name="Flute", description="Very old", price_min=200, price_max=300, views=40)
-    i8 = create_item(c22, u3, name="Electric guitar", description="One cord is broken", price_min=150, price_max=250,
-                     views=50)
-
-    i9 = create_item(c22, u4, name="Trumpet", description="Good sound", price_min=300, price_max=350, views=60)
+    i1 = create_item(c8, u1, name="Shoes", description="A shoe is an item of footwear intended to protect and comfort "
+                                                       "the human foot while the wearer is doing various activities. "
+                                                       "Shoes are also used as an item of decoration and fashion. The "
+                                                       "design of shoes has varied enormously through time and from "
+                                                       "culture to culture, with appearance originally being tied to "
+                                                       "function."
+                                                       "\n \n"
+                                                       "Additionally, fashion has often dictated many "
+                                                       "design elements, such as whether shoes have very high heels "
+                                                       "or flat ones. Contemporary footwear in the 2010s varies "
+                                                       "widely in style, complexity and cost. Basic sandals may "
+                                                       "consist of only a thin sole and simple strap and be sold for "
+                                                       "a low cost. High fashion shoes made by famous designers may "
+                                                       "be made of expensive materials, use complex construction and "
+                                                       "sell for hundreds or even thousands of dollars a pair."
+                                                       "\n \n"
+                                                       "Some shoes are designed for specific purposes, such as boots "
+                                                       "designed specifically for mountaineering or skiing.",
+                     price_min=10, price_max=50, views=800)
+    i1.delivery_methods.add(d1)
+    i1.delivery_methods.add(d2)
+    i1.delivery_methods.add(d3)
+    i1.save()
+    i2 = create_item(c8, u1, name="Shirt", description="A shirt is a cloth garment for the upper body."
+                                                       "\n \n"
+                                                       "Originally an "
+                                                       "undergarment worn exclusively by men and women it has become, "
+                                                       "in American English, a catch-all term for a broad variety of "
+                                                       "upper-body garments and undergarments. In British English, "
+                                                       "a shirt is more specifically a garment with a collar, "
+                                                       "sleeves with cuffs, and a full vertical opening with buttons "
+                                                       "or snaps (North Americans would call that a 'dress shirt', "
+                                                       "a specific type of 'collared shirt')."
+                                                       "\n \n"
+                                                       "A shirt can also be "
+                                                       "worn with a necktie under the shirt collar.", price_min=5,
+                     price_max=30, views=100)
+    i2.delivery_methods.add(d1)
+    i2.save()
+    i3 = create_item(c19, u1, name="Ring", description="A ring is a round band, usually of metal, worn as an "
+                                                       "ornamental piece of jewellery around the finger, or sometimes "
+                                                       "the toe; it is the most common current meaning of the word "
+                                                       "'ring'."
+                                                       "\n \n"
+                                                       "Strictly speaking a normal ring is a finger ring ("
+                                                       "which may be hyphenated); other types of rings worn as "
+                                                       "ornaments are earrings, bracelets for the wrist, armlets or "
+                                                       "arm rings, toe rings and torc or neck rings, but except "
+                                                       "perhaps for toe rings, the plain term 'ring' is not normally "
+                                                       "used to refer to these."
+                                                       "\n \n"
+                                                       "Rings are most often made of metal "
+                                                       "but can be of almost any material: metal, plastic, stone, "
+                                                       "wood, bone, glass, or gemstone. They may be set with a stone "
+                                                       "or stones, often a gemstone such as diamond, ruby, "
+                                                       "sapphire or emerald.", price_min=100, price_max=500, views=400)
+    i3.delivery_methods.add(d2)
+    i3.delivery_methods.add(d3)
+    i3.save()
+    i4 = create_item(c12, u2, name="New mouse", description="A computer mouse is a pointing device (hand control) "
+                                                            "that detects two-dimensional motion relative to a "
+                                                            "surface."
+                                                            "\n \n"
+                                                            "This motion is typically translated into the "
+                                                            "motion of a pointer on a display, which allows a smooth "
+                                                            "control of the graphical user interface. Physically, "
+                                                            "a mouse consists of an object held in one's hand, "
+                                                            "with one or more buttons."
+                                                            "\n \n"
+                                                            "Mice often also feature other "
+                                                            "elements, such as touch surfaces and 'wheels', "
+                                                            "which enable additional control and dimensional input.",
+                     price_min=40, price_max=150, views=200)
+    i4.delivery_methods.add(d2)
+    i4.save()
+    i5 = create_item(c22, u2, name="Piano", description="The piano is an acoustic, stringed musical instrument, "
+                                                        "in which the strings are struck by hammers. It is played "
+                                                        "using a keyboard, which is a row of keys (small levers) "
+                                                        "that the performer presses down or strikes with the fingers "
+                                                        "and thumbs of both hands to cause the hammers to strike the "
+                                                        "strings."
+                                                        "\n \n"
+                                                        "Invented in about 1700 (the exact year is "
+                                                        "uncertain), the piano is widely employed in classical, jazz, "
+                                                        "traditional and popular music for solo and ensemble "
+                                                        "performances, accompaniment, and for composing, songwriting "
+                                                        "and rehearsals."
+                                                        ""
+                                                        "\n \n"
+                                                        "Although the piano is very heavy and thus "
+                                                        "not portable and is expensive (in comparison with other "
+                                                        "widely used accompaniment instruments, such as the acoustic "
+                                                        "guitar), its musical versatility (i.e., its wide pitch "
+                                                        "range, ability to play chords with up to 10 notes, "
+                                                        "louder or softer notes and two or more independent musical "
+                                                        "lines at the same time), the large number of musicians and "
+                                                        "amateurs trained in playing it, and its wide availability in "
+                                                        "performance venues, schools and rehearsal spaces have made "
+                                                        "it one of the Western world's most familiar musical "
+                                                        "instruments.", price_min=500, price_max=1000, views=1000)
+    i5.delivery_methods.add(d1)
+    i5.delivery_methods.add(d2)
+    i5.delivery_methods.add(d3)
+    i5.save()
+    i6 = create_item(c22, u3, name="Violin", description="The violin is a wooden string instrument in the violin "
+                                                         "family. It is the smallest and highest-pitched instrument "
+                                                         "in the family in regular use. Smaller violin-type "
+                                                         "instruments are known, including the violino piccolo and "
+                                                         "the kit violin, but these are virtually unused in the "
+                                                         "2010s."
+                                                         "\n \n"
+                                                         "The violin typically has four strings tuned in "
+                                                         "perfect fifths, and is most commonly played by drawing a "
+                                                         "bow across its strings, though it can also be played by "
+                                                         "plucking the strings with the fingers (pizzicato). Violins "
+                                                         "are important instruments in a wide variety of musical "
+                                                         "genres."
+                                                         "\n \n"
+                                                         "They are most prominent in the Western classical "
+                                                         "tradition and in many varieties of folk music. They are "
+                                                         "also frequently used in genres of folk including country "
+                                                         "music and bluegrass music and in jazz. Electric violins are "
+                                                         "used in some forms of rock music; further, the violin has "
+                                                         "come to be played in many non-Western music cultures, "
+                                                         "including Indian music and Iranian music."
+                                                         "\n \n"
+                                                         "The violin is "
+                                                         "sometimes informally called a fiddle, particularly in Irish "
+                                                         "traditional music and bluegrass, but this nickname is also "
+                                                         "used regardless of the type of music played on it.",
+                     price_min=1000, price_max=2000, views=30)
+    i6.delivery_methods.add(d1)
+    i6.delivery_methods.add(d3)
+    i6.save()
+    i7 = create_item(c22, u3, name="Flute", description="The flute is a family of musical instruments in the woodwind "
+                                                        "group. Unlike woodwind instruments with reeds, a flute is an "
+                                                        "aerophone or reedless wind instrument that produces its "
+                                                        "sound from the flow of air across an opening."
+                                                        "\n \n"
+                                                        "According to "
+                                                        "the instrument classification of Hornbostel–Sachs, "
+                                                        "flutes are categorized as edge-blown aerophones."
+                                                        "\n \n"
+                                                        "A musician who plays the flute can be referred to as a flute "
+                                                        "player, flautist, flutist or, less commonly, "
+                                                        "fluter or flutenist.",
+                     price_min=200, price_max=300, views=40)
+    i7.delivery_methods.add(d1)
+    i7.delivery_methods.add(d2)
+    i7.delivery_methods.add(d3)
+    i7.save()
+    i8 = create_item(c22, u3, name="Electric guitar", description="An electric guitar is a fretted string instrument "
+                                                                  "that uses a pickup to convert the vibration of its "
+                                                                  "strings—which are typically made of steel, "
+                                                                  "and which occurs when a guitarist strums, "
+                                                                  "plucks or fingerpicks the strings—into electrical "
+                                                                  "signals."
+                                                                  "\n \n"
+                                                                  "The vibrations of the strings are sensed "
+                                                                  "by a pickup, of which the most common type is the "
+                                                                  "magnetic pickup, which uses the principle of "
+                                                                  "direct electromagnetic induction. The signal "
+                                                                  "generated by an electric guitar is too weak to "
+                                                                  "drive a loudspeaker, so it is plugged into a "
+                                                                  "guitar amplifier before being sent to a "
+                                                                  "loudspeaker, which makes a sound loud enough to "
+                                                                  "hear."
+                                                                  "\n \n"
+                                                                  "The output of an electric guitar is an "
+                                                                  "electric signal, and the signal can easily be "
+                                                                  "altered by electronic circuits to add 'color' to "
+                                                                  "the sound or change the sound. Often the signal is "
+                                                                  "modified using effects such as reverb and "
+                                                                  "distortion and 'overdrive', with the latter being "
+                                                                  "a key element of the sound of the electric guitar "
+                                                                  "as it is used in blues and rock music.",
+                     price_min=150, price_max=250, views=50)
+    i8.delivery_methods.add(d1)
+    i8.delivery_methods.add(d3)
+    i8.save()
+    i9 = create_item(c22, u4, name="Trumpet", description="A trumpet is a musical instrument commonly used in "
+                                                          "classical and jazz ensembles. The trumpet group contains "
+                                                          "the instruments with the highest register in the brass "
+                                                          "family. Trumpet-like instruments have historically been "
+                                                          "used as signaling devices in battle or hunting, "
+                                                          "with examples dating back to at least 1500 BC; they began "
+                                                          "to be used as musical instruments only in the late-14th or "
+                                                          "early 15th century."
+                                                          "\n \n"
+                                                          "Trumpets are used in art music "
+                                                          "styles, for instance in orchestras, concert bands, "
+                                                          "and jazz ensembles, as well as in popular music. They are "
+                                                          "played by blowing air through almost-closed lips (called "
+                                                          "the player's embouchure), producing a 'buzzing' sound that "
+                                                          "starts a standing wave vibration in the air column inside "
+                                                          "the instrument."
+                                                          "\n \n"
+                                                          "Since the late 15th century they have "
+                                                          "primarily been constructed of brass tubing, usually bent "
+                                                          "twice into a rounded rectangular shape.", price_min=300,
+                     price_max=350, views=60)
+    i9.delivery_methods.add(d3)
+    i9.save()
 
     # Set userprofiles images
     set_image_profile(u1, "user1.jpg")
@@ -184,17 +415,23 @@ if __name__ == "__main__":
 
     set_image_item(i2, "shirt_1.jpg")
     set_image_item(i2, "shirt_2.jpg")
+    set_image_item(i2, "shirt_3.jpg")
 
     set_image_item(i3, "ring_1.jpg")
+    set_image_item(i3, "ring_2.jpg")
+    set_image_item(i3, "ring_3.jpg")
 
     set_image_item(i4, "newMouse_1.jpg")
-    set_image_item(i4, "newMouse_2.png")
+    set_image_item(i4, "newMouse_2.jpg")
     set_image_item(i4, "newMouse_3.jpg")
 
-    set_image_item(i5, "piano_1.png")
+    set_image_item(i5, "piano_1.jpg")
     set_image_item(i5, "piano_2.jpg")
+    set_image_item(i5, "piano_3.jpg")
 
     set_image_item(i6, "violin_1.jpg")
+    set_image_item(i6, "violin_2.jpg")
+    set_image_item(i6, "violin_3.jpg")
 
     set_image_item(i7, "flute_1.jpg")
     set_image_item(i7, "flute_2.jpg")
@@ -202,6 +439,7 @@ if __name__ == "__main__":
 
     set_image_item(i8, "electricGuitar_1.jpg")
     set_image_item(i8, "electricGuitar_2.jpg")
+    set_image_item(i8, "electricGuitar_3.jpg")
 
     set_image_item(i9, "trumpet_1.jpg")
     set_image_item(i9, "trumpet_2.jpg")
@@ -273,14 +511,14 @@ if __name__ == "__main__":
     Like.objects.create(user=u1, item=i9)
 
     # Create new offers with corresponding notifications (made automatically)
-    o1 = create_offer(i1, i4, "A good offer for my shoes")
-    o2 = create_offer(i5, i6, "A very good offer my piano")
-    o3 = create_offer(i3, i4, "A very very good offer for my old ring")
-    o4 = create_offer(i7, i9, "Please accept my offer for my flute")
+    o1 = create_offer(i1, i4, "A good offer for my shoes.")
+    o2 = create_offer(i5, i6, "A very good offer my piano.")
+    o3 = create_offer(i3, i4, "A very very good offer for my old ring.")
+    o4 = create_offer(i7, i9, "Please accept my offer for my flute.")
     # These offers will be not accepted or refused (not answered)
-    o5 = create_offer(i5, i3, "I want your precious ring")
-    o6 = create_offer(i8, i4, "I want your brand new mouse")
-    o7 = create_offer(i7, i3, "Give me the precious against this elfic flute")
+    o5 = create_offer(i5, i3, "I want your precious ring.")
+    o6 = create_offer(i8, i4, "I want your brand new mouse.")
+    o7 = create_offer(i7, i3, "Give me the precious against this elfic flute.")
 
     # Change read to True for new offers notifications 2 and 4
     n2 = Notification.objects.get(pk=2)
@@ -309,43 +547,86 @@ if __name__ == "__main__":
     o4.accepted = True
     o4.save()
 
-    # Change read to True for new accepted offer notification 6 and for new refused offer notification 8
-    n6 = Notification.objects.get(pk=6)
-    n6.read = True
-    n6.save()
+    # Change read to True for new accepted offer notification 7 and for new refused offer notification 9
+    n7 = Notification.objects.get(pk=7)
+    n7.read = True
+    n7.save()
 
-    n8 = Notification.objects.get(pk=8)
-    n8.read = True
-    n8.save()
+    n9 = Notification.objects.get(pk=9)
+    n9.read = True
+    n9.save()
 
     # Create new comments with corresponding notifications (made automatically)
-    co1 = create_comment(u1, i4, "I think this mouse is not a good deal.")
-    co2 = create_comment(u1, i5, "In my opinion, a piano can't be traded.")
+    co1 = create_comment(u2, i1, "Oh, this old shoes are so rare.")
+    co2 = create_comment(u3, i1, "Aren't those the shoes of a famous football player?")
+    co3 = create_comment(u4, i1, "But still, those shoes look smelly.")
+    co4 = create_comment(u5, i1, "I want to put those shoes on.")
 
-    co3 = create_comment(u2, i1, "Oh, this old shoes are so rare.")
-    co4 = create_comment(u2, i2, "Seriously, i don't think we can trade an old shirt. That is too ugly.")
+    co5 = create_comment(u1, i2, "I don't want this ugly shirt.")
+    co6 = create_comment(u4, i2, "I really need a shirt like this.")
+    co7 = create_comment(u5, i2, "This shirt is too expensive.")
+    co8 = create_comment(u6, i2, "Oh, this shirt has a nice color.")
 
-    co5 = create_comment(u3, i1, "Aren't those the shoes of a famous football player?")
-    co6 = create_comment(u3, i1, "But still, those shoes look smelly.")
+    co9 = create_comment(u2, i3, "I need the precious.")
+    co10 = create_comment(u3, i3, "I know the manufacturer of this ring.")
+    co11 = create_comment(u4, i3, "This ring reminds me of a film.")
 
-    co7 = create_comment(u4, i1, "I want to put those shoes on.")
+    co12 = create_comment(u1, i4, "I think this mouse is not a good deal.")
+    co13 = create_comment(u2, i4, "I really need a mouse like this.")
+    co14 = create_comment(u6, i4, "This mouse seems to break down.")
 
-    # Change read to True for new comments notifications 10 and 11
-    n10 = Notification.objects.get(pk=10)
-    n10.read = True
-    n10.save()
+    co15 = create_comment(u3, i5, "In my opinion, a piano can't be traded.")
+    co16 = create_comment(u4, i5, "A piano is too big to be traded.")
+    co17 = create_comment(u5, i5, "This piano is too expensive.")
 
+    co18 = create_comment(u2, i6, "This violin could be a big deal.")
+    co19 = create_comment(u3, i6, "This violin comes from a well know manufacturer.")
+    co20 = create_comment(u5, i6, "I don't really want a violin like this.")
+
+    co21 = create_comment(u1, i7, "This instrument could be a big deal.")
+    co22 = create_comment(u3, i7, "This flute comes from a well know manufacturer.")
+    co23 = create_comment(u5, i7, "That is a good deal.")
+
+    co24 = create_comment(u1, i8, "I need a new guitar.")
+    co25 = create_comment(u3, i8, "This guitar is not very expensive.")
+    co26 = create_comment(u4, i8, "I'm looking for a guitar like this.")
+
+    co27 = create_comment(u1, i9, "I need a new trumpet.")
+    co28 = create_comment(u2, i9, "This is a very good trumpet.")
+    co29 = create_comment(u3, i9, "I'm looking for a trumpet like this.")
+
+    # Change read to True for new comments notifications 11, 12, 15 and 16
     n11 = Notification.objects.get(pk=11)
     n11.read = True
     n11.save()
 
+    n12 = Notification.objects.get(pk=12)
+    n12.read = True
+    n12.save()
+
+    n15 = Notification.objects.get(pk=15)
+    n15.read = True
+    n15.save()
+
+    n16 = Notification.objects.get(pk=16)
+    n16.read = True
+    n16.save()
+
     # Create new notes with corresponding notifications (made automatically)
-    no1 = Note.objects.create(user=u2, offer=o1, text="Very good", note=5)
-    no2 = Note.objects.create(user=u2, offer=o2, text="Very bad", note=0)
+    no1 = Note.objects.create(user=u1, offer=o1, text="Very good", note=5)
+    no2 = Note.objects.create(user=u2, offer=o1, text="Not very good", note=3)
 
-    no3 = Note.objects.create(user=u1, offer=o4, text="Not too bad", note=3)
+    no3 = Note.objects.create(user=u2, offer=o2, text="Bad", note=1)
+    no4 = Note.objects.create(user=u3, offer=o2, text="Not recommended", note=0)
 
-    # Change read to True for new note notification 17
-    n17 = Notification.objects.get(pk=17)
-    n17.read = True
-    n17.save()
+    no5 = Note.objects.create(user=u3, offer=o4, text="Not too bad", note=2)
+    no6 = Note.objects.create(user=u4, offer=o4, text="Excellent transaction", note=5)
+
+    # Change read to True for new note notification 40 and 42
+    n40 = Notification.objects.get(pk=40)
+    n40.read = True
+    n40.save()
+
+    n42 = Notification.objects.get(pk=42)
+    n42.read = True
+    n42.save()

@@ -2,7 +2,7 @@ from django.db.models import Q
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 from offers.models import Offer
 from offers.serializers import CreateOfferSerializer, RetrieveOfferSerializer, UpdateOfferSerializer
@@ -39,7 +39,7 @@ class OfferViewSet(mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
 
     queryset = Offer.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == "create":
