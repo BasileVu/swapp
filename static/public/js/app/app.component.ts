@@ -78,6 +78,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.authService.getAccount().then(
             account => {
                 this.account = account;
+                this.authService.selectAccount(account);
             },
             error => this.toastr.error(error, "Error")
         )

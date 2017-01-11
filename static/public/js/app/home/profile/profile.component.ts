@@ -220,6 +220,6 @@ export class ProfileComponent implements OnInit {
     }
 
     seeMyProfile() {
-        this.profileService.selectProfileToShow(this.user)
+        this.authService.selectAccount(this.user);
     }
 }
