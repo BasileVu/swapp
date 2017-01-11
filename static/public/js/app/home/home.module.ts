@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // External angular2 libraries
 import { ImageCropperComponent } from 'ng2-img-cropper';
+import { RatingModule } from "ng2-rating";
 
 import { HomeComponent } from './home.component';
 import { routing }       from './home.routing';
@@ -39,7 +40,8 @@ import { UpdateGridDirective } from './items/update-grid.directive';
 import { UpdateCarouselDirective } from './items/update-carousel.directive';
 import { UpdateInventoryDirective } from './inventory/update-inventory.directive';
 import {MessagesModalComponent} from "./messages/messages-modal.component";
-
+import {XSRFStrategy, CookieXSRFStrategy} from "@angular/http";
+import {AuthService} from "../shared/authentication/authentication.service";
 
 @NgModule({
     imports: [
@@ -47,6 +49,7 @@ import {MessagesModalComponent} from "./messages/messages-modal.component";
         FormsModule,
         ReactiveFormsModule,
         routing,
+        RatingModule
     ],
     declarations: [
         InventoryComponent,

@@ -29,7 +29,7 @@ declare let $:any;
                 animate('0.2s 10 ease-out', style({transform: 'translateX(0) scale(0)'}))
             ])
         ])
-    ],
+    ]
 })
 export class SendPropositionModalComponent implements OnInit {
 
@@ -46,6 +46,7 @@ export class SendPropositionModalComponent implements OnInit {
     constructor(private offerService: OfferService,
                 private formBuilder: FormBuilder,
                 public toastr: ToastsManager) {
+
         offerService.offerModalSelected$.subscribe(
             offerArray => {
                 this.initOffer(offerArray);

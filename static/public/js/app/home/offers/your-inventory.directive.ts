@@ -20,7 +20,7 @@ export class YourInventoryDirective {
                     adaptiveHeight: true,
                     pageDots: true
                 });
-            }, 300);
+            }, 200);
 
         }
     }

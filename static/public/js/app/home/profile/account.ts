@@ -49,6 +49,10 @@ export class Location {
         this.region = region;
         this.country = country;
     }
+
+    public toString = () : string => {
+        return this.city + ", " + this.country;
+    }
 }
 
 export class Coordinates {
@@ -58,6 +62,24 @@ export class Coordinates {
     constructor(lat: number, lng: number) {
         this.latitude = lat;
         this.longitude = lng;
+    }
+}
+
+export class OfferGet {
+    id: number;
+    accepted: boolean;
+    answered: boolean;
+    comment: string;
+    item_given: number;
+    item_received: number;
+
+    constructor() {
+        this.id = 0;
+        this.accepted = false;
+        this.answered = false;
+        this.comment = "";
+        this.item_given = 0;
+        this.item_received = 0;
     }
 }
 
@@ -75,6 +97,7 @@ export class Account {
     notes: number;
     note_avg: number;
     coordinates: Coordinates;
+    pending_offers: Array<OfferGet>;
 
     constructor() {
         this.id = null;
@@ -83,12 +106,13 @@ export class Account {
         this.first_name = null;
         this.last_name = null;
         this.email = null;
-        this.location = new Location(null, null, null, null);
+        this.location = new Location("", "", "", "");
         this.last_modification_date = null;
         this.categories = [];
         this.items = [];
         this.notes = null;
         this.note_avg = null;
         this.coordinates = new Coordinates(null, null);
+        this.pending_offers = [];
     }
 }

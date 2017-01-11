@@ -12,6 +12,7 @@ import { Subscription }   from 'rxjs/Subscription';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 import { AuthService } from './shared/authentication/authentication.service';
+import {Account} from "./home/profile/account";
 
 declare let $:any;
 declare let google: any;
@@ -42,6 +43,7 @@ declare let google: any;
 export class AppComponent implements OnInit, AfterViewInit {
     loggedIn: boolean = false;
     subscription: Subscription;
+    account: Account = new Account();
 
     constructor (private http: Http,
                  private authService: AuthService,
@@ -50,14 +52,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.authService.getCSRF().then(
-            res => console.log(res),
-            error => console.log(error)
-        );
+        this.authService.getCSRF();
 
         // Listen for login changes
         this.subscription = this.authService.loggedInSelected$.subscribe(
-            loggedIn => this.loggedIn = loggedIn
+            loggedIn => {
+                this.loggedIn = loggedIn;
+                if (this.loggedIn)
+                    this.seeProfile();
+            }
         );
 
         // TODO : make a proper service to store geolocation
@@ -69,6 +72,15 @@ export class AppComponent implements OnInit, AfterViewInit {
         } else {
             console.log("Geolocation not available");
         }
+    }
+
+    seeProfile() {
+        this.authService.getAccount().then(
+            account => {
+                this.account = account;
+            },
+            error => this.toastr.error(error, "Error")
+        )
     }
 
     logout() {
