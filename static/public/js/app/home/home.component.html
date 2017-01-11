@@ -36,11 +36,6 @@
         (updateAccountEvent)="profile.getAccount()">
 </update-profile-modal>
 
-<add-item-modal
-        #addItemModal
-        (newItemEvent)="inventory.addItemEvent($event)">
-</add-item-modal>
-
 <edit-item-modal
         (editItemEvent)="inventory.editItemEvent($event)">
 </edit-item-modal>
@@ -62,6 +57,11 @@
 <profile-modal
         #profileModal>
 </profile-modal>
+
+<add-item-modal
+        #addItemModal
+        (newItemEvent)="inventory.addItemEvent($event)">
+</add-item-modal>
 
 <infos-modal></infos-modal>
 <messages-modal></messages-modal>
