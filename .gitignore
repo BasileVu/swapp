@@ -283,8 +283,6 @@ tests/report/
 
 # Created by https://www.gitignore.io/api/visu,visualstudiocode
 
-#!! ERROR: visu is undefined. Use list command to see defined gitignore types !!#
-
 ### VisualStudioCode ###
 .vscode/*
 .vscode/settings.json
@@ -292,12 +290,12 @@ tests/report/
 .vscode/launch.json
 
 ### JS ###
-static/public/js/app/**/*.js
-static/public/js/app/**/*.js.map
-static/public/js/vendor/
+backend/static/public/js/app/**/*.js
+backend/static/public/js/app/**/*.js.map
+backend/static/public/js/vendor/
 
 ### generated folders ###
-uploaded_media/
+backend/uploaded_media/
 
 ### CSS ###
 *.css.map
