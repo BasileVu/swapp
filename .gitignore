@@ -301,3 +301,7 @@ uploaded_media/
 
 ### CSS ###
 *.css.map
+/static/public/css
+
+### Fonts
+/static/public/fonts
