@@ -9,6 +9,23 @@ A project developped at HEIG-VD in the PDG course in a team of 5 people:
 
 It consists in a web platform on which users can trade objects. Various filters are provided to find objects, such as object proximity, price range, categories and so on.
 
+### Overview 
+![home](https://user-images.githubusercontent.com/2306585/31589874-b4b3dd16-b208-11e7-9026-9da8d014e863.jpg)
+*The home page with popular tradable items*
+
+
+![item-1](https://user-images.githubusercontent.com/2306585/31589959-a4c65856-b209-11e7-8674-cd0c40280c0a.jpg)
+![item-2](https://user-images.githubusercontent.com/2306585/31589993-ed00703e-b209-11e7-86e1-25426581c9fe.png)
+*Overview of an item with its various details and possible interactions*
+
+
+![swapp2](https://user-images.githubusercontent.com/2306585/31590032-3aa2a3e8-b20a-11e7-8aa7-1579a2327172.png)
+*Preview of a swap proposition*
+
+
+![search-advanced](https://user-images.githubusercontent.com/2306585/31590041-6bdd8b8a-b20a-11e7-8a64-8758c818ee05.jpg)
+*Various search filters can be applied, with advanced filters such as distance and/or price ranges*
+
 ## Installation
 
 ### Prerequisites
