@@ -1,4 +1,4 @@
 Django==1.10.4
 djangorestframework==3.5.3
-Pillow==3.4.2
+Pillow==4.3.0
 requests==2.12.3
