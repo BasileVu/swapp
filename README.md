@@ -5,7 +5,7 @@
 ## Description
 
 A project developped at HEIG-VD in the PDG course in a team of 5 people:
-[Sébastien Boson](https://github.com/sebastie-boson), [Antoine Drabble](https://github.com/servietsky777), [Sébastien Richoz](https://github.com/sebastienrichoz), [Mathieu Urstein](https://github.com/MathieuUrstein) and [Basile Vu](https://github.com/Flagoul).
+[Sébastien Boson](https://github.com/sebastie-boson), [Antoine Drabble](https://github.com/servietsky777), [Sébastien Richoz](https://github.com/sebastienrichoz), [Mathieu Urstein](https://github.com/MathieuUrstein) and [Basile Vu](https://github.com/BasileVu).
 
 It consists in a web platform on which users can trade objects. Various filters are provided to find objects, such as object proximity, price range, categories and so on.
 
