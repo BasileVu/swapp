@@ -1,6 +1,6 @@
 # Swapp
 
-[![Build Status](https://travis-ci.com/Flagoul/swapp.svg?token=EpMgztqGsgqLdu8HDosP&branch=master)](https://travis-ci.com/BasileVu/swapp)
+[![Build Status](https://travis-ci.com/BasileVu/swapp.svg?token=EpMgztqGsgqLdu8HDosP&branch=master)](https://travis-ci.com/BasileVu/swapp)
 
 ## Description
 
