@@ -36,7 +36,7 @@ It consists in a web platform on which users can trade objects. Various filters 
 ### Installation steps
 Begin by cloning the repo and go into it:
 ```
-$ git clone git@github.com:Flagoul/swapp.git
+$ git clone git@github.com:BasileVu/swapp.git
 $ cd swapp
 ```
 #### Install backend dependencies
